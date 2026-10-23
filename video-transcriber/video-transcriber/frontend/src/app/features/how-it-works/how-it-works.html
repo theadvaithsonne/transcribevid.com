@@ -1,0 +1,142 @@
+<div class="page how">
+  <header class="hero">
+    <h1 class="page-title">How {{ site.brand().name }} works</h1>
+    <p class="page-lead">
+      {{ site.brand().name }} turns the speech in a video or audio file into text with timestamps, in three simple steps.
+    </p>
+    <app-free-chips />
+    <a class="btn primary big" routerLink="/">Transcribe a file</a>
+  </header>
+
+  <section aria-labelledby="steps-title">
+    <h2 class="section-title" id="steps-title">3 simple steps</h2>
+    <ol class="steps">
+      <li>
+        <span class="num" aria-hidden="true">1</span>
+        <h3>Add your file</h3>
+        <p>Drop a video or audio file on the <a routerLink="/">home page</a>, or record from your microphone.</p>
+      </li>
+      <li>
+        <span class="num" aria-hidden="true">2</span>
+        <h3>Pick quality</h3>
+        <p>Choose Fastest, Standard, High accuracy or Best accuracy: Fastest is quickest, Best accuracy makes the fewest mistakes.</p>
+      </li>
+      <li>
+        <span class="num" aria-hidden="true">3</span>
+        <h3>Read, edit, download</h3>
+        <p>Watch the text appear live, fix any mistakes, then download it as SRT, VTT, TXT, Markdown, JSON or PDF.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="get-title">
+    <h2 class="section-title" id="get-title">What you get</h2>
+    <ul class="features">
+      <li>
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.5" /></svg>
+        </span>
+        <h3>Accurate text</h3>
+        <p>Usually very accurate on clear speech. Lines it is unsure about are marked, so you can check them first.</p>
+      </li>
+      <li>
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
+        </span>
+        <h3>Timestamps</h3>
+        <p>Every line has a time. Play the media from any line to hear what was said.</p>
+      </li>
+      <li>
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18" /></svg>
+        </span>
+        <h3>More than 50 languages</h3>
+        <p>Choose the spoken language or leave it on auto-detect. You can also translate speech into English.</p>
+      </li>
+      <li>
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 20l1-4L16.5 4.5a2 2 0 013 3L8 19l-4 1z" /></svg>
+        </span>
+        <h3>Edit it right here</h3>
+        <p>Change or delete a line, or search and replace. Your edits are in every download.</p>
+      </li>
+      <li>
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" /></svg>
+        </span>
+        <h3>Six ways to download</h3>
+        <p>SRT and VTT for subtitles, TXT and Markdown for reading, JSON for programs, or a PDF to print.</p>
+      </li>
+      <li>
+        <span class="ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>
+        </span>
+        <h3>Private</h3>
+        @switch (site.mode()) {
+          @case ('public') {
+            <p>No account and no tracking. Your files are kept only for your session and deleted automatically.</p>
+          }
+          @case ('local') {
+            <p>This copy runs on your own computer. Your files are processed on this machine and nothing leaves it.</p>
+          }
+          @default {
+            <p>Where your files are processed depends on how {{ site.brand().name }} is run.</p>
+          }
+        }
+      </li>
+    </ul>
+  </section>
+
+  <div class="two">
+    <section class="tips" aria-labelledby="tips-title">
+      <h2 id="tips-title">Tips for the best results</h2>
+      <ul>
+        <li><b>Choose the spoken language</b> instead of auto-detect.</li>
+        <li><b>Add a vocabulary hint</b>: names, brands and jargon, spelled the way you want them.</li>
+        <li><b>Pick High accuracy or Best accuracy</b> for difficult audio.</li>
+        <li><b>Re-transcribe</b> with another quality or language; your current transcript is kept.</li>
+        <li><b>Start from good audio</b>: little background noise, a close microphone, one person at a time. Keep "Enhance audio" on.</li>
+        <li><b>Check the marked lines</b> and fix them in the transcript editor.</li>
+      </ul>
+    </section>
+
+    <section class="know" aria-labelledby="know-title">
+      <h2 id="know-title">Good to know</h2>
+      <ul>
+        <li>
+          <b>File limits.</b>
+          @if (site.limitsText()) {
+            {{ site.limitsText() }} Larger or longer files are refused before they are processed, so split them first.
+          } @else {
+            No size or length limit is announced by the server right now. Very large files simply take longer.
+          }
+        </li>
+        <li><b>Speed.</b> It depends on the quality you pick, the length of the file and how busy the service is.</li>
+        @switch (site.mode()) {
+          @case ('public') {
+            <li>
+              <b>Nothing is saved for later.</b> Files and transcripts exist only for your session. Export what you need before you leave.
+              Details are in the <a routerLink="/privacy">Privacy policy</a>.
+            </li>
+          }
+          @case ('local') {
+            <li>
+              <b>Nothing is saved for later.</b> Transcripts exist only for this session, so export what you need. The
+              <a routerLink="/privacy">Privacy policy</a> describes the hosted website.
+            </li>
+          }
+        }
+        <li>
+          <b>Mistakes happen.</b> No speech recognition is perfect. Always verify a transcript before relying on it for anything important.
+        </li>
+      </ul>
+      <p class="more">More answers: <a routerLink="/faq">Frequently asked questions</a></p>
+    </section>
+  </div>
+
+  <div class="end">
+    <a class="btn big ghost" routerLink="/">Transcribe a file</a>
+  </div>
+
+  <app-related-tools />
+</div>

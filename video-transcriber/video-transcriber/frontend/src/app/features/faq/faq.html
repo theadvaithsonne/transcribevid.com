@@ -1,0 +1,144 @@
+<div class="page faq-page">
+  <header class="head">
+    <h1 class="page-title">Frequently asked questions</h1>
+    <p class="page-lead">Press a question to read its answer.</p>
+    <app-free-chips />
+  </header>
+
+  <div class="faq">
+    <details class="qa">
+      <summary>Is it really free and unlimited? Do I need to log in?<span class="pm" aria-hidden="true"></span></summary>
+      @if (site.isLocal()) {
+        <p>
+          Yes. It is free, and there is nothing to sign up for and no login. This copy runs on your own computer, so there is no quota and
+          no paywall; how fast it works depends on your computer.
+          @if (site.limitsText()) { {{ site.limitsText() }} }
+        </p>
+      } @else {
+        <p>
+          Yes. It is free, and there is no account or login, ever. There is no daily or monthly quota and no paywall.
+        </p>
+        <p>
+          To keep it fast for everyone, each file has a size and length limit.
+          @if (site.limitsText()) { {{ site.limitsText() }} }
+          Unusually heavy bursts of uploads may be asked to wait a little.
+        </p>
+      }
+    </details>
+
+    <details class="qa">
+      <summary>How accurate is it?<span class="pm" aria-hidden="true"></span></summary>
+      <p>
+        On clear speech in a supported language it is usually very accurate, but no speech recognition is perfect. Accuracy depends on the
+        audio quality, accents, background noise, overlapping speakers, music, and rare names or jargon. Every line has a confidence score,
+        and low-confidence lines are marked so you can check them first. Always verify a transcript before relying on it for anything
+        important.
+      </p>
+      <p>
+        <b>Why can results differ between runs, quality settings or other tools?</b> Speech recognition is probabilistic: it chooses the most
+        likely words, and in noisy or ambiguous passages several answers are close. A different quality setting, language setting,
+        vocabulary hint or audio clean-up can change the text, and so can another tool that uses a different system. Speaker names or labels are not added.
+      </p>
+    </details>
+
+    <details class="qa">
+      <summary>How do I get better accuracy?<span class="pm" aria-hidden="true"></span></summary>
+      <ul>
+        <li><b>Choose the spoken language</b> instead of auto-detect.</li>
+        <li><b>Add a vocabulary hint</b>: names, brands and jargon that appear in the audio, spelled the way you want them.</li>
+        <li><b>Pick High accuracy or Best accuracy</b> for difficult audio.</li>
+        <li><b>Re-transcribe</b> a finished transcript with another quality or language; your current transcript is kept.</li>
+        <li><b>Start from good audio</b>: less background noise, a close microphone, and one person speaking at a time. Keep "Enhance audio" on.</li>
+        <li><b>Check the marked lines</b> and fix them in the transcript editor.</li>
+      </ul>
+    </details>
+
+    <details class="qa">
+      <summary>Which languages are supported?<span class="pm" aria-hidden="true"></span></summary>
+      <p>
+        More than 50 languages, including English, Spanish, French, German, Portuguese, Italian, Dutch, Russian, Arabic, Hindi, Chinese,
+        Japanese and Korean. Leave the language on auto-detect or choose it yourself. You can also translate speech into English.
+      </p>
+      @if (store.languages().length) {
+        <details class="langs-box">
+          <summary>Show all {{ store.languages().length }} languages</summary>
+          <ul class="langs">
+            @for (l of store.languages(); track l.code) {
+              <li>{{ l.name }}</li>
+            }
+          </ul>
+        </details>
+      }
+    </details>
+
+    <details class="qa">
+      <summary>Which files can I use, and what are the limits?<span class="pm" aria-hidden="true"></span></summary>
+      <p>
+        <b>File types.</b> Video: MP4, MKV, MOV, AVI, WEBM, WMV, FLV, M4V, 3GP, TS and MTS. Audio: MP3, WAV, M4A, AAC, FLAC, OGG and OPUS. You can
+        also record straight from your microphone.
+      </p>
+      @if (site.limitsText()) {
+        <p><b>Limits.</b> {{ site.limitsText() }} Larger or longer files are refused before they are processed, so split them first.</p>
+      } @else {
+        <p><b>Limits.</b> No size or length limit is announced by the server right now. Very large files simply take longer.</p>
+      }
+      <p>If the service is busy or too many transcripts are already running, it asks you to wait and says why.</p>
+    </details>
+
+    <details class="qa">
+      <summary>How long does it take?<span class="pm" aria-hidden="true"></span></summary>
+      <p>
+        It depends on the quality you pick, the length of the file and how busy the service is. Fastest is quick; Best accuracy takes
+        longest but makes the fewest mistakes. Progress and the time left are shown live, and a file waiting for its turn shows "Waiting in
+        queue".
+      </p>
+    </details>
+
+    <details class="qa">
+      <summary>Is my data private?<span class="pm" aria-hidden="true"></span></summary>
+      @switch (site.mode()) {
+        @case ('public') {
+          <p>
+            Your files are uploaded to our server so they can be processed there. They are kept only for your session and deleted
+            automatically when it ends@if (site.idleText()) {, after {{ site.idleText() }} of inactivity}, or right away when you press
+            <b>Delete my data now</b> in the Transcripts menu. There is no account and no tracking, and the only cookie is one essential session
+            cookie (no analytics or advertising cookies).
+          </p>
+          <p>
+            Files and transcripts exist only for your session. Export what you need before you leave. The only thing we keep is one
+            anonymous running total of how many files have been transcribed on the site (a single number, shown in the page header); it is
+            not linked to you, your files or your session. Details are in the <a routerLink="/privacy">Privacy policy</a>.
+          </p>
+        }
+        @case ('local') {
+          <p>
+            This copy of {{ site.brand().name }} runs on your own computer. Your files are processed on this machine and nothing leaves it.
+            Nothing is saved permanently: transcripts exist only for this session, so export what you need. The
+            <a routerLink="/privacy">Privacy policy</a> describes the hosted website.
+          </p>
+        }
+        @default {
+          <p>
+            Where your files are processed depends on how {{ site.brand().name }} is run, and the server did not answer just now. See the
+            <a routerLink="/privacy">Privacy policy</a>.
+          </p>
+        }
+      }
+    </details>
+
+    <details class="qa">
+      <summary>Can I edit the transcript?<span class="pm" aria-hidden="true"></span></summary>
+      <p>
+        Yes. Use the pencil next to a line to change its text or delete the line, or search and replace across the whole transcript. Your
+        edits are included in every export.
+      </p>
+    </details>
+  </div>
+
+  <div class="end">
+    <a class="btn primary big" routerLink="/">Transcribe a file</a>
+    <p class="still">Still stuck? <a routerLink="/how-it-works">Read How it works</a></p>
+  </div>
+
+  <app-related-tools />
+</div>

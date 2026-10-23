@@ -1,0 +1,785 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* The landing page, kept deliberately simple: a title with three chips, one place for the file, and one card with the
+   quality, the language and the big Transcribe button. One main button at a time ("Choose a file" until a file is chosen,
+   then "Transcribe"). From 1000px wide the two parts sit side by side and the page fits the window without scrolling;
+   below that it is one column that scrolls. Flat: solid colours, 1px borders, no shadows or gradients. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.upload {
+  --gap-y: clamp(14px, 2.4vh, 28px);
+  --pad: clamp(18px, 2.6vh, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-y);
+  height: 100%;
+  padding: clamp(16px, 3vh, 32px) var(--gutter) var(--gap-y);
+}
+
+/* ------------------------------------------------------------------ title + chips */
+.hero {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  .page-title {
+    font-size: var(--fs-h2);
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+  }
+}
+.trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    --c: var(--tint-sky);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 3px 16px 3px 5px;
+    border-radius: 999px;
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.3;
+  }
+  .ck {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--tint-ink);
+    color: var(--c);
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ two parts side by side from 1000px */
+.layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 580px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap-y) clamp(18px, 2vw, 32px);
+}
+@media (min-width: 1000px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) minmax(420px, 500px);
+    grid-template-rows: minmax(0, 1fr);
+  }
+}
+.col-files {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ------------------------------------------------------------------ the file */
+.drop {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 150px;
+  padding: var(--pad);
+  border: 2px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  text-align: center;
+  /* a file is chosen: the file is shown right here, with a quieter "Add another file" under it */
+  &.has-files {
+    gap: 12px;
+    .drop-icon,
+    .drop-hint {
+      display: none;
+    }
+    .drop-label {
+      gap: 0;
+    }
+  }
+  &.disabled {
+    opacity: 0.6;
+    .drop-label {
+      cursor: not-allowed;
+    }
+  }
+}
+.drop-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  max-width: 520px;
+  cursor: pointer;
+}
+.drop-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+  color: var(--text-strong);
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
+.choose {
+  min-width: 240px;
+}
+#file:focus-visible + .drop-label .choose {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+}
+.drop-hint {
+  max-width: 44ch;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+/* the microphone: a quiet text button, not a second main button */
+.rec {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--line-strong);
+  cursor: pointer;
+  &:hover:not(:disabled) {
+    background: var(--surface-2);
+    text-decoration-color: currentColor;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  &.on {
+    color: var(--err);
+  }
+}
+.rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--err);
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* drop a file anywhere: the whole window says so */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  pointer-events: none;
+}
+.drop-overlay-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(560px, 100%);
+  padding: 48px 24px;
+  border: 3px dashed var(--primary-bright);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--text-strong);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------------ chosen files */
+.files {
+  flex: none;
+  width: 100%;
+  max-width: 560px;
+  max-height: 260px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  li {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 6px 8px 12px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    font-size: 18px;
+    text-align: left;
+  }
+  .ficon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: var(--r-sm);
+    background: var(--surface-2);
+    color: var(--text-strong);
+  }
+  .fname {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 650;
+  }
+  .fsize {
+    color: var(--muted);
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .x {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 0;
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    &:hover {
+      color: var(--err);
+      background: var(--surface-2);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ settings card */
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-y);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--pad);
+}
+.settings-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--gap-y);
+  min-height: 0;
+  margin: -4px;
+  padding: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.quality {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  legend {
+    margin: 0 0 10px;
+    padding: 0;
+    font-size: var(--fs-lg);
+    font-weight: 800;
+    color: var(--text-strong);
+  }
+}
+.quality-help {
+  min-height: 1.45em;
+  margin: 10px 0 0;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+/* a choice: a radio dot, the name, one word under it. Picked = 2px outline + soft background. */
+.preset {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 9px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  cursor: pointer;
+  .dot {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--line-strong);
+    border-radius: 50%;
+    background: var(--surface);
+  }
+  .words {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  b {
+    font-size: 18px;
+    font-weight: 750;
+    line-height: 1.25;
+    color: var(--text-strong);
+  }
+  .sub {
+    font-size: 16px;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+  &:hover:not(.sel):not(.na) {
+    background: var(--surface-2);
+  }
+  &.sel {
+    padding: 8px 12px;
+    border: 2px solid var(--primary-bright);
+    background: var(--surface-2);
+    .dot {
+      border: 7px solid var(--primary-bright);
+    }
+  }
+  &.na {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  &:has(input:focus-visible) {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+}
+
+/* ------------------------------------------------------------------ language + more options */
+.lang-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 16px;
+  .field {
+    flex: 1 1 200px;
+  }
+}
+.field {
+  gap: 6px;
+  > label {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+  select {
+    min-height: 50px;
+    padding-block: 8px;
+    font-size: 18px;
+  }
+}
+.more-toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 50px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--line-strong);
+  cursor: pointer;
+  &:hover {
+    text-decoration-color: currentColor;
+  }
+  .chev {
+    flex: none;
+    transition: transform 0.2s var(--ease);
+    &.open {
+      transform: rotate(180deg);
+    }
+  }
+}
+.more-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  textarea {
+    min-height: 76px;
+    font-size: 18px;
+  }
+}
+.checks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.check {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 8px 0;
+  font-size: 17px;
+  line-height: 1.5;
+  cursor: pointer;
+  input {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    margin: 1px 0 0;
+    accent-color: var(--primary-bright);
+    cursor: pointer;
+  }
+  span {
+    color: var(--muted);
+  }
+  b {
+    color: var(--text-strong);
+    font-weight: 650;
+  }
+}
+input[type='range'] {
+  width: 100%;
+  height: 32px;
+  accent-color: var(--primary-bright);
+}
+
+/* ------------------------------------------------------------------ the big button */
+.submit {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 8px;
+  .go {
+    width: 100%;
+    min-height: 58px;
+    /* no file yet: clearly waiting, and it says why */
+    &:disabled {
+      opacity: 1;
+      background: var(--surface-2);
+      border-color: var(--line-strong);
+      color: var(--muted);
+    }
+  }
+}
+.note {
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--muted);
+  a {
+    color: var(--accent);
+    text-underline-offset: 3px;
+  }
+}
+
+/* ------------------------------------------------------------------ errors + upload progress */
+.alert {
+  flex: none;
+  padding: 12px 16px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 2px solid var(--err);
+  font-size: 17px;
+  line-height: 1.45;
+  overflow-y: auto;
+  max-height: 120px;
+}
+.upload-card {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  &.done {
+    border: 2px solid var(--ok);
+  }
+}
+.up-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.up-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  .up-label {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  b {
+    font-size: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+.pct {
+  flex: none;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+  small {
+    margin-left: 2px;
+    font-size: 18px;
+    color: var(--muted);
+  }
+}
+.big-bar {
+  height: 12px;
+  > i {
+    width: 100%;
+    border-radius: 0;
+    background: var(--primary-bright);
+    transform-origin: left center;
+    transition: transform 0.3s var(--ease);
+  }
+}
+.up-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.up-meta,
+.up-sub,
+.up-keep {
+  margin: 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+.ok-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  b {
+    font-size: 18px;
+  }
+}
+.tick {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ok);
+  color: var(--bg);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* ------------------------------------------------------------------ short laptop windows: spacing shrinks so it still fits */
+@media (min-width: 1000px) and (max-height: 760px) {
+  .upload {
+    --gap-y: 12px;
+    --pad: 16px;
+  }
+  .note {
+    display: none;
+  }
+  .drop-icon {
+    width: 52px;
+    height: 52px;
+  }
+  .preset {
+    min-height: 56px;
+  }
+}
+@media (min-width: 1000px) and (max-height: 640px) {
+  .upload {
+    --gap-y: 8px;
+    padding-top: 10px;
+  }
+  .drop-icon {
+    display: none;
+  }
+  .quality legend {
+    margin-bottom: 6px;
+  }
+  .quality-help {
+    margin-top: 6px;
+  }
+  .submit .go {
+    min-height: 52px;
+  }
+}
+
+/* ------------------------------------------------------------------ below 1000px: one column, the page scrolls */
+@media (max-width: 999px) {
+  .upload {
+    --gap-y: 22px;
+    --pad: 20px;
+    height: auto;
+    min-height: 100%;
+    padding: 20px var(--gutter) 28px;
+  }
+  .layout {
+    flex: none;
+    max-height: none;
+  }
+  .settings-body {
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+  .drop {
+    flex: none;
+    min-height: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ phones */
+@media (max-width: 719px) {
+  .upload {
+    padding-top: 16px;
+  }
+  .hero {
+    gap: 12px;
+    .page-title {
+      font-size: 28px;
+    }
+  }
+  .drop {
+    padding: 22px 16px 14px;
+    &.has-files {
+      padding: 14px 12px 10px;
+    }
+  }
+  .drop-label {
+    width: 100%;
+    max-width: none;
+  }
+  .drop-icon {
+    width: 56px;
+    height: 56px;
+  }
+  .choose {
+    width: 100%;
+    min-width: 0;
+  }
+  .dnd {
+    display: none;
+  }
+  .drop-hint {
+    font-size: 16px;
+  }
+  .rec {
+    width: 100%;
+    justify-content: center;
+    min-height: 50px;
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    text-decoration: none;
+  }
+  /* the settings are not a card on a phone: just the controls */
+  .settings {
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .preset {
+    gap: 10px;
+    padding-inline: 11px;
+    &.sel {
+      padding-inline: 10px;
+    }
+    b {
+      font-size: 17px;
+    }
+  }
+  .lang-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    .field {
+      flex: none;
+    }
+  }
+  .more-toggle {
+    width: 100%;
+    justify-content: space-between;
+    padding: 8px 16px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    text-decoration: none;
+  }
+  .note {
+    display: none;
+  }
+  /* once a file is chosen the button stays at the bottom of the screen */
+  .ready .submit {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 10px var(--gutter) max(10px, env(safe-area-inset-bottom));
+    background: var(--bg);
+    border-top: 1px solid var(--line);
+  }
+}
+@media (max-width: 359px) {
+  .presets {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

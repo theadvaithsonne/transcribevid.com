@@ -1,0 +1,8 @@
+fastapi>=0.115
+uvicorn>=0.30
+faster-whisper>=1.1
+imageio-ffmpeg>=0.5
+numpy
+# PDF export: fpdf2 lays out the pages; uharfbuzz shapes Arabic/Hindi/Thai/... (fpdf2 < 2.8.3 cannot switch shaping off again)
+fpdf2>=2.8.3
+uharfbuzz>=0.39

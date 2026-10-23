@@ -1,0 +1,80 @@
+/* Shared by the privacy policy and the terms: one plain, readable column, centred inside the reading page.
+   Big text (the --fs-lg token, 20-24px) with generous line spacing and high contrast. Plain headings, a plain "last
+   updated" line, and one short summary box (a white card with a thin border); nothing else is boxed or coloured. */
+:host {
+  display: block;
+}
+.doc {
+  max-width: 820px;
+  margin-inline: auto;
+  font-size: var(--fs-lg);
+  line-height: 1.75;
+  color: var(--text);
+  b {
+    color: var(--text-strong);
+  }
+  a:not(.btn) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+  }
+  a:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+  h2 {
+    margin: 48px 0 12px;
+    font-size: clamp(24px, 2vw, 30px);
+    font-weight: 750;
+  }
+  /* the one box: the short summary at the top */
+  .lede {
+    margin: 0 0 24px;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    font-size: var(--fs-lg);
+    line-height: 1.6;
+    color: var(--text-strong);
+  }
+  /* the note for people running their own copy: plain words in bold, no box */
+  .callout {
+    margin: 0 0 24px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+}
+.doc-head {
+  margin-bottom: 32px;
+  h1 {
+    margin-bottom: 8px;
+  }
+  .updated {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+  }
+}
+.end {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 560px) {
+  .doc h2 {
+    margin-top: 40px;
+  }
+  .doc .lede {
+    padding: 16px 18px;
+  }
+  .end .btn {
+    width: 100%;
+  }
+}

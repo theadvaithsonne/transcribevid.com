@@ -1,0 +1,82 @@
+# TranscribeVid production stack:  internet -> caddy (HTTPS on 80/443) -> app (port 8000, internal only)
+#
+#   cp deploy/.env.example deploy/.env      # then edit it
+#   docker compose up -d --build
+#
+# Full guide: deploy/README.md
+
+name: transcribevid
+
+# Rotate container logs so they can never fill the disk (and are forgotten after ~30 MB per container).
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  app:
+    build:
+      context: .
+    image: transcribevid-app:latest
+    env_file: deploy/.env
+    restart: unless-stopped
+    # On SIGTERM the app deletes every visitor's files before exiting (~5 s); do not SIGKILL it earlier.
+    stop_grace_period: 20s
+    # Tiny init process as PID 1: forwards SIGTERM and reaps the ffmpeg child processes of cancelled jobs.
+    init: true
+    logging: *default-logging
+    # Healthcheck: inherited from the Dockerfile (GET /api/health every 30 s). caddy starts only once it is healthy.
+
+    # No "ports:" on purpose: the app is only reachable from caddy, over the compose network.
+
+    # Hardening: the root filesystem is read-only; only /tmp, /data/models, /data/session and /data/stats are writable.
+    read_only: true
+    tmpfs:
+      - /tmp:size=1g
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # Whisper models (0.15 - 3 GB each): safe to delete, models are re-downloaded.
+      - models:/data/models
+      # Uploads and decoded audio of the visitors currently online. The app empties it on exit and whenever a
+      # session goes idle. A volume (disk), not tmpfs (RAM): a queue of large uploads would exhaust memory.
+      - scratch:/data/session
+      # The "videos transcribed" counter: ONE small JSON file holding a single integer and a timestamp (no visitor
+      # data, so it is not personal data). A volume so that deploys, updates and restarts do not reset the number.
+      # It is a folder, not a single-file mount, because the app replaces the file atomically through a temp file.
+      # Never run "docker compose down -v" or "docker volume rm" on it unless you want the counter to start at 0.
+      - stats:/data/stats
+
+    # Optional resource limits (uncomment). Without them the app may use the whole machine, and a runaway
+    # job could starve caddy and sshd too. Example for 8 vCPU / 16 GB: leave ~1 core and ~4 GB to the OS.
+    # cpus: 7
+    # mem_limit: 12g
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    # Only ACME_EMAIL is read from this file; keeping one env file avoids a second one to maintain.
+    env_file: deploy/.env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates and the Let's Encrypt account. Keep this volume: re-issuing is rate-limited.
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    logging: *default-logging
+
+volumes:
+  models:
+  scratch:
+  stats:
+  caddy_data:
+  caddy_config:

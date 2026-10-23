@@ -1,0 +1,102 @@
+# TranscribeVid - Caddy v2 reverse proxy: automatic HTTPS (Let's Encrypt), redirects, security headers.
+#
+# Used as /etc/caddy/Caddyfile by the "caddy" service in docker-compose.yml. For a non-Docker install change
+# "app:8000" to "127.0.0.1:8000" (deploy/README.md, section 11). Validate after editing:
+#   docker compose run --rm --no-deps caddy caddy validate --config /etc/caddy/Caddyfile
+
+{
+	# Contact address sent to Let's Encrypt; set ACME_EMAIL in deploy/.env (Caddy fails to start without it).
+	email {$ACME_EMAIL}
+
+	# FIRST TESTS ONLY: uncomment to get untrusted certificates from Let's Encrypt's staging CA, which has far more
+	# generous rate limits. Test with `curl -k`, not a browser (the HSTS header below makes browsers refuse an
+	# untrusted certificate with no way to click through). Re-comment it and restart caddy to get real certificates;
+	# Caddy keeps staging and production certificates apart.
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+
+	servers {
+		timeouts {
+			# Drop clients that dribble in their request headers. read_body and write are deliberately NOT set:
+			# uploads of hundreds of MB over slow links and hour-long event streams must not be cut off.
+			read_header 30s
+		}
+	}
+}
+
+# www -> bare domain (the app redirects too, this just does it before reaching the app). Needs its own DNS record.
+www.transcribevid.com {
+	redir https://transcribevid.com{uri} permanent
+}
+
+transcribevid.com {
+	# Access log: JSON on stdout (docker compose logs caddy), kept short by Docker's log rotation (docker-compose.yml).
+	# Privacy: the request URL carries the uploaded file's name and, for the operator log API, the admin token as
+	# ?filename=...&token=..., so everything from "?" on is cut from the logged URI, and all request and response
+	# headers (Cookie, Referer, User-Agent, ...) are dropped. The visitor's IP address (remote_ip / client_ip) IS
+	# logged: keep it for abuse handling and say so in the Privacy page, or add the two lines
+	#   request>remote_ip ip_mask 24 64
+	#   request>client_ip ip_mask 24 64
+	# inside the filter block to store truncated addresses (last 8 bits of IPv4, last 64 bits of IPv6) instead.
+	log {
+		output stdout
+		format filter {
+			wrap json
+			request>uri regexp [?].*$ ""
+			request>headers delete
+			resp_headers delete
+		}
+	}
+
+	# Compress text only. A positive list keeps text/event-stream (live progress) and media/PDF/zip downloads
+	# uncompressed; Caddy's built-in default list contains "text/*", which would include the event stream.
+	# Covers the pages (html), the app (js, css), data (json, manifest, xml incl. sitemap.xml), svg and the text exports.
+	# The app already gzips these itself (VT_COMPRESS=1); Caddy passes such answers through and compresses the rest.
+	encode zstd gzip {
+		match {
+			header Content-Type text/html*
+			header Content-Type text/css*
+			header Content-Type text/javascript*
+			header Content-Type text/plain*
+			header Content-Type text/vtt*
+			header Content-Type text/xml*
+			header Content-Type application/javascript*
+			header Content-Type application/json*
+			header Content-Type application/manifest+json*
+			header Content-Type application/xml*
+			header Content-Type image/svg+xml*
+		}
+	}
+
+	# Largest accepted upload (decimal units: 600MB = 600,000,000 bytes) - a safety net above VT_MAX_UPLOAD_MB (500 MiB
+	# = 524 MB). The app answers oversize uploads with a friendly message; this only stops runaway bodies.
+	request_body {
+		max_size 600MB
+	}
+
+	header {
+		# One year; add "; preload" only after you have checked that every subdomain you will ever use serves https.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "microphone=(self), camera=(), geolocation=()"
+		-Server
+		# Apply after the app has answered, so these values win if the app sets the same headers.
+		defer
+	}
+
+	reverse_proxy app:8000 {
+		# Send response bytes to the visitor immediately (live progress over Server-Sent Events). Request bodies
+		# (uploads) are streamed to the app as they arrive; Caddy does not buffer them either.
+		flush_interval -1
+
+		transport http {
+			dial_timeout 5s
+			# Max wait for the app's next read/write. Reads cover a whole upload: the app answers only after the
+			# last byte arrived, so keep this above the slowest upload you want to allow (1h = 500 MB at ~1.2 Mbit/s).
+			# The progress stream sends a keep-alive every 0.5 s, so it never idles into this limit.
+			read_timeout 1h
+			write_timeout 10m
+		}
+	}
+}

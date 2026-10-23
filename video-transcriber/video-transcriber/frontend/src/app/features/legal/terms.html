@@ -1,0 +1,102 @@
+<!-- TEMPLATE: review with a lawyer before launch -->
+<div class="page-doc">
+<article class="doc">
+  <header class="doc-head">
+    <h1>Terms of use</h1>
+    <p class="updated">Last updated: {{ updated }}</p>
+  </header>
+
+  @if (site.isLocal()) {
+    <p class="callout" role="note">
+      You are running {{ site.brand().name }} on your own computer. These terms describe the hosted website at {{ site.brand().domain }}.
+    </p>
+  }
+
+  <h2>1. Agreement</h2>
+  <p>
+    By using {{ site.brand().name }} ({{ site.brand().domain }}) you agree to these terms. If you do not agree, please do not use the service. The
+    service is operated by <mark class="placeholder">[Operator / company name and address]</mark>.
+  </p>
+
+  <h2>2. The service</h2>
+  <p>
+    {{ site.brand().name }} turns video and audio files into text. It is free to use and needs no account. We may change, limit or stop features at
+    any time.
+  </p>
+
+  <h2>3. Your content</h2>
+  <p>
+    You keep all rights in the files you upload and the transcripts made from them. You allow us to process them only to provide the service to
+    you. You are responsible for what you upload: only upload content you own or have the right to process, including any permission needed from
+    the people who speak in it.
+  </p>
+
+  <h2>4. Acceptable use</h2>
+  <p>You agree not to:</p>
+  <ul>
+    <li>upload content that is illegal, or that infringes someone else's rights;</li>
+    <li>use the service to harass, harm or deceive others;</li>
+    <li>use scripts, bots or other automated means, or bulk or commercial-scale automated use, without our written permission;</li>
+    <li>bypass or try to bypass the limits, rate limits or security of the service, or interfere with its operation or other visitors' use of it;</li>
+    <li>upload malware or anything meant to damage the service.</li>
+  </ul>
+  <p>We may remove content and block access if these rules are broken.</p>
+
+  <h2>5. Limits</h2>
+  <p>
+    To keep the service fair for everyone it has limits.
+    @if (site.limitsText()) { {{ site.limitsText() }} }
+    There are also limits on how fast and how many files you can send, and how many transcripts can run at the same time. Your session and everything in
+    it is deleted automatically after
+    @if (site.idleText()) { {{ site.idleText() }} } @else { a period }
+    of inactivity. See the <a routerLink="/privacy">Privacy policy</a>.
+  </p>
+
+  <h2>6. Accuracy: no warranty</h2>
+  <p>
+    Transcripts are produced automatically and will contain mistakes, especially with noisy audio, strong accents, overlapping speakers, music, and
+    names or technical terms. Always check a transcript before relying on it, particularly for legal, medical, financial or published use. The service
+    is provided "as is" and "as available", without any warranty, express or implied, including about accuracy, completeness or fitness for a
+    particular purpose.
+  </p>
+
+  <h2>7. Availability</h2>
+  <p>
+    We do not promise that the service will always be available, uninterrupted or error-free. It may be unavailable for maintenance, because of
+    capacity limits, or for reasons outside our control. Because data is kept only for your session, always export what you need.
+  </p>
+
+  <h2>8. Liability</h2>
+  <p>
+    To the extent the law allows, we are not liable for indirect or consequential loss, loss of data, profits or business, or for any loss arising from
+    your use of, or inability to use, the service or from errors in a transcript. Nothing in these terms limits liability that cannot be limited by
+    law.
+  </p>
+
+  <h2>9. Termination</h2>
+  <p>
+    You can stop using the service at any time and delete your data with <b>Delete my data now</b>. We may suspend or end your access at any time,
+    in particular if you break these terms.
+  </p>
+
+  <h2>10. Changes</h2>
+  <p>We may update these terms. The new version appears on this page with a new "Last updated" date, and applies from then on.</p>
+
+  <h2>11. Governing law</h2>
+  <p>These terms are governed by <mark class="placeholder">[Governing law and jurisdiction]</mark>.</p>
+
+  <h2>12. Contact</h2>
+  <p>
+    Questions about these terms:
+    @if (site.contactEmail(); as mail) {
+      <a [href]="'mailto:' + mail">{{ mail }}</a>.
+    } @else {
+      <mark class="placeholder">[Contact e-mail address]</mark>.
+    }
+  </p>
+
+  <div class="end">
+    <a class="btn big ghost" routerLink="/">Transcribe a file</a>
+  </div>
+</article>
+</div>

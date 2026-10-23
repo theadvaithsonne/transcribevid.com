@@ -1,0 +1,113 @@
+<!-- TEMPLATE: review with a lawyer before launch -->
+<div class="page-doc">
+<article class="doc">
+  <header class="doc-head">
+    <h1>Privacy policy</h1>
+    <p class="updated">Last updated: {{ updated }}</p>
+  </header>
+
+  @if (site.isLocal()) {
+    <p class="callout" role="note">
+      You are running {{ site.brand().name }} on your own computer. Nothing you add is sent to {{ site.brand().domain }} or to anyone else:
+      files are processed on this machine. The policy below describes the hosted website at {{ site.brand().domain }}.
+    </p>
+  }
+
+  <p class="lede">
+    {{ site.brand().name }} turns video and audio into text. This page explains what that involves for your data, in plain words. In short:
+    your files and transcripts are kept only for your session, there is no account, no tracking and no advertising.
+  </p>
+
+  <h2>1. Who runs this website</h2>
+  <p>
+    {{ site.brand().name }} ({{ site.brand().domain }}) is operated by <mark class="placeholder">[Operator / company name and address]</mark>
+    ("we", "us"). We decide how and why your data is processed, as described here.
+  </p>
+
+  <h2>2. What we process</h2>
+  <ul>
+    <li><b>Media you add.</b> The video or audio files you upload or record, so that the speech in them can be recognised.</li>
+    <li>
+      <b>Text we generate.</b> The transcript, its timestamps and your edits, the title you choose, and the settings you pick
+      (quality, language, vocabulary hint).
+    </li>
+    <li>
+      <b>Technical logs.</b> Basic operating information such as the time of a request, what was requested, the result or error, file sizes, a
+      random session identifier and your IP address. They never contain the content of your media or transcripts. We use them to run the service,
+      fix errors and prevent abuse (for example, rate limiting).
+    </li>
+    <li>
+      <b>One running total.</b> We keep one anonymous running total of how many files have been transcribed on the site (a single number,
+      shown in the page header). It is not linked to you, your files or your session.
+    </li>
+  </ul>
+  <p>We do not ask for your name, e-mail address or any other account details.</p>
+
+  <h2>3. Why we process it</h2>
+  <p>
+    To give you the transcription you asked for, and to keep the service secure and available for everyone. Where data protection law such as the
+    GDPR applies, our legal bases are providing the service you requested (Art. 6(1)(b)) and our legitimate interest in security and preventing
+    abuse (Art. 6(1)(f)).
+  </p>
+
+  <h2>4. How long we keep it</h2>
+  <ul>
+    <li>
+      <b>Files and transcripts exist only for your session.</b> They are deleted automatically when it ends, which happens after
+      @if (site.idleText()) { {{ site.idleText() }} } @else { a period }
+      of inactivity, or at once when you press <b>Delete my data now</b> in the Transcripts menu.
+    </li>
+    <li>Apart from that single number, nothing is stored permanently. We do not keep copies or backups of your files or transcripts, and a restart of the service also clears them.</li>
+    <li>Technical logs are kept only for a limited time for operations and abuse prevention, and contain no media or transcript content.</li>
+  </ul>
+  <p>Because your transcripts exist only in your browser session, export what you need before you leave. Deleted data cannot be recovered.</p>
+
+  <h2>5. Cookies and browser storage</h2>
+  <ul>
+    <li>
+      <b>One essential session cookie.</b> It holds a random session identifier so that your files and transcripts stay separate from other visitors'
+      and so that the service works at all. It is strictly necessary, so there is no cookie banner.
+    </li>
+    <li><b>No analytics, advertising or tracking cookies</b>, and no third-party scripts, fonts or trackers on this website.</li>
+    <li>
+      Your browser remembers your light or dark theme choice, and its session storage keeps a few convenience settings for the current tab
+      (such as your last quality choice). They stay in your browser and are not sent to us.
+    </li>
+  </ul>
+
+  <h2>6. Sharing</h2>
+  <p>
+    We do not sell your data and we do not share your files or transcripts with third parties. The recognition runs on our own server, not on an
+    external transcription or AI service. If hosting or network providers are involved, they only act as technical service providers on our
+    behalf. We may disclose information if the law requires it.
+  </p>
+
+  <h2>7. Security</h2>
+  <p>
+    Data travels between your browser and our server over an encrypted connection (HTTPS), and each session is kept separate from other visitors'
+    sessions. No system is perfectly secure, so please do not upload anything you are not comfortable processing this way.
+  </p>
+
+  <h2>8. Your rights and choices</h2>
+  <p>
+    You are in control: delete everything at any time with <b>Delete my data now</b>, or by simply ending your session. Because we hold no account and
+    no details that identify you, we usually cannot link stored data to a person. Where the law gives you rights over your personal data, such as
+    access, correction, deletion, restriction, objection and portability, or the right to complain to your data protection authority, you can
+    exercise them by contacting us:
+    @if (site.contactEmail(); as mail) {
+      <a [href]="'mailto:' + mail">{{ mail }}</a>.
+    } @else {
+      <mark class="placeholder">[Contact e-mail address]</mark>.
+    }
+  </p>
+
+  <h2>9. Changes to this policy</h2>
+  <p>If we change this policy, the new version appears on this page with a new "Last updated" date.</p>
+
+  <p>See also the <a routerLink="/terms">Terms of use</a>, <a routerLink="/how-it-works">How it works</a> and the <a routerLink="/faq">FAQ</a>.</p>
+
+  <div class="end">
+    <a class="btn big ghost" routerLink="/">Transcribe a file</a>
+  </div>
+</article>
+</div>

@@ -1,0 +1,181 @@
+@if (sessionEnded()) {
+  <div class="page state" role="status">
+    <div class="state-card">
+      <h1>Your session has ended</h1>
+      <p>Its data was deleted, including this transcript. Transcripts are only kept for the session that created them.</p>
+      <a class="btn primary big" routerLink="/">Start a new transcription</a>
+    </div>
+  </div>
+} @else if (notFound()) {
+  <div class="page state">
+    <div class="state-card">
+      <h1>Transcript not found</h1>
+      <p>
+        It may have been deleted.
+        @if (site.isPublic()) { Transcripts are only kept for the browser session that created them. }
+      </p>
+      <a class="btn primary big" routerLink="/">Start a new transcription</a>
+    </div>
+  </div>
+} @else if (job(); as j) {
+  <div class="page job">
+    <header class="head">
+      <div class="head-main">
+        @if (renaming()) {
+          <input class="title-edit" type="text" [(ngModel)]="titleDraft" (keydown.enter)="finishRename(true)" (keydown.escape)="finishRename(false); $event.stopPropagation()" (blur)="finishRename(true)" maxlength="200" aria-label="Transcript name" enterkeyhint="done" />
+        } @else {
+          <!-- the name and its pencil flow like text: a long name wraps and the pencil follows its last word -->
+          <div class="titles">
+            <h1 (dblclick)="startRename()">{{ j.title }}</h1>
+            <button type="button" class="rename" (click)="startRename()" aria-label="Rename" title="Rename">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20h4l10.5-10.5a2.1 2.1 0 00-3-3L5 17v3z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" /><path d="M13.5 7.5l3 3" stroke="currentColor" stroke-width="1.9" /></svg>
+            </button>
+          </div>
+        }
+        @if (facts().length) {
+          <p class="facts" [title]="j.filename">
+            @for (f of facts(); track $index) {
+              <span>{{ f }}</span>
+            }
+          </p>
+        }
+      </div>
+
+      @if (j.status === 'done') {
+        <div class="actions">
+          @if (j.segments.length) {
+            <div class="menu-wrap export">
+              <button type="button" class="btn primary" data-menu="export" (click)="toggleMenu('export', $event)" [disabled]="!!exporting()" [attr.aria-expanded]="menu() === 'export'" aria-haspopup="menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                {{ exporting() ? 'Preparing…' : 'Export' }}
+              </button>
+              @if (menu() === 'export') {
+                <div class="menu" role="menu" aria-label="Choose a format">
+                  <!-- on a phone this is a bottom sheet: it gets a title and a Close button (both hidden on a desktop) -->
+                  <p class="sheet-title" aria-hidden="true">Choose a format</p>
+                  @for (e of exports; track e.fmt) {
+                    <button type="button" role="menuitem" (click)="download(e.fmt)"><b>{{ e.label }}</b><span>{{ e.hint }}</span></button>
+                  }
+                  <label class="menu-opt">Subtitle line length
+                    <select [(ngModel)]="subtitleChars">
+                      <option [ngValue]="32">Short (32 letters)</option>
+                      <option [ngValue]="42">Standard (42 letters)</option>
+                      <option [ngValue]="56">Long (56 letters)</option>
+                    </select>
+                  </label>
+                  <button type="button" class="btn menu-close" (click)="closeMenu()">Close</button>
+                </div>
+              }
+            </div>
+            <button type="button" class="btn copy" (click)="copy()" [disabled]="copying()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.9" /><path d="M15 9V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7a2 2 0 002 2h3" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+              {{ copying() ? 'Copying…' : 'Copy text' }}
+            </button>
+          }
+          <div class="menu-wrap more">
+            <button type="button" class="btn ghost" data-menu="more" (click)="toggleMenu('more', $event)" [attr.aria-expanded]="menu() === 'more' || menu() === 'rerun'" aria-haspopup="menu">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
+              More
+            </button>
+            @if (menu() === 'more') {
+              <div class="menu end" role="menu" aria-label="More">
+                <button type="button" role="menuitem" (click)="menu.set(null); startRename()"><b>Rename</b><span>Give it a new name</span></button>
+                <button type="button" role="menuitem" (click)="menu.set('rerun')"><b>Re-transcribe</b><span>Try another quality or language</span></button>
+                <button type="button" role="menuitem" class="danger" (click)="remove()" [disabled]="deleting()"><b>Delete transcript</b><span>Removes it for good</span></button>
+                <button type="button" class="btn menu-close" (click)="closeMenu()">Close</button>
+              </div>
+            } @else if (menu() === 'rerun') {
+              <div class="menu end rerun" role="dialog" aria-labelledby="rerun-title">
+                <h2 id="rerun-title">Re-transcribe</h2>
+                <p>Make a new transcript of the same file. This one is kept.</p>
+                <div class="field"><label for="rm">Quality</label>
+                  <select id="rm" [(ngModel)]="rerunModel">
+                    @for (m of rerunModels(); track m.id) { <option [value]="m.id">{{ m.label }}{{ m.downloaded ? '' : ' (first use downloads ' + m.size_mb + ' MB)' }}</option> }
+                  </select></div>
+                <div class="field"><label for="rl">Language</label>
+                  <select id="rl" [(ngModel)]="rerunLanguage">
+                    <option [ngValue]="null">Find it automatically</option>
+                    @for (l of store.languages(); track l.code) { <option [ngValue]="l.code">{{ l.name }}</option> }
+                  </select></div>
+                <div class="rerun-actions">
+                  <button type="button" class="btn primary" (click)="rerun()" [disabled]="rerunning()">{{ rerunning() ? 'Starting…' : 'Start' }}</button>
+                  <button type="button" class="btn ghost" (click)="menu.set('more')">Back</button>
+                </div>
+              </div>
+            }
+          </div>
+          @if (saving()) { <span class="saving" role="status">Saving…</span> }
+          <!-- phones: a dark scrim behind the open bottom sheet; a tap on it closes the sheet (not drawn on a desktop) -->
+          @if (menu()) { <div class="menu-scrim" (click)="closeMenu()"></div> }
+        </div>
+      }
+    </header>
+
+    @if (active()) {
+      <section class="card progress" aria-label="Progress">
+        <p class="status" role="status"><b>{{ statusText() }}</b> @if (statusDetail()) { <span>{{ statusDetail() }}</span> }</p>
+        <button type="button" class="btn small" (click)="cancel()" [disabled]="cancelling()">{{ cancelling() ? 'Cancelling…' : 'Cancel' }}</button>
+        <div class="bar" [class.indeterminate]="j.status === 'queued' || j.phase !== 'transcribing'"><i [style.transform]="'scaleX(' + j.progress + ')'"></i></div>
+      </section>
+    }
+
+    @if (j.status === 'error') {
+      <section class="card alert" role="alert">
+        <div class="alert-text">
+          <h2>Transcription failed</h2>
+          <p>{{ j.error || 'Something went wrong while reading this file.' }}</p>
+        </div>
+        <button type="button" class="btn primary" (click)="rerun()" [disabled]="rerunning()">{{ rerunning() ? 'Starting…' : 'Try again' }}</button>
+      </section>
+    }
+    @if (j.status === 'cancelled') {
+      <section class="card alert warn" role="status">
+        <div class="alert-text">
+          <h2>Cancelled</h2>
+          <p>{{ j.segments.length ? 'The text found before it was stopped is shown below.' : 'It was stopped before any text was found.' }}</p>
+        </div>
+        <button type="button" class="btn primary" (click)="rerun()" [disabled]="rerunning()">{{ rerunning() ? 'Starting…' : 'Start again' }}</button>
+      </section>
+    }
+
+    @if (j.segments.length || j.status === 'done' || active()) {
+      <div class="cols" [class.with-video]="hasVideo()" [class.with-audio]="hasMedia() && !hasVideo()">
+        @if (hasMedia()) {
+          <div class="player">
+            @if (hasVideo()) {
+              <video #player [src]="j.media_url!" controls playsinline preload="metadata" (timeupdate)="time.set(player.currentTime)" (ratechange)="speed.set(player.playbackRate)" (play)="playing.set(true)" (pause)="playing.set(false)" (ended)="playing.set(false)"></video>
+            } @else {
+              <audio #player [src]="j.media_url!" controls preload="metadata" (timeupdate)="time.set(player.currentTime)" (ratechange)="speed.set(player.playbackRate)" (play)="playing.set(true)" (pause)="playing.set(false)" (ended)="playing.set(false)"></audio>
+            }
+            <label class="speed">Speed
+              <select (change)="setSpeed(+$any($event.target).value)" aria-label="Playback speed">
+                @for (s of speeds; track s) {
+                  <option [value]="s" [selected]="speed() === s">{{ s === 1 ? 'Normal' : s + '×' }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        }
+        <section class="card tcard" aria-label="Transcript">
+          <app-transcript [segments]="j.segments" [activeSegment]="activeSeg()" [live]="active()" [hasMedia]="hasMedia()" [playing]="playing()" (seek)="seek($event)" (save)="save($event)" />
+        </section>
+      </div>
+    }
+  </div>
+} @else if (busy()) {
+  <div class="page state" role="status">
+    <div class="state-card">
+      <h1>The server is busy</h1>
+      <p>{{ busy() }} Trying again in a moment…</p>
+    </div>
+  </div>
+} @else if (unreachable()) {
+  <div class="page state" role="status">
+    <div class="state-card">
+      <h1>Cannot reach the server</h1>
+      <p>Trying again. This page loads by itself as soon as the server is back.</p>
+    </div>
+  </div>
+} @else {
+  <div class="page state loading" aria-busy="true">Loading…</div>
+}

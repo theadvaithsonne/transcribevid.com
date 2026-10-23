@@ -1,0 +1,19 @@
+{
+  "name": "transcribevid",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Accurate local video/audio transcription: Angular frontend + FastAPI backend",
+  "scripts": {
+    "dev": "node scripts/run.mjs dev",
+    "start": "node scripts/run.mjs start",
+    "build": "npm --prefix frontend run build -- --configuration production",
+    "test": "node scripts/run.mjs test",
+    "setup": "node scripts/run.mjs setup",
+    "test:real": "node scripts/run.mjs test-real",
+    "test:backend": "node scripts/run.mjs test-backend",
+    "test:frontend": "node scripts/run.mjs test-frontend"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

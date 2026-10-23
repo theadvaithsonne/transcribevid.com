@@ -1,0 +1,81 @@
+<!-- no text yet (waiting for the first words, or no speech at all): nothing to search, so no toolbar either -->
+@if (segments().length) {
+<div class="toolbar">
+  @if (!live()) {
+    <div class="search">
+      <div class="search-box">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.9" />
+          <path d="M16 16l4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+        </svg>
+        <input #box type="search" placeholder="Search the text" aria-label="Search the transcript" enterkeyhint="search" [value]="query()" (input)="onSearchInput(box.value)" (keydown.enter)="onSearchEnter(box.value)" (keydown.escape)="clearSearch(box); $event.stopPropagation()" />
+      </div>
+      @if (query()) {
+        <span class="count" aria-live="polite">{{ matches().length ? matchIdx() + 1 + ' of ' + matches().length : 'No matches' }}</span>
+        @if (matches().length) {
+          <button type="button" class="btn small icon ghost" (click)="step(-1)" aria-label="Previous match" title="Previous match">↑</button>
+          <button type="button" class="btn small icon ghost" (click)="step(1)" aria-label="Next match" title="Next match">↓</button>
+          <button type="button" class="btn small ghost" (click)="showReplace.set(!showReplace())" [attr.aria-expanded]="showReplace()">Replace…</button>
+        }
+      }
+    </div>
+    <label class="switch">
+      <input type="checkbox" role="switch" [checked]="uncertain()" (change)="uncertain.set($any($event.target).checked)" />
+      <span class="track" aria-hidden="true"></span>
+      <span>Underline unsure words</span>
+      <span class="onoff" aria-hidden="true">{{ uncertain() ? 'On' : 'Off' }}</span>
+    </label>
+  } @else {
+    <p class="live-note"><span class="pulse" aria-hidden="true"></span> Live: the text appears here as it is recognised</p>
+  }
+</div>
+}
+@if (showReplace() && query() && matches().length) {
+  <div class="replace">
+    <input type="text" placeholder="Replace with…" aria-label="Replace with" [ngModel]="replacement()" (ngModelChange)="replacement.set($event)" (keydown.enter)="replaceAll()" />
+    <button type="button" class="btn primary" (click)="replaceAll()">Replace in {{ matches().length }} {{ matches().length === 1 ? 'line' : 'lines' }}</button>
+  </div>
+}
+
+<!-- One click listener for the whole list (time, pencil, word): thousands of rows do not get thousands of listeners. -->
+<div class="list" #list [class.live]="live()" (click)="onListClick($event)">
+  @for (blk of blocks(); track blk.i) {
+    <div class="blk">
+      @for (row of blk.rows; track row.seg.id) {
+        <div class="seg" [attr.data-id]="row.seg.id" [class.active]="row.seg.id === activeId()" [class.match]="currentMatch(row.seg.id)" [class.editing]="editingId() === row.seg.id">
+          <button type="button" class="ts mono" data-act="seek" [disabled]="!hasMedia()" [title]="hasMedia() ? 'Play from here' : ''">{{ row.time }}</button>
+          <div class="txt">
+            @if (editingId() === row.seg.id) {
+              <textarea class="edit" rows="2" [(ngModel)]="draft" (keydown)="onKey($event, row.seg)" (blur)="commit(row.seg)" aria-label="Edit this line" enterkeyhint="done"></textarea>
+              <!-- Save / Cancel / Delete line on every screen; on a computer Enter saves and Escape cancels too -->
+              <div class="edit-actions">
+                <button type="button" class="btn small primary" (mousedown)="$event.preventDefault()" (click)="commit(row.seg)">Save</button>
+                <button type="button" class="btn small ghost" (mousedown)="$event.preventDefault()" (click)="cancel()">Cancel</button>
+                <button type="button" class="btn small ghost danger" (mousedown)="$event.preventDefault()" (click)="remove(row.seg)">Delete line</button>
+                <span class="hint">Enter saves · Esc cancels</span>
+              </div>
+            }
+            <span class="words">{{ row.rich ? '' : row.seg.text }}@if (row.rich) {@for (p of row.parts; track $index) {@if (p.hit) {<mark>{{ p.text }}</mark>} @else if (p.level) {<span class="w" [class.low]="p.level === 'low'" [class.mid]="p.level === 'mid'" [attr.data-t]="p.start">{{ p.text }}</span>} @else {{{ p.text }}}}}</span>
+            @if (row.flag) { <span class="flag" title="Unsure: worth listening to again">⚠</span> }
+            @if (row.seg.edited) { <span class="flag ed" title="Edited by you">✎</span> }
+          </div>
+          <button type="button" class="pencil" data-act="edit" aria-label="Edit this line" title="Edit"></button>
+        </div>
+      }
+    </div>
+  } @empty {
+    @if (live()) {
+      <p class="empty">Waiting for the first words…</p>
+    } @else {
+      <p class="empty">No speech was found in this file.<span class="empty-hint">If it does have speech, try More › Re-transcribe with the right language.</span></p>
+    }
+  }
+</div>
+
+@if (hasMedia() && playing() && !live()) {
+  <div class="follow-bar">
+    <button type="button" class="follow" [class.on]="autoScroll()" [attr.aria-pressed]="autoScroll()" (click)="autoScroll.set(!autoScroll())">
+      <svg class="fcheck" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" /></svg>{{ autoScroll() ? 'Following playback' : 'Follow playback' }}
+    </button>
+  </div>
+}

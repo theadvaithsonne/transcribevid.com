@@ -1,0 +1,8 @@
+# Everything public may be crawled. The API, the operator logs and the private transcript pages may not.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /logs
+Disallow: /jobs/
+
+Sitemap: https://transcribevid.com/sitemap.xml

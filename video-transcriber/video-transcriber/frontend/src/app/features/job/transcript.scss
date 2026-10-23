@@ -1,0 +1,536 @@
+:host {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+/* Flat and calm: big readable text, generous rows, no rules between them. Text is 16px and up (the transcript 18px and
+   up), targets 44px and up. Colour only where it means something: the line being played, a search hit, an unsure word. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ toolbar: a search box and one switch */
+.toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding-bottom: 16px;
+}
+.search {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1 1 300px;
+  min-width: 0;
+  .btn.small {
+    min-height: 44px;
+    &.icon {
+      min-width: 44px;
+      font-size: 20px;
+    }
+  }
+}
+.search-box {
+  position: relative;
+  flex: 1 1 220px;
+  min-width: 0;
+  svg {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+}
+.search-box input,
+.replace input {
+  width: 100%;
+  min-height: 50px;
+  padding: 10px 14px;
+  background: var(--field-bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-base);
+  &::placeholder {
+    color: var(--muted);
+    opacity: 1;
+  }
+  &:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 1px;
+  }
+}
+.search-box input {
+  padding-left: 46px;
+}
+.count {
+  padding: 0 6px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* the switch: a plain track, its words, and On / Off, so it never depends on colour alone */
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .track {
+    position: relative;
+    flex: none;
+    width: 48px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--surface-3);
+    border: 2px solid var(--line-strong);
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: transform 0.15s var(--ease);
+    }
+  }
+  .onoff {
+    min-width: 28px;
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+  input:checked + .track {
+    background: var(--accent);
+    border-color: var(--accent);
+    &::after {
+      transform: translateX(20px);
+      background: var(--accent-ink);
+    }
+  }
+  input:focus-visible + .track {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+}
+.replace {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 16px;
+  input {
+    flex: 1 1 240px;
+    width: auto;
+  }
+}
+/* the live note: quiet text with one slowly blinking dot (the only thing here that moves) */
+.live-note {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 44px;
+  margin: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+.pulse {
+  flex: none;
+  align-self: flex-start;
+  margin-top: 0.5em;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.4s infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* "Follow playback": a quiet strip at the foot of the card (in the flow, so it never covers the text) */
+.follow-bar {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 0 12px;
+  border-top: 1px solid var(--line);
+}
+.follow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  &:hover {
+    background: var(--surface-2);
+  }
+  .fcheck {
+    display: none;
+    width: 18px;
+    height: 18px;
+  }
+  &.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+    .fcheck {
+      display: block;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ the lines
+   content-visibility: groups of rows that are scrolled out of view are not laid out or painted (and keep a remembered
+   height), which is what keeps a 3000 line transcript smooth. */
+.list {
+  flex: 1;
+  min-height: 0;
+  margin: 0 -12px;
+  padding: 2px 0 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-behavior: auto;
+}
+.empty {
+  margin: 0;
+  padding: 56px 16px;
+  text-align: center;
+  font-size: var(--fs-lg);
+  color: var(--text);
+}
+.empty-hint {
+  display: block;
+  margin-top: 8px;
+  font-size: var(--fs-base);
+  color: var(--muted);
+}
+.blk {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 3150px;
+}
+.seg {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 12px 12px 10px;
+  border-radius: var(--r-sm);
+  border-left: 4px solid transparent;
+
+  &:hover,
+  &.editing {
+    background: var(--surface-2);
+  }
+  /* the line being played: a light wash and a bar at its left */
+  &.active {
+    background: color-mix(in srgb, var(--accent) 9%, var(--surface));
+    border-left-color: var(--accent);
+  }
+  /* the search hit you are on: outlined (its words are already marked) */
+  &.match {
+    outline: 2px solid var(--warn);
+    outline-offset: -2px;
+  }
+}
+/* a new live line fades in; only the newest few rows ever carry the animation */
+.live .blk:last-child .seg:nth-last-child(-n + 3) {
+  animation: seg-in 0.35s var(--ease) both;
+}
+@keyframes seg-in {
+  from {
+    opacity: 0;
+  }
+}
+/* the time: a small button that plays from there */
+.ts {
+  position: relative;
+  flex: none;
+  min-width: 68px;
+  padding: 3px 8px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  line-height: 1.7;
+  text-align: center;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  /* a bigger hit area than the small pill itself */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -8px -6px;
+  }
+  &:disabled {
+    cursor: default;
+    background: transparent;
+    color: var(--muted);
+  }
+  &:hover:not(:disabled) {
+    background: var(--surface-3);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+.active .ts {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.txt {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 52px 0 0; /* room for the edit button at the end of the row */
+  font-size: max(18px, var(--fs-base));
+  line-height: 1.7;
+  color: var(--text);
+  overflow-wrap: anywhere; /* a very long unbroken word (a URL, a code) wraps instead of being clipped */
+}
+.w {
+  text-underline-offset: 5px;
+  &.low {
+    text-decoration: underline wavy var(--err);
+    text-decoration-thickness: 1.5px;
+  }
+  &.mid {
+    text-decoration: underline dotted var(--warn);
+    text-decoration-thickness: 2px;
+  }
+}
+mark {
+  padding: 0 2px;
+  border-radius: 4px;
+  background: var(--hl);
+  color: inherit;
+}
+.flag {
+  margin-left: 8px;
+  color: var(--warn);
+  font-size: var(--fs-sm);
+  cursor: help;
+  &.ed {
+    color: var(--muted);
+  }
+}
+.editing .words,
+.editing .flag {
+  display: none;
+}
+
+/* the edit button: a quiet pencil at the end of every row (a plain button with a drawn icon, no svg per row) */
+.pencil {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  &::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linejoin='round'%3E%3Cpath d='M4 20h4l10.5-10.5a2.1 2.1 0 00-3-3L5 17v3z'/%3E%3Cpath d='M13.5 7.5l3 3'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linejoin='round'%3E%3Cpath d='M4 20h4l10.5-10.5a2.1 2.1 0 00-3-3L5 17v3z'/%3E%3Cpath d='M13.5 7.5l3 3'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  &:hover {
+    background: var(--surface-3);
+    color: var(--text-strong);
+  }
+}
+.seg:hover .pencil,
+.active .pencil {
+  color: var(--text);
+}
+.live .pencil,
+.editing .pencil {
+  display: none;
+}
+.edit {
+  width: 100%;
+  min-height: 88px;
+  padding: 12px 14px;
+  background: var(--field-bg);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  font-size: max(18px, var(--fs-base));
+  line-height: 1.6;
+  resize: vertical;
+  &:focus {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+.edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  .btn.small {
+    min-height: 44px;
+  }
+  .danger {
+    margin-left: auto;
+  }
+}
+.hint {
+  flex-basis: 100%;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* a touch screen has no keyboard shortcuts to hint at */
+@media (hover: none) {
+  .hint {
+    display: none;
+  }
+}
+
+/* ==================================================================================================================
+   Phones (<= 719px) and tablets (720-999px). The list is as tall as its rows (the page scrolls, not a box inside it).
+   ================================================================================================================== */
+@media (max-width: 999px) {
+  .list {
+    overflow: visible;
+    margin: 0;
+    padding-bottom: 20px;
+  }
+  /* "Follow playback" stays at the bottom of the screen while the page scrolls through the text */
+  .follow-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin: 0 -10px;
+    padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--line-strong);
+  }
+  .follow {
+    flex: 1;
+    justify-content: center;
+    min-height: 52px;
+  }
+  .edit {
+    min-height: 120px;
+  }
+  .edit-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    .btn.small {
+      min-height: 48px;
+    }
+    .danger {
+      grid-column: 1 / -1;
+      margin: 0;
+    }
+  }
+  .replace .btn {
+    width: 100%;
+    min-height: 52px;
+  }
+  /* the time is a real 44px target on every touch screen (a computer keeps the small pill with a hidden hit area) */
+  .ts {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    line-height: 1.3;
+    &::after {
+      content: none;
+    }
+  }
+}
+
+@media (max-width: 719px) {
+  .toolbar {
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+  /* the search box takes the whole row; the count, the arrows and "Replace…" sit on the row below */
+  .search {
+    flex-basis: 100%;
+    gap: 8px;
+  }
+  .search-box {
+    flex: 1 1 100%;
+  }
+  .search .btn.small {
+    min-height: 48px;
+  }
+  .count {
+    flex: 1;
+  }
+  .switch {
+    display: flex;
+    width: 100%;
+  }
+  .blk {
+    contain-intrinsic-size: auto 5500px;
+  }
+  .empty {
+    padding: 40px 12px;
+  }
+  /* a row: the time and the pencil on the first line, the text full width underneath */
+  .seg {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 10px 8px 12px;
+  }
+  .ts {
+    min-width: 76px;
+    padding: 6px 12px;
+  }
+  .pencil {
+    order: 1;
+    position: static;
+    margin-left: auto;
+    color: var(--text);
+  }
+  .txt {
+    order: 2;
+    flex: 1 1 100%;
+    padding: 0;
+  }
+}

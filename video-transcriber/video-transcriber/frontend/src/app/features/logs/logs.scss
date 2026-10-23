@@ -1,0 +1,356 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+/* Quiet controls and a plain list: outlined buttons, toggles that show a tick when on, colour only on the level words.
+   Text is 16px and up, everything you can press 44px and up. */
+
+/* ---------------------------------------------------------------------------- token prompt / turned off */
+.gate-page {
+  display: flex;
+  justify-content: center;
+}
+.gate {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  max-width: 560px;
+  margin-top: clamp(16px, 6vh, 72px);
+  padding: clamp(24px, 3vw, 40px);
+  h1 {
+    font-size: var(--fs-h2);
+    font-weight: 800;
+  }
+  p {
+    margin: 0;
+    font-size: var(--fs-base);
+    line-height: 1.6;
+  }
+  .field {
+    width: 100%;
+    margin-top: 8px;
+  }
+  .btn {
+    margin-top: 4px;
+  }
+}
+.bad {
+  color: var(--err);
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------------- the console */
+.logs {
+  height: 100%;
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: clamp(20px, 2.6vw, 36px) var(--gutter) 24px;
+  min-height: 0;
+}
+.bar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  .title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+  }
+  h1 {
+    font-size: var(--fs-h2);
+    font-weight: 800;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+/* "Live" / "Reconnecting…": a dot and a word (a filled dot while live, a hollow one otherwise) */
+.conn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--muted);
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+  }
+  &.live {
+    color: var(--ok);
+    .dot {
+      background: currentColor;
+    }
+  }
+}
+
+/* a toggle (Follow newest, the levels): outlined; when on, a tick and a light fill */
+.toggle {
+  .tick {
+    position: relative;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    border: 2px solid var(--line-strong);
+  }
+  &.on {
+    background: var(--surface-2);
+    border-color: var(--text);
+    color: var(--text-strong);
+    .tick {
+      border-color: var(--text-strong);
+      background: var(--text-strong);
+      &::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 1px;
+        width: 5px;
+        height: 10px;
+        border: solid var(--surface);
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
+      }
+    }
+  }
+}
+.btn.small.toggle {
+  gap: 10px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+.levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.lvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 6px 14px 6px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  b {
+    font-weight: 600;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  &:hover {
+    border-color: var(--text);
+  }
+}
+.search {
+  flex: 1 1 320px;
+  min-width: min(320px, 100%);
+  max-width: 560px;
+  input {
+    width: 100%;
+    min-height: 46px;
+    padding: 8px 14px;
+    background: var(--field-bg);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    font-size: var(--fs-sm);
+    &::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+    &:focus {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.viewport {
+  flex: 1;
+  min-height: 320px;
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  font-size: 16px;
+  line-height: 1.6;
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+}
+.head,
+.row {
+  display: grid;
+  grid-template-columns: 8em 5.6em 10.5em minmax(0, 1fr);
+  gap: 18px;
+  padding: 8px 20px;
+}
+.head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-strong);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.row {
+  color: var(--text);
+  border-bottom: 1px solid var(--line);
+  .t {
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .lv {
+    font-weight: 700;
+  }
+  .lg {
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .msg {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  &.DEBUG .lv,
+  &.DEBUG .msg {
+    color: var(--muted);
+  }
+  &.INFO .lv {
+    color: var(--ok);
+  }
+  &.WARNING .lv,
+  &.WARNING .msg {
+    color: var(--warn);
+  }
+  &.ERROR .lv,
+  &.ERROR .msg {
+    color: var(--err);
+  }
+}
+.none {
+  padding: 28px 20px;
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--fs-base);
+}
+.foot {
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+
+/* ==================================================================================================================
+   Phones (<= 719px) and tablets (720-999px): the page scrolls as a whole and the list keeps a generous fixed height
+   (it is a live, following view); each line is the time and the level, then the message, wrapped.
+   ================================================================================================================== */
+@media (max-width: 999px) {
+  .logs {
+    height: auto;
+    min-height: 100%;
+    gap: 16px;
+    padding: 16px var(--gutter) 24px;
+  }
+  .bar-top .actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    .btn {
+      width: 100%;
+      padding-inline: 8px;
+      white-space: normal;
+    }
+  }
+  .search {
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: none;
+  }
+  .viewport {
+    flex: none;
+    min-height: 0;
+    height: max(360px, 62dvh);
+  }
+  .gate .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 719px) {
+  .bar-top .actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    .btn {
+      min-height: 48px;
+    }
+  }
+  .levels {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+  .lvl {
+    min-height: 48px;
+    b {
+      margin-left: auto;
+    }
+  }
+  .viewport {
+    height: max(320px, 58dvh);
+  }
+  .head {
+    display: none;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 12px;
+    padding: 10px 12px;
+    .lg {
+      flex: 1;
+      min-width: 0;
+    }
+    .msg {
+      flex: 1 1 100%;
+    }
+  }
+  .none {
+    padding: 20px 14px;
+  }
+}
+/* the narrowest phones: the level toggles one under the other */
+@media (max-width: 379px) {
+  .levels {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

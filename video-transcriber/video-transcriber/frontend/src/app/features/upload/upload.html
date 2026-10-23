@@ -1,0 +1,202 @@
+<div class="page upload" [class.ready]="files().length > 0">
+  <header class="hero">
+    <h1 class="page-title">Transcribe a video or audio file</h1>
+    <ul class="trust" aria-label="Free, unlimited, and no login needed">
+      <li class="tint-mint" style="--c: var(--tint-mint)"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Free</li>
+      <li class="tint-sky" style="--c: var(--tint-sky)"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Unlimited</li>
+      <li class="tint-lemon" style="--c: var(--tint-lemon)"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>No login</li>
+    </ul>
+  </header>
+
+  <div class="layout">
+    <!-- 1. the file -->
+    <div class="col-files">
+      <div class="drop" [class.disabled]="uploading()" [class.has-files]="files().length > 0">
+        <input id="file" type="file" class="visually-hidden" multiple accept="video/*,audio/*,.mkv,.mov,.avi,.m4a,.flac,.opus,.wmv,.ts" [disabled]="uploading()" (change)="onPick($event)" />
+        @if (files().length) {
+          <ul class="files" aria-label="Chosen files">
+            @for (f of files(); track $index) {
+              <li>
+                <span class="ficon" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.8" />
+                    <path d="M10 9.5v5l4-2.5-4-2.5z" fill="currentColor" />
+                  </svg>
+                </span>
+                <span class="fname">{{ f.name }}</span>
+                <span class="fsize">{{ fmtBytes(f.size) }}</span>
+                @if (!uploading()) {
+                  <button class="x" (click)="removeFile($index)" [attr.aria-label]="'Remove ' + f.name" title="Remove">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        }
+        <label for="file" class="drop-label">
+          <span class="drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span class="btn choose" [class.big]="!files().length" [class.primary]="!files().length">{{ files().length ? 'Add another file' : 'Choose a file' }}</span>
+          <span class="drop-hint"><span class="dnd">or drop it anywhere on this page. </span>{{ site.limitsText() || 'Video or audio, several at once is fine.' }}</span>
+        </label>
+        <button type="button" class="rec" [class.on]="recording()" [disabled]="uploading() || micBusy()" (click)="toggleRecording()">
+          @if (recording()) {
+            <span class="rec-dot" aria-hidden="true"></span> Stop recording · {{ fmtTime(recSeconds()) }}
+          } @else if (micBusy()) {
+            Waiting for microphone permission…
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.8" />
+              <path d="M5 11a7 7 0 0014 0M12 18v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+            Record from microphone
+          }
+        </button>
+      </div>
+
+      @if (error()) {
+        <div class="alert" role="alert">{{ error() }}</div>
+      }
+
+      @if (uploading()) {
+        <section class="upload-card" [class.done]="uploadDone()" role="status" aria-live="polite">
+          @if (uploadDone()) {
+            <div class="ok-row">
+              <span class="tick" aria-hidden="true">✓</span>
+              <div>
+                <b>Upload complete</b>
+                <div class="up-sub">Opening your transcript…</div>
+              </div>
+            </div>
+          } @else {
+            <div class="up-row">
+              <div class="up-title">
+                <span class="up-label">Uploading</span>
+                <b>{{ files()[uploadIndex()]?.name }}</b>
+              </div>
+              <span class="pct">{{ (uploadProgress() * 100).toFixed(0) }}<small>%</small></span>
+            </div>
+            <div class="bar big-bar"><i [style.transform]="'scaleX(' + uploadProgress() + ')'"></i></div>
+            <div class="up-meta">
+              <span>{{ fmtBytes(uploadedBytes()) }} of {{ fmtBytes(uploadTotal()) }}@if (files().length > 1) { · file {{ uploadIndex() + 1 }} of {{ files().length }} }</span>
+              @if (uploadSpeed() > 0) { <span>{{ fmtBytes(uploadSpeed()) }}/s</span> }
+            </div>
+            <p class="up-keep">Keep this page open until the upload is done.</p>
+          }
+        </section>
+      }
+    </div>
+
+    <!-- 2. how good, which language, go -->
+    <section class="card settings" aria-label="Transcription settings">
+      <div class="settings-body">
+        @if (visiblePresets().length) {
+          <fieldset class="quality">
+            <legend>Quality</legend>
+            <div class="presets" role="radiogroup" aria-label="Quality">
+              @for (p of visiblePresets(); track p.model) {
+                <label class="preset" [class.sel]="opts.model === p.model" [class.na]="!available(p.model)" [title]="tip(p)">
+                  <input type="radio" name="preset" class="visually-hidden" [value]="p.model" [(ngModel)]="opts.model" [disabled]="!available(p.model)" />
+                  <span class="dot" aria-hidden="true"></span>
+                  <span class="words">
+                    <b>{{ p.title }}</b>
+                    <span class="sub">{{ p.recommended ? 'Recommended' : p.speedLabel }}</span>
+                  </span>
+                </label>
+              }
+            </div>
+            <p class="quality-help" aria-live="polite">{{ selectedHelp() }}</p>
+          </fieldset>
+        }
+
+        <div class="lang-row">
+          <div class="field">
+            <label for="lang">Language</label>
+            <select id="lang" [(ngModel)]="opts.language">
+              <option [ngValue]="null">Detect automatically</option>
+              @for (l of store.languages(); track l.code) {
+                <option [ngValue]="l.code">{{ l.name }}</option>
+              }
+            </select>
+          </div>
+          <button type="button" class="more-toggle" (click)="showAdvanced.set(!showAdvanced())" [attr.aria-expanded]="showAdvanced()" aria-controls="more-options">
+            More options
+            <svg class="chev" [class.open]="showAdvanced()" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+        </div>
+        @if (showAdvanced()) {
+          <div class="more-body" id="more-options">
+            <div class="field">
+              <label for="task">Output</label>
+              <select id="task" [(ngModel)]="opts.task">
+                <option value="transcribe">Transcribe (same language)</option>
+                <option value="translate">Translate to English</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="prompt">Vocabulary hint <span class="muted">(optional)</span></label>
+              <textarea id="prompt" rows="2" maxlength="1000" [(ngModel)]="opts.prompt" placeholder="Names, brands and jargon in the audio, e.g. Kubernetes, Dr. Okafor"></textarea>
+              <span class="hint">Helps spell uncommon words correctly.</span>
+            </div>
+            <div class="field">
+              <label for="model">Model</label>
+              <select id="model" [(ngModel)]="opts.model">
+                @for (m of selectableModels(); track m.id) {
+                  <option [value]="m.id">{{ m.label }} — {{ m.note }}{{ downloadShort(m.id) ? ' (' + downloadShort(m.id) + ')' : '' }}</option>
+                }
+                @if (!store.models().length) {
+                  <option [value]="opts.model">{{ opts.model }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label for="beam">Search depth: {{ opts.beam_size }}</label>
+              <input id="beam" type="range" min="1" max="10" [(ngModel)]="opts.beam_size" />
+              <span class="hint">Higher is slightly more accurate and slower. 5 is a good default.</span>
+            </div>
+            <div class="checks">
+              <label class="check"><input type="checkbox" [(ngModel)]="opts.enhance_audio" /> <span><b>Enhance audio</b> — filter rumble &amp; hiss, even out quiet speakers</span></label>
+              <label class="check"><input type="checkbox" [(ngModel)]="opts.vad" /> <span><b>Skip silence &amp; music</b> — prevents made-up text</span></label>
+              <label class="check"><input type="checkbox" [(ngModel)]="opts.word_timestamps" /> <span><b>Word-level timing</b> — better subtitles and confidence marks</span></label>
+              <label class="check"><input type="checkbox" [(ngModel)]="opts.condition_on_previous" /> <span><b>Use previous text as context</b> — can repeat on long files</span></label>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="submit">
+        <button class="btn primary big go" [disabled]="!files().length || uploading() || recording()" (click)="start()">
+          @if (uploading()) {
+            Uploading…
+          } @else if (!files().length) {
+            Choose a file first
+          } @else {
+            Transcribe{{ files().length > 1 ? ' ' + files().length + ' files' : '' }}
+          }
+        </button>
+        @if (site.isPublic()) {
+          <p class="note">Your files are deleted automatically. <a routerLink="/privacy">Privacy</a></p>
+        } @else {
+          <p class="note">Nothing is saved. Export what you need.</p>
+        }
+      </div>
+    </section>
+  </div>
+
+  @if (dragging()) {
+    <div class="drop-overlay" aria-hidden="true">
+      <div class="drop-overlay-box">
+        <svg viewBox="0 0 24 24" fill="none" width="48" height="48">
+          <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        Drop to add your file
+      </div>
+    </div>
+  }
+</div>

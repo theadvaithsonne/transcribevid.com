@@ -1,0 +1,7 @@
+[
+  {"name": "small_b5",       "model": "small"},
+  {"name": "turbo_b5",       "model": "large-v3-turbo"},
+  {"name": "turbo_b5_raw",   "model": "large-v3-turbo", "enhance_audio": false},
+  {"name": "distil35_b5",    "model": "distil-large-v3.5", "english_only": true},
+  {"name": "medium_b5",      "model": "medium"}
+]

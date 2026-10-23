@@ -1,0 +1,607 @@
+/* =====================================================================================================
+   TranscribeVid design system ("Warm sunset" palette). Light is the default theme; dark ("Midnight teal") is the alternative.
+   Pages build on: the tokens below, .page / .page-doc containers, .card, .btn, .field, .chip, .grid-*.
+   ===================================================================================================== */
+
+:root {
+  /* layout */
+  --header-h: 76px;
+  --sidebar-w: 340px;
+  --gutter: clamp(20px, 3.4vw, 64px);
+  --container: 1560px;
+  --container-doc: 1320px;
+
+  /* type */
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* the device's own font: nothing to download */
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+  /* nothing the visitor has to read is smaller than 16px; body text is 18-20px */
+  --fs-sm: clamp(16px, 0.15vw + 14px, 18px);
+  --fs-base: clamp(18px, 0.3vw + 14.4px, 21px);
+  --fs-lg: clamp(20px, 0.35vw + 15.5px, 24px);
+  --fs-xl: clamp(22px, 0.45vw + 16.5px, 27px);
+  --fs-h1: clamp(36px, 3.6vw, 60px);
+  --fs-h2: clamp(28px, 2.4vw, 40px);
+  --fs-h3: clamp(21px, 0.5vw + 15px, 26px);
+
+  /* shape + space */
+  --r-sm: 8px;   /* buttons, inputs */
+  --r-md: 10px;
+  --r-lg: 12px;  /* cards */
+  --r-xl: 16px;
+  --space-card: clamp(22px, 2.2vw, 34px);
+  --gap: clamp(20px, 2vw, 32px);
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* "Warm sunset" palette. Light is the default (no data-theme attribute = light); dark is the alternative and is plain
+   black and white. Flat colour only: no gradients, glow or shadows. The main button (--primary-*) is for the ONE main
+   action of an area; --accent is for small badges and links; the "tint" colours are for icon tiles and badges: always put
+   --tint-ink text on them. */
+
+/* Dark: black and white only. Greys for the layers, white for the main button, links and the selected outline. The only
+   colours left are the status ones (green done, amber warning, red error), because they carry meaning. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #111111;
+  --surface-2: #1c1c1c;
+  --surface-3: #2a2a2a;        /* hover rows, menus, the disabled main button */
+  --field-bg: #000000;
+  --line: #333333;             /* card borders */
+  --line-strong: #5c5c5c;      /* outlines of buttons, inputs and pills */
+  --text: #f2f2f2;
+  --text-strong: #ffffff;
+  --muted: #b3b3b3;
+  --accent: #ffffff;           /* links, small badges, progress */
+  --accent-2: #ffffff;
+  --accent-hover: #d9d9d9;
+  --accent-ink: #000000;       /* text ON an accent-coloured background */
+  --accent-soft: rgba(255, 255, 255, 0.12);
+  --primary-bg: #ffffff;       /* the main button: white with black text */
+  --primary-ink: #000000;
+  --primary-hover: #d9d9d9;
+  --primary-bright: #ffffff;   /* focus ring, selected outline */
+  --grad-accent: #ffffff;      /* kept for old references: solid, not a gradient */
+  --tint-mint: #e6e6e6;
+  --tint-sky: #d9d9d9;
+  --tint-peach: #e6e6e6;
+  --tint-lilac: #d9d9d9;
+  --tint-rose: #e6e6e6;
+  --tint-lemon: #f2f2f2;
+  --tint-ink: #000000;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --err: #ff8a8a;
+  --hl: rgba(255, 255, 255, 0.3);
+  --shadow: none;
+  --shadow-lg: none;
+  --glass: rgba(0, 0, 0, 0.96);
+  --glow: none;
+}
+
+/* Light: warm cream page, white cards, burnt-orange main button with white text, teal links and badges. */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #fff7ed;
+  --surface: #ffffff;
+  --surface-2: #ffedd5;
+  --surface-3: #fed7aa;
+  --field-bg: #ffffff;
+  --line: #fed7aa;
+  --line-strong: #bf7a47;      /* 3.5:1 on white, so inputs and outlined buttons have a visible edge */
+  --text: #431407;
+  --text-strong: #2c0d04;
+  --muted: #7a5238;
+  --accent: #0f766e;
+  --accent-2: #0f766e;
+  --accent-hover: #115e59;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(15, 118, 110, 0.12);
+  --primary-bg: #c2410c;
+  --primary-ink: #ffffff;
+  --primary-hover: #9a3412;
+  --primary-bright: #ea580c;
+  --grad-accent: #0f766e;
+  --tint-mint: #99f6e4;
+  --tint-sky: #ccfbf1;
+  --tint-peach: #fed7aa;
+  --tint-lilac: #ffedd5;
+  --tint-rose: #fecaca;
+  --tint-lemon: #fde68a;
+  --tint-ink: #431407;
+  --ok: #15803d;
+  --warn: #b45309;
+  --err: #b91c1c;
+  --hl: rgba(253, 230, 138, 0.6);
+  --shadow: none;
+  --shadow-lg: none;
+  --glass: rgba(255, 247, 237, 0.96);
+  --glow: none;
+}
+
+/* The same tokens under the names of the palette spec, for new code. */
+:root {
+  --primary: var(--primary-bg);
+  --on-primary: var(--primary-ink);
+  --on-accent: var(--accent-ink);
+  --border: var(--line);
+  --text-muted: var(--muted);
+  --success: var(--ok);
+  --warning: var(--warn);
+  --danger: var(--err);
+  --radius: var(--r-lg);
+  --radius-sm: var(--r-sm);
+  --focus-ring: var(--primary-bright);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  scrollbar-color: var(--line-strong) transparent;
+  scrollbar-width: thin;
+}
+
+body {
+  margin: 0;
+  font: var(--fs-base) / 1.65 var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------------------- buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 12px 26px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 700;
+  font-size: var(--fs-base);
+  line-height: 1.2;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.18s var(--ease), border-color 0.18s var(--ease), transform 0.12s var(--ease),
+    box-shadow 0.18s var(--ease), color 0.18s var(--ease);
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: var(--surface-3);
+  }
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  &.primary {
+    background: var(--primary-bg);
+    border-color: var(--primary-bg);
+    color: var(--primary-ink);
+    &:hover:not(:disabled) {
+      background: var(--primary-hover);
+      border-color: var(--primary-hover);
+    }
+  }
+  &.danger:hover:not(:disabled) {
+    border-color: var(--err);
+    color: var(--err);
+  }
+  &.ghost:not(.primary) {
+    background: transparent;
+    &:hover:not(:disabled) {
+      background: var(--surface-2);
+    }
+  }
+  &.small {
+    min-height: 44px;
+    padding: 8px 18px;
+    font-size: var(--fs-sm);
+    border-radius: var(--r-sm);
+  }
+  &.icon {
+    min-width: 52px;
+    padding: 9px 12px;
+  }
+  &.small.icon {
+    min-width: 44px;
+    padding: 6px 10px;
+  }
+  &.big {
+    min-height: 60px;
+    padding: 15px 36px;
+    font-size: var(--fs-lg);
+    border-radius: var(--r-md);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- forms */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+
+  > label,
+  > .label {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0;
+  }
+  input[type='text'],
+  input[type='search'],
+  input[type='number'],
+  select,
+  textarea {
+    width: 100%;
+    min-height: 54px;
+    font-size: var(--fs-base);
+    background: var(--field-bg);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-md);
+    padding: 12px 15px;
+    min-width: 0;
+    transition: border-color 0.16s var(--ease), box-shadow 0.16s var(--ease);
+    &:hover {
+      border-color: color-mix(in srgb, var(--accent) 50%, var(--line-strong));
+    }
+    &:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+  }
+  textarea {
+    resize: vertical;
+    min-height: 92px;
+  }
+  .hint {
+    font-size: var(--fs-sm);
+    color: var(--muted);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- surfaces */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: var(--space-card);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 15px;
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--muted);
+  border: 1px solid var(--line);
+
+  &.ok {
+    color: var(--ok);
+    border-color: color-mix(in srgb, var(--ok) 40%, transparent);
+  }
+  &.warn {
+    color: var(--warn);
+    border-color: color-mix(in srgb, var(--warn) 40%, transparent);
+  }
+  &.err {
+    color: var(--err);
+    border-color: color-mix(in srgb, var(--err) 40%, transparent);
+  }
+  &.accent {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: transparent;
+  }
+}
+
+.bar {
+  height: 9px;
+  background: var(--surface-3);
+  border-radius: 99px;
+  overflow: hidden;
+
+  > i {
+    display: block;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.35s ease;
+  }
+  &.indeterminate > i {
+    width: 35% !important;
+    animation: slide 1.2s infinite ease-in-out;
+  }
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- page layout
+   .page      : full-width working pages (upload, job, logs)    - up to --container, fluid gutters
+   .page-doc  : reading pages (about, privacy, terms, 404)      - up to --container-doc
+   Both fill wide screens instead of leaving a narrow column in the middle of empty space. */
+.page,
+.page-doc {
+  width: 100%;
+  margin-inline: auto;
+  padding: clamp(28px, 4vw, 64px) var(--gutter) clamp(56px, 6vw, 110px);
+}
+.page {
+  max-width: var(--container);
+}
+.page-doc {
+  max-width: var(--container-doc);
+}
+
+.eyebrow {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--accent);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.page-title {
+  font-size: var(--fs-h1);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.page-lead {
+  max-width: 62ch;
+  margin: 16px 0 0;
+  font-size: var(--fs-xl);
+  line-height: 1.6;
+  color: var(--muted);
+}
+.section-title {
+  font-size: var(--fs-h2);
+  font-weight: 750;
+  margin: 0 0 24px;
+}
+
+.grid-2,
+.grid-3,
+.grid-4 {
+  display: grid;
+  gap: var(--gap);
+}
+.grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+}
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+}
+.grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+
+/* ---------------------------------------------------------------------------------------- long-form text (legal pages)
+   Larger, calmer typography. Pages with their own layout (About) may restyle it. */
+.doc {
+  font-size: var(--fs-lg);
+  line-height: 1.75;
+
+  h1 {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  h2 {
+    font-size: var(--fs-h2);
+    font-weight: 750;
+    margin: 56px 0 14px;
+  }
+  h3 {
+    font-size: var(--fs-h3);
+    margin: 30px 0 8px;
+  }
+  p,
+  ul,
+  ol {
+    margin: 0 0 18px;
+  }
+  ul,
+  ol {
+    padding-left: 28px;
+  }
+  li {
+    margin-bottom: 8px;
+  }
+  a:not(.btn) {
+    color: var(--accent);
+    text-underline-offset: 3px;
+  }
+  .lede {
+    font-size: var(--fs-xl);
+    color: var(--muted);
+  }
+  .updated {
+    margin: 0 0 28px;
+    font-size: var(--fs-sm);
+    color: var(--muted);
+  }
+  .callout {
+    margin: 0 0 28px;
+    padding: 20px 24px;
+    border-radius: var(--r-md);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  /* something the owner of the site still has to fill in */
+  mark.placeholder {
+    padding: 1px 7px;
+    border-radius: 6px;
+    background: var(--hl);
+    color: var(--text);
+    font-weight: 600;
+  }
+  details {
+    margin: 12px 0;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    transition: border-color 0.16s var(--ease);
+    &[open] {
+      border-color: var(--line-strong);
+    }
+  }
+  summary {
+    cursor: pointer;
+    padding: 20px 24px;
+    font-weight: 650;
+    font-size: var(--fs-lg);
+    border-radius: var(--r-md);
+  }
+  details > :not(summary) {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
+  details > :last-child {
+    margin-bottom: 22px;
+  }
+  .langs {
+    columns: 4 180px;
+    padding-left: 24px;
+    font-size: var(--fs-base);
+    color: var(--muted);
+  }
+}
+
+/* "Skip to content": only visible while it has keyboard focus */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 18px;
+  border-radius: var(--r-sm);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+  &:focus {
+    transform: none;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------------------------------------- colour helpers
+   .tint-*  solid pastel fill with dark text (icon tiles, number badges, tags).
+   .wash-*  a very light colour wash for a whole card, with a coloured border (mint, sky, lilac, rose only: peach and
+            lemon look muddy as washes, use them as solid .tint-* tiles). Flat: no gradients. */
+.tint-mint { background: var(--tint-mint); color: var(--tint-ink); }
+.tint-sky { background: var(--tint-sky); color: var(--tint-ink); }
+.tint-peach { background: var(--tint-peach); color: var(--tint-ink); }
+.tint-lilac { background: var(--tint-lilac); color: var(--tint-ink); }
+.tint-rose { background: var(--tint-rose); color: var(--tint-ink); }
+.tint-lemon { background: var(--tint-lemon); color: var(--tint-ink); }
+
+@mixin wash($c) {
+  background: color-mix(in srgb, #{$c} 14%, var(--surface));
+  border-color: color-mix(in srgb, #{$c} 62%, var(--line-strong));
+}
+.wash-mint { @include wash(var(--tint-mint)); }
+.wash-sky { @include wash(var(--tint-sky)); }
+.wash-lilac { @include wash(var(--tint-lilac)); }
+.wash-rose { @include wash(var(--tint-rose)); }
+
+/* The theme button adds this class for an instant, flicker-free switch (app.ts removes it again). */
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
+/* Touch: no double-tap zoom delay on controls (the page itself can still be pinch-zoomed). */
+a,
+button,
+input,
+select,
+textarea,
+label,
+summary,
+[role='button'] {
+  touch-action: manipulation;
+}

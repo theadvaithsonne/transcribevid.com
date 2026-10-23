@@ -1,0 +1,102 @@
+# TranscribeVid behind nginx instead of Caddy (non-Docker install, see deploy/README.md, section 11).
+# Written for nginx 1.24 (Ubuntu 24.04). Install as /etc/nginx/sites-available/transcribevid and link it into
+# sites-enabled; the file is included inside nginx's "http" block, which log_format below requires.
+# On nginx 1.25.1 or newer, replace "listen 443 ssl http2;" by "listen 443 ssl;" plus a line "http2 on;".
+#
+# Certificates (once the DNS records point at this server and port 80 is open):
+#   sudo apt install nginx certbot
+#   sudo certbot certonly --webroot -w /var/www/html -d transcribevid.com -d www.transcribevid.com
+# certbot then renews them automatically (systemd timer "certbot.timer"); make it reload nginx afterwards:
+#   printf '#!/bin/sh\nsystemctl reload nginx\n' | sudo tee /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+#   sudo chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+# Create the port-80 server below first (comment out the two 443 servers until the certificate exists), run
+# `sudo nginx -t && sudo systemctl reload nginx`, request the certificate, then enable the rest.
+
+# Access log without query strings: the default format logs the request line, which contains ?filename=...
+# (an uploaded file's name) and possibly ?token=... ($uri is the path only).
+log_format transcribevid '$remote_addr [$time_iso8601] $request_method $uri $status $body_bytes_sent ${request_time}s';
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name transcribevid.com www.transcribevid.com;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+    location / {
+        return 301 https://transcribevid.com$request_uri;
+    }
+}
+
+# www -> bare domain
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name www.transcribevid.com;
+
+    ssl_certificate     /etc/letsencrypt/live/transcribevid.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/transcribevid.com/privkey.pem;
+
+    return 301 https://transcribevid.com$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name transcribevid.com;
+
+    ssl_certificate     /etc/letsencrypt/live/transcribevid.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/transcribevid.com/privkey.pem;
+
+    access_log /var/log/nginx/transcribevid.access.log transcribevid;
+    server_tokens off;
+
+    # Uploads: above VT_MAX_UPLOAD_MB (500 MiB); nginx waits at most 5 min between two chunks of a slow upload.
+    client_max_body_size 600m;
+    client_body_timeout 300s;
+
+    # Compress text only (text/html is always included). The event stream is not in this list on purpose.
+    # Same set as deploy/Caddyfile: html, css, js, json, manifest, xml (sitemap.xml), svg and the text exports.
+    # The app already gzips these itself (VT_COMPRESS=1); nginx passes such answers through unchanged.
+    gzip on;
+    gzip_vary on;
+    gzip_types text/css text/javascript text/plain text/vtt text/xml application/javascript application/json
+               application/manifest+json application/xml image/svg+xml;
+
+    # Same values as deploy/Caddyfile (one year, includeSubDomains, no "preload": see deploy/README.md section 8).
+    # The app sends these headers itself, so they are hidden from its answers first (see "location /" below);
+    # otherwise every response would carry each of them twice.
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header Permissions-Policy "microphone=(self), camera=(), geolocation=()" always;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+
+        # The app already sets these; the add_header lines above are the single source (like "defer" in the Caddyfile).
+        # Its other headers pass through untouched on purpose: Cache-Control (immutable assets, 1 day for icons, 1 hour for
+        # robots.txt / sitemap.xml, no-cache for pages, no-store for /api/) and X-Robots-Tag (noindex for /api/, /logs, /jobs/).
+        proxy_hide_header Strict-Transport-Security;
+        proxy_hide_header X-Content-Type-Options;
+        proxy_hide_header X-Frame-Options;
+        proxy_hide_header Referrer-Policy;
+        proxy_hide_header Permissions-Policy;
+
+        # Stream uploads to the app as they arrive and send events to the visitor immediately.
+        proxy_request_buffering off;
+        proxy_buffering off;
+
+        # The app answers an upload only after the last byte arrived; event streams can run for the whole job.
+        proxy_read_timeout 1h;
+        proxy_send_timeout 1h;
+
+        proxy_set_header Host $host;
+        # Overwrite (do not append to) X-Forwarded-For: the app (VT_TRUST_PROXY=1) believes the first address.
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}

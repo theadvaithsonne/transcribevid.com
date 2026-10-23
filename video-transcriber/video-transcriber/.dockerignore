@@ -1,0 +1,39 @@
+# Keeps the build context small and, above all, keeps secrets (deploy/.env) and user data out of the image.
+
+# Version control / editors
+.git
+.gitignore
+.vscode
+.idea
+
+# Secrets and deployment files (not needed inside the image; deploy/.env holds the admin token)
+deploy
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Python
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+backend/.venv
+# Whisper models and session data: gigabytes, never part of the image (they live in volumes)
+backend/data
+# Dev-only: tests, accuracy tools, CLI, dev requirements
+backend/tests
+backend/tools
+backend/cli.py
+backend/pytest.ini
+backend/requirements-dev.txt
+
+# Node / Angular build output (rebuilt inside the image)
+**/node_modules
+frontend/dist
+frontend/.angular
+
+# Project clutter
+legacy
+sample-output
+scripts
+package.json
+**/*.md

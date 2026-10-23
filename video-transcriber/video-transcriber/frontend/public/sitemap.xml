@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Every public page, at its one canonical address (no trailing slash). The backend's APP_PAGES must know each of them
+     (backend/tests/test_spa.py checks it). No <lastmod>: a date is only useful to Google when it is always accurate, and
+     nothing here could keep it so; ask Google to recrawl a changed page in Search Console instead (deploy/SEO.md). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://transcribevid.com/</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/video-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/audio-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/mp4-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/mp3-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/srt-subtitle-generator</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/voice-recording-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/how-it-works</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/faq</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/privacy</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/terms</loc>
+  </url>
+</urlset>

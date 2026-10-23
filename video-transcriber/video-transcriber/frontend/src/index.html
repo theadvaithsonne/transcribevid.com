@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Free Video to Text Transcription, No Login - TranscribeVid</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Free video to text and audio to text transcription. No login, no daily limit, 50+ languages. Get timestamped text and export SRT, VTT, TXT, PDF.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="application-name" content="TranscribeVid">
+  <meta name="apple-mobile-web-app-title" content="TranscribeVid">
+  <meta name="color-scheme" content="light dark">
+  <!-- One value: the light theme is the default whatever the device prefers (the theme does not follow the system). -->
+  <meta name="theme-color" content="#fff7ed">
+  <!-- No canonical link and no og:url here on purpose: this one file is served for every address, so a fixed value would
+       point every page at the home page. The app sets both for the page being shown (core/title.service.ts). -->
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TranscribeVid">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Free Video to Text Transcription, No Login - TranscribeVid">
+  <meta property="og:description" content="Free video to text and audio to text transcription. No login, no daily limit, 50+ languages. Get timestamped text and export SRT, VTT, TXT, PDF.">
+  <meta property="og:image" content="https://transcribevid.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="TranscribeVid - Video to text, accurately.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Free Video to Text Transcription, No Login - TranscribeVid">
+  <meta name="twitter:description" content="Free video to text and audio to text transcription. No login, no daily limit, 50+ languages. Get timestamped text and export SRT, VTT, TXT, PDF.">
+  <meta name="twitter:image" content="https://transcribevid.com/og-image.png">
+  <meta name="twitter:image:alt" content="TranscribeVid - Video to text, accurately.">
+
+  <!-- Google shows a square icon whose size is a multiple of 48 px (or an SVG) next to the site in search results. -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Structured data (WebSite, Organization, WebApplication, BreadcrumbList, FAQPage, HowTo) is added per page by the
+       app (core/structured-data.service.ts), so no page ever carries another page's data. -->
+
+  <style>
+    html { background: #fff7ed; color: #431407; }
+    html[data-theme='dark'] { background: #000000; color: #f2f2f2; }
+    .boot { max-width: 760px; margin: 0 auto; padding: 48px 20px; font: 18px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    .boot h1 { margin: 0 0 12px; font-size: 32px; line-height: 1.2; }
+    .boot h2 { margin: 28px 0 8px; font-size: 20px; }
+    .boot p { margin: 0 0 12px; }
+    .boot ul { margin: 0; padding-left: 22px; }
+    .boot li { margin-bottom: 6px; }
+    .boot a { color: #0f766e; }
+    html[data-theme='dark'] .boot a { color: #ffffff; }
+    noscript .boot { border: 1px solid currentColor; border-radius: 10px; margin-top: 24px; }
+  </style>
+  <!-- A visitor who chose the dark theme sees it from the first paint (the prerendered HTML is built in the
+       default light theme and the app applies the same saved choice, core/theme.service.ts, once it has started). -->
+  <script>try{var t=localStorage.getItem('vt-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+  <app-root>
+    <!-- What a visitor or crawler without JavaScript sees: real text and plain links. The app replaces it as soon as it starts. -->
+    <div class="boot">
+      <h1>Free video to text transcription</h1>
+      <p>TranscribeVid turns video and audio files into accurate, timestamped text. It is free, unlimited and needs no login. Add an MP4, MP3 or any other video or audio file, choose the spoken language (more than 50 are supported) and download the transcript as SRT, VTT, TXT, Markdown, JSON or PDF.</p>
+      <p class="boot-loading">Loading&hellip;</p>
+      <nav aria-label="Free tools">
+        <h2>Free tools</h2>
+        <ul>
+          <li><a href="/video-to-text">Video to text</a></li>
+          <li><a href="/audio-to-text">Audio to text</a></li>
+          <li><a href="/mp4-to-text">MP4 to text</a></li>
+          <li><a href="/mp3-to-text">MP3 to text</a></li>
+          <li><a href="/srt-subtitle-generator">SRT subtitle generator</a></li>
+          <li><a href="/voice-recording-to-text">Voice recording to text</a></li>
+        </ul>
+      </nav>
+      <nav aria-label="More pages">
+        <h2>More</h2>
+        <ul>
+          <li><a href="/how-it-works">How it works</a></li>
+          <li><a href="/faq">Frequently asked questions</a></li>
+          <li><a href="/privacy">Privacy policy</a></li>
+          <li><a href="/terms">Terms of use</a></li>
+        </ul>
+      </nav>
+    </div>
+  </app-root>
+  <!-- Not in <head>: the prerender (a DOM library) writes the contents of a <noscript> in <head> out as escaped text. -->
+  <noscript>
+    <style>.boot-loading { display: none; }</style>
+    <div class="boot">
+      <p><strong>TranscribeVid needs JavaScript.</strong></p>
+      <p>Please turn on JavaScript in your browser to transcribe videos and audio. TranscribeVid is free, needs no account, and turns video and audio into accurate, timestamped text in more than 50 languages.</p>
+    </div>
+  </noscript>
+</body>
+</html>

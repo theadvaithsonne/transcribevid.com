@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Video Transcriber</title>
+<style>
+  :root { --bg:#0f1216; --card:#181c22; --line:#2a3039; --text:#e8ebef; --muted:#9aa3ad; --accent:#4f8cff; --ok:#3ccf7a; --err:#ff6b6b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--text); }
+  .wrap { max-width:860px; margin:0 auto; padding:32px 16px; }
+  h1 { font-size:26px; margin:0 0 4px; }
+  .sub { color:var(--muted); margin:0 0 24px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:20px; }
+  .drop { border:2px dashed var(--line); border-radius:10px; padding:36px 16px; text-align:center; cursor:pointer; transition:.15s; }
+  .drop.over, .drop:hover { border-color:var(--accent); background:rgba(79,140,255,.06); }
+  .drop input { display:none; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:end; margin-top:16px; }
+  label { font-size:13px; color:var(--muted); display:block; margin-bottom:4px; }
+  select, input[type=text] { background:#0f1216; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:14px; }
+  button { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:10px 18px; font-size:15px; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  button.ghost { background:transparent; border:1px solid var(--line); color:var(--text); font-weight:500; }
+  .bar { height:8px; background:#0f1216; border-radius:4px; overflow:hidden; margin-top:12px; }
+  .bar > div { height:100%; width:0; background:var(--accent); transition:width .4s; }
+  .status { margin-top:8px; color:var(--muted); font-size:14px; }
+  .status.err { color:var(--err); }
+  .seg { display:flex; gap:12px; padding:6px 0; border-bottom:1px solid var(--line); }
+  .seg:last-child { border-bottom:0; }
+  .ts { color:var(--accent); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; flex:0 0 58px; padding-top:2px; }
+  .meta { color:var(--muted); font-size:13px; margin-bottom:12px; }
+  .actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+  textarea { width:100%; min-height:240px; background:#0f1216; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:10px; font:13px/1.5 ui-monospace,Menlo,Consolas,monospace; display:none; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Video Transcriber</h1>
+  <p class="sub">Drop a video or audio file - get a timestamped transcript. Runs fully on your computer, nothing is uploaded anywhere.</p>
+
+  <div class="card">
+    <div class="drop" id="drop">
+      <input type="file" id="file" accept="video/*,audio/*,.mp4,.mkv,.mov,.avi,.webm,.mp3,.wav,.m4a,.aac,.flac,.ogg">
+      <div id="dropText"><strong>Click to choose a file</strong> or drag &amp; drop it here<br><span style="color:var(--muted);font-size:13px">MP4, MKV, MOV, AVI, WEBM, MP3, WAV, M4A ...</span></div>
+    </div>
+    <div class="row">
+      <div><label>Model (bigger = more accurate, slower)</label>
+        <select id="model">
+          <option value="tiny">tiny (fastest)</option>
+          <option value="base">base</option>
+          <option value="small" selected>small (recommended)</option>
+          <option value="medium">medium</option>
+          <option value="large-v3">large-v3 (best, slow)</option>
+        </select></div>
+      <div><label>Language (blank = auto-detect)</label>
+        <input type="text" id="lang" placeholder="e.g. en, hi, es" size="12"></div>
+      <div><button id="go" disabled>Transcribe</button></div>
+    </div>
+    <div class="bar"><div id="barFill"></div></div>
+    <div class="status" id="status">Choose a file to begin.</div>
+  </div>
+
+  <div class="card hidden" id="result">
+    <div class="meta" id="meta"></div>
+    <div class="actions">
+      <button class="ghost" id="dlTxt">Download .txt (timestamps)</button>
+      <button class="ghost" id="dlPlain">Download .txt (plain)</button>
+      <button class="ghost" id="dlSrt">Download .srt (subtitles)</button>
+      <button class="ghost" id="copy">Copy text</button>
+      <button class="ghost" id="toggle">Show as editable text</button>
+    </div>
+    <div id="segs"></div>
+    <textarea id="raw"></textarea>
+  </div>
+</div>
+
+<script>
+const $ = s => document.getElementById(s);
+let file = null, jobId = null, poll = null;
+
+function setFile(f){ file = f; $('dropText').innerHTML = '<strong>'+f.name+'</strong><br><span style="color:var(--muted);font-size:13px">'+(f.size/1048576).toFixed(1)+' MB - click to change</span>'; $('go').disabled = false; $('status').textContent = 'Ready.'; }
+$('drop').onclick = () => $('file').click();
+$('file').onchange = e => e.target.files[0] && setFile(e.target.files[0]);
+['dragenter','dragover'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.add('over'); }));
+['dragleave','drop'].forEach(ev => $('drop').addEventListener(ev, e => { e.preventDefault(); $('drop').classList.remove('over'); }));
+$('drop').addEventListener('drop', e => e.dataTransfer.files[0] && setFile(e.dataTransfer.files[0]));
+
+function setProgress(p, msg, err){ $('barFill').style.width = Math.round(p*100)+'%'; $('status').textContent = msg; $('status').className = 'status'+(err?' err':''); }
+
+$('go').onclick = async () => {
+  if(!file) return;
+  $('go').disabled = true; $('result').classList.add('hidden');
+  const fd = new FormData(); fd.append('file', file); fd.append('model', $('model').value); fd.append('language', $('lang').value);
+  setProgress(0, 'Uploading file...');
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', '/transcribe');
+  xhr.upload.onprogress = e => e.lengthComputable && setProgress(e.loaded/e.total*0.1, 'Uploading... '+Math.round(e.loaded/e.total*100)+'%');
+  xhr.onload = () => {
+    if(xhr.status !== 200){ setProgress(0, 'Error: '+xhr.responseText, true); $('go').disabled=false; return; }
+    jobId = JSON.parse(xhr.responseText).job_id;
+    setProgress(0.1, 'Loading model (first run downloads it, may take a few minutes)...');
+    poll = setInterval(check, 1000);
+  };
+  xhr.onerror = () => { setProgress(0, 'Upload failed', true); $('go').disabled=false; };
+  xhr.send(fd);
+};
+
+async function check(){
+  const r = await fetch('/status/'+jobId); const j = await r.json();
+  if(j.status === 'running' || j.status === 'queued'){ if(j.progress>0) setProgress(0.1+j.progress*0.9, 'Transcribing... '+Math.round(j.progress*100)+'%'); return; }
+  clearInterval(poll); $('go').disabled = false;
+  if(j.status === 'error'){ setProgress(0, 'Error: '+j.error, true); return; }
+  setProgress(1, 'Done.'); render(j);
+}
+
+function render(j){
+  $('meta').textContent = j.filename+' - '+Math.round(j.duration)+'s - language: '+j.language+' - '+j.segments.length+' segments';
+  $('segs').innerHTML = j.segments.map(s => '<div class="seg"><span class="ts">'+s.ts+'</span><span>'+esc(s.text)+'</span></div>').join('');
+  $('raw').value = j.segments.map(s => '['+s.ts+'] '+s.text).join('\n');
+  $('result').classList.remove('hidden');
+  $('dlTxt').onclick = () => location.href = '/download/'+jobId+'/txt';
+  $('dlPlain').onclick = () => location.href = '/download/'+jobId+'/plain';
+  $('dlSrt').onclick = () => location.href = '/download/'+jobId+'/srt';
+  $('copy').onclick = () => navigator.clipboard.writeText($('raw').value).then(()=>{ $('copy').textContent='Copied!'; setTimeout(()=>$('copy').textContent='Copy text',1500); });
+  $('toggle').onclick = () => { const t = $('raw').style.display !== 'block'; $('raw').style.display = t?'block':'none'; $('segs').style.display = t?'none':''; $('toggle').textContent = t?'Show as list':'Show as editable text'; };
+}
+function esc(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+</script>
+</body>
+</html>

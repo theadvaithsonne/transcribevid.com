@@ -1,0 +1,8 @@
+-r requirements.txt
+pytest>=8
+httpx>=0.27
+# reads text back out of the generated PDFs in tests/test_pdf.py
+pypdf>=5
+# accuracy-analysis tools (backend/tools): rapidfuzz = fast word alignment, num2words = oracle for number-word tests
+rapidfuzz>=3.9
+num2words>=0.5.13

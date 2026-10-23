@@ -1,0 +1,238 @@
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, ElementRef, HostListener, computed, inject, signal, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
+import { ApiService } from './core/api.service';
+import { fmtEta, fmtTime, timeAgo } from './core/format';
+import { errorDetail } from './core/http-error';
+import { JobsStore } from './core/jobs.store';
+import { JobSummary } from './core/models';
+import { SessionService } from './core/session.service';
+import { SiteService, TAGLINE } from './core/site.service';
+import { StatsService } from './core/stats.service';
+import { ThemeService } from './core/theme.service';
+import { TOOL_PAGES } from './features/tool-pages/tool-pages.list';
+import { Logo } from './shared/logo';
+import { Toasts } from './shared/toasts';
+
+@Component({
+  selector: 'app-root',
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts],
+  templateUrl: './app.html',
+  styleUrl: './app.scss',
+})
+export class App {
+  store = inject(JobsStore);
+  theme = inject(ThemeService);
+  site = inject(SiteService);
+  session = inject(SessionService);
+  stats = inject(StatsService);
+  private api = inject(ApiService);
+  private router = inject(Router);
+
+  /** The mobile menu sheet (narrow windows) and the desktop "Transcripts" popover. */
+  menuOpen = signal(false);
+  popOpen = signal(false);
+  deleting = signal(false);
+  readonly tagline = TAGLINE;
+  readonly year = new Date().getFullYear();
+  /** the keyword landing pages: linked from the footer so every page links to them */
+  readonly tools = TOOL_PAGES;
+
+  private popWrap = viewChild<ElementRef<HTMLElement>>('popWrap');
+  private popBtn = viewChild<ElementRef<HTMLButtonElement>>('popBtn');
+  private menuBtn = viewChild<ElementRef<HTMLButtonElement>>('menuBtn');
+
+  /** This visitor's transcripts, newest first. */
+  jobs = computed(() => [...this.store.jobs()].sort((a, b) => b.created_at - a.created_at));
+  /** Something is still being processed: the header button shows a pulsing dot. */
+  busy = computed(() => this.jobs().some((j) => j.status === 'running' || j.status === 'queued'));
+  /** The popover only exists while there is something to list. */
+  popVisible = computed(() => this.popOpen() && this.jobs().length > 0);
+
+  /** What happens to the data, worded for where the files really go (shown in full as a tooltip). */
+  sessionNote = computed(() => {
+    const h = this.store.health();
+    if (!h) return '';
+    if (this.site.isPublic()) {
+      const idle = this.site.idleText();
+      const when = idle ? `after ${idle} of inactivity` : 'when it ends';
+      return `Your files and transcripts are kept only for this session and deleted automatically ${when}, or when you press "Delete my data now". No account, no tracking, one essential session cookie. Export what you need before you leave.`;
+    }
+    return h.persistent === false ? 'Session only — nothing is saved. Closing the app erases all transcripts. Export what you need.' : '';
+  });
+
+  /** The one quiet line next to "Delete my data now". */
+  dataNote = computed(() => {
+    if (!this.sessionNote()) return '';
+    return this.site.isPublic() ? 'Kept only for this session, then deleted automatically.' : 'Session only — nothing is saved.';
+  });
+
+  fmtTime = fmtTime;
+  fmtEta = fmtEta;
+  timeAgo = timeAgo;
+
+  /** true on a transcript page: it shows its own full-page "session ended" message, so the shell banner stays away */
+  readonly onJobPage = signal(false);
+
+  constructor() {
+    // any navigation (a row, a link, back/forward) closes whatever is open
+    this.router.events
+      .pipe(
+        filter((e) => e instanceof NavigationEnd),
+        takeUntilDestroyed(),
+      )
+      .subscribe((e) => {
+        this.onJobPage.set((e as NavigationEnd).urlAfterRedirects.startsWith('/jobs/'));
+        this.closeAll();
+      });
+  }
+
+  /**
+   * Light/dark switch. The `theme-switching` class on <html> lets the global styles turn transitions off for the
+   * moment of the switch, so every colour changes at once instead of fading piece by piece.
+   */
+  toggleTheme() {
+    const root = document.documentElement;
+    root.classList.add('theme-switching');
+    this.theme.toggle();
+    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('theme-switching')));
+  }
+
+  statusLabel(j: JobSummary) {
+    switch (j.status) {
+      case 'queued':
+        return 'Queued';
+      case 'running':
+        return j.phase === 'transcribing' ? `Transcribing ${Math.round(j.progress * 100)}%` : 'Starting…';
+      case 'error':
+        return 'Failed';
+      case 'cancelled':
+        return 'Cancelled';
+      default:
+        return fmtTime(j.duration);
+    }
+  }
+
+  // ------------------------------------------------------------------ popover + mobile sheet
+  togglePop() {
+    if (this.popVisible()) return this.closePop();
+    this.menuOpen.set(false);
+    this.popOpen.set(true);
+    setTimeout(() => this.popWrap()?.nativeElement.querySelector<HTMLElement>('.item')?.focus());
+  }
+
+  closePop(restoreFocus = true) {
+    if (!this.popOpen()) return;
+    this.popOpen.set(false);
+    if (restoreFocus) this.popBtn()?.nativeElement.focus();
+  }
+
+  toggleMenu() {
+    if (this.menuOpen()) return this.closeMenu();
+    this.popOpen.set(false);
+    this.menuOpen.set(true);
+    setTimeout(() => document.querySelector<HTMLElement>('#mobile-menu .sheet-link')?.focus());
+  }
+
+  closeMenu(restoreFocus = true) {
+    if (!this.menuOpen()) return;
+    this.menuOpen.set(false);
+    if (restoreFocus) this.menuBtn()?.nativeElement.focus();
+  }
+
+  closeAll() {
+    this.popOpen.set(false);
+    this.menuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape() {
+    if (this.popOpen()) this.closePop();
+    else if (this.menuOpen()) this.closeMenu();
+  }
+
+  /** A click anywhere outside the popover closes it (clicks on the button itself are its own toggle). */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(ev: Event) {
+    if (!this.popOpen()) return;
+    if (this.popWrap()?.nativeElement.contains(ev.target as Node)) return;
+    this.closePop(false);
+  }
+
+  /** Tabbing out of the popover closes it as well. */
+  onPopFocusOut(ev: FocusEvent) {
+    const next = ev.relatedTarget as Node | null;
+    if (this.popOpen() && next && !this.popWrap()?.nativeElement.contains(next)) this.closePop(false);
+  }
+
+  /**
+   * A file dropped slightly outside the upload drop zone would make the browser navigate to it (and abort a
+   * running upload), so cancel the default for file drags anywhere in the window. Other drags (selected text
+   * into an input) are left alone.
+   */
+  @HostListener('window:dragover', ['$event'])
+  @HostListener('window:drop', ['$event'])
+  blockFileNavigation(ev: DragEvent) {
+    if (ev.dataTransfer?.types?.includes('Files')) ev.preventDefault();
+  }
+
+  /** "Skip to main content": a plain #fragment link would navigate to the base href, so move the focus ourselves. */
+  skipToContent(ev: Event) {
+    ev.preventDefault();
+    const main = document.getElementById('main');
+    main?.focus();
+    main?.scrollIntoView?.({ block: 'start' });
+  }
+
+  // ------------------------------------------------------------------ data
+  /** Wipes every transcript and uploaded file of this visitor on the server, then resets the page. */
+  deleteMyData() {
+    if (this.deleting()) return;
+    if (!confirm('Delete all your transcripts and uploaded files now?\n\nThis cannot be undone. Export anything you want to keep first.')) return;
+    this.deleting.set(true);
+    this.api.deleteSession().subscribe({
+      next: () => {
+        this.deleting.set(false);
+        this.session.reset();
+        this.store.clearAll();
+        this.closeAll();
+        this.router.navigateByUrl('/');
+        this.store.notify('Your transcripts and files were removed from the server.', 'success', 'All your data was deleted');
+      },
+      error: (e) => {
+        this.deleting.set(false);
+        this.store.notify(errorDetail(e, 'Could not delete your data.'));
+        this.store.refresh();
+      },
+    });
+  }
+
+  remove(ev: Event, j: JobSummary) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    const run = j.status === 'running';
+    const msg = run ? `Cancel "${j.title}"?` : `Delete "${j.title}" and its transcript?`;
+    if (!confirm(msg)) return;
+    // a deleted transcript is gone, so leave its page; a cancelled one still exists (it shows "Cancelled"), so stay on it
+    const done = () => {
+      this.store.refresh();
+      if (!run && this.router.url.includes(j.id)) this.router.navigateByUrl('/');
+    };
+    // e.g. 409 "Cancel the running job first." when the list was stale; resync the list either way
+    const fail = (e: unknown) => {
+      this.store.notify(errorDetail(e, run ? 'Could not cancel the transcript.' : 'Could not delete the transcript.'));
+      this.store.refresh();
+    };
+    if (run) this.api.cancel(j.id).subscribe({ next: done, error: fail });
+    else
+      this.api.delete(j.id).subscribe({
+        next: () => {
+          this.store.remove(j.id);
+          done();
+        },
+        error: fail,
+      });
+  }
+}

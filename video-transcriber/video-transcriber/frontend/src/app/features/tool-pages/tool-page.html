@@ -1,0 +1,98 @@
+<div class="page tool">
+  <header class="hero">
+    <div class="hero-text">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a routerLink="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{{ label() }}</span>
+      </nav>
+      <h1 class="page-title">{{ c().h1 }}</h1>
+      <p class="page-lead">{{ c().lead }}</p>
+    </div>
+    <app-free-chips class="hero-chips" />
+    <div class="hero-drop">
+      <app-tool-drop [kind]="c().dropKind" [noun]="c().dropNoun" [formats]="c().accepts" [limits]="limits()" />
+      @if (c().record) {
+        <p class="alt"><a routerLink="/">Record with your microphone</a></p>
+      }
+    </div>
+  </header>
+
+  <section aria-labelledby="why-title">
+    <h2 class="section-title" id="why-title">{{ c().whyTitle }}</h2>
+    <div class="why-text">
+      @for (p of c().why; track $index) {
+        <p>{{ p }}</p>
+      }
+    </div>
+  </section>
+
+  <section aria-labelledby="how-title">
+    <h2 class="section-title" id="how-title">{{ c().howTitle }}</h2>
+    <ol class="steps">
+      @for (s of c().steps; track $index) {
+        <li>
+          <span class="num" aria-hidden="true">{{ $index + 1 }}</span>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.text }}</p>
+        </li>
+      }
+    </ol>
+  </section>
+
+  <section aria-labelledby="formats-title">
+    <h2 class="section-title" id="formats-title">{{ c().formatsTitle }}</h2>
+    <p class="intro">{{ c().formatsIntro }}</p>
+    @if (c().example; as example) {
+      <pre class="code mono" tabindex="0" [attr.aria-label]="c().exampleLabel">{{ example }}</pre>
+    }
+    <div class="formats">
+      <div>
+        <h3>{{ c().uploadTitle }}</h3>
+        <ul class="types">
+          @for (a of c().accepts; track a) {
+            <li>{{ a }}</li>
+          }
+        </ul>
+      </div>
+      <div>
+        <h3>Download the transcript as</h3>
+        <ul class="downloads">
+          @for (d of c().downloads; track d.name) {
+            <li><b>{{ d.name }}</b> {{ d.use }}</li>
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="tips" aria-labelledby="tips-title">
+    <h2 class="section-title" id="tips-title">{{ c().tipsTitle }}</h2>
+    <ul>
+      @for (t of c().tips; track $index) {
+        <li>
+          <b>{{ t.title }}</b>
+          {{ t.text }}
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="faq" aria-labelledby="faq-title">
+    <h2 class="section-title" id="faq-title">{{ label() }}: common questions</h2>
+    <div class="qas">
+      @for (f of faqs(); track $index) {
+        <details class="qa">
+          <summary>{{ f.question }}<span class="pm" aria-hidden="true"></span></summary>
+          <p>{{ f.answer }}</p>
+        </details>
+      }
+    </div>
+  </section>
+
+  <div class="end">
+    <a class="btn big ghost" routerLink="/">Transcribe a file</a>
+  </div>
+
+  <app-related-tools [current]="path()" />
+</div>

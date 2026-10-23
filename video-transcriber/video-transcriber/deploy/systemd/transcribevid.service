@@ -1,0 +1,50 @@
+# TranscribeVid without Docker (see deploy/README.md, section 11).
+#
+#   sudo cp deploy/systemd/transcribevid.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now transcribevid
+#
+# Expects: code in /opt/transcribevid (backend/app, backend/run.py, backend/.venv, frontend/dist/frontend/browser),
+# settings in /etc/transcribevid/transcribevid.env (a copy of deploy/.env.example plus the lines from README
+# section 11), and a system user "transcribevid".
+
+[Unit]
+Description=TranscribeVid (FastAPI + Angular)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=transcribevid
+Group=transcribevid
+WorkingDirectory=/opt/transcribevid/backend
+EnvironmentFile=/etc/transcribevid/transcribevid.env
+Environment=NO_BROWSER=1 PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 HF_HUB_DISABLE_XET=1
+ExecStart=/opt/transcribevid/backend/.venv/bin/python run.py
+
+# The app deletes all visitor files on SIGTERM (needs ~5 s), then exits.
+KillSignal=SIGTERM
+TimeoutStopSec=20
+Restart=on-failure
+RestartSec=5
+
+# /var/lib/transcribevid, owned by the service user: models, scratch files, Hugging Face side cache.
+StateDirectory=transcribevid
+
+# Optional resource limits (uncomment), e.g. for an 8 vCPU / 16 GB server:
+# CPUQuota=700%
+# MemoryMax=12G
+
+# Sandboxing: the service can write only to its StateDirectory and its private /tmp.
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

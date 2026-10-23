@@ -1,0 +1,79 @@
+@if (access() === 'disabled') {
+  <div class="page gate-page">
+    <section class="gate card" role="status">
+      <h1>Logs</h1>
+      <p class="muted">Logs are turned off on this server.</p>
+      <a class="btn" routerLink="/">Back to transcribing</a>
+    </section>
+  </div>
+} @else if (access() === 'token' || access() === 'denied') {
+  <div class="page gate-page">
+    <form class="gate card" (submit)="$event.preventDefault(); submitToken()">
+      <h1>Logs</h1>
+      <p class="muted">These logs are for whoever runs this server. Enter the access token to view them.</p>
+      @if (access() === 'denied') {
+        <p class="bad" role="alert">That token was not accepted. Check it and try again.</p>
+      }
+      <div class="field">
+        <label for="logs-token">Access token</label>
+        <input id="logs-token" name="token" type="password" autocomplete="off" [(ngModel)]="tokenDraft" />
+      </div>
+      <button class="btn primary big" type="submit" [disabled]="!tokenDraft.trim()">Unlock logs</button>
+    </form>
+  </div>
+} @else {
+<div class="logs">
+  <header class="bar-top">
+    <div class="title">
+      <h1>Logs</h1>
+      <span class="conn" [class.live]="conn() === 'live'" role="status">
+        <span class="dot" aria-hidden="true"></span>{{ conn() === 'live' ? 'Live' : conn() === 'connecting' ? 'Connecting…' : 'Reconnecting…' }}
+      </span>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn small ghost" (click)="togglePause()" [attr.aria-pressed]="paused()">
+        {{ paused() ? 'Resume' + (pendingCount() ? ' (' + pendingCount() + ' new)' : '') : 'Pause' }}
+      </button>
+      <button type="button" class="btn small ghost toggle" [class.on]="follow()" (click)="setFollow(!follow())" [attr.aria-pressed]="follow()" title="Keep the newest line in view; scrolling up stops it">
+        <span class="tick" aria-hidden="true"></span>Follow newest
+      </button>
+      <button type="button" class="btn small ghost" (click)="download()" [disabled]="!visible().length">Download</button>
+      <button type="button" class="btn small ghost danger" (click)="clear()" [disabled]="clearing()">Clear</button>
+    </div>
+  </header>
+
+  <div class="filters">
+    <div class="levels" role="group" aria-label="Filter by level">
+      @for (l of levels; track l) {
+        <button type="button" class="lvl toggle" [class.on]="active().has(l)" [class.off]="!active().has(l)" (click)="toggleLevel(l)" [attr.aria-pressed]="active().has(l)">
+          <span class="tick" aria-hidden="true"></span>
+          {{ l }} <b>{{ counts()[l] }}</b>
+        </button>
+      }
+    </div>
+    <div class="search">
+      <input type="search" [ngModel]="query()" (ngModelChange)="query.set($event)" placeholder="Search messages and loggers" aria-label="Search logs" />
+    </div>
+  </div>
+
+  <div class="viewport mono" #viewport (scroll)="onScroll()" role="log" aria-live="off" tabindex="0" aria-label="Log output">
+    <div class="head" aria-hidden="true">
+      <span class="t">Time</span>
+      <span class="lv">Level</span>
+      <span class="lg">Logger</span>
+      <span class="msg">Message</span>
+    </div>
+    @for (e of visible(); track e.seq) {
+      <div class="row" [class]="'row ' + lvl(e.level)">
+        <span class="t">{{ time(e.ts) }}</span>
+        <span class="lv">{{ e.level }}</span>
+        <span class="lg" [title]="e.logger">{{ e.logger }}</span>
+        <span class="msg">{{ e.message }}</span>
+      </div>
+    } @empty {
+      <p class="muted none">{{ entries().length ? 'No entries match the current filters.' : 'No log entries yet.' }}</p>
+    }
+  </div>
+  <p class="muted foot">Showing at most 3000 recent lines. Logs live only in memory and are erased when the server stops.</p>
+</div>
+}
