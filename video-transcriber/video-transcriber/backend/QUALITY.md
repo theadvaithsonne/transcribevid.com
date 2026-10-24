@@ -20,13 +20,23 @@ cd backend
 
 Qwen models: `qwen3-asr-0.6b` and `qwen3-asr-1.7b`. Their weights download on first
 use. Qwen is an experimental transcription adapter, not an English translation
-engine. It uses silence-aware chunks of at most 25 seconds, with up to two seconds
-of preceding audio re-decoded for continuity. Only exact suffix/prefix matches of
-at least three words are removed (ignoring case and punctuation). Short or
-uncertain repetitions are retained. Raw per-chunk output is stored as
+engine. It uses speech detection with 300 ms pauses and 100 ms padding to choose
+natural chunk boundaries, at most 25 seconds apart. Silence gaps of two seconds or
+longer are skipped without changing original sample offsets. Silent audio returns
+no segments without loading the recognition model. Disabling VAD keeps all audio.
+Only cuts inside continuous speech use up to two seconds of preceding audio.
+Exact suffix/prefix matches of at least three words are removed (ignoring case and
+punctuation). If no reliable match exists, the non-overlapping audio is recognized
+once more instead of deleting fuzzy matches or appending ambiguous overlap text.
+These retries add processing time on continuous speech. Short or uncertain
+repetitions inside the recognized passage are retained. Raw per-chunk output is stored as
 `recognition_text`; `original_text` keeps the Hindi text after overlap removal so
-restyling does not reintroduce duplicates. If no match is found, approximate chunk
-timestamps show the overlapping audio range. Hindi word alignment
+restyling does not reintroduce duplicates. Retried overlap text is preserved in
+`overlap_recognition_text`; `boundary_resolution` records the processing decision.
+`review_reasons` flags boundary retries and long repeated phrases for listening,
+without inventing confidence scores or automatically rewriting the speaker.
+This is language-independent processing, not a claim of universal accuracy.
+Hindi word alignment
 is not supported by Qwen's released forced aligner, so this adapter intentionally
 returns approximate chunk timing, `words: null`, and `confidence: null`.
 It does not fabricate word timestamps or confidence scores.

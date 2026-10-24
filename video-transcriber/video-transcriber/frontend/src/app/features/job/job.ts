@@ -196,6 +196,9 @@ export class JobPage {
     const j = this.job();
     if (!j || j.status !== 'done') return '';
     if (!j.segments.length) return 'No speech was transcribed. Check the recording and the selected language.';
+    if (j.segments.some((s) => !s.edited && s.review_reasons?.length)) {
+      return 'Some passages need a listening check because of repeated text or an uncertain speech boundary.';
+    }
     if (j.stats?.avg_confidence != null && j.stats.avg_confidence < 0.6) {
       return 'This transcript has low model confidence. Listen to the recording and check the spoken language before using the text.';
     }

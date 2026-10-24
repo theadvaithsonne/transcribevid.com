@@ -720,6 +720,18 @@ describe('JobPage', () => {
     });
 
     describe('language recovery', () => {
+      it('shows audio review signals even when word confidence is unavailable', () => {
+        const segment = { ...makeJob().segments[0], review_reasons: ['boundary_retry'], confidence: null };
+        show({ segments: [segment], language_probability: null, stats: null });
+        expect(clean(q('.quality-review'))).toContain('uncertain speech boundary');
+      });
+
+      it('does not keep a review warning after the user has corrected that passage', () => {
+        const segment = { ...makeJob().segments[0], review_reasons: ['repeated_phrase'], edited: true };
+        show({ segments: [segment], language_probability: null, stats: null });
+        expect(q('.quality-review')).toBeNull();
+      });
+
       it('keeps Auto on retry even when the previous detection was confidently wrong', () => {
         show({ language: 'hi', language_probability: 0.988, stats: stats({ avg_confidence: 0.38 }) });
         expect(page.rerunLanguage).toBeNull();

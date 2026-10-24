@@ -33,6 +33,7 @@ export interface Segment {
   romanizer?: string;
   conversion_warning?: string;
   timing?: 'chunk';
+  review_reasons?: string[];
   words: Word[] | null;
   confidence: number | null;
   no_speech_prob?: number;

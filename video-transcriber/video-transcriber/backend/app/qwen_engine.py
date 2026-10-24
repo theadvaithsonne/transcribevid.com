@@ -2,6 +2,7 @@
 import gc
 import re
 import unicodedata
+from dataclasses import dataclass
 
 from . import config, engine
 from .hinglish import convert_segment
@@ -13,18 +14,27 @@ _model = None
 _name = None
 
 
+@dataclass(frozen=True)
+class Chunk:
+    start: int
+    end: int
+    overlap: bool = False  # only a forced cut inside continuous speech needs context
+
+
+def token_key(token):
+    return "".join(c for c in unicodedata.normalize("NFC", token).casefold()
+                   if unicodedata.category(c)[0] in "LNM")
+
+
 def trim_overlap(previous, current, max_words=24):
     """Remove only a substantial exact suffix/prefix match at an audio overlap.
 
     Ignore case and punctuation, but never guess similar words or remove isolated
     repetitions. Unmatched text is retained for review rather than silently lost.
     """
-    def key(token):
-        return "".join(c for c in unicodedata.normalize("NFC", token).casefold()
-                       if unicodedata.category(c)[0] in "LNM")
-    left = [key(m.group()) for m in re.finditer(r"\S+", previous)]
+    left = [token_key(m.group()) for m in re.finditer(r"\S+", previous)]
     right = list(re.finditer(r"\S+", current))
-    keys = [key(m.group()) for m in right]
+    keys = [token_key(m.group()) for m in right]
     for size in range(min(max_words, len(left), len(keys)), 2, -1):
         if all(keys[:size]) and left[-size:] == keys[:size]:
             return current[right[size - 1].end():].lstrip(), size
@@ -54,19 +64,53 @@ def load_model(name):
     return _model
 
 
-def chunks(audio, seconds=25):
-    """Prefer silence near the next boundary; keep exact offsets and cover all audio."""
-    from faster_whisper.vad import get_speech_timestamps
-    speech = get_speech_timestamps(audio)
-    breaks = [(a["end"] + b["start"]) // 2 for a, b in zip(speech, speech[1:])]
-    start, step = 0, seconds * engine.SAMPLE_RATE
-    while start < len(audio):
-        end = min(len(audio), start + step)
-        nearby = [p for p in breaks if start + step * 0.6 <= p <= end]
-        if end < len(audio) and nearby:
-            end = nearby[-1]
-        yield start, end
-        start = end
+def chunks(audio, seconds=25, vad=True):
+    """Split at natural pauses, skip long silence, overlap only forced cuts.
+
+    Sample offsets always refer to the original audio, even across skipped gaps.
+    No transcript vocabulary or assumed spoken language affects this plan.
+    """
+    from faster_whisper.vad import VadOptions, get_speech_timestamps
+    step = int(seconds * engine.SAMPLE_RATE)
+    if step <= 0:
+        raise ValueError("Chunk duration must be positive.")
+    speech = (get_speech_timestamps(audio, vad_options=VadOptions(
+        min_silence_duration_ms=300, speech_pad_ms=100,
+    )) if vad else [{"start": 0, "end": len(audio)}])
+    if not speech:
+        return
+    # Do not ask the recognizer to invent speech over long empty intervals.
+    groups, group = [], []
+    for interval in speech:
+        if group and interval["start"] - group[-1]["end"] >= 2 * engine.SAMPLE_RATE:
+            groups.append(group)
+            group = []
+        group.append(interval)
+    groups.append(group)
+    for group in groups:
+        start, stop = group[0]["start"], group[-1]["end"]
+        breaks = [(a["end"] + b["start"]) // 2 for a, b in zip(group, group[1:])
+                  if b["start"] > a["end"]]
+        overlap = False
+        while start < stop:
+            end = min(stop, start + step)
+            nearby = [p for p in breaks if start + step * 0.6 <= p <= end]
+            forced = end < stop
+            if forced and nearby:
+                end, forced = nearby[-1], False
+            yield Chunk(start, end, overlap)
+            start, overlap = end, forced
+
+
+def repeated_phrase(text):
+    """A review signal, never an instruction to delete potentially spoken words."""
+    words = [key for token in text.split() if (key := token_key(token))]
+    for width in range(3, min(12, len(words) // 3) + 1):
+        for start in range(len(words) - 3 * width + 1):
+            phrase = words[start:start + width]
+            if phrase == words[start + width:start + 2 * width] == words[start + 2 * width:start + 3 * width]:
+                return True
+    return False
 
 
 class QwenEngine:
@@ -90,36 +134,63 @@ class QwenEngine:
             if config.MAX_DURATION_MIN and duration > config.MAX_DURATION_MIN * 60:
                 raise ValueError("The recording exceeds this server's duration limit.")
             check()
+            spans = list(chunks(audio, vad=o["vad"]))
+            check()
+            if not spans:
+                return {"language": o.get("language"), "language_probability": None,
+                        "duration": round(duration, 2), "segments": []}
             phase("loading_model", o["model"])
             model = load_model(o["model"])
             phase("transcribing")
             out, language = [], o.get("language")
             inverse = {name.lower(): code for code, name in engine.LANGUAGES.items()}
-            spans = list(chunks(audio))
             previous_text = ""
-            for start, end in spans:
+            def decode(start, end):
+                check()
+                kwargs = {"audio": (np.array(audio[start:end], copy=True), engine.SAMPLE_RATE),
+                          "language": engine.LANGUAGES.get(o.get("language")), "context": o.get("prompt", "")}
+                response = model.transcribe(**engine._supported(model.transcribe, **kwargs))[0]
+                check()
+                return response
+
+            for chunk in spans:
+                start, end = chunk.start, chunk.end
                 check()
                 # Re-decode two seconds before the boundary to recover cut words.
                 # Keep copies: numpy views would prevent decoded memmap cleanup.
                 overlap = min(2 * engine.SAMPLE_RATE, (end - start) // 4)
-                audio_start = max(0, start - overlap) if previous_text else start
-                kwargs = {"audio": (np.array(audio[audio_start:end], copy=True), engine.SAMPLE_RATE),
-                          "language": engine.LANGUAGES.get(o.get("language")), "context": o.get("prompt", "")}
-                response = model.transcribe(**engine._supported(model.transcribe, **kwargs))[0]
-                detected = inverse.get(response.language.lower())
-                language = language or detected
+                audio_start = max(0, start - overlap) if previous_text and chunk.overlap else start
+                response = decode(audio_start, end)
                 raw_text = response.text.strip()
                 text, removed = trim_overlap(previous_text, raw_text) if audio_start < start else (raw_text, 0)
+                boundary, reasons = "pause", []
+                overlap_text = None
+                if audio_start < start:
+                    if removed:
+                        boundary = "exact_overlap"
+                    else:
+                        # Text-only fuzzy matching can delete real speech, names,
+                        # or code-switching. Retry the non-overlapping audio once.
+                        overlap_text = raw_text
+                        response = decode(start, end)
+                        raw_text = text = response.text.strip()
+                        boundary = "audio_retry"
+                        reasons.append("boundary_retry")
+                detected = inverse.get((response.language or "").lower())
+                language = language or detected
                 if not text:
+                    previous_text = ""
                     continue
                 previous_text = raw_text
-                # Without a reliable text match, expose the actual overlapping
-                # audio boundary rather than pretending the words were aligned.
-                segment_start = start if removed else audio_start
-                seg = {"id": len(out), "start": round(segment_start / engine.SAMPLE_RATE, 2),
+                if repeated_phrase(text):
+                    reasons.append("repeated_phrase")
+                seg = {"id": len(out), "start": round(start / engine.SAMPLE_RATE, 2),
                        "end": round(end / engine.SAMPLE_RATE, 2), "text": text, "original_text": text,
                        "recognition_text": raw_text, "overlap_words_removed": removed,
+                       "boundary_resolution": boundary, "review_reasons": reasons,
                        "words": None, "confidence": None, "timing": "chunk", "edited": False}
+                if overlap_text is not None:
+                    seg["overlap_recognition_text"] = overlap_text
                 if o["output_script"] == "hinglish" and (detected or language) in ("hi", "en"):
                     seg = convert_segment(seg, o.get("romanizer", "auto"))
                 out.append(seg)
