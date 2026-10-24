@@ -1,6 +1,6 @@
 <div class="page upload" [class.ready]="files().length > 0">
   <header class="hero">
-    <h1 class="page-title">Transcribe a video or audio file</h1>
+    <h1 class="page-title">{{ tool() === 'download' ? 'Download a video from a link' : 'Transcribe a video or audio file' }}</h1>
     <ul class="trust" aria-label="Free, unlimited, and no login needed">
       <li class="tint-mint" style="--c: var(--tint-mint)"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Free</li>
       <li class="tint-sky" style="--c: var(--tint-sky)"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Unlimited</li>
@@ -8,6 +8,14 @@
     </ul>
   </header>
 
+  <nav class="tool-picker" aria-label="Choose a tool">
+    <button type="button" class="btn" [class.primary]="tool() === 'transcribe'" [attr.aria-pressed]="tool() === 'transcribe'" (click)="tool.set('transcribe')">Transcribe a file</button>
+    <button type="button" class="btn" [class.primary]="tool() === 'download'" [attr.aria-pressed]="tool() === 'download'" [disabled]="uploading() || recording() || micBusy()" (click)="tool.set('download')">Download from link</button>
+  </nav>
+
+  @if (tool() === 'download') {
+    <app-video-downloader />
+  } @else {
   <div class="layout">
     <!-- 1. the file -->
     <div class="col-files">
@@ -213,7 +221,8 @@
     </section>
   </div>
 
-  @if (dragging()) {
+  }
+  @if (dragging() && tool() === 'transcribe') {
     <div class="drop-overlay" aria-hidden="true">
       <div class="drop-overlay-box">
         <svg viewBox="0 0 24 24" fill="none" width="48" height="48">

@@ -1,0 +1,18 @@
+:host { display: block; }
+.downloader { max-width: 1100px; margin: 0 auto; padding: var(--space-card); }
+h2 { font-size: var(--fs-h3); margin: 0 0 8px; }
+header p, .hint, .privacy { color: var(--muted); font-size: var(--fs-sm); }
+header { margin-bottom: 24px; }
+form { display: flex; gap: 14px; align-items: end; flex-wrap: wrap; }
+.link-field { flex: 1 1 340px; min-width: 0; }
+.quality-field { flex: 0 1 180px; min-width: 150px; }
+input, select { width: 100%; min-width: 0; }
+.hint { margin-top: 12px; }
+.privacy { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 28px; }
+.download-result { margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; }
+.result-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.video-title, .download-result p { overflow-wrap: anywhere; }
+progress { display: block; width: 100%; margin: 18px 0; accent-color: var(--accent); }
+.clear { margin-top: 16px; }
+.alert { color: var(--err); }
+@media (max-width: 600px) { form { display: grid; grid-template-columns: minmax(0, 1fr); } .quality-field { min-width: 0; } }

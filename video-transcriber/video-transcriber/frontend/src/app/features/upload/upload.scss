@@ -2,6 +2,7 @@
   display: block;
   height: 100%;
 }
+.tool-picker { display: flex; flex-wrap: wrap; gap: 10px; flex: none; }
 
 /* The landing page, kept deliberately simple: a title with three chips, one place for the file, and one card with the
    quality, the language and the big Transcribe button. One main button at a time ("Choose a file" until a file is chosen,

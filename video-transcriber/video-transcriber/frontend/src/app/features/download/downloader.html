@@ -1,0 +1,38 @@
+<section class="card downloader" aria-labelledby="download-heading">
+  <header>
+    <h2 id="download-heading">Paste a link. Save the video.</h2>
+    <p>YouTube videos &amp; Shorts · Instagram Reels &amp; video posts</p>
+  </header>
+  <form (ngSubmit)="start()">
+    <div class="field link-field">
+      <label for="download-url">Video link</label>
+      <input id="download-url" name="videoUrl" type="url" inputmode="url" required maxlength="2048" autocomplete="off" placeholder="https://www.youtube.com/watch?v=…" [(ngModel)]="url" [disabled]="busy()" />
+    </div>
+    <div class="field quality-field">
+      <label for="download-quality">Quality</label>
+      <select id="download-quality" name="quality" [(ngModel)]="quality" [disabled]="busy()">
+        <option [ngValue]="360">Up to 360p</option><option [ngValue]="720">Up to 720p</option><option [ngValue]="1080">Up to 1080p</option>
+      </select>
+    </div>
+    <button type="submit" class="btn primary" [disabled]="busy() || !url.trim()">{{ loading() ? 'Starting…' : 'Download' }}</button>
+  </form>
+  <p class="hint">Public single videos only. Private, login-required, live videos and carousels may not be available.</p>
+  @if (error()) { <p class="alert" role="alert">{{ error() }}</p> }
+  @if (job(); as j) {
+    <section class="download-result" aria-label="Download status" aria-live="polite">
+      <div class="result-heading"><b>{{ statusText() }}</b>
+        @if (active()) { <button type="button" class="btn" (click)="cancel()" [disabled]="cancelling() || j.cancel_requested">{{ cancelling() || j.cancel_requested ? 'Cancelling…' : 'Cancel' }}</button> }
+      </div>
+      @if (j.title) { <p class="video-title">{{ j.title }}</p> }
+      @if (active()) { <progress aria-label="Preparing your video"></progress> }
+      @if (j.status === 'error') { <p class="alert" role="alert">{{ j.error }}</p> }
+      @if (j.status === 'done') {
+        <p>{{ j.filename }} · {{ fmtBytes(j.size_bytes || 0) }}</p>
+        <a class="btn primary" [href]="fileUrl()" [attr.download]="j.filename">Save video</a>
+        <p class="hint">Your download starts automatically. If it did not start, use Save video.</p>
+      }
+      @if (!active()) { <button type="button" class="btn clear" (click)="clear()" [disabled]="loading()">Clear download</button> }
+    </section>
+  }
+  <p class="privacy">Downloaded files are temporary and are removed when your session ends.</p>
+</section>

@@ -11,6 +11,7 @@ import { DEFAULT_OPTIONS, JobOptions } from '../../core/models';
 import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
+import { VideoDownloader } from '../download/downloader';
 
 const KEY = 'vt-options';
 const MEDIA_EXT = /\.(mp4|mkv|mov|avi|webm|mp3|wav|m4a|aac|flac|ogg|opus|wmv|flv|m4v|3gp|ts|mts)$/i;
@@ -39,11 +40,12 @@ const fileKey = (f: File) => `${f.name}|${f.size}|${f.lastModified}`;
 
 @Component({
   selector: 'app-upload',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, VideoDownloader],
   templateUrl: './upload.html',
   styleUrl: './upload.scss',
 })
 export class UploadPage {
+  tool = signal<'transcribe' | 'download'>('transcribe');
   private api = inject(ApiService);
   private router = inject(Router);
   private log = inject(LogService);
