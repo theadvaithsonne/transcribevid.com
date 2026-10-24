@@ -856,6 +856,65 @@ describe('UploadPage', () => {
     const clean = (el: Element | null) => (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
     const toggle = () => q('button.more-toggle') as HTMLButtonElement;
 
+    it('defaults to visible Hinglish and sends it with a new upload', async () => {
+      setup();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect((q('#output-script') as HTMLSelectElement).value).toBe('hinglish');
+      page.addFiles([media('a.mp4')]);
+      page.start();
+      expect(JSON.parse(uploadReq().request.params.get('options')!).output_script).toBe('hinglish');
+    });
+
+    it('switches the engine and model together and prevents Qwen translation', () => {
+      setup();
+      store.models.set([
+        { id: 'small', label: 'Small', size_mb: 465, speed: 3, accuracy: 3, note: '', downloaded: true, engine: 'whisper' },
+        { id: 'qwen3-asr-0.6b', label: 'Qwen', size_mb: 1300, speed: 2, accuracy: 0, note: '', downloaded: true, engine: 'qwen' },
+      ]);
+      page.opts.task = 'translate';
+      page.opts.engine = 'qwen';
+      page.changeEngine();
+      expect(page.opts.model).toBe('qwen3-asr-0.6b');
+      expect(page.opts.task).toBe('transcribe');
+      expect(page.selectableModels().map((m) => m.id)).toEqual(['qwen3-asr-0.6b']);
+      page.choosePreset('small');
+      expect(page.opts.engine).toBe('whisper');
+    });
+
+    it('lets the user choose original script and remembers that selection', () => {
+      setup();
+      fixture.detectChanges();
+      const style = q('#output-script') as HTMLSelectElement;
+      style.value = 'original';
+      style.dispatchEvent(new Event('change'));
+      page.addFiles([media('a.mp4')]);
+      page.start();
+      expect(JSON.parse(uploadReq().request.params.get('options')!).output_script).toBe('original');
+      expect(JSON.parse(sessionStorage.getItem('vt-options')!).output_script).toBe('original');
+    });
+
+    it('restores an explicit original script preference', () => {
+      sessionStorage.setItem('vt-options', JSON.stringify({ model: 'small', output_script: 'original' }));
+      setup();
+      expect(page.opts.output_script).toBe('original');
+    });
+
+    it('gives old saved options the new Hinglish default', () => {
+      sessionStorage.setItem('vt-options', JSON.stringify({ model: 'small' }));
+      setup();
+      expect(page.opts.output_script).toBe('hinglish');
+    });
+
+    it('disables script selection for English translation', async () => {
+      setup();
+      page.opts.task = 'translate';
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect((q('#output-script') as HTMLSelectElement).disabled).toBe(true);
+      expect(clean(q('#output-script-hint'))).toContain('English translation');
+    });
+
     it('is a closed disclosure at first, with the spoken language always visible', () => {
       setup();
       fixture.detectChanges();

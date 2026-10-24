@@ -112,7 +112,7 @@
     outline-offset: 2px;
   }
 }
-/* "English · 00:45 · 190 words · 87% sure": plain text, the dots drawn between the parts */
+/* Language, duration, words and model confidence: plain text, with dots between the parts. */
 .facts {
   display: flex;
   flex-wrap: wrap;

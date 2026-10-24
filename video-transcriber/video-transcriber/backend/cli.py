@@ -7,15 +7,20 @@
 import argparse
 import sys
 
-from app import engine, formats
+from app import engine, formats, backends
+from app.schemas import JobOptions
 
 
 def main():
     p = argparse.ArgumentParser(description="Transcribe a video/audio file locally with Whisper.")
     p.add_argument("file")
-    p.add_argument("--model", default="small", help="tiny, base, small, medium, large-v3-turbo, large-v3")
+    p.add_argument("--engine", choices=["whisper", "qwen"], default="whisper")
+    p.add_argument("--model", default=None, help="Whisper model name or qwen3-asr-0.6b / qwen3-asr-1.7b")
+    p.add_argument("--romanizer", choices=["auto", "indicxlit", "basic"], default="auto")
     p.add_argument("--lang", default=None, help="spoken language code, e.g. en (default: auto-detect)")
     p.add_argument("--translate", action="store_true", help="translate speech to English")
+    p.add_argument("--output-script", choices=["hinglish", "original"], default="hinglish",
+                   help="Hindi in Roman letters (default) or original recognition script")
     p.add_argument("--prompt", default="", help="names/jargon that appear in the audio")
     p.add_argument("--format", default="txt", choices=["txt", "plain", "srt", "vtt", "md", "json"])
     p.add_argument("-o", "--out", help="write to a file instead of the console")
@@ -27,11 +32,12 @@ def main():
     def on_segment(seg, progress, info):
         print(f"\r{progress:5.0%}", end="", file=sys.stderr)
 
-    r = engine.transcribe(a.file, {"model": a.model, "language": a.lang, "prompt": a.prompt,
-                                   "task": "translate" if a.translate else "transcribe"},
-                          on_phase, on_segment)
+    options = JobOptions(engine=a.engine, model=a.model or ("small" if a.engine == "whisper" else "qwen3-asr-0.6b"),
+                         language=a.lang, prompt=a.prompt, task="translate" if a.translate else "transcribe",
+                         output_script=a.output_script, romanizer=a.romanizer).model_dump()
+    r = backends.transcribe(a.file, options, on_phase, on_segment)
     print(file=sys.stderr)
-    job = {"title": a.file, "filename": a.file, "options": {"model": a.model},
+    job = {"title": a.file, "filename": a.file, "options": options,
            "stats": formats.compute_stats(r["segments"], r["duration"]), **r}
     body = formats.render(job, a.format)[0]
     if a.out:

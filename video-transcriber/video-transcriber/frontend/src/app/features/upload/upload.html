@@ -94,13 +94,13 @@
     <!-- 2. how good, which language, go -->
     <section class="card settings" aria-label="Transcription settings">
       <div class="settings-body">
-        @if (visiblePresets().length) {
+        @if (opts.engine === 'whisper' && visiblePresets().length) {
           <fieldset class="quality">
             <legend>Quality</legend>
             <div class="presets" role="radiogroup" aria-label="Quality">
               @for (p of visiblePresets(); track p.model) {
                 <label class="preset" [class.sel]="opts.model === p.model" [class.na]="!available(p.model)" [title]="tip(p)">
-                  <input type="radio" name="preset" class="visually-hidden" [value]="p.model" [(ngModel)]="opts.model" [disabled]="!available(p.model)" />
+                  <input type="radio" name="preset" class="visually-hidden" [value]="p.model" [ngModel]="opts.model" (ngModelChange)="choosePreset($event)" [disabled]="!available(p.model)" />
                   <span class="dot" aria-hidden="true"></span>
                   <span class="words">
                     <b>{{ p.title }}</b>
@@ -130,13 +130,37 @@
             </svg>
           </button>
         </div>
+        <div class="field">
+          <label for="output-script">Transcript style</label>
+          <select id="output-script" [(ngModel)]="opts.output_script" [disabled]="opts.task === 'translate'" aria-describedby="output-script-hint">
+            <option value="hinglish">Hinglish (Roman Hindi)</option>
+            <option value="original">Original script</option>
+          </select>
+          <span id="output-script-hint" class="hint">{{ opts.task === 'translate' ? 'English translation is selected in More options.' : 'Hindi in English letters, with English words preserved. Other languages keep their original script. Review unfamiliar words and names.' }}</span>
+        </div>
         @if (showAdvanced()) {
           <div class="more-body" id="more-options">
+            <div class="field">
+              <label for="engine">Recognition engine</label>
+              <select id="engine" [(ngModel)]="opts.engine" (ngModelChange)="changeEngine()">
+                <option value="whisper">Whisper</option>
+                @if (qwenAvailable()) { <option value="qwen">Qwen3 ASR (experimental)</option> }
+              </select>
+              <span class="hint">Qwen uses chunk timestamps and does not provide word confidence. Compare a short sample before choosing it.</span>
+            </div>
+            <div class="field">
+              <label for="romanizer">Hinglish conversion</label>
+              <select id="romanizer" [(ngModel)]="opts.romanizer">
+                <option value="auto">Automatic (IndicXlit when installed)</option>
+                <option value="indicxlit">IndicXlit (trained model)</option>
+                <option value="basic">Basic phonetic spelling</option>
+              </select>
+            </div>
             <div class="field">
               <label for="task">Output</label>
               <select id="task" [(ngModel)]="opts.task">
                 <option value="transcribe">Transcribe (same language)</option>
-                <option value="translate">Translate to English</option>
+                <option value="translate" [disabled]="opts.engine === 'qwen'">Translate to English</option>
               </select>
             </div>
             <div class="field">

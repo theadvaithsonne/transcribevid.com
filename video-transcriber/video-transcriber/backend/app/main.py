@@ -105,8 +105,7 @@ async def lifespan(app):
         log.info("counting finished transcriptions: %d so far (%s)", stats.total(), config.STATS_FILE)
     else:
         log.info("transcription counter is off (VT_COUNT_JOBS=auto counts in public mode only)")
-    if config.WARMUP:
-        threading.Thread(target=engine.warm_up, name="warm-up", daemon=True).start()
+    # Models belong to the reusable inference process, never to the API process.
     try:
         yield
     finally:
@@ -539,10 +538,14 @@ def patch_job(job_id: str, body: JobPatch, store: JobStore = Depends(get_store))
             store.update_title(job_id, body.title)
         if body.segments:
             store.update_segments(job_id, [s.model_dump(exclude_none=True) for s in body.segments])
+        if body.output_script is not None or body.romanizer is not None:
+            store.restyle(job_id, body.output_script, body.romanizer)
     except KeyError:
         raise HTTPException(404, "Job not found")
     except ValueError as e:
         raise HTTPException(409, str(e))
+    except RuntimeError as e:
+        raise HTTPException(422, str(e))
     return _public(store, job)
 
 

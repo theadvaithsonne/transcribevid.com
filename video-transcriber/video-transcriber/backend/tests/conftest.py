@@ -14,6 +14,15 @@ def isolated_storage(tmp_path, monkeypatch):
     """Every test gets its own session/tmp/model dirs, so nothing touches the real data folder
     (the app wipes these on start/stop)."""
     from app import config
+    # Unit/API fixtures replace recognition in-process. Real process lifecycle is
+    # tested separately with ProcessWorker, including a permanently blocked decode.
+    from app import jobs, backends
+    class InlineWorker:
+        def transcribe(self, *args, **kwargs):
+            return backends.transcribe(*args, **kwargs)
+        def close(self):
+            pass
+    monkeypatch.setattr(jobs, "ProcessWorker", InlineWorker)
     data = tmp_path / "data"
     monkeypatch.setattr(config, "DATA_DIR", data)
     monkeypatch.setattr(config, "SESSION_ROOT", data / "session")

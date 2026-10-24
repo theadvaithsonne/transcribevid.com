@@ -144,6 +144,10 @@ export class JobPage {
   titleDraft = '';
   rerunModel = '';
   rerunLanguage: string | null = null;
+  rerunOutputScript: 'hinglish' | 'original' = 'hinglish';
+  rerunEngine: 'whisper' | 'qwen' = 'whisper';
+  rerunRomanizer: 'auto' | 'indicxlit' | 'basic' = 'auto';
+  restyling = signal(false);
 
   /**
    * How many files the visitor just uploaded when this page was opened straight after an upload (0 otherwise). Read
@@ -173,20 +177,40 @@ export class JobPage {
   private lastExport = { fmt: '', at: 0 };
 
   /** the models the server allows for a re-run */
-  rerunModels = computed(() => this.store.models().filter((m) => this.site.modelAllowed(m.id)));
+  rerunModels() {
+    return this.store.models().filter((m) => this.site.modelAllowed(m.id) && (m.engine ?? 'whisper') === this.rerunEngine);
+  }
+  qwenAvailable = computed(() => this.store.models().some((m) => m.engine === 'qwen' && this.site.modelAllowed(m.id)));
+  changeRerunEngine() {
+    this.rerunModel = this.rerunModels()[0]?.id ?? 'small';
+  }
+  conversionWarning = computed(() => this.job()?.segments.find((s) => s.conversion_warning)?.conversion_warning ?? '');
 
   /** The segment under the playhead. The clock ticks several times a second; this only changes when the line does. */
   activeSeg = computed(() => findActiveId(this.job()?.segments ?? [], this.time()));
   active = computed(() => ['queued', 'running'].includes(this.job()?.status ?? ''));
   hasMedia = computed(() => !!this.job()?.media_url);
   hasVideo = computed(() => this.hasMedia() && this.job()?.media_kind === 'video');
+  /** Completion means decoding finished; it does not establish transcript accuracy. */
+  qualityConcern = computed(() => {
+    const j = this.job();
+    if (!j || j.status !== 'done') return '';
+    if (!j.segments.length) return 'No speech was transcribed. Check the recording and the selected language.';
+    if (j.stats?.avg_confidence != null && j.stats.avg_confidence < 0.6) {
+      return 'This transcript has low model confidence. Listen to the recording and check the spoken language before using the text.';
+    }
+    if (j.options.language == null && j.language_probability != null && j.language_probability < 0.8) {
+      return 'The spoken language could not be identified confidently. Choose the language you hear and try again.';
+    }
+    return '';
+  });
   /** "English", or the language code when the name is not known; "English → English" is never shown */
   languageName = computed(() => {
     const code = this.job()?.language;
     if (!code) return '';
     return this.store.languages().find((l) => l.code === code)?.name ?? code.toUpperCase();
   });
-  /** The one quiet line under the title: "English · 00:45 · 190 words · 87% sure". */
+  /** The model's confidence is a review signal, not measured accuracy. */
   facts = computed(() => {
     const j = this.job();
     if (!j) return [] as string[];
@@ -197,7 +221,7 @@ export class JobPage {
     const st = j.stats;
     if (st?.word_count) {
       out.push(`${st.word_count.toLocaleString('en-US')} ${st.word_count === 1 ? 'word' : 'words'}`);
-      if (st.avg_confidence != null) out.push(`${Math.round(st.avg_confidence * 100)}% sure`);
+      if (st.avg_confidence != null) out.push(`${Math.round(st.avg_confidence * 100)}% model confidence`);
     }
     return out;
   });
@@ -282,6 +306,8 @@ export class JobPage {
       this.playing.set(false);
       this.menu.set(null);
       this.renaming.set(false);
+      this.cancelling.set(false);
+      this.restyling.set(false);
     }
     this.fetchSub = this.api.getJob(id).subscribe({
       next: (j) => {
@@ -295,7 +321,11 @@ export class JobPage {
         if (!soft) this.log.info(`Job opened: ${j.title} (${j.status})`, { id: j.id });
         if (!soft || !this.rerunModel) {
           this.rerunModel = j.options.model;
-          this.rerunLanguage = j.language ?? j.options.language;
+          // Preserve Auto: a detected language must not become a forced choice on the next run.
+          this.rerunLanguage = j.options.language ?? null;
+          this.rerunOutputScript = j.options.output_script ?? 'hinglish';
+          this.rerunEngine = j.options.engine ?? 'whisper';
+          this.rerunRomanizer = j.options.romanizer ?? 'auto';
         }
         this.afterStatus(j);
         if (j.status === 'queued' || j.status === 'running') this.watch(id, j.segments.length);
@@ -329,6 +359,11 @@ export class JobPage {
    */
   private afterStatus(j: JobSummary) {
     const running = j.status === 'queued' || j.status === 'running';
+    if (running && j.cancel_requested) this.cancelling.set(true);
+    if (!running && this.cancelling()) {
+      this.cancelling.set(false);
+      if (j.status === 'cancelled') this.toast.info('The text found so far is kept.', 'Cancelled');
+    }
     const files = this.justUploaded();
     if (files && j.id === this.uploadedId) {
       this.justUploaded.set(0);
@@ -436,6 +471,14 @@ export class JobPage {
   }
 
   // ------------------------------------------------------------------ menus
+  reviewQuality(ev: Event) {
+    ev.stopPropagation(); // the document's outside-click handler must not close the form immediately
+    this.menu.set('rerun');
+    setTimeout(() => {
+      if (!this.destroyed && this.menu() === 'rerun') document.getElementById('rl')?.focus();
+    });
+  }
+
   toggleMenu(which: 'export' | 'more', ev?: Event) {
     const open = this.menu();
     const isOpen = which === 'more' ? open === 'more' || open === 'rerun' : open === which;
@@ -720,11 +763,15 @@ export class JobPage {
     this.cancelling.set(true);
     this.api.cancel(j.id).subscribe({
       next: (upd) => {
-        this.cancelling.set(false);
+        if (!this.current(j.id)) return;
+        const pending = upd.status === 'running' || upd.status === 'queued';
+        this.cancelling.set(pending);
         if (this.current(j.id)) this.job.update((cur) => (cur?.id === j.id ? { ...cur, ...upd, segments: cur.segments } : cur));
-        this.wasActive = false;
+        this.wasActive = pending;
         this.store.refresh();
-        this.toast.info('The text found so far is kept.', 'Cancelled');
+        if (pending) this.toast.info('Stopping the transcription worker. The text found so far is kept.', 'Cancellation requested');
+        else if (upd.status === 'cancelled') this.toast.info('The text found so far is kept.', 'Cancelled');
+        else this.toast.info('The transcript finished before it could be cancelled.', 'Already finished');
       },
       error: (e) => {
         this.cancelling.set(false);
@@ -738,7 +785,8 @@ export class JobPage {
     const id = this.job()?.id ?? this.id();
     if (this.rerunning()) return;
     this.rerunning.set(true);
-    this.api.rerun(id, { model: this.rerunModel, language: this.rerunLanguage }).subscribe({
+    this.api.rerun(id, { engine: this.rerunEngine, model: this.rerunModel, language: this.rerunLanguage,
+      output_script: this.rerunOutputScript, romanizer: this.rerunRomanizer }).subscribe({
       next: (j) => {
         this.rerunning.set(false);
         this.store.upsert(j);
@@ -750,6 +798,26 @@ export class JobPage {
       error: (e) => {
         this.rerunning.set(false);
         this.toast.error(errorDetail(e, 'Could not start.'), 'Could not start');
+      },
+    });
+  }
+
+  applyStyle() {
+    const j = this.job();
+    if (!j || this.restyling()) return;
+    this.restyling.set(true);
+    this.api.patchJob(j.id, { output_script: this.rerunOutputScript, romanizer: this.rerunRomanizer }).subscribe({
+      next: (updated) => {
+        if (!this.current(j.id)) return;
+        this.restyling.set(false);
+        this.job.set(updated);
+        this.menu.set(null);
+        this.toast.success('Style updated using the saved recognition. Edited lines are kept.', 'Style updated');
+      },
+      error: (e) => {
+        if (!this.current(j.id)) return;
+        this.restyling.set(false);
+        this.toast.error(errorDetail(e, 'Could not change transcript style.'), 'Style unchanged');
       },
     });
   }

@@ -2,9 +2,12 @@ export type JobStatus = 'queued' | 'running' | 'done' | 'error' | 'cancelled';
 export type JobPhase = 'extracting' | 'loading_model' | 'transcribing' | null;
 
 export interface JobOptions {
+  engine: 'whisper' | 'qwen';
+  romanizer: 'auto' | 'indicxlit' | 'basic';
   model: string;
   language: string | null;
   task: 'transcribe' | 'translate';
+  output_script: 'hinglish' | 'original';
   prompt: string;
   beam_size: number;
   vad: boolean;
@@ -17,6 +20,7 @@ export interface Word {
   start: number;
   end: number;
   word: string;
+  original_word?: string;
   probability: number;
 }
 
@@ -25,6 +29,10 @@ export interface Segment {
   start: number;
   end: number;
   text: string;
+  original_text?: string;
+  romanizer?: string;
+  conversion_warning?: string;
+  timing?: 'chunk';
   words: Word[] | null;
   confidence: number | null;
   no_speech_prob?: number;
@@ -47,6 +55,7 @@ export interface Stats {
 }
 
 export interface JobSummary {
+  cancel_requested?: boolean;
   id: string;
   title: string;
   filename: string;
@@ -74,6 +83,7 @@ export interface Job extends JobSummary {
 }
 
 export interface ModelInfo {
+  engine?: 'whisper' | 'qwen';
   id: string;
   label: string;
   size_mb: number;
@@ -165,9 +175,12 @@ export interface SegmentEdit {
 export type ExportFormat = 'txt' | 'plain' | 'srt' | 'vtt' | 'md' | 'json' | 'pdf';
 
 export const DEFAULT_OPTIONS: JobOptions = {
+  engine: 'whisper',
+  romanizer: 'auto',
   model: 'small',
   language: null,
   task: 'transcribe',
+  output_script: 'hinglish',
   prompt: '',
   beam_size: 5,
   vad: true,

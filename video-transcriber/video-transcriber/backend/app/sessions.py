@@ -155,6 +155,7 @@ class SessionManager:
         from . import engine
         for s in sessions:
             s.store.close(kill_ffmpeg=False)
+        self.scheduler.close()
         engine.kill_all()
         try:
             self._lock_file.close()

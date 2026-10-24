@@ -639,6 +639,28 @@ describe('JobPage', () => {
       ctl.expectNone('/api/jobs/a/cancel');
     });
 
+    it('keeps Cancelling visible until the backend reports a terminal state', () => {
+      page.cancel();
+      ctl.expectOne('/api/jobs/a/cancel').flush(makeJob({ id: 'a', status: 'running', cancel_requested: true }));
+      expect(page.cancelling()).toBe(true);
+      expect(lastToast()).toMatchObject({ title: 'Cancellation requested' });
+      expect(page.job()?.status).toBe('running');
+      (page as any).afterStatus(makeJob({ id: 'a', status: 'cancelled' }));
+      expect(page.cancelling()).toBe(false);
+      expect(lastToast()).toMatchObject({ title: 'Cancelled' });
+    });
+
+    it('applies script changes to saved recognition without starting another transcription', () => {
+      page.rerunOutputScript = 'original';
+      page.applyStyle();
+      expect(page.restyling()).toBe(true);
+      const req = patch('a');
+      expect(req.request.body).toEqual({ output_script: 'original', romanizer: 'auto' });
+      req.flush(makeJob({ id: 'a' }));
+      expect(page.restyling()).toBe(false);
+      ctl.expectNone('/api/jobs/a/rerun');
+    });
+
     it('delete: shows the server message and stays on the page', () => {
       page.remove();
       ctl.expectOne((r) => r.method === 'DELETE' && r.url === '/api/jobs/a').flush(...httpError(409, 'Cancel the running job first.'));
@@ -697,6 +719,83 @@ describe('JobPage', () => {
       HTMLMediaElement.prototype.play = vi.fn(() => Promise.resolve());
     });
 
+    describe('language recovery', () => {
+      it('keeps Auto on retry even when the previous detection was confidently wrong', () => {
+        show({ language: 'hi', language_probability: 0.988, stats: stats({ avg_confidence: 0.38 }) });
+        expect(page.rerunLanguage).toBeNull();
+        expect(clean(q('.quality-review'))).toContain('low model confidence');
+        page.rerun();
+        const req = ctl.expectOne('/api/jobs/a/rerun');
+        expect(req.request.body.language).toBeNull();
+        expect(req.request.body.output_script).toBe('hinglish');
+        req.flush(makeJob({ id: 'new', status: 'queued' }));
+      });
+
+      it('keeps an explicit language instead of replacing it with the detected language', () => {
+        show({ language: 'hi', options: { ...makeJob().options, language: 'en' } });
+        expect(page.rerunLanguage).toBe('en');
+      });
+
+      it('preserves an explicit original-script preference on retry', () => {
+        show({ options: { ...makeJob().options, output_script: 'original' } });
+        expect(page.rerunOutputScript).toBe('original');
+        page.rerun();
+        const req = ctl.expectOne('/api/jobs/a/rerun');
+        expect(req.request.body.output_script).toBe('original');
+        req.flush(makeJob({ id: 'new', status: 'queued' }));
+      });
+
+      it('opens a usable recovery form without starting a job or downloading a model', () => {
+        show({ language: 'hi', stats: stats({ avg_confidence: 0.38 }) }, [{ code: 'en', name: 'English' }]);
+        (q('.quality-review button') as HTMLButtonElement).click();
+        fixture.detectChanges();
+        expect(page.menu()).toBe('rerun'); // survives the bubbling document click
+        expect(q('.menu.rerun')).not.toBeNull();
+        vi.advanceTimersByTime(1);
+        expect(document.activeElement?.id).toBe('rl');
+        ctl.expectNone('/api/jobs/a/rerun');
+        const language = q('#rl') as HTMLSelectElement;
+        language.selectedIndex = 1;
+        language.dispatchEvent(new Event('change'));
+        fixture.detectChanges();
+        expect(page.rerunLanguage).toBe('en');
+        (q('.rerun-actions .primary') as HTMLButtonElement).click();
+        const req = ctl.expectOne('/api/jobs/a/rerun');
+        expect(req.request.body.language).toBe('en');
+        req.flush(makeJob({ id: 'new', status: 'queued' }));
+      });
+
+      it('asks for language review when auto detection is uncertain despite good word confidence', () => {
+        show({ language_probability: 0.55, stats: stats() });
+        expect(clean(q('.quality-review'))).toContain('could not be identified confidently');
+      });
+
+      it.each(['running', 'queued', 'error', 'cancelled'] as const)('does not show quality recovery for a %s job', (status) => {
+        show({ status, stats: stats({ avg_confidence: 0.38 }) });
+        expect(q('.quality-review')).toBeNull();
+      });
+
+      it('does not warn for a confident completed transcript', () => {
+        show({ language_probability: 0.99, stats: stats() });
+        expect(q('.quality-review')).toBeNull();
+      });
+
+      it('does not treat missing confidence as zero', () => {
+        show({ language_probability: null, stats: null });
+        expect(q('.quality-review')).toBeNull();
+      });
+
+      it('does not flag detection confidence when the user explicitly selected a language', () => {
+        show({ options: { ...makeJob().options, language: 'en' }, language_probability: 0.4, stats: stats() });
+        expect(q('.quality-review')).toBeNull();
+      });
+
+      it('offers recovery when decoding finishes without any transcript', () => {
+        show({ segments: [] });
+        expect(clean(q('.quality-review'))).toContain('No speech was transcribed');
+      });
+    });
+
     describe('the name and the one line of facts', () => {
       const facts = () => qa('p.facts > span').map((s) => clean(s));
 
@@ -709,7 +808,7 @@ describe('JobPage', () => {
 
       it('language, length, words and how sure: one quiet line of text (no pills, no tiles)', () => {
         show({ language: 'en', duration: 125, stats: stats() }, [{ code: 'en', name: 'English' }]);
-        expect(facts()).toEqual(['English', '02:05', '321 words', '90% sure']);
+        expect(facts()).toEqual(['English', '02:05', '321 words', '90% model confidence']);
         expect(qa('p.facts [class*="tint-"]')).toEqual([]);
         expect(q('.stats')).toBeNull();
         expect(q('dl')).toBeNull();
@@ -717,7 +816,7 @@ describe('JobPage', () => {
 
       it('rounds the confidence and counts words in the singular too', () => {
         show({ language: null, duration: null, stats: stats({ word_count: 1, avg_confidence: 0.876 }) });
-        expect(facts()).toEqual(['1 word', '88% sure']);
+        expect(facts()).toEqual(['1 word', '88% model confidence']);
       });
 
       it('names the language by its code when the server has no name for it', () => {

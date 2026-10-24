@@ -88,6 +88,11 @@
               <div class="menu end rerun" role="dialog" aria-labelledby="rerun-title">
                 <h2 id="rerun-title">Re-transcribe</h2>
                 <p>Make a new transcript of the same file. This one is kept.</p>
+                <div class="field"><label for="re">Recognition engine</label>
+                  <select id="re" [(ngModel)]="rerunEngine" (ngModelChange)="changeRerunEngine()" [disabled]="j.options.task === 'translate'">
+                    <option value="whisper">Whisper</option>
+                    @if (qwenAvailable()) { <option value="qwen">Qwen3 ASR (experimental)</option> }
+                  </select></div>
                 <div class="field"><label for="rm">Quality</label>
                   <select id="rm" [(ngModel)]="rerunModel">
                     @for (m of rerunModels(); track m.id) { <option [value]="m.id">{{ m.label }}{{ m.downloaded ? '' : ' (first use downloads ' + m.size_mb + ' MB)' }}</option> }
@@ -97,10 +102,23 @@
                     <option [ngValue]="null">Find it automatically</option>
                     @for (l of store.languages(); track l.code) { <option [ngValue]="l.code">{{ l.name }}</option> }
                   </select></div>
+                <div class="field"><label for="rs">Transcript style</label>
+                  <select id="rs" [(ngModel)]="rerunOutputScript" [disabled]="j.options.task === 'translate'">
+                    <option value="hinglish">Hinglish (Roman Hindi)</option>
+                    <option value="original">Original script</option>
+                  </select></div>
                 <div class="rerun-actions">
                   <button type="button" class="btn primary" (click)="rerun()" [disabled]="rerunning()">{{ rerunning() ? 'Starting…' : 'Start' }}</button>
                   <button type="button" class="btn ghost" (click)="menu.set('more')">Back</button>
                 </div>
+                <div class="field"><label for="rr">Hinglish conversion</label>
+                  <select id="rr" [(ngModel)]="rerunRomanizer">
+                    <option value="auto">Automatic (IndicXlit when installed)</option>
+                    <option value="indicxlit">IndicXlit (trained model)</option>
+                    <option value="basic">Basic phonetic spelling</option>
+                  </select></div>
+                <button type="button" class="btn ghost" (click)="applyStyle()" [disabled]="restyling() || j.options.task === 'translate'">{{ restyling() ? 'Converting…' : 'Apply style only' }}</button>
+                <p>Apply style uses saved recognition without processing the audio again. Edited lines are kept.</p>
               </div>
             }
           </div>
@@ -110,6 +128,22 @@
         </div>
       }
     </header>
+
+    @if (conversionWarning(); as warning) {
+      <section class="card alert warn" role="status"><div class="alert-text"><h2>Check Hinglish spelling</h2><p>{{ warning }}</p></div></section>
+    }
+    @if (j.options.engine === 'qwen') {
+      <p class="facts">Qwen uses approximate chunk timestamps. Word timing and confidence are unavailable.</p>
+    }
+    @if (qualityConcern(); as concern) {
+      <section class="card alert warn quality-review" role="status" aria-labelledby="quality-title">
+        <div class="alert-text">
+          <h2 id="quality-title">Review this transcript</h2>
+          <p>{{ concern }} For accented or mixed-language speech, try a higher quality setting. The confidence score is not an accuracy percentage.</p>
+        </div>
+        <button type="button" class="btn primary" (click)="reviewQuality($event)" aria-haspopup="dialog">Review language and quality</button>
+      </section>
+    }
 
     @if (active()) {
       <section class="card progress" aria-label="Progress">

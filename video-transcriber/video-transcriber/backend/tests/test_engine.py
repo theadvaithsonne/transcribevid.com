@@ -101,7 +101,7 @@ class FakeModel:
         # deliberately a narrow signature: other options must be filtered out by _supported
         self.kwargs = dict(language=language, task=task, beam_size=beam_size,
                            initial_prompt=initial_prompt, vad_filter=vad_filter)
-        return iter(self.segs), NS(language="en", language_probability=0.987654)
+        return iter(self.segs), NS(language=getattr(self, "language", "en"), language_probability=0.987654)
 
 
 @pytest.fixture()
@@ -137,6 +137,22 @@ def test_transcribe_passes_options_and_drops_unsupported(patched):
                                 "task": "translate", "vad": False})
     assert model.kwargs == {"language": "de", "task": "translate", "beam_size": 3,
                             "initial_prompt": "Kubernetes", "vad_filter": False}
+
+
+@pytest.mark.parametrize("options,language,expected", [
+    ({}, "hi", "toh student hai."),
+    ({"output_script": "original"}, "hi", "तो student है।"),
+    ({"task": "translate"}, "hi", "तो student है।"),
+    ({}, "mr", "तो student है।"),
+])
+def test_hinglish_default_live_and_final_output(patched, options, language, expected):
+    model = patched([fake_seg(0, 2, "तो student है।")])
+    model.language = language
+    live = []
+    result = engine.transcribe("x.wav", options, on_segment=lambda s, *a: live.append(s))
+    assert result["segments"][0]["text"] == expected
+    assert live == result["segments"]
+    assert result["segments"][0]["start"] == 0 and result["segments"][0]["end"] == 2
 
 
 def test_repetition_loop_is_broken(patched):

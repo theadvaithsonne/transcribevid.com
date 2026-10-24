@@ -1,0 +1,4 @@
+# Optional Qwen adapter; isolate from legacy IndicXlit/fairseq dependencies.
+torch==2.9.1
+qwen-asr==0.0.6
+gradio==6.17.3

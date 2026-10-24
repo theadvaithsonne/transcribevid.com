@@ -244,6 +244,53 @@ def test_delete_running_refused(store):
     assert store.dir(job["id"]).exists()
 
 
+def test_cancel_during_completion_never_becomes_done(store, monkeypatch):
+    job = add_job(store, "queued")
+    def complete(*args, **kwargs):
+        store.cancel(job["id"])
+        return {"segments": [], "language": "en", "duration": 1, "language_probability": 1}
+    monkeypatch.setattr(engine, "transcribe", complete)
+    store._run(job)
+    assert job["status"] == "cancelled" and not job["counted"]
+
+
+def test_restyle_uses_saved_recognition_without_engine_and_preserves_edits(store, monkeypatch):
+    job = add_job(store, "done", [seg(0, "तो student है।", 0, 1),
+                                 {**seg(1, "my correction", 1, 2), "edited": True}], language_probability=0.9)
+    job["language"] = "hi"
+    monkeypatch.setattr(engine, "transcribe", lambda *a, **k: pytest.fail("must not re-run recognition"))
+    out = store.restyle(job["id"], "hinglish", "basic")
+    assert out["segments"][0]["text"] == "toh student hai."
+    assert out["segments"][1]["text"] == "my correction"
+    store.restyle(job["id"], "original")
+    assert job["segments"][0]["text"] == "तो student है।"
+
+
+def test_failed_style_conversion_is_atomic(store, monkeypatch):
+    import copy
+    from app import hinglish
+    job = add_job(store, "done", [seg(0, "तो", 0, 1)])
+    job["language"] = "hi"
+    before = copy.deepcopy(job)
+    monkeypatch.setattr(hinglish, "restyle_segment", lambda *a: (_ for _ in ()).throw(RuntimeError("missing model")))
+    with pytest.raises(RuntimeError):
+        store.restyle(job["id"], "hinglish", "indicxlit")
+    assert job == before
+
+
+def test_concurrent_edit_is_not_overwritten_by_style_conversion(store, monkeypatch):
+    from app import hinglish
+    job = add_job(store, "done", [seg(0, "तो", 0, 1)])
+    job["language"] = "hi"
+    def concurrent_edit(segment, *args):
+        store.update_segments(job["id"], [{"id": 0, "text": "My latest edit"}])
+        return {**segment, "text": "toh"}
+    monkeypatch.setattr(hinglish, "restyle_segment", concurrent_edit)
+    with pytest.raises(ValueError, match="changed during conversion"):
+        store.restyle(job["id"], "hinglish", "basic")
+    assert job["segments"][0]["text"] == "My latest edit"
+
+
 @pytest.mark.parametrize("bad", ["../x", "..", "0" * 31, "0" * 33, "", "../" + "0" * 32,
                                  "0" * 31 + "/", "0" * 30 + "..", "G" * 32, "0" * 32 + "\n"])
 def test_invalid_job_id_rejected(store, bad):

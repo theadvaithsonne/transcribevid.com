@@ -84,7 +84,7 @@ export class ApiService {
       );
   }
 
-  patchJob(id: string, body: { title?: string; segments?: SegmentEdit[] }) {
+  patchJob(id: string, body: { title?: string; segments?: SegmentEdit[]; output_script?: JobOptions['output_script']; romanizer?: JobOptions['romanizer'] }) {
     return this.http.patch<Job>(`/api/jobs/${id}`, body);
   }
   cancel(id: string) {

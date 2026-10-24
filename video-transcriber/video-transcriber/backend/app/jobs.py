@@ -23,7 +23,8 @@ import time
 import uuid
 from pathlib import Path
 
-from . import config, engine, formats, stats
+from . import config, engine, formats, stats, backends
+from .worker import ProcessWorker
 
 log = logging.getLogger("vt.jobs")
 LOCK_NAME = ".vt-session.lock"
@@ -72,6 +73,8 @@ class Scheduler:
         self.queue = queue.Queue()
         self.pending = 0  # waiting + running, all sessions
         self._lock = threading.Lock()
+        self._closed = threading.Event()
+        self.worker = ProcessWorker()
         self.thread = threading.Thread(target=self._work, name=name, daemon=True)
         self.thread.start()
 
@@ -80,9 +83,18 @@ class Scheduler:
             self.pending += 1
         self.queue.put((store, job_id))
 
+    def close(self):
+        self._closed.set()
+        self.queue.put(None)
+        self.thread.join(timeout=5)
+
     def _work(self):
         while True:
-            store, job_id = self.queue.get()
+            item = self.queue.get()
+            if item is None:
+                self.worker.close()
+                return
+            store, job_id = item
             try:
                 store._process(job_id)
             except BaseException:  # noqa - the worker must never die
@@ -98,7 +110,7 @@ BROWSER_PLAYABLE = {".mp4", ".m4v", ".webm", ".ogv", ".mp3", ".wav", ".ogg", ".o
 AUDIO_EXT = {".mp3", ".wav", ".ogg", ".oga", ".m4a", ".aac", ".flac", ".opus", ".wma", ".amr"}
 
 # Fields shown in the history list (the full job additionally carries segments and stats).
-SUMMARY_FIELDS = ("id", "title", "filename", "status", "phase", "progress", "eta_seconds", "error",
+SUMMARY_FIELDS = ("id", "title", "filename", "status", "phase", "progress", "eta_seconds", "error", "cancel_requested",
                   "created_at", "started_at", "finished_at", "language", "duration", "size_bytes",
                   "media_kind", "options", "segment_count")
 
@@ -132,6 +144,7 @@ class JobStore:
         self._cancel = set()
         self._closing = False
         self._scheduler = scheduler or (Scheduler() if start_worker else None)
+        self._owns_scheduler = scheduler is None and start_worker
         if instance:
             atexit.register(self.close)
         log.info("session %s started - nothing is saved; all data is discarded when it ends "
@@ -217,6 +230,8 @@ class JobStore:
         deadline = time.time() + 5
         while time.time() < deadline and any(j["status"] == "running" for j in list(self.jobs.values())):
             time.sleep(0.1)
+        if self._owns_scheduler:
+            self._scheduler.close()
         if kill_ffmpeg:
             engine.kill_all()  # an ffmpeg still decoding would keep its files open
         if self._lock_file:
@@ -289,7 +304,7 @@ class JobStore:
             "origin": origin or job_id, "counted": False,  # bookkeeping for the "videos transcribed" counter
             "media_kind": "audio" if ext in AUDIO_EXT else "video",
             "playable": ext in BROWSER_PLAYABLE,
-            "status": "queued", "phase": None, "progress": 0.0, "eta_seconds": None, "error": None,
+            "status": "queued", "phase": None, "progress": 0.0, "eta_seconds": None, "error": None, "cancel_requested": False,
             "created_at": time.time(), "started_at": None, "finished_at": None,
             "language": None, "language_probability": None, "duration": None,
             "options": {**engine.DEFAULT_OPTIONS, **{k: v for k, v in options.items()}},
@@ -367,8 +382,10 @@ class JobStore:
                 log.info("job %s cancelled while queued", job_id[:8])
                 self._finish(job, "cancelled")
             elif job["status"] == "running":
-                log.info("job %s: cancel requested (stops at the next segment)", job_id[:8])
+                log.info("job %s: cancel requested (stopping inference worker)", job_id[:8])
                 self._cancel.add(job_id)
+                job["cancel_requested"] = True
+                self._touch(job)
         return job
 
     def delete(self, job_id):
@@ -427,9 +444,35 @@ class JobStore:
         log.info("job %s edited: %d segment(s) changed, %d deleted", job_id[:8], changed, removed)
         return job
 
+    def restyle(self, job_id, output_script=None, romanizer=None):
+        import copy
+        from .hinglish import restyle_segment
+        job = self.get(job_id)
+        if not job:
+            raise KeyError(job_id)
+        with self.lock:
+            if job["status"] not in ("done", "cancelled"):
+                raise ValueError("Wait for transcription to finish or cancel it before changing its style.")
+            if job["options"]["task"] == "translate":
+                raise ValueError("This transcript is an English translation; its script cannot be changed.")
+            script = output_script or job["options"]["output_script"]
+            method = romanizer or job["options"].get("romanizer", "auto")
+            version = job["version"]
+            source, language = copy.deepcopy(job["segments"]), job["language"]
+        # Model inference must not hold the store lock or block another job's cancellation.
+        segments = [restyle_segment(s, script, method) if language in ("hi", "en") else dict(s) for s in source]
+        with self.lock:
+            if self.get(job_id) is not job or job["version"] != version:
+                raise ValueError("The transcript changed during conversion. Try applying the style again.")
+            job["segments"] = segments
+            job["options"] = {**job["options"], "output_script": script, "romanizer": method}
+            job["stats"] = formats.compute_stats(segments, job["duration"])
+            self._touch(job)
+        return job
+
     # ------------------------------------------------------------------ worker
     def _finish(self, job, status, error=None):
-        job.update(status=status, error=error, phase=None, eta_seconds=None,
+        job.update(status=status, error=error, phase=None, eta_seconds=None, cancel_requested=False,
                    finished_at=time.time())
         self.last_activity = job["finished_at"]
         if status == "done":
@@ -494,21 +537,30 @@ class JobStore:
                 self._touch(job)
 
         try:
-            result = engine.transcribe(
-                self.media_path(job), job["options"], on_phase, on_segment,
-                should_cancel=lambda: job_id in self._cancel or self._closing, workdir=str(self.tmp_dir))
+            scratch = self.dir(job_id) / "scratch"
+            runner = self._scheduler.worker.transcribe if self._scheduler else backends.transcribe
+            options = dict(job["options"])
+            if not job["playable"] and not (self.dir(job_id) / "preview.mp3").exists():
+                options["_preview_to"] = str(self.dir(job_id) / "preview.mp3")
+            result = runner(
+                self.media_path(job), options, on_phase, on_segment,
+                should_cancel=lambda: job_id in self._cancel or self._closing, workdir=str(scratch))
+            if job_id in self._cancel or self._closing:
+                raise engine.Cancelled()
         except engine.Cancelled:
             with self.lock:
                 self._cancel.discard(job_id)
                 self._finish(job, "cancelled")
             log.info("job %s cancelled after %d segment(s)", job_id[:8], len(job["segments"]))
             return
-        # a browser can't play every container, so make a small audio copy to play along with
-        if not job["playable"] and not (self.dir(job_id) / "preview.mp3").exists():
-            ok = engine.make_audio_preview(self.media_path(job), self.dir(job_id) / "preview.mp3")
-            log.info("job %s: audio preview for non-browser format %s %s", job_id[:8],
-                     Path(job["media_file"]).suffix, "created" if ok else "FAILED")
+        finally:
+            shutil.rmtree(scratch, ignore_errors=True)
+        # Non-browser audio previews are made inside the killable worker too.
         with self.lock:
+            if job_id in self._cancel or self._closing:
+                self._cancel.discard(job_id)
+                self._finish(job, "cancelled")
+                return
             job["segments"] = result["segments"]
             job["segment_count"] = len(result["segments"])
             job["language"] = result["language"]
@@ -518,7 +570,7 @@ class JobStore:
             self._finish(job, "done")
             self._count_once(job)
         took = max(job["finished_at"] - job["started_at"], 1e-6)
-        log.info("job %s done: %d segment(s), %d word(s), language=%s (p=%.2f), %.1fs of audio in %.1fs (%.1fx realtime)",
+        log.info("job %s done: %d segment(s), %d word(s), language=%s (p=%s), %.1fs of audio in %.1fs (%.1fx realtime)",
                  job_id[:8], len(result["segments"]), job["stats"]["word_count"], result["language"],
                  result["language_probability"], result["duration"], took, result["duration"] / took)
 

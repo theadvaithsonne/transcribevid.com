@@ -107,7 +107,21 @@ export class UploadPage {
   /** the presets the server allows (all of them unless it restricts the models) */
   visiblePresets = computed(() => this.presets.filter((p) => this.site.modelAllowed(p.model)));
   /** the models for the advanced select: the ones the server has, minus any it does not allow */
-  selectableModels = computed(() => this.store.models().filter((m) => this.site.modelAllowed(m.id)));
+  selectableModels() {
+    return this.store.models().filter((m) => this.site.modelAllowed(m.id) && (m.engine ?? 'whisper') === this.opts.engine);
+  }
+
+  qwenAvailable = computed(() => this.store.models().some((m) => m.engine === 'qwen' && this.site.modelAllowed(m.id)));
+
+  changeEngine() {
+    this.opts.model = this.selectableModels()[0]?.id ?? 'small';
+    if (this.opts.engine === 'qwen') this.opts.task = 'transcribe';
+  }
+
+  choosePreset(model: string) {
+    this.opts.engine = 'whisper';
+    this.opts.model = model;
+  }
 
   totalSize = computed(() => this.files().reduce((n, f) => n + f.size, 0));
   micSupported = typeof MediaRecorder !== 'undefined' && !!navigator.mediaDevices?.getUserMedia;
@@ -132,7 +146,10 @@ export class UploadPage {
     if (this.site.modelAllowed(this.opts.model)) return;
     const pick = [DEFAULT_OPTIONS.model, ...this.presets.map((p) => p.model)].find((m) => this.site.modelAllowed(m));
     const next = pick ?? this.site.allowedModels()?.[0];
-    if (next) this.opts.model = next;
+    if (next) {
+      this.opts.model = next;
+      this.opts.engine = next.startsWith('qwen3-asr-') ? 'qwen' : 'whisper';
+    }
   }
 
   modelInfo(id: string) {
@@ -464,7 +481,8 @@ export class UploadPage {
   private restore(): JobOptions {
     try {
       // `prompt` is never persisted; ignore one left behind by an older version too
-      return { ...DEFAULT_OPTIONS, ...JSON.parse(sessionStorage.getItem(KEY) ?? '{}'), prompt: '' };
+      const saved = JSON.parse(sessionStorage.getItem(KEY) ?? '{}');
+      return { ...DEFAULT_OPTIONS, ...saved, output_script: saved?.output_script === 'original' ? 'original' : 'hinglish', prompt: '' };
     } catch {
       return { ...DEFAULT_OPTIONS };
     }

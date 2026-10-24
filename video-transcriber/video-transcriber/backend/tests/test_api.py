@@ -151,11 +151,25 @@ def test_validation(client):
     assert upload(client, options={"model": "nope"}).status_code == 422
     assert upload(client, options={"language": "xx"}).status_code == 422
     assert upload(client, options={"beam_size": 99}).status_code == 422
+    assert upload(client, options={"output_script": "nope"}).status_code == 422
     assert upload(client, data=b"").status_code == 400
     assert client.get("/api/jobs").json() == []  # a rejected upload leaves nothing behind
     assert client.get("/api/jobs/" + "0" * 32).status_code == 404
     assert client.get("/api/jobs/..%2F..%2Fetc").status_code == 404
     assert client.get("/api/jobs/" + "0" * 32 + "%0A").status_code == 404
+
+
+def test_hinglish_default_and_original_script_rerun(client):
+    created = upload(client).json()
+    assert created["options"]["output_script"] == "hinglish"
+    wait(client, created["id"])
+    rerun = client.post(f"/api/jobs/{created['id']}/rerun", json={"output_script": "original"})
+    assert rerun.status_code == 201
+    assert rerun.json()["options"]["output_script"] == "original"
+    wait(client, rerun.json()["id"])
+    again = client.post(f"/api/jobs/{rerun.json()['id']}/rerun", json={"model": "base"})
+    assert again.status_code == 201
+    assert again.json()["options"]["output_script"] == "original"
 
 
 def test_cancel_and_delete(client):

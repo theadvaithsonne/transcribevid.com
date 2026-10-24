@@ -7,6 +7,17 @@ from app.schemas import JobOptions, RerunRequest
 def test_defaults():
     o = JobOptions()
     assert o.model == "small" and o.language is None and o.task == "transcribe" and o.beam_size == 5
+    assert o.output_script == "hinglish"
+
+
+def test_output_script_validation_and_partial_rerun():
+    assert JobOptions(output_script="original").output_script == "original"
+    assert RerunRequest(output_script="original").model_dump(exclude_unset=True) == {"output_script": "original"}
+    assert "output_script" not in RerunRequest(model="small").model_dump(exclude_unset=True)
+    with pytest.raises(ValidationError):
+        JobOptions(output_script="english")
+    with pytest.raises(ValidationError):
+        RerunRequest(output_script="english")
 
 
 @pytest.mark.parametrize("m", ["tiny", "base", "small", "medium", "large-v3", "large-v3-turbo"])

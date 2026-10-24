@@ -10,6 +10,7 @@ install system-wide) decodes any audio/video container. Accuracy features:
 * word-level timestamps and per-segment confidence for review in the UI
 """
 import inspect
+import importlib.util
 import logging
 import math
 import os
@@ -24,6 +25,7 @@ import traceback
 import numpy as np
 
 from . import config
+from .hinglish import convert_segment
 
 log = logging.getLogger("vt.engine")
 SAMPLE_RATE = 16000
@@ -44,6 +46,10 @@ MODEL_CATALOG = [
      "note": "Best accuracy, slowest"},
     {"id": "distil-large-v3", "label": "Distil Large v3", "size_mb": 1500, "speed": 4, "accuracy": 4,
      "note": "English only, very fast and accurate"},
+    {"id": "qwen3-asr-0.6b", "label": "Qwen3 ASR 0.6B", "size_mb": 1300, "speed": 2, "accuracy": 0,
+     "note": "Experimental: compare on your audio; chunk timestamps", "engine": "qwen"},
+    {"id": "qwen3-asr-1.7b", "label": "Qwen3 ASR 1.7B", "size_mb": 3500, "speed": 1, "accuracy": 0,
+     "note": "Experimental: larger model; chunk timestamps", "engine": "qwen"},
 ]
 
 LANGUAGES = {
@@ -62,9 +68,12 @@ LANGUAGES = {
 }
 
 DEFAULT_OPTIONS = {
+    "engine": "whisper",
+    "romanizer": "auto",
     "model": "small",
     "language": None,          # None = auto-detect
     "task": "transcribe",      # or "translate" (any language -> English)
+    "output_script": "hinglish",  # Hindi in Roman letters; original leaves recognition text unchanged
     "prompt": "",              # vocabulary / context hint: names, jargon, spelling
     "beam_size": 5,
     "vad": True,               # skip non-speech
@@ -115,6 +124,14 @@ _DOWNLOADED_TTL = 15.0
 
 
 def model_downloaded(name):
+    if name.startswith("qwen3-asr-"):
+        from huggingface_hub import snapshot_download
+        from .qwen_engine import MODELS
+        try:
+            snapshot_download(MODELS[name], cache_dir=config.MODEL_DIR, local_files_only=True)
+            return True
+        except Exception:
+            return False
     hit = _downloaded_cache.get(name)
     if hit and time.monotonic() - hit[0] < _DOWNLOADED_TTL:
         return hit[1]
@@ -130,7 +147,9 @@ def model_downloaded(name):
 
 def list_models():
     ok = available_model_ids()
-    return [dict(m, downloaded=model_downloaded(m["id"])) for m in MODEL_CATALOG
+    if importlib.util.find_spec("qwen_asr"):
+        ok.update(m["id"] for m in MODEL_CATALOG if m.get("engine") == "qwen")
+    return [dict(m, engine=m.get("engine", "whisper"), downloaded=model_downloaded(m["id"])) for m in MODEL_CATALOG
             if m["id"] in ok and (not config.ALLOWED_MODELS or m["id"] in config.ALLOWED_MODELS)]
 
 
@@ -491,6 +510,9 @@ def _recognise(audio, o, phase, on_segment, cancelled, loader):
             log.debug("dropped repeated segment at %.1fs: %r", s.start, text[:60])
             continue
         seg = _segment_dict(len(out), s)
+        if o["output_script"] == "hinglish" and o["task"] == "transcribe" and info.language in ("hi", "en"):
+            seg = convert_segment(seg, o.get("romanizer", "auto"))
+        seg.setdefault("original_text", s.text.strip())
         out.append(seg)
         log.debug("segment %d [%.1f-%.1f] conf=%.2f: %s", seg["id"], seg["start"], seg["end"],
                   seg["confidence"], text[:80])

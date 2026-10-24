@@ -1,0 +1,4 @@
+# Preparation only. Runtime reuses the existing CTranslate2 dependency, without Fairseq.
+torch==2.9.1
+omegaconf==2.3.0
+ctranslate2>=4.6,<5
