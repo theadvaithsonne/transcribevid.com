@@ -185,6 +185,18 @@ def test_robots_txt_points_at_the_sitemap_and_both_are_served(dist, client):
     assert ET.fromstring(sm.content).tag.endswith("urlset")
 
 
+@pytest.mark.skipif(not (PUBLIC_FILES / "ads.txt").is_file(), reason="frontend/public/ads.txt is missing")
+def test_ads_txt_is_served_as_plain_text_from_the_root(dist, client):
+    """Google only honours /ads.txt when it answers 200 as text/plain at the root domain; anything else is ignored."""
+    shutil.copy(PUBLIC_FILES / "ads.txt", dist / "ads.txt")
+    r = client.get("/ads.txt")
+    assert r.status_code == 200 and r.headers["content-type"].startswith("text/plain")
+    assert r.headers["cache-control"] == "public, max-age=3600" and "x-robots-tag" not in r.headers
+    records = [[p.strip() for p in ln.split(",")] for ln in r.text.splitlines() if ln.strip() and not ln.startswith("#") and "=" not in ln]
+    assert any(f[:1] == ["google.com"] and f[1].startswith("pub-") and f[2] == "DIRECT" and f[3] == "f08c47fec0942fa0"
+               for f in records if len(f) == 4), r.text
+
+
 @pytest.mark.skipif(not TOOL_PAGES_TS.is_file(), reason="the frontend sources are missing")
 def test_the_backend_knows_every_tool_page_the_frontend_defines():
     paths = re.findall(r"^\s*path:\s*'/([a-z0-9-]+)'", TOOL_PAGES_TS.read_text(encoding="utf-8"), re.M)

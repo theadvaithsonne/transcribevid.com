@@ -14,7 +14,9 @@ milestone, and every milestone ends in a commit on `feature/in-browser`.
    be marked "lost" with evidence and the owner's attention.
 2. Commit at every milestone. Never push (the owner pushes).
 3. The test suites stay green at every commit.
-4. Free-tier services only. AdSense stays inert until the owner's IDs are configured. On desktop the
+4. Free-tier services only. AdSense stays inert until the owner's ad unit (slot) ids are configured in
+   `frontend/src/app/core/ads.config.ts` (the publisher id `ca-pub-5152758693265080` is in; it is also the
+   verification meta tag in `index.html` and the line in `public/ads.txt`). On desktop the
    right 20% of the viewport is reserved for ads; on tablet and phone the units are in-flow. Fully
    responsive everywhere.
 
@@ -68,3 +70,7 @@ Baseline measured on this machine before any change:
   for the rule-based fallback.
 * 2026-10-25: the plan's "remove the server code" step is postponed: the server stays as the optional
   transport until the owner decides, so the self-hosted and CLI paths and the accuracy tooling keep working.
+* 2026-10-25 (evening): the owner added `transcribevid.com` to AdSense (status "Requires review") and gave the
+  publisher id. `ads.txt` and the `google-adsense-account` meta tag are in the build; verification can only
+  succeed once the new site is deployed to the domain (today it is a parked page that redirects to `/lander`).
+  Per `spike/adsense.md`: manual ad units only, Auto ads off, no ad script until the slot ids exist.

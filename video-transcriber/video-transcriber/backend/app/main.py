@@ -68,7 +68,8 @@ _JOB_PAGE = re.compile(r"^jobs/[0-9a-f]{32}$")
 # Never indexed: the JSON API, the operator log viewer and a visitor's private transcript pages.
 _NOINDEX = re.compile(r"^/(api(/|$)|logs(/|$)|jobs/)")
 _LONG_CACHED = re.compile(r"\.(png|ico|svg|jpe?g|webp|gif|webmanifest)$", re.I)  # icons, og-image, manifest, favicons
-_MEDIA_TYPES = {".webmanifest": "application/manifest+json", ".xml": "application/xml"}  # same on every platform
+# Same on every platform. ads.txt must be text/plain, or Google ignores it.
+_MEDIA_TYPES = {".webmanifest": "application/manifest+json", ".xml": "application/xml", ".txt": "text/plain; charset=utf-8"}
 
 
 def is_app_page(page: str) -> bool:
@@ -650,7 +651,7 @@ async def events(job_id: str, since: int = 0, sess: Session = Depends(get_sessio
 
 # --------------------------------------------------------------------------- Angular app
 # Serves the built frontend (config.STATIC_DIR, looked up per request so tests can point it elsewhere). In order:
-#   (a) an exact static file                      -> its own cache policy (hashed = immutable, icons 1 day, robots/sitemap 1 h)
+#   (a) an exact static file                      -> its own cache policy (hashed = immutable, icons 1 day, robots/sitemap/ads.txt 1 h)
 #   (b) <path>/index.html (a prerendered page)    -> 200, no-cache ("/" is the root index.html)
 #   (c) a known app page / /jobs/<id>             -> index.csr.html (client-only shell) if built, else index.html, 200
 #   (d) anything else                             -> the same shell with a TRUE 404 (no "soft 404"s for search engines)
@@ -688,7 +689,7 @@ def _api_miss(request: Request, head: bool):
 def _static_headers(name: str) -> dict:
     if _HASHED_ASSET.match(name):
         return {"Cache-Control": "public, max-age=31536000, immutable"}
-    if name in ("robots.txt", "sitemap.xml"):
+    if name in ("robots.txt", "sitemap.xml", "ads.txt"):
         return {"Cache-Control": "public, max-age=3600"}
     if _LONG_CACHED.search(name):
         return {"Cache-Control": "public, max-age=86400"}

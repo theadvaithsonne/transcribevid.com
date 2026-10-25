@@ -436,6 +436,17 @@ def test_favicon_files_google_can_use_exist():
     assert (PUBLIC_FILES / "og-image.png").read_bytes()[16:24] == (1200).to_bytes(4, "big") + (630).to_bytes(4, "big")
 
 
+def test_adsense_meta_tag_and_ads_txt_name_the_same_publisher():
+    """Google verifies site ownership from either one, so they must never drift apart. The ad script itself stays out of
+    index.html: where (and whether) ads load is decided in the app, frontend/src/app/core/ads.config.ts."""
+    head = (config.PROJECT_DIR / "frontend" / "src" / "index.html").read_text(encoding="utf-8")
+    tags = re.findall(r'<meta name="google-adsense-account" content="ca-(pub-\d{16})">', head)
+    assert len(tags) == 1, tags
+    ads = (PUBLIC_FILES / "ads.txt").read_text(encoding="utf-8")
+    assert re.search(rf"^google\.com,\s*{tags[0]},\s*DIRECT,\s*f08c47fec0942fa0\s*$", ads, re.M), ads
+    assert "adsbygoogle" not in head and "googlesyndication" not in head
+
+
 def test_startup_reports_ignored_settings_without_echoing_them(monkeypatch):
     from app.logbuffer import BUFFER
     monkeypatch.setattr(config, "BAD_VERIFICATION_CODES", ('bad"<x>',))
