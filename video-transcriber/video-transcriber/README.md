@@ -11,16 +11,6 @@ It runs two ways from the same code:
 - **Backend:** FastAPI + [faster-whisper](https://github.com/SYSTRAN/faster-whisper) (Whisper on CTranslate2) + bundled ffmpeg
 - Python was kept for the backend on purpose: the best open speech-recognition engine lives there, so there is no accuracy-losing rewrite.
 
-## Video downloads from links
-
-On the homepage, choose **Download from link**, paste a public YouTube video/Shorts
-or Instagram Reel/video post link, choose a maximum quality, and Download. The MP4
-is saved automatically when ready, with a Save video fallback and Cancel control.
-Install the current backend requirements and keep Node 22+ on PATH. Private/login-
-restricted content, live streams, playlists and carousels are not supported.
-Files belong to the visitor's temporary session. See [backend/DOWNLOADS.md](backend/DOWNLOADS.md)
-for setup, limits, API endpoints and platform restrictions.
-
 ## Quick start
 
 ```

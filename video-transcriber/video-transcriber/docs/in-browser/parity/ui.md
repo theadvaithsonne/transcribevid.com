@@ -126,6 +126,11 @@ HIGH-risk items and why:
 
 ## 3. Link download tab (`features/download/downloader.*`)
 
+> **Removed by owner decision (2026-10-25).** AdSense forbids pages that enable downloading streaming video against the
+> provider's terms (`spike/adsense.md` section 3), so the owner chose to drop this feature rather than risk the whole
+> site's ads. The code was removed by reverting commit `3d8d3dc`. UI-022 and UI-058..UI-064 below are kept as the record
+> of what existed; their status is **REMOVED**, not lost.
+
 | ID | Feature | Where | Server dependency | Browser strategy | Risk |
 |---|---|---|---|---|---|
 | UI-058 | "Paste a link. Save the video." form: URL input (`type=url`, <= 2048), quality select (360 / 720 / 1080), Download button, hint "Public single videos only..." | downloader.html:1-20; downloader.ts:38-83 | `POST /api/downloads {url, quality}` (yt-dlp worker, session cookie, 429 rate limit) | OPTIONAL-SERVER (see evidence below) | HIGH |

@@ -988,7 +988,11 @@ Known gaps vs the Python PDF: (1) Firefox and Safari support for `@page` margin 
 
 ## EN-100 .. EN-102 Out-of-engine capabilities that touch it
 
-### EN-100 YouTube / Instagram link download  (SERVER-OPTIONAL; HIGH)
+### EN-100 YouTube / Instagram link download  (REMOVED by owner decision 2026-10-25; was SERVER-OPTIONAL; HIGH)
+
+> The owner removed this feature because AdSense forbids pages that enable downloading streaming video against the
+> provider's terms (`spike/adsense.md` section 3). Commit `3d8d3dc` was reverted. The text below is the record of what
+> existed and is not a porting task.
 Source: `backend/DOWNLOADS.md`, `downloads*.py`, `download_worker.py`. Today: `yt-dlp[default]>=2026.10.21` + a JS runtime (Node 22+/Deno) for YouTube signature solving + ffmpeg merge, MP4 H.264/AAC up to a chosen height, 500 MB / 60 min / 600 s limits, two workers and 20 slots, per-session isolation, private-IP rejection (SSRF guard), known-domain single-video URLs only, no cookies.
 Why it cannot be a pure static-site feature (evidence, 2.6): the page and media endpoints of both sites send no `Access-Control-Allow-Origin` (Instagram also sends `cross-origin-resource-policy: same-origin`), so `fetch()` from transcribevid.com cannot read them; the extraction needs server-side requests with spoofable headers/cookies, the platform's anti-bot checks block datacenter IPs and change weekly (hence the pinned-version yt-dlp), and Cloudflare Workers/Pages cannot run yt-dlp (no subprocess, no long CPU).
 Closest alternatives, in order: (1) keep the existing downloader router as an optional service whose URL is configured in the site (the app already isolates it behind `/api/downloads`; PROGRESS.md decision), with the transcript flow unchanged afterwards (the downloaded MP4 is handed to the browser engine like an uploaded file); (2) paste-the-file flow: explain "download the video with your own tool, then drop it here" (works offline); (3) a browser extension or bookmarklet that fetches the media from the user's logged-in tab (user-initiated, platform ToS risk) - not recommended. The UI row must stay visible with a clear "needs the downloader service" message when no service is configured (platform/UI tracks).

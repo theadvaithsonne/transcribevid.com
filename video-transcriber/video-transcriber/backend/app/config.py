@@ -52,12 +52,6 @@ ALLOWED_MODELS = [m.strip() for m in os.environ.get("VT_ALLOWED_MODELS", "").spl
 MAX_UPLOAD_MB = _env_int("VT_MAX_UPLOAD_MB", 500 if PUBLIC else 4096)
 MAX_UPLOAD_BYTES = MAX_UPLOAD_MB * 1024 * 1024
 
-# Public video downloads have their own bounded network queue and scratch files.
-MAX_DOWNLOAD_MB = max(1, _env_int("VT_MAX_DOWNLOAD_MB", 500))
-MAX_DOWNLOAD_BYTES = MAX_DOWNLOAD_MB * 1024 * 1024
-MAX_DOWNLOAD_DURATION = max(1, _env_int("VT_MAX_DOWNLOAD_MINUTES", 60)) * 60
-DOWNLOAD_TIMEOUT = max(1, _env_int("VT_DOWNLOAD_TIMEOUT_SECONDS", 600))
-
 # ---------------------------------------------------------------- "videos transcribed" counter (see stats.py)
 # One integer: how many uploaded files this website has transcribed. VT_COUNT_JOBS = "auto" (default) counts only
 # when the server runs in public mode, so a local copy never touches the number; "1" forces counting, "0" turns it off.

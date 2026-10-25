@@ -58,7 +58,7 @@ Baseline measured on this machine before any change:
 | M2 | Architecture review + `PARITY.md` signed off | todo | |
 | M3 | Engine core with unit + real-browser tests | todo | |
 | M4 | Browser transport + UI integration (upload, job, shell) | todo | |
-| M5 | Parity work: Hinglish, Qwen decision, downloader, PDF, logs | todo | |
+| M5 | Parity work: Hinglish, Qwen decision, PDF, logs | todo | |
 | M6 | 20% ad rail, responsive layout, AdSense (inert), consent, legal text | todo | |
 | M7 | Cloudflare Pages config, counter Worker, docs, scripts | todo | |
 | M8 | Accuracy check, cross-browser run, adversarial review, parity audit | todo | |
@@ -74,3 +74,7 @@ Baseline measured on this machine before any change:
   publisher id. `ads.txt` and the `google-adsense-account` meta tag are in the build; verification can only
   succeed once the new site is deployed to the domain (today it is a parked page that redirects to `/lander`).
   Per `spike/adsense.md`: manual ad units only, Auto ads off, no ad script until the slot ids exist.
+* 2026-10-25 (evening): **the owner removed the YouTube / Instagram link downloader** after reading that
+  AdSense bans pages that enable downloading streaming video against the provider's terms
+  (`spike/adsense.md` section 3). This is the one deliberate exception to ground rule 1. Done by reverting the
+  commit that added it (`3d8d3dc`); the parity matrix marks the feature "removed (owner decision)" rather than lost.

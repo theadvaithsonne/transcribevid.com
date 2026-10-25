@@ -25,7 +25,6 @@ from pathlib import Path
 
 from . import config, engine, formats, stats, backends
 from .worker import ProcessWorker
-from .downloads import DownloadStore
 
 log = logging.getLogger("vt.jobs")
 LOCK_NAME = ".vt-session.lock"
@@ -130,7 +129,6 @@ class JobStore:
         else:
             self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
-        self.downloads = DownloadStore(self.root / "downloads")
         self._lock_file = None
         if instance:
             self._lock_file = open(self.root / LOCK_NAME, "a+b")  # held (locked) until close()
@@ -163,7 +161,7 @@ class JobStore:
 
     def active_jobs(self):
         with self.lock:
-            return sum(1 for j in self.jobs.values() if j["status"] in ("queued", "running")) + self.downloads.active_count()
+            return sum(1 for j in self.jobs.values() if j["status"] in ("queued", "running"))
 
     def _check_quota(self):
         """Public-mode limits: raise Busy / OSError instead of accepting work the server cannot carry."""
@@ -221,7 +219,6 @@ class JobStore:
         if self._closing:
             return
         self._closing = True
-        self.downloads.close()
         atexit.unregister(self.close)
         with self.lock:
             n = len(self.jobs)

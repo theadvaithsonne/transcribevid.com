@@ -32,7 +32,7 @@ FROM python:3.12-slim AS runtime
 # Japanese and Korean text in PDFs is replaced by '?'.
 ARG CJK_FONTS=1
 RUN apt-get update \
- && apt-get install -y --no-install-recommends fonts-noto-core fonts-dejavu-core libstdc++6 \
+ && apt-get install -y --no-install-recommends fonts-noto-core fonts-dejavu-core \
  && if [ "$CJK_FONTS" = "1" ]; then apt-get install -y --no-install-recommends fonts-noto-cjk; fi \
  && rm -rf /var/lib/apt/lists/*
 
@@ -46,9 +46,6 @@ RUN groupadd --system --gid 10001 app \
  && chown -R app:app /data
 
 WORKDIR /app/backend
-
-# yt-dlp uses Node 22+ for YouTube's JavaScript challenge solver.
-COPY --from=frontend /usr/local/bin/node /usr/local/bin/node
 
 # Runtime dependencies only (requirements-dev.txt is for tests and the backend/tools accuracy scripts).
 # ffmpeg comes from the imageio-ffmpeg wheel, so no system ffmpeg is needed.

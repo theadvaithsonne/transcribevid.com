@@ -40,7 +40,6 @@ from .limits import RateLimiter
 from .logbuffer import setup_logging
 from .schemas import JobOptions, JobPatch, RerunRequest
 from .sessions import COOKIE_NAME, Session, SessionManager
-from .downloads_api import create_download_router
 
 log = logging.getLogger("vt.api")
 manager: SessionManager = None
@@ -423,9 +422,6 @@ def get_session(request: Request) -> Session:
 
 def get_store(sess: Session = Depends(get_session)) -> JobStore:
     return sess.store
-
-
-app.include_router(create_download_router(get_store))
 
 
 def _job(store, job_id):
