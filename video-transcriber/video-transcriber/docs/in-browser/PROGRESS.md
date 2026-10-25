@@ -53,15 +53,33 @@ Baseline measured on this machine before any change:
 | # | What | Status | Commit |
 | --- | --- | --- | --- |
 | M0 | Branch on `swapnil`, dependencies, baseline tests | done | - |
-| M1 | Spike (plan step 1): fixtures, Whisper / audio / VAD probes in real Chrome, feature inventory, Qwen / Cloudflare / AdSense research | running | |
-| M1b | IndicXlit ported to the browser, parity measured | running | |
-| M2 | Architecture review + `PARITY.md` signed off | todo | |
-| M3 | Engine core with unit + real-browser tests | todo | |
+| M1 | Spike (plan step 1): fixtures, Whisper / audio / VAD probes in real Chrome, feature inventory, Qwen / Cloudflare / AdSense research | done | `432d10d`, `2ee2207`, spike reports |
+| M1b | IndicXlit ported to the browser, parity measured, independently verified | fixes in progress | |
+| M2 | Architecture written (`ARCHITECTURE.md`), `PARITY.md` merged; owner sign-off of section 4 decisions still open | done | |
+| M3 | Engine core with unit + real-browser tests (audio, VAD, Whisper + models, post + exports, device + session store, then the job runner / worker / browser transport) | running | |
 | M4 | Browser transport + UI integration (upload, job, shell) | todo | |
 | M5 | Parity work: Hinglish, Qwen decision, PDF, logs | todo | |
 | M6 | 20% ad rail, responsive layout, AdSense (inert), consent, legal text | todo | |
 | M7 | Cloudflare Pages config, counter Worker, docs, scripts | todo | |
 | M8 | Accuracy check, cross-browser run, adversarial review, parity audit | todo | |
+
+## Spike result (plan step 1): GO
+
+Measured in headless Chrome 155 on this laptop (Ryzen 7 7730U, Radeon iGPU, 15 GB); full detail in `spike/`.
+
+| Question | Answer |
+| --- | --- |
+| Do all seven Whisper sizes run in a browser? | Yes. tiny / base faster than real time on WASM (1 thread) and WebGPU; small on WebGPU (RTF 0.7-0.8); medium, large-v3-turbo, large-v3 run on the iGPU at 1.4-1.9x slower than real time with the best accuracy (WER 1.1%); needs 5-8 GB of memory, so they are gated by device, not offered blindly. `spike/model-matrix.md` |
+| Accuracy vs the server | Within 0.6 WER points for base / small; word timing within 0.02 s median; per-word confidence within 0.04. `spike/asr.md` |
+| What Transformers.js does not give | Beam search, token scores, language detection, prompt, correct word timing, cancel: all re-implemented in the reference worker (960 lines, built and smoke-tested). |
+| Audio in, any format | WebCodecs in a worker decodes everything the server reads today, streams files over 2 GB, one hour in 3-18 s; the clean-up filters and resampler match ffmpeg's output sample for sample. `spike/audio.md` |
+| Silence / music guard | Silero v6 (the server's own file) driven by onnxruntime-web; segments identical to the Python engine. Mandatory: without VAD 11 of 22 noise runs still produce text. `spike/vad.md` |
+| Hinglish (trained IndicXlit) | Ported bit-for-bit (int8 weights copied from the server model): identical output on 24,959 + 3,332 fresh words up to 256 symbols; verifier found 6 defects (long inputs, beam > 4, cancel, memory, errors), fixes in progress. `spike/indicxlit*.md` |
+| Qwen3-ASR | Runs on desktop WebGPU (Chrome / Edge) from published ONNX, not on CPU / phones; stays in the picker, disabled with a reason where it cannot run. `spike/qwen.md` |
+| Hosting | Cloudflare Pages free tier is enough; flatten `dir/index.html`, rewrite `/jobs/*`, ship `404.html`, serve the 25+ MiB ORT files from a pinned CDN or use the 16 MiB JSPI build, count videos in D1. `spike/hosting.md` |
+| Ads | Manual units only, Auto ads off, never on the transcribing / privacy / terms / logs pages; ads cannot load on a cross-origin-isolated document. `spike/adsense.md` |
+
+Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have no published export with word timing (either we export them ourselves or those two sizes lose word timing, to be stated in the UI); GPU-process memory grows across windows on WebGPU (the engine recycles its worker every N windows until understood); nothing is measured on phones, Safari or Firefox.
 
 ## Decisions log
 
@@ -78,3 +96,11 @@ Baseline measured on this machine before any change:
   AdSense bans pages that enable downloading streaming video against the provider's terms
   (`spike/adsense.md` section 3). This is the one deliberate exception to ground rule 1. Done by reverting the
   commit that added it (`3d8d3dc`); the parity matrix marks the feature "removed (owner decision)" rather than lost.
+* 2026-10-25 (night), after the spike: **no cross-origin isolation anywhere** in v1. Ads cannot load on an isolated
+  document and WebGPU (the fast path) does not need isolation; single-thread WASM is the fallback. A separate isolated
+  transcriber document can be added later if phone / CPU speed demands it.
+* 2026-10-25 (night): **ffmpeg.wasm is not shipped in v1** (its GPL core cannot be self-hosted within the Pages limit
+  and needs an owner licensing decision); unsupported codecs get the small lazy WASM codecs where they exist and a
+  clear "convert this file first" message otherwise.
+* 2026-10-25 (night): engine dependencies pinned exactly: `@huggingface/transformers` 4.3.1, `mediabunny` 1.62.1 and
+  the `onnxruntime-web` build transformers.js itself pins (one ORT copy serves Whisper, Silero VAD and Qwen).
