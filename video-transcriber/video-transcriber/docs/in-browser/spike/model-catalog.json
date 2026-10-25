@@ -1,0 +1,3417 @@
+{
+ "generatedAt": "2026-10-25T17:44:15.645Z",
+ "transformersJs": "4.3.1",
+ "onnxruntimeWeb": "1.31.0-dev.20260914-8d85527a0",
+ "note": "sizes are bytes of the files that Transformers.js downloads for each dtype (encoder_model + decoder_model_merged, incl. .onnx_data external data)",
+ "howToRead": {
+  "sizesMB": "download size in megabytes (1 MB = 1e6 bytes) of encoder_model + decoder_model_merged for the dtype mix",
+  "wordTimestamps": "needs a decoder that exports cross_attentions.* (the *_timestamped repos); plain repos cannot produce word timings",
+  "mixes": {
+   "wasmDefault": {
+    "device": "wasm",
+    "dtype": {
+     "encoder_model": "q8",
+     "decoder_model_merged": "q8"
+    }
+   },
+   "webgpuF16": {
+    "device": "webgpu",
+    "dtype": {
+     "encoder_model": "fp16",
+     "decoder_model_merged": "fp16"
+    }
+   },
+   "webgpuF16SmallDecoder": {
+    "device": "webgpu",
+    "dtype": {
+     "encoder_model": "fp16",
+     "decoder_model_merged": "q4f16"
+    }
+   },
+   "webgpuNoShaderF16": {
+    "device": "webgpu",
+    "dtype": {
+     "encoder_model": "fp32",
+     "decoder_model_merged": "q4"
+    }
+   },
+   "webgpuFp32": {
+    "device": "webgpu",
+    "dtype": {
+     "encoder_model": "fp32",
+     "decoder_model_merged": "fp32"
+    }
+   }
+  },
+  "status": "measured = tiny/base/small ran in headless Chrome from a replay cache; not measured yet = sizes from the Hugging Face API only, the benchmark agent fills speed/memory/WER",
+  "bench": "built-in generate() on one 22.7 s window (passage-b): realTimeFactor = generateTotalMs / audio seconds, lower is faster; loadFromCacheMs = model load from the Cache API, not a download",
+  "quality": "reference engine (custom decode loop): werPercent on passage-a (174 words) / passage-b (63 words) / passage-c (18 words); word timing medians against the SAPI pause anchors",
+  "memory": "per-process working set in MB read from the OS (renderer that hosts the worker + GPU process) at each stage"
+ },
+ "models": [
+  {
+   "id": "tiny",
+   "label": "Tiny",
+   "pythonModelSizeMb": 75,
+   "recommendedRepo": "onnx-community/whisper-tiny_timestamped",
+   "wordTimestampsRepo": "onnx-community/whisper-tiny_timestamped",
+   "wordTimestampsAvailable": true,
+   "alignmentHeads": 6,
+   "layers": {
+    "encoder": 4,
+    "decoder": 4,
+    "d_model": 384,
+    "heads": 6
+   },
+   "mixes": {
+    "wasmDefault": {
+     "device": "wasm",
+     "dtype": {
+      "encoder_model": "q8",
+      "decoder_model_merged": "q8"
+     },
+     "downloadMB": 40.8
+    },
+    "webgpuF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "fp16"
+     },
+     "downloadMB": 76.1
+    },
+    "webgpuF16SmallDecoder": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "q4f16"
+     },
+     "downloadMB": 62.5
+    },
+    "webgpuNoShaderF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "q4"
+     },
+     "downloadMB": 119.7
+    },
+    "webgpuFp32": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "fp32"
+     },
+     "downloadMB": 151.6
+    }
+   },
+   "repos": [
+    {
+     "repo": "onnx-community/whisper-tiny",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-06-19T13:56:43.000Z",
+     "downloadsLast30d": 69512,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 32.9,
+       "decoder": 118.6,
+       "total": 151.5,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 16.5,
+       "decoder": 59.6,
+       "total": 76.1,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.8,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.8,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.8,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 9,
+       "decoder": 86.7,
+       "total": 95.7,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 8.6,
+       "decoder": 86.1,
+       "total": 94.7,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "onnx-community/whisper-tiny_timestamped",
+     "exists": true,
+     "timestampedExport": true,
+     "lastModified": "2025-03-05T00:13:43.000Z",
+     "downloadsLast30d": 17393,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 32.9,
+       "decoder": 118.7,
+       "total": 151.6,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 16.5,
+       "decoder": 59.6,
+       "total": 76.1,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.8,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.8,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.8,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 9,
+       "decoder": 86.8,
+       "total": 95.8,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": null,
+       "decoder": 46,
+       "total": null,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 8.6,
+       "decoder": 86.2,
+       "total": 94.8,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "Xenova/whisper-tiny",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-12-16T18:46:42.000Z",
+     "downloadsLast30d": 573273,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 32.9,
+       "decoder": 118.6,
+       "total": 151.5,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 16.5,
+       "decoder": 59.6,
+       "total": 76.1,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.9,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": null,
+       "decoder": 30.7,
+       "total": null,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 10.1,
+       "decoder": 30.7,
+       "total": 40.8,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 9,
+       "decoder": 86.7,
+       "total": 95.7,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 6.3,
+       "decoder": 46,
+       "total": 52.3,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 8.6,
+       "decoder": 86.2,
+       "total": 94.7,
+       "externalData": false
+      }
+     }
+    }
+   ],
+   "measuredOnThisMachine": {
+    "bench": {
+     "plain-webgpu-fp16": {
+      "cpuCalibrationMs": 596,
+      "loadFromCacheMs": 23692,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 275,
+      "decoderStepMedianMs": 108.6,
+      "decoderSteps": 85,
+      "generateTotalMs": 11054,
+      "realTimeFactor": 0.49,
+      "peakRendererMB": 731,
+      "peakGpuProcessMB": 634
+     },
+     "ts-webgpu-fp16": {
+      "cpuCalibrationMs": 476,
+      "loadFromCacheMs": 17152,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 230,
+      "decoderStepMedianMs": 110.1,
+      "decoderSteps": 85,
+      "generateTotalMs": 11534,
+      "realTimeFactor": 0.51,
+      "peakRendererMB": 753,
+      "peakGpuProcessMB": 626
+     },
+     "wasm-q8-iso4": {
+      "cpuCalibrationMs": 124,
+      "loadFromCacheMs": 3895,
+      "threads": 4,
+      "isolated": true,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 843,
+      "decoderStepMedianMs": 40,
+      "decoderSteps": 87,
+      "generateTotalMs": 4868,
+      "realTimeFactor": 0.21,
+      "peakRendererMB": 652,
+      "peakGpuProcessMB": 145
+     },
+     "wasm-q8-t1": {
+      "cpuCalibrationMs": 208,
+      "loadFromCacheMs": 6699,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 2149,
+      "decoderStepMedianMs": 40.8,
+      "decoderSteps": 87,
+      "generateTotalMs": 6222,
+      "realTimeFactor": 0.27,
+      "peakRendererMB": 588,
+      "peakGpuProcessMB": 152
+     },
+     "webgpu-fp16": {
+      "cpuCalibrationMs": 121,
+      "loadFromCacheMs": 5694,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 150,
+      "decoderStepMedianMs": 41.3,
+      "decoderSteps": 85,
+      "generateTotalMs": 4077,
+      "realTimeFactor": 0.18,
+      "peakRendererMB": 801,
+      "peakGpuProcessMB": 632
+     },
+     "webgpu-fp16q4f16": {
+      "cpuCalibrationMs": 107,
+      "loadFromCacheMs": 3152,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 140,
+      "decoderStepMedianMs": 37.3,
+      "decoderSteps": 85,
+      "generateTotalMs": 3611,
+      "realTimeFactor": 0.16,
+      "peakRendererMB": 672,
+      "peakGpuProcessMB": 567
+     },
+     "webgpu-fp32q4": {
+      "cpuCalibrationMs": 127,
+      "loadFromCacheMs": 4103,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 214,
+      "decoderStepMedianMs": 31.7,
+      "decoderSteps": 85,
+      "generateTotalMs": 3080,
+      "realTimeFactor": 0.14,
+      "peakRendererMB": 1193,
+      "peakGpuProcessMB": 926
+     }
+    },
+    "quality": {
+     "wasm-fp32-v2": [
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 14659,
+       "wordStartVsPauseEndMedianAbsSec": null,
+       "wordEndVsPauseStartMedianAbsSec": null
+      },
+      {
+       "clip": "passage-a",
+       "beam": 5,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 40386,
+       "wordStartVsPauseEndMedianAbsSec": null,
+       "wordEndVsPauseStartMedianAbsSec": null
+      }
+     ],
+     "wasm-q8-v2": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 8492,
+       "wordStartVsPauseEndMedianAbsSec": 0.04,
+       "wordEndVsPauseStartMedianAbsSec": 0.05
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 4.6,
+       "errors": "8/174",
+       "wallMs": 24395,
+       "wordStartVsPauseEndMedianAbsSec": 0.025,
+       "wordEndVsPauseStartMedianAbsSec": 0.06
+      },
+      {
+       "clip": "passage-c",
+       "beam": 1,
+       "werPercent": 5.6,
+       "errors": "1/18",
+       "wallMs": 6205,
+       "wordStartVsPauseEndMedianAbsSec": 0.94,
+       "wordEndVsPauseStartMedianAbsSec": 0.8
+      }
+     ],
+     "wasm-q8": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 8944,
+       "wordStartVsPauseEndMedianAbsSec": 0.04,
+       "wordEndVsPauseStartMedianAbsSec": 0.44
+      },
+      {
+       "clip": "passage-b",
+       "beam": 5,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 20105,
+       "wordStartVsPauseEndMedianAbsSec": 0.04,
+       "wordEndVsPauseStartMedianAbsSec": 0.44
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 4.6,
+       "errors": "8/174",
+       "wallMs": 24102,
+       "wordStartVsPauseEndMedianAbsSec": 0.03,
+       "wordEndVsPauseStartMedianAbsSec": 0.54
+      },
+      {
+       "clip": "passage-a",
+       "beam": 5,
+       "werPercent": 10.3,
+       "errors": "18/174",
+       "wallMs": 60175,
+       "wordStartVsPauseEndMedianAbsSec": 0.04,
+       "wordEndVsPauseStartMedianAbsSec": 0.545
+      }
+     ],
+     "webgpu-fp16-v2": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 6176,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.05
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 16225,
+       "wordStartVsPauseEndMedianAbsSec": 0.05,
+       "wordEndVsPauseStartMedianAbsSec": 0.05
+      },
+      {
+       "clip": "passage-c",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/18",
+       "wallMs": 2001,
+       "wordStartVsPauseEndMedianAbsSec": 0.98,
+       "wordEndVsPauseStartMedianAbsSec": 0.84
+      }
+     ],
+     "webgpu-fp16": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 9218,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.49
+      },
+      {
+       "clip": "passage-b",
+       "beam": 5,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 45974,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.49
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 36873,
+       "wordStartVsPauseEndMedianAbsSec": 0.05,
+       "wordEndVsPauseStartMedianAbsSec": 0.545
+      },
+      {
+       "clip": "passage-a",
+       "beam": 5,
+       "werPercent": 2.3,
+       "errors": "4/174",
+       "wallMs": 157610,
+       "wordStartVsPauseEndMedianAbsSec": 0.06,
+       "wordEndVsPauseStartMedianAbsSec": 0.545
+      }
+     ],
+     "webgpu-fp16q4f16-v2": [
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 3.4,
+       "errors": "6/174",
+       "wallMs": 22703,
+       "wordStartVsPauseEndMedianAbsSec": 0.06,
+       "wordEndVsPauseStartMedianAbsSec": 0.05
+      }
+     ],
+     "webgpu-fp32q4-v2": [
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 2.9,
+       "errors": "5/174",
+       "wallMs": 21271,
+       "wordStartVsPauseEndMedianAbsSec": 0.06,
+       "wordEndVsPauseStartMedianAbsSec": 0.05
+      }
+     ]
+    },
+    "memory": {
+     "wasm": [
+      {
+       "label": "idle page",
+       "rendererWsMB": 82,
+       "rendererPeakWsMB": 82,
+       "gpuProcWsMB": 92,
+       "gpuProcPeakWsMB": 93,
+       "totalWsMB": 454,
+       "totalPeakWsMB": 457,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after load",
+       "rendererWsMB": 436,
+       "rendererPeakWsMB": 619,
+       "gpuProcWsMB": 92,
+       "gpuProcPeakWsMB": 93,
+       "totalWsMB": 844,
+       "totalPeakWsMB": 1077,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 1 transcription (22.7 s, greedy, words)",
+       "rendererWsMB": 627,
+       "rendererPeakWsMB": 665,
+       "gpuProcWsMB": 137,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1079,
+       "totalPeakWsMB": 1166,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 3 more windows (24 s each)",
+       "rendererWsMB": 651,
+       "rendererPeakWsMB": 722,
+       "gpuProcWsMB": 137,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1098,
+       "totalPeakWsMB": 1224,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after a beam-5 window",
+       "rendererWsMB": 662,
+       "rendererPeakWsMB": 722,
+       "gpuProcWsMB": 137,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1110,
+       "totalPeakWsMB": 1224,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after dispose + worker.terminate()",
+       "rendererWsMB": 212,
+       "rendererPeakWsMB": 722,
+       "gpuProcWsMB": 86,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 606,
+       "totalPeakWsMB": 1224,
+       "gpuCounters": {}
+      }
+     ],
+     "webgpu": [
+      {
+       "label": "idle page",
+       "rendererWsMB": 82,
+       "rendererPeakWsMB": 82,
+       "gpuProcWsMB": 100,
+       "gpuProcPeakWsMB": 101,
+       "totalWsMB": 463,
+       "totalPeakWsMB": 466,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after load",
+       "rendererWsMB": 648,
+       "rendererPeakWsMB": 783,
+       "gpuProcWsMB": 459,
+       "gpuProcPeakWsMB": 467,
+       "totalWsMB": 1423,
+       "totalPeakWsMB": 1643,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 1 transcription (22.7 s, greedy, words)",
+       "rendererWsMB": 653,
+       "rendererPeakWsMB": 783,
+       "gpuProcWsMB": 710,
+       "gpuProcPeakWsMB": 710,
+       "totalWsMB": 1678,
+       "totalPeakWsMB": 1886,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 3 more windows (24 s each)",
+       "rendererWsMB": 670,
+       "rendererPeakWsMB": 783,
+       "gpuProcWsMB": 796,
+       "gpuProcPeakWsMB": 798,
+       "totalWsMB": 1777,
+       "totalPeakWsMB": 1975,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after a beam-5 window",
+       "rendererWsMB": 722,
+       "rendererPeakWsMB": 783,
+       "gpuProcWsMB": 888,
+       "gpuProcPeakWsMB": 888,
+       "totalWsMB": 1921,
+       "totalPeakWsMB": 2064,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after dispose + worker.terminate()",
+       "rendererWsMB": 219,
+       "rendererPeakWsMB": 783,
+       "gpuProcWsMB": 497,
+       "gpuProcPeakWsMB": 888,
+       "totalWsMB": 1025,
+       "totalPeakWsMB": 2065,
+       "gpuCounters": {}
+      }
+     ]
+    }
+   },
+   "status": "measured",
+   "headline": {
+    "bestLoadFromCacheMs": {
+     "wasmQ8": 4176,
+     "webgpuFp16": 5314
+    },
+    "refEngineRtfGreedy": {
+     "wasmQ8": 0.33,
+     "webgpuFp16": 0.22
+    },
+    "werPercentPassageA": {
+     "wasmQ8": 4.6,
+     "webgpuFp16": 1.7,
+     "python": 1.1
+    },
+    "werPercentPassageB": {
+     "wasmQ8": 0,
+     "webgpuFp16": 0,
+     "python": 0
+    },
+    "peakTotalWorkingSetMB": {
+     "wasmQ8": 1224,
+     "webgpuFp16": 2065
+    },
+    "sources": {
+     "load": "results/qual-tiny-{wasm-q8,webgpu-fp16}-v2.json (small: qual-small-wasm-q8-a.json) load.ms.total",
+     "rtf": "same files: runs[passage-a].wallMs / 73 s, greedy, word timestamps on",
+     "wer": "same files + results/fw/tiny-passage-*.json for python",
+     "memory": "results/q10-mem-tiny-{wasm,webgpu}.json totalPeakWsMB after a beam-5 window"
+    }
+   },
+   "devicesThatWorked": [
+    "wasm q8",
+    "wasm fp32",
+    "webgpu fp16/fp16",
+    "webgpu fp32/q4",
+    "webgpu fp16/q4f16",
+    "webgpu fp32/fp32 (default)"
+   ],
+   "matrix": {
+    "status": "measured in headless Chrome 155 on this machine (replay cache, no real network)",
+    "devicesThatWork": [
+     "wasm q8",
+     "wasm fp32",
+     "webgpu fp16/fp16",
+     "webgpu fp32/q4",
+     "webgpu fp16/q4f16",
+     "webgpu fp32/fp32 (default)"
+    ],
+    "wasmQ8": {
+     "modelDownloadMB": 40.8,
+     "firstVisitBytes": 70511716,
+     "coldLoadMs": 4635,
+     "warmLoadMs": 3872,
+     "rtfPassageA": 0.33,
+     "rtfLong5min": 0.204,
+     "werPassageA": 4.6,
+     "werPassageB": 0,
+     "werLong5min": 2.95,
+     "werPassageABeam5": 10.3,
+     "peakTotalWsMB": 1224,
+     "peakRendererMB": 722
+    },
+    "webgpuFp16": {
+     "modelDownloadMB": 76.1,
+     "firstVisitBytes": 105736646,
+     "coldLoadMs": 5556,
+     "warmLoadMs": 5196,
+     "rtfPassageA": 0.22,
+     "rtfLong5min": 0.325,
+     "werPassageA": 1.7,
+     "werPassageB": 0,
+     "werLong5min": 1.87,
+     "werPassageABeam5": 2.3,
+     "peakTotalWsMB": 2064,
+     "peakRendererMB": 783,
+     "peakGpuProcessMB": 888
+    },
+    "python": {
+     "passage-a-greedy": {
+      "werPercent": 1.1,
+      "errors": "2/174",
+      "runS": 3.98,
+      "rtf": 0.05,
+      "beam": 1
+     },
+     "passage-a": {
+      "werPercent": 1.1,
+      "errors": "2/174",
+      "runS": 5.51,
+      "rtf": 0.08,
+      "beam": 5
+     },
+     "passage-b": {
+      "werPercent": 0,
+      "errors": "0/63",
+      "runS": 3.35,
+      "rtf": 0.15,
+      "beam": 5
+     },
+     "passage-c": {
+      "werPercent": 0,
+      "errors": "0/18",
+      "runS": 2.06,
+      "rtf": 0.3,
+      "beam": 5
+     }
+    },
+    "weakDevice": {
+     "wasm": {
+      "modes": {
+       "baseline": {
+        "wallMs": 19247,
+        "rtf": 0.85,
+        "calibMainMs": 247,
+        "werPercent": 0
+       },
+       "baseline2": {
+        "wallMs": 11549,
+        "rtf": 0.51,
+        "calibMainMs": 156,
+        "werPercent": 0
+       },
+       "cdp4x": {
+        "wallMs": 11136,
+        "rtf": 0.49,
+        "calibMainMs": 887,
+        "werPercent": 0
+       },
+       "affinity0x1": {
+        "wallMs": 13040,
+        "rtf": 0.57,
+        "calibMainMs": 161,
+        "werPercent": 0
+       },
+       "affinity0x1_2": {
+        "wallMs": 10290,
+        "rtf": 0.45,
+        "calibMainMs": 195,
+        "werPercent": 0
+       },
+       "affinity0x3": {
+        "wallMs": 11399,
+        "rtf": 0.5,
+        "calibMainMs": 177,
+        "werPercent": 0
+       }
+      },
+      "affinityOk": false,
+      "file": "throttle-tb.json"
+     },
+     "webgpu": {
+      "modes": {
+       "baseline": {
+        "wallMs": 7146,
+        "rtf": 0.31,
+        "calibMainMs": 108,
+        "werPercent": 0
+       },
+       "baseline2": {
+        "wallMs": 8097,
+        "rtf": 0.36,
+        "calibMainMs": 116,
+        "werPercent": 0
+       },
+       "cdp4x": {
+        "wallMs": 6857,
+        "rtf": 0.3,
+        "calibMainMs": 618,
+        "werPercent": 0
+       },
+       "affinity0x1": {
+        "wallMs": 24103,
+        "rtf": 1.06,
+        "calibMainMs": 86,
+        "werPercent": 0
+       },
+       "affinity0x1_2": {
+        "wallMs": 21490,
+        "rtf": 0.95,
+        "calibMainMs": 121,
+        "werPercent": 0
+       },
+       "affinity0x3": {
+        "wallMs": 9525,
+        "rtf": 0.42,
+        "calibMainMs": 103,
+        "werPercent": 0
+       }
+      },
+      "affinityOk": true,
+      "file": "throttle-tb.json"
+     }
+    },
+    "minimumRam": {
+     "measuredTotalPeakWorkingSetMB": 2064,
+     "assumption": "renderer peak + GPU-process peak are the measured numbers; the device needs that plus the OS and the rest of the browser (~1 GB) - an assumption, phones were not measured"
+    },
+    "sources": "results/matrix-summary.json (small.tiny)"
+   }
+  },
+  {
+   "id": "base",
+   "label": "Base",
+   "pythonModelSizeMb": 145,
+   "recommendedRepo": "onnx-community/whisper-base_timestamped",
+   "wordTimestampsRepo": "onnx-community/whisper-base_timestamped",
+   "wordTimestampsAvailable": true,
+   "alignmentHeads": 8,
+   "layers": {
+    "encoder": 6,
+    "decoder": 6,
+    "d_model": 512,
+    "heads": 8
+   },
+   "mixes": {
+    "wasmDefault": {
+     "device": "wasm",
+     "dtype": {
+      "encoder_model": "q8",
+      "decoder_model_merged": "q8"
+     },
+     "downloadMB": 76.9
+    },
+    "webgpuF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "fp16"
+     },
+     "downloadMB": 146
+    },
+    "webgpuF16SmallDecoder": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "q4f16"
+     },
+     "downloadMB": 109.8
+    },
+    "webgpuNoShaderF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "q4"
+     },
+     "downloadMB": 206.2
+    },
+    "webgpuFp32": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "fp32"
+     },
+     "downloadMB": 291.1
+    }
+   },
+   "repos": [
+    {
+     "repo": "onnx-community/whisper-base",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-06-19T13:49:48.000Z",
+     "downloadsLast30d": 164646,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 82.5,
+       "decoder": 208.5,
+       "total": 291,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 41.3,
+       "decoder": 104.7,
+       "total": 146.1,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 23.2,
+       "decoder": 53.7,
+       "total": 76.9,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 23.2,
+       "decoder": 53.7,
+       "total": 76.9,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 23.2,
+       "decoder": 53.7,
+       "total": 76.9,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 18.8,
+       "decoder": 123.6,
+       "total": 142.4,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 17.6,
+       "decoder": 122,
+       "total": 139.6,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "onnx-community/whisper-base_timestamped",
+     "exists": true,
+     "timestampedExport": true,
+     "lastModified": "2025-03-05T00:13:29.000Z",
+     "downloadsLast30d": 43871,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 82.5,
+       "decoder": 208.7,
+       "total": 291.1,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 41.3,
+       "decoder": 104.7,
+       "total": 146,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 23.2,
+       "decoder": 53.7,
+       "total": 76.9,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 23.2,
+       "decoder": 53.7,
+       "total": 76.9,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 23.2,
+       "decoder": 53.7,
+       "total": 76.9,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 18.8,
+       "decoder": 123.7,
+       "total": 142.5,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": null,
+       "decoder": 68.5,
+       "total": null,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 17.6,
+       "decoder": 122.2,
+       "total": 139.8,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "Xenova/whisper-base",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-12-16T18:47:26.000Z",
+     "downloadsLast30d": 68873,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 82.5,
+       "decoder": 208.6,
+       "total": 291,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 41.3,
+       "decoder": 104.7,
+       "total": 146.1,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 23.2,
+       "decoder": 53.7,
+       "total": 76.9,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": null,
+       "decoder": 53.7,
+       "total": null,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 23.1,
+       "decoder": 53.7,
+       "total": 76.8,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 18.7,
+       "decoder": 123.6,
+       "total": 142.4,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 14.1,
+       "decoder": 68.6,
+       "total": 82.7,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 17.6,
+       "decoder": 122.1,
+       "total": 139.6,
+       "externalData": false
+      }
+     }
+    }
+   ],
+   "measuredOnThisMachine": {
+    "bench": {
+     "wasm-q8-iso4": {
+      "cpuCalibrationMs": 129,
+      "loadFromCacheMs": 4548,
+      "threads": 4,
+      "isolated": true,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 1710,
+      "decoderStepMedianMs": 61.3,
+      "decoderSteps": 85,
+      "generateTotalMs": 7390,
+      "realTimeFactor": 0.32,
+      "peakRendererMB": 759,
+      "peakGpuProcessMB": 144
+     },
+     "wasm-q8-iso8": {
+      "cpuCalibrationMs": 120,
+      "loadFromCacheMs": 3817,
+      "threads": 8,
+      "isolated": true,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 1117,
+      "decoderStepMedianMs": 67.9,
+      "decoderSteps": 85,
+      "generateTotalMs": 7513,
+      "realTimeFactor": 0.33,
+      "peakRendererMB": 812,
+      "peakGpuProcessMB": 144
+     },
+     "wasm-q8-t1": {
+      "cpuCalibrationMs": 149,
+      "loadFromCacheMs": 4670,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 3375,
+      "decoderStepMedianMs": 84.8,
+      "decoderSteps": 85,
+      "generateTotalMs": 10772,
+      "realTimeFactor": 0.47,
+      "peakRendererMB": 719,
+      "peakGpuProcessMB": 152
+     },
+     "webgpu-fp16": {
+      "cpuCalibrationMs": 118,
+      "loadFromCacheMs": 5275,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 346,
+      "decoderStepMedianMs": 62.6,
+      "decoderSteps": 85,
+      "generateTotalMs": 6161,
+      "realTimeFactor": 0.27,
+      "peakRendererMB": 1055,
+      "peakGpuProcessMB": 782
+     },
+     "webgpu-fp16q4f16": {
+      "cpuCalibrationMs": 91,
+      "loadFromCacheMs": 3253,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 292,
+      "decoderStepMedianMs": 47.3,
+      "decoderSteps": 85,
+      "generateTotalMs": 4607,
+      "realTimeFactor": 0.2,
+      "peakRendererMB": 898,
+      "peakGpuProcessMB": 734
+     },
+     "webgpu-fp32q4": {
+      "cpuCalibrationMs": 94,
+      "loadFromCacheMs": 4127,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 513,
+      "decoderStepMedianMs": 52.2,
+      "decoderSteps": 85,
+      "generateTotalMs": 5291,
+      "realTimeFactor": 0.23,
+      "peakRendererMB": 1249,
+      "peakGpuProcessMB": 1154
+     }
+    },
+    "quality": {
+     "wasm-q8-v2": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 11094,
+       "wordStartVsPauseEndMedianAbsSec": 0.11,
+       "wordEndVsPauseStartMedianAbsSec": 0.16
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 2.9,
+       "errors": "5/174",
+       "wallMs": 38378,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.135
+      },
+      {
+       "clip": "passage-c",
+       "beam": 1,
+       "werPercent": 5.6,
+       "errors": "1/18",
+       "wallMs": 7650,
+       "wordStartVsPauseEndMedianAbsSec": 1.1,
+       "wordEndVsPauseStartMedianAbsSec": 0.96
+      }
+     ],
+     "wasm-q8": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 14804,
+       "wordStartVsPauseEndMedianAbsSec": 0.11,
+       "wordEndVsPauseStartMedianAbsSec": 0.37
+      },
+      {
+       "clip": "passage-b",
+       "beam": 5,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 39061,
+       "wordStartVsPauseEndMedianAbsSec": 0.11,
+       "wordEndVsPauseStartMedianAbsSec": 0.37
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 2.9,
+       "errors": "5/174",
+       "wallMs": 47470,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.405
+      },
+      {
+       "clip": "passage-a",
+       "beam": 5,
+       "werPercent": 2.9,
+       "errors": "5/174",
+       "wallMs": 130946,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.415
+      }
+     ],
+     "webgpu-fp16-v2": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 7089,
+       "wordStartVsPauseEndMedianAbsSec": 0.18,
+       "wordEndVsPauseStartMedianAbsSec": 0.19
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 2.9,
+       "errors": "5/174",
+       "wallMs": 21531,
+       "wordStartVsPauseEndMedianAbsSec": 0.125,
+       "wordEndVsPauseStartMedianAbsSec": 0.165
+      },
+      {
+       "clip": "passage-c",
+       "beam": 1,
+       "werPercent": 5.6,
+       "errors": "1/18",
+       "wallMs": 2458,
+       "wordStartVsPauseEndMedianAbsSec": 1.1,
+       "wordEndVsPauseStartMedianAbsSec": 0.96
+      }
+     ],
+     "webgpu-fp16": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 21509,
+       "wordStartVsPauseEndMedianAbsSec": 0.18,
+       "wordEndVsPauseStartMedianAbsSec": 0.35
+      },
+      {
+       "clip": "passage-b",
+       "beam": 5,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 83553,
+       "wordStartVsPauseEndMedianAbsSec": 0.18,
+       "wordEndVsPauseStartMedianAbsSec": 0.35
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 2.9,
+       "errors": "5/174",
+       "wallMs": 50669,
+       "wordStartVsPauseEndMedianAbsSec": 0.125,
+       "wordEndVsPauseStartMedianAbsSec": 0.38
+      },
+      {
+       "clip": "passage-a",
+       "beam": 5,
+       "werPercent": 2.9,
+       "errors": "5/174",
+       "wallMs": 210848,
+       "wordStartVsPauseEndMedianAbsSec": 0.125,
+       "wordEndVsPauseStartMedianAbsSec": 0.38
+      }
+     ],
+     "webgpu-fp32q4-v2": [
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 3.4,
+       "errors": "6/174",
+       "wallMs": 30824,
+       "wordStartVsPauseEndMedianAbsSec": 0.125,
+       "wordEndVsPauseStartMedianAbsSec": 0.16
+      }
+     ]
+    },
+    "memory": {
+     "wasm": [
+      {
+       "label": "idle page",
+       "rendererWsMB": 82,
+       "rendererPeakWsMB": 82,
+       "gpuProcWsMB": 99,
+       "gpuProcPeakWsMB": 101,
+       "totalWsMB": 461,
+       "totalPeakWsMB": 465,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after load",
+       "rendererWsMB": 539,
+       "rendererPeakWsMB": 711,
+       "gpuProcWsMB": 92,
+       "gpuProcPeakWsMB": 101,
+       "totalWsMB": 947,
+       "totalPeakWsMB": 1200,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 1 transcription (22.7 s, greedy, words)",
+       "rendererWsMB": 748,
+       "rendererPeakWsMB": 841,
+       "gpuProcWsMB": 137,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1201,
+       "totalPeakWsMB": 1365,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 3 more windows (24 s each)",
+       "rendererWsMB": 704,
+       "rendererPeakWsMB": 841,
+       "gpuProcWsMB": 136,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1149,
+       "totalPeakWsMB": 1367,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after a beam-5 window",
+       "rendererWsMB": 722,
+       "rendererPeakWsMB": 841,
+       "gpuProcWsMB": 136,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1168,
+       "totalPeakWsMB": 1367,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after dispose + worker.terminate()",
+       "rendererWsMB": 154,
+       "rendererPeakWsMB": 841,
+       "gpuProcWsMB": 85,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 548,
+       "totalPeakWsMB": 1367,
+       "gpuCounters": {}
+      }
+     ],
+     "webgpu": [
+      {
+       "label": "idle page",
+       "rendererWsMB": 82,
+       "rendererPeakWsMB": 82,
+       "gpuProcWsMB": 92,
+       "gpuProcPeakWsMB": 94,
+       "totalWsMB": 457,
+       "totalPeakWsMB": 461,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after load",
+       "rendererWsMB": 900,
+       "rendererPeakWsMB": 951,
+       "gpuProcWsMB": 530,
+       "gpuProcPeakWsMB": 530,
+       "totalWsMB": 1751,
+       "totalPeakWsMB": 1919,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 1 transcription (22.7 s, greedy, words)",
+       "rendererWsMB": 867,
+       "rendererPeakWsMB": 1004,
+       "gpuProcWsMB": 846,
+       "gpuProcPeakWsMB": 846,
+       "totalWsMB": 2033,
+       "totalPeakWsMB": 2288,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 3 more windows (24 s each)",
+       "rendererWsMB": 898,
+       "rendererPeakWsMB": 1004,
+       "gpuProcWsMB": 973,
+       "gpuProcPeakWsMB": 973,
+       "totalWsMB": 2186,
+       "totalPeakWsMB": 2415,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after a beam-5 window",
+       "rendererWsMB": 920,
+       "rendererPeakWsMB": 1004,
+       "gpuProcWsMB": 1061,
+       "gpuProcPeakWsMB": 1062,
+       "totalWsMB": 2294,
+       "totalPeakWsMB": 2504,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after dispose + worker.terminate()",
+       "rendererWsMB": 217,
+       "rendererPeakWsMB": 1004,
+       "gpuProcWsMB": 381,
+       "gpuProcPeakWsMB": 1062,
+       "totalWsMB": 911,
+       "totalPeakWsMB": 2504,
+       "gpuCounters": {}
+      }
+     ]
+    }
+   },
+   "status": "measured",
+   "headline": {
+    "bestLoadFromCacheMs": {
+     "wasmQ8": 5579,
+     "webgpuFp16": 7545
+    },
+    "refEngineRtfGreedy": {
+     "wasmQ8": 0.53,
+     "webgpuFp16": 0.29
+    },
+    "werPercentPassageA": {
+     "wasmQ8": 2.9,
+     "webgpuFp16": 2.9,
+     "python": 2.3
+    },
+    "werPercentPassageB": {
+     "wasmQ8": 0,
+     "webgpuFp16": 0,
+     "python": 0
+    },
+    "peakTotalWorkingSetMB": {
+     "wasmQ8": 1367,
+     "webgpuFp16": 2504
+    },
+    "sources": {
+     "load": "results/qual-base-{wasm-q8,webgpu-fp16}-v2.json (small: qual-small-wasm-q8-a.json) load.ms.total",
+     "rtf": "same files: runs[passage-a].wallMs / 73 s, greedy, word timestamps on",
+     "wer": "same files + results/fw/base-passage-*.json for python",
+     "memory": "results/q10-mem-base-{wasm,webgpu}.json totalPeakWsMB after a beam-5 window"
+    }
+   },
+   "devicesThatWorked": [
+    "wasm q8",
+    "webgpu fp16/fp16",
+    "webgpu fp32/q4",
+    "webgpu fp16/q4f16"
+   ],
+   "matrix": {
+    "status": "measured in headless Chrome 155 on this machine (replay cache, no real network)",
+    "devicesThatWork": [
+     "wasm q8",
+     "webgpu fp16/fp16",
+     "webgpu fp32/q4",
+     "webgpu fp16/q4f16"
+    ],
+    "wasmQ8": {
+     "modelDownloadMB": 76.9,
+     "firstVisitBytes": 106556277,
+     "coldLoadMs": 5190,
+     "warmLoadMs": 4896,
+     "rtfPassageA": 0.52,
+     "rtfLong5min": 0.365,
+     "werPassageA": 2.9,
+     "werPassageB": 0,
+     "werLong5min": 1.87,
+     "werPassageABeam5": 2.9,
+     "peakTotalWsMB": 1367,
+     "peakRendererMB": 841
+    },
+    "webgpuFp16": {
+     "modelDownloadMB": 146,
+     "firstVisitBytes": 175657122,
+     "coldLoadMs": 9323,
+     "warmLoadMs": 5040,
+     "rtfPassageA": 0.29,
+     "rtfLong5min": 0.437,
+     "werPassageA": 2.9,
+     "werPassageB": 0,
+     "werLong5min": 2.01,
+     "werPassageABeam5": 2.9,
+     "peakTotalWsMB": 2504,
+     "peakRendererMB": 1004,
+     "peakGpuProcessMB": 1062
+    },
+    "python": {
+     "passage-a": {
+      "werPercent": 2.3,
+      "errors": "4/174",
+      "runS": 14.66,
+      "rtf": 0.2,
+      "beam": 5
+     },
+     "passage-b": {
+      "werPercent": 0,
+      "errors": "0/63",
+      "runS": 5.34,
+      "rtf": 0.23,
+      "beam": 5
+     },
+     "passage-c": {
+      "werPercent": 5.6,
+      "errors": "1/18",
+      "runS": 3.86,
+      "rtf": 0.56,
+      "beam": 5
+     }
+    },
+    "weakDevice": {
+     "wasm": {
+      "modes": {
+       "baseline": {
+        "wallMs": 18298,
+        "rtf": 0.8,
+        "calibMainMs": 142,
+        "werPercent": 0
+       },
+       "baseline2": {
+        "wallMs": 18331,
+        "rtf": 0.81,
+        "calibMainMs": 123,
+        "werPercent": 0
+       },
+       "cdp4x": {
+        "wallMs": 17200,
+        "rtf": 0.76,
+        "calibMainMs": 605,
+        "werPercent": 0
+       },
+       "affinity0x1": {
+        "wallMs": 15481,
+        "rtf": 0.68,
+        "calibMainMs": 129,
+        "werPercent": 0
+       },
+       "affinity0x1_2": {
+        "wallMs": 14541,
+        "rtf": 0.64,
+        "calibMainMs": 93,
+        "werPercent": 0
+       },
+       "affinity0x3": {
+        "wallMs": 18222,
+        "rtf": 0.8,
+        "calibMainMs": 100,
+        "werPercent": 0
+       }
+      },
+      "affinityOk": false,
+      "file": "throttle-tb.json"
+     },
+     "webgpu": {
+      "modes": {
+       "baseline": {
+        "wallMs": 12860,
+        "rtf": 0.57,
+        "calibMainMs": 96,
+        "werPercent": 0
+       },
+       "baseline2": {
+        "wallMs": 26648,
+        "rtf": 1.17,
+        "calibMainMs": 101,
+        "werPercent": 0
+       },
+       "cdp4x": {
+        "wallMs": 12844,
+        "rtf": 0.56,
+        "calibMainMs": 563,
+        "werPercent": 0
+       },
+       "affinity0x1": {
+        "wallMs": 27732,
+        "rtf": 1.22,
+        "calibMainMs": 189,
+        "werPercent": 0
+       },
+       "affinity0x1_2": {
+        "wallMs": 13246,
+        "rtf": 0.58,
+        "calibMainMs": 121,
+        "werPercent": 0
+       },
+       "affinity0x3": {
+        "wallMs": 10344,
+        "rtf": 0.45,
+        "calibMainMs": 82,
+        "werPercent": 0
+       }
+      },
+      "affinityOk": true,
+      "file": "throttle-tb.json"
+     }
+    },
+    "minimumRam": {
+     "measuredTotalPeakWorkingSetMB": 2504,
+     "assumption": "renderer peak + GPU-process peak are the measured numbers; the device needs that plus the OS and the rest of the browser (~1 GB) - an assumption, phones were not measured"
+    },
+    "sources": "results/matrix-summary.json (small.base)"
+   }
+  },
+  {
+   "id": "small",
+   "label": "Small",
+   "pythonModelSizeMb": 465,
+   "recommendedRepo": "onnx-community/whisper-small_timestamped",
+   "wordTimestampsRepo": "onnx-community/whisper-small_timestamped",
+   "wordTimestampsAvailable": true,
+   "alignmentHeads": 10,
+   "layers": {
+    "encoder": 12,
+    "decoder": 12,
+    "d_model": 768,
+    "heads": 12
+   },
+   "mixes": {
+    "wasmDefault": {
+     "device": "wasm",
+     "dtype": {
+      "encoder_model": "q8",
+      "decoder_model_merged": "q8"
+     },
+     "downloadMB": 249
+    },
+    "webgpuF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "fp16"
+     },
+     "downloadMB": 485
+    },
+    "webgpuF16SmallDecoder": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "q4f16"
+     },
+     "downloadMB": 322.3
+    },
+    "webgpuNoShaderF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "q4"
+     },
+     "downloadMB": 586.2
+    },
+    "webgpuFp32": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "fp32"
+     },
+     "downloadMB": 968.4
+    }
+   },
+   "repos": [
+    {
+     "repo": "onnx-community/whisper-small",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-06-19T13:56:48.000Z",
+     "downloadsLast30d": 140916,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 352.8,
+       "decoder": 615.3,
+       "total": 968.2,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 176.6,
+       "decoder": 308.6,
+       "total": 485.2,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 92.3,
+       "decoder": 156.8,
+       "total": 249.1,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 92.3,
+       "decoder": 156.8,
+       "total": 249.1,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 92.3,
+       "decoder": 156.8,
+       "total": 249.1,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 66.2,
+       "decoder": 233.1,
+       "total": 299.3,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 60.9,
+       "decoder": 226.1,
+       "total": 286.9,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "onnx-community/whisper-small_timestamped",
+     "exists": true,
+     "timestampedExport": true,
+     "lastModified": "2025-03-05T00:13:06.000Z",
+     "downloadsLast30d": 24598,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 352.8,
+       "decoder": 615.7,
+       "total": 968.4,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 176.5,
+       "decoder": 308.5,
+       "total": 485,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 92.2,
+       "decoder": 156.8,
+       "total": 249,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 92.2,
+       "decoder": 156.8,
+       "total": 249,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 92.2,
+       "decoder": 156.8,
+       "total": 249,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 66.2,
+       "decoder": 233.4,
+       "total": 299.6,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": null,
+       "decoder": 145.8,
+       "total": null,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 60.9,
+       "decoder": 226.3,
+       "total": 287.2,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "Xenova/whisper-small",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-12-16T18:45:04.000Z",
+     "downloadsLast30d": 40423,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 352.8,
+       "decoder": 615.4,
+       "total": 968.2,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 176.6,
+       "decoder": 308.6,
+       "total": 485.2,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 92.3,
+       "decoder": 156.8,
+       "total": 249.1,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": null,
+       "decoder": 156.8,
+       "total": null,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 92.2,
+       "decoder": 156.8,
+       "total": 249,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 66.1,
+       "decoder": 233.2,
+       "total": 299.4,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 54.4,
+       "decoder": 145.8,
+       "total": 200.2,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 60.8,
+       "decoder": 226.2,
+       "total": 287,
+       "externalData": false
+      }
+     }
+    }
+   ],
+   "measuredOnThisMachine": {
+    "bench": {
+     "wasm-q8-iso4": {
+      "cpuCalibrationMs": 124,
+      "loadFromCacheMs": 6693,
+      "threads": 4,
+      "isolated": true,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 5048,
+      "decoderStepMedianMs": 114.5,
+      "decoderSteps": 89,
+      "generateTotalMs": 15930,
+      "realTimeFactor": 0.7,
+      "peakRendererMB": 1354,
+      "peakGpuProcessMB": 144
+     },
+     "wasm-q8-iso8": {
+      "cpuCalibrationMs": 114,
+      "loadFromCacheMs": 7738,
+      "threads": 8,
+      "isolated": true,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 3478,
+      "decoderStepMedianMs": 106.5,
+      "decoderSteps": 89,
+      "generateTotalMs": 13749,
+      "realTimeFactor": 0.6,
+      "peakRendererMB": 1387,
+      "peakGpuProcessMB": 137
+     },
+     "wasm-q8-t1": {
+      "cpuCalibrationMs": 157,
+      "loadFromCacheMs": 13206,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 19286,
+      "decoderStepMedianMs": 175.1,
+      "decoderSteps": 89,
+      "generateTotalMs": 37803,
+      "realTimeFactor": 1.66,
+      "peakRendererMB": 1335,
+      "peakGpuProcessMB": 137
+     },
+     "webgpu-fp16": {
+      "cpuCalibrationMs": 116,
+      "loadFromCacheMs": 10872,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 1332,
+      "decoderStepMedianMs": 121.7,
+      "decoderSteps": 89,
+      "generateTotalMs": 12631,
+      "realTimeFactor": 0.56,
+      "peakRendererMB": 2057,
+      "peakGpuProcessMB": 1720
+     },
+     "webgpu-fp16q4f16": {
+      "cpuCalibrationMs": 94,
+      "loadFromCacheMs": 5130,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 1252,
+      "decoderStepMedianMs": 102.1,
+      "decoderSteps": 89,
+      "generateTotalMs": 10729,
+      "realTimeFactor": 0.47,
+      "peakRendererMB": 1492,
+      "peakGpuProcessMB": 1464
+     },
+     "webgpu-fp32q4": {
+      "cpuCalibrationMs": 103,
+      "loadFromCacheMs": 32322,
+      "threads": 1,
+      "isolated": false,
+      "clip": "passage-b",
+      "audioSeconds": 22.7,
+      "encoderMsPer30sWindow": 1705,
+      "decoderStepMedianMs": 104,
+      "decoderSteps": 89,
+      "generateTotalMs": 11553,
+      "realTimeFactor": 0.51,
+      "peakRendererMB": 2795,
+      "peakGpuProcessMB": 2103
+     }
+    },
+    "quality": {
+     "wasm-q8-a": [
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 108902,
+       "wordStartVsPauseEndMedianAbsSec": 0.075,
+       "wordEndVsPauseStartMedianAbsSec": 0.38
+      }
+     ],
+     "wasm-q8": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 46207,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.33
+      },
+      {
+       "clip": "passage-b",
+       "beam": 5,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 91935,
+       "wordStartVsPauseEndMedianAbsSec": 0.08,
+       "wordEndVsPauseStartMedianAbsSec": 0.33
+      }
+     ],
+     "webgpu-fp16-v2": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 17537,
+       "wordStartVsPauseEndMedianAbsSec": 0.06,
+       "wordEndVsPauseStartMedianAbsSec": 0.13
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 52041,
+       "wordStartVsPauseEndMedianAbsSec": 0.075,
+       "wordEndVsPauseStartMedianAbsSec": 0.19
+      },
+      {
+       "clip": "passage-c",
+       "beam": 1,
+       "werPercent": 5.6,
+       "errors": "1/18",
+       "wallMs": 6727,
+       "wordStartVsPauseEndMedianAbsSec": 1.14,
+       "wordEndVsPauseStartMedianAbsSec": 1
+      }
+     ],
+     "webgpu-fp16": [
+      {
+       "clip": "passage-b",
+       "beam": 1,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 37411,
+       "wordStartVsPauseEndMedianAbsSec": 0.06,
+       "wordEndVsPauseStartMedianAbsSec": 0.34
+      },
+      {
+       "clip": "passage-b",
+       "beam": 5,
+       "werPercent": 0,
+       "errors": "0/63",
+       "wallMs": 158371,
+       "wordStartVsPauseEndMedianAbsSec": 0.06,
+       "wordEndVsPauseStartMedianAbsSec": 0.34
+      },
+      {
+       "clip": "passage-a",
+       "beam": 1,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 103397,
+       "wordStartVsPauseEndMedianAbsSec": 0.075,
+       "wordEndVsPauseStartMedianAbsSec": 0.35
+      },
+      {
+       "clip": "passage-a",
+       "beam": 5,
+       "werPercent": 1.7,
+       "errors": "3/174",
+       "wallMs": 422534,
+       "wordStartVsPauseEndMedianAbsSec": 0.075,
+       "wordEndVsPauseStartMedianAbsSec": 0.35
+      }
+     ]
+    },
+    "memory": {
+     "wasm": [
+      {
+       "label": "idle page",
+       "rendererWsMB": 82,
+       "rendererPeakWsMB": 82,
+       "gpuProcWsMB": 100,
+       "gpuProcPeakWsMB": 102,
+       "totalWsMB": 462,
+       "totalPeakWsMB": 466,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after load",
+       "rendererWsMB": 1033,
+       "rendererPeakWsMB": 1286,
+       "gpuProcWsMB": 84,
+       "gpuProcPeakWsMB": 102,
+       "totalWsMB": 1431,
+       "totalPeakWsMB": 1869,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 1 transcription (22.7 s, greedy, words)",
+       "rendererWsMB": 1275,
+       "rendererPeakWsMB": 1405,
+       "gpuProcWsMB": 137,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1722,
+       "totalPeakWsMB": 2024,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 3 more windows (24 s each)",
+       "rendererWsMB": 1303,
+       "rendererPeakWsMB": 1546,
+       "gpuProcWsMB": 136,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1747,
+       "totalPeakWsMB": 2165,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after a beam-5 window",
+       "rendererWsMB": 1330,
+       "rendererPeakWsMB": 1590,
+       "gpuProcWsMB": 136,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 1774,
+       "totalPeakWsMB": 2210,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after dispose + worker.terminate()",
+       "rendererWsMB": 155,
+       "rendererPeakWsMB": 1590,
+       "gpuProcWsMB": 86,
+       "gpuProcPeakWsMB": 137,
+       "totalWsMB": 549,
+       "totalPeakWsMB": 2210,
+       "gpuCounters": {}
+      }
+     ],
+     "webgpu": [
+      {
+       "label": "idle page",
+       "rendererWsMB": 82,
+       "rendererPeakWsMB": 82,
+       "gpuProcWsMB": 91,
+       "gpuProcPeakWsMB": 93,
+       "totalWsMB": 456,
+       "totalPeakWsMB": 460,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after load",
+       "rendererWsMB": 1927,
+       "rendererPeakWsMB": 2015,
+       "gpuProcWsMB": 1263,
+       "gpuProcPeakWsMB": 1263,
+       "totalWsMB": 3508,
+       "totalPeakWsMB": 3907,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 1 transcription (22.7 s, greedy, words)",
+       "rendererWsMB": 1663,
+       "rendererPeakWsMB": 2083,
+       "gpuProcWsMB": 2104,
+       "gpuProcPeakWsMB": 2104,
+       "totalWsMB": 4081,
+       "totalPeakWsMB": 4817,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after 3 more windows (24 s each)",
+       "rendererWsMB": 1690,
+       "rendererPeakWsMB": 2083,
+       "gpuProcWsMB": 2843,
+       "gpuProcPeakWsMB": 2844,
+       "totalWsMB": 4846,
+       "totalPeakWsMB": 5557,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after a beam-5 window",
+       "rendererWsMB": 1707,
+       "rendererPeakWsMB": 2083,
+       "gpuProcWsMB": 3114,
+       "gpuProcPeakWsMB": 3114,
+       "totalWsMB": 5128,
+       "totalPeakWsMB": 5827,
+       "gpuCounters": {}
+      },
+      {
+       "label": "after dispose + worker.terminate()",
+       "rendererWsMB": 223,
+       "rendererPeakWsMB": 2083,
+       "gpuProcWsMB": 566,
+       "gpuProcPeakWsMB": 3114,
+       "totalWsMB": 1096,
+       "totalPeakWsMB": 5827,
+       "gpuCounters": {}
+      }
+     ]
+    }
+   },
+   "status": "measured",
+   "headline": {
+    "bestLoadFromCacheMs": {
+     "wasmQ8": 8148,
+     "webgpuFp16": 11092
+    },
+    "refEngineRtfGreedy": {
+     "wasmQ8": 1.49,
+     "webgpuFp16": 0.71
+    },
+    "werPercentPassageA": {
+     "wasmQ8": 1.7,
+     "webgpuFp16": 1.7,
+     "python": 1.1
+    },
+    "werPercentPassageB": {
+     "wasmQ8": 0,
+     "webgpuFp16": 0,
+     "python": 0
+    },
+    "peakTotalWorkingSetMB": {
+     "wasmQ8": 2210,
+     "webgpuFp16": 5827
+    },
+    "sources": {
+     "load": "results/qual-small-{wasm-q8,webgpu-fp16}-v2.json (small: qual-small-wasm-q8-a.json) load.ms.total",
+     "rtf": "same files: runs[passage-a].wallMs / 73 s, greedy, word timestamps on",
+     "wer": "same files + results/fw/small-passage-*.json for python",
+     "memory": "results/q10-mem-small-{wasm,webgpu}.json totalPeakWsMB after a beam-5 window"
+    }
+   },
+   "devicesThatWorked": [
+    "wasm q8",
+    "webgpu fp16/fp16",
+    "webgpu fp32/q4",
+    "webgpu fp16/q4f16"
+   ],
+   "matrix": {
+    "status": "measured in headless Chrome 155 on this machine (replay cache, no real network)",
+    "devicesThatWork": [
+     "wasm q8",
+     "webgpu fp16/fp16",
+     "webgpu fp32/q4",
+     "webgpu fp16/q4f16"
+    ],
+    "wasmQ8": {
+     "modelDownloadMB": 249,
+     "firstVisitBytes": 278720696,
+     "coldLoadMs": 11281,
+     "warmLoadMs": 6437,
+     "rtfPassageA": 1.49,
+     "rtfLong5min": null,
+     "werPassageA": 1.7,
+     "werPassageB": 0,
+     "werLong5min": null,
+     "werPassageABeam5": null,
+     "peakTotalWsMB": 2210,
+     "peakRendererMB": 1590
+    },
+    "webgpuFp16": {
+     "modelDownloadMB": 485,
+     "firstVisitBytes": 514705933,
+     "coldLoadMs": 13787,
+     "warmLoadMs": 9066,
+     "rtfPassageA": 0.71,
+     "rtfLong5min": 0.809,
+     "werPassageA": 1.7,
+     "werPassageB": 0,
+     "werLong5min": 1.47,
+     "werPassageABeam5": 1.7,
+     "peakTotalWsMB": 5827,
+     "peakRendererMB": 2083,
+     "peakGpuProcessMB": 3114
+    },
+    "python": {
+     "passage-a": {
+      "werPercent": 1.1,
+      "errors": "2/174",
+      "runS": 47.98,
+      "rtf": 0.66,
+      "beam": 5
+     },
+     "passage-b": {
+      "werPercent": 0,
+      "errors": "0/63",
+      "runS": 18.88,
+      "rtf": 0.83,
+      "beam": 5
+     },
+     "passage-c": {
+      "werPercent": 5.6,
+      "errors": "1/18",
+      "runS": 14.22,
+      "rtf": 2.04,
+      "beam": 5
+     }
+    },
+    "weakDevice": {
+     "wasm": null,
+     "webgpu": null
+    },
+    "minimumRam": {
+     "measuredTotalPeakWorkingSetMB": 5827,
+     "assumption": "renderer peak + GPU-process peak are the measured numbers; the device needs that plus the OS and the rest of the browser (~1 GB) - an assumption, phones were not measured"
+    },
+    "sources": "results/matrix-summary.json (small.small)"
+   }
+  },
+  {
+   "id": "medium",
+   "label": "Medium",
+   "pythonModelSizeMb": 1500,
+   "recommendedRepo": "onnx-community/whisper-medium_timestamped",
+   "wordTimestampsRepo": "onnx-community/whisper-medium_timestamped",
+   "wordTimestampsAvailable": true,
+   "alignmentHeads": 6,
+   "layers": {
+    "encoder": 24,
+    "decoder": 24,
+    "d_model": 1024,
+    "heads": 16
+   },
+   "mixes": {
+    "wasmDefault": {
+     "device": "wasm",
+     "dtype": {
+      "encoder_model": "q8",
+      "decoder_model_merged": "q8"
+     },
+     "downloadMB": 985.7
+    },
+    "webgpuF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "fp16"
+     },
+     "downloadMB": 1529.7
+    },
+    "webgpuF16SmallDecoder": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "q4f16"
+     },
+     "downloadMB": 951
+    },
+    "webgpuNoShaderF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "q4"
+     },
+     "downloadMB": 1698.5
+    },
+    "webgpuFp32": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "fp32"
+     },
+     "downloadMB": 3057.4
+    }
+   },
+   "repos": [
+    {
+     "repo": "onnx-community/whisper-medium-ONNX",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-03-04T22:52:10.000Z",
+     "downloadsLast30d": 938,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 1229.1,
+       "decoder": 1828.2,
+       "total": 3057.4,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 614.7,
+       "decoder": 915.1,
+       "total": 1529.8,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 313.2,
+       "decoder": 672.6,
+       "total": 985.7,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 313.2,
+       "decoder": 672.6,
+       "total": 985.7,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 313.2,
+       "decoder": 672.6,
+       "total": 985.7,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 210,
+       "decoder": 469.4,
+       "total": 679.3,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 180.6,
+       "decoder": 336.3,
+       "total": 516.9,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 191.1,
+       "decoder": 444.2,
+       "total": 635.3,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "onnx-community/whisper-medium_timestamped",
+     "exists": true,
+     "timestampedExport": true,
+     "lastModified": "2025-12-16T17:29:07.000Z",
+     "downloadsLast30d": 1191,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 1229.1,
+       "decoder": 1828.3,
+       "total": 3057.4,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 614.7,
+       "decoder": 915,
+       "total": 1529.7,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 313.2,
+       "decoder": 672.6,
+       "total": 985.7,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 313.2,
+       "decoder": 1828.3,
+       "total": 2141.4,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 313.2,
+       "decoder": 1828.3,
+       "total": 2141.4,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 210,
+       "decoder": 469.4,
+       "total": 679.3,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 180.6,
+       "decoder": 336.3,
+       "total": 516.9,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 191.1,
+       "decoder": 444.2,
+       "total": 635.3,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "Xenova/whisper-medium",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-12-16T18:47:37.000Z",
+     "downloadsLast30d": 2696,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 1229.3,
+       "decoder": 1828.7,
+       "total": 3058,
+       "externalData": false
+      },
+      "fp16": {
+       "encoder": 615,
+       "decoder": 916.2,
+       "total": 1531.2,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 313.5,
+       "decoder": 462.7,
+       "total": 776.1,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": null,
+       "decoder": 462.7,
+       "total": null,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 313.2,
+       "decoder": 462.7,
+       "total": 775.9,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 210,
+       "decoder": 469.8,
+       "total": 679.8,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 180.7,
+       "decoder": 337.4,
+       "total": 518.1,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 191.1,
+       "decoder": 444.7,
+       "total": 635.8,
+       "externalData": false
+      }
+     }
+    }
+   ],
+   "measuredOnThisMachine": {
+    "status": "measured (WebGPU q4f16; see matrix)",
+    "note": "model-matrix track: webgpu q4f16/q4f16: works",
+    "runs": [
+     {
+      "file": "large-medium-webgpu-q4f16.json",
+      "repo": "onnx-community/whisper-medium_timestamped",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 18343,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 548015514,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 2.1,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 1.8,
+        "werPercent": 1.1,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 5337,
+      "peakRendererMB": 2043,
+      "peakGpuProcessMB": 2631,
+      "calibMs": 173
+     }
+    ]
+   },
+   "status": "measured (WebGPU q4f16; see matrix)",
+   "matrix": {
+    "status": "probed in the model-matrix track (onnx-community/whisper-medium_timestamped webgpu q4f16/q4f16 works)",
+    "runs": [
+     {
+      "file": "large-medium-webgpu-q4f16.json",
+      "repo": "onnx-community/whisper-medium_timestamped",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 18343,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 548015514,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 2.1,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 1.8,
+        "werPercent": 1.1,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 5337,
+      "peakRendererMB": 2043,
+      "peakGpuProcessMB": 2631,
+      "calibMs": 173
+     }
+    ],
+    "sources": "results/matrix-summary.json (big.medium)"
+   }
+  },
+  {
+   "id": "large-v3-turbo",
+   "label": "Large v3 Turbo",
+   "pythonModelSizeMb": 1600,
+   "recommendedRepo": "onnx-community/whisper-large-v3-turbo_timestamped",
+   "wordTimestampsRepo": "onnx-community/whisper-large-v3-turbo_timestamped",
+   "wordTimestampsAvailable": true,
+   "alignmentHeads": 6,
+   "layers": {
+    "encoder": 32,
+    "decoder": 4,
+    "d_model": 1280,
+    "heads": 20
+   },
+   "mixes": {
+    "wasmDefault": {
+     "device": "wasm",
+     "dtype": {
+      "encoder_model": "q8",
+      "decoder_model_merged": "q8"
+     },
+     "downloadMB": 1084.9
+    },
+    "webgpuF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "fp16"
+     },
+     "downloadMB": 1618.7
+    },
+    "webgpuF16SmallDecoder": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "q4f16"
+     },
+     "downloadMB": 1468
+    },
+    "webgpuNoShaderF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "q4"
+     },
+     "downloadMB": 2882.6
+    },
+    "webgpuFp32": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "fp32"
+     },
+     "downloadMB": 3236.5
+    }
+   },
+   "repos": [
+    {
+     "repo": "onnx-community/whisper-large-v3-turbo",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-03-06T17:18:13.000Z",
+     "downloadsLast30d": 35742,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 2548.3,
+       "decoder": 688,
+       "total": 3236.3,
+       "externalData": true
+      },
+      "fp16": {
+       "encoder": 1274.3,
+       "decoder": 344.2,
+       "total": 1618.6,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 644.8,
+       "decoder": 439.9,
+       "total": 1084.8,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 644.8,
+       "decoder": 439.9,
+       "total": 1084.8,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 644.8,
+       "decoder": 439.9,
+       "total": 1084.8,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 424.9,
+       "decoder": 334.1,
+       "total": 759.1,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 370,
+       "decoder": 193.5,
+       "total": 563.5,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 385.6,
+       "decoder": 327.6,
+       "total": 713.2,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "onnx-community/whisper-large-v3-turbo_timestamped",
+     "exists": true,
+     "timestampedExport": true,
+     "lastModified": "2025-03-06T17:18:38.000Z",
+     "downloadsLast30d": 17877,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 2548.4,
+       "decoder": 688.1,
+       "total": 3236.5,
+       "externalData": true
+      },
+      "fp16": {
+       "encoder": 1274.4,
+       "decoder": 344.3,
+       "total": 1618.7,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 644.9,
+       "decoder": 440,
+       "total": 1084.9,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 644.9,
+       "decoder": 440,
+       "total": 1084.9,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 644.9,
+       "decoder": 440,
+       "total": 1084.9,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 425,
+       "decoder": 334.2,
+       "total": 759.2,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 370,
+       "decoder": 193.6,
+       "total": 563.6,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 385.7,
+       "decoder": 327.7,
+       "total": 713.3,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "onnx-community/whisper-large-v3-turbo-ONNX",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-03-05T00:12:04.000Z",
+     "downloadsLast30d": 812,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 2548.3,
+       "decoder": 687.9,
+       "total": 3236.3,
+       "externalData": true
+      },
+      "fp16": {
+       "encoder": 1274.3,
+       "decoder": 344.1,
+       "total": 1618.5,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 644.8,
+       "decoder": 438.1,
+       "total": 1083,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 644.8,
+       "decoder": 438.1,
+       "total": 1083,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 644.8,
+       "decoder": 438.1,
+       "total": 1083,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 424.9,
+       "decoder": 334.1,
+       "total": 759,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 370,
+       "decoder": 193.4,
+       "total": 563.4,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 385.6,
+       "decoder": 327.5,
+       "total": 713.1,
+       "externalData": false
+      }
+     }
+    }
+   ],
+   "measuredOnThisMachine": {
+    "status": "measured (WebGPU q4f16; see matrix)",
+    "note": "model-matrix track: webgpu q4f16/q4f16: works",
+    "runs": [
+     {
+      "file": "large-large-v3-turbo-webgpu-q4f16.json",
+      "repo": "onnx-community/whisper-large-v3-turbo_timestamped",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 16037,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 593285171,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 1.46,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 1.36,
+        "werPercent": 1.1,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 5057,
+      "peakRendererMB": 2323,
+      "peakGpuProcessMB": 2038,
+      "calibMs": 156
+     }
+    ]
+   },
+   "status": "measured (WebGPU q4f16; see matrix)",
+   "matrix": {
+    "status": "probed in the model-matrix track (onnx-community/whisper-large-v3-turbo_timestamped webgpu q4f16/q4f16 works)",
+    "runs": [
+     {
+      "file": "large-large-v3-turbo-webgpu-q4f16.json",
+      "repo": "onnx-community/whisper-large-v3-turbo_timestamped",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 16037,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 593285171,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 1.46,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 1.36,
+        "werPercent": 1.1,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 5057,
+      "peakRendererMB": 2323,
+      "peakGpuProcessMB": 2038,
+      "calibMs": 156
+     }
+    ],
+    "sources": "results/matrix-summary.json (big.large-v3-turbo)"
+   }
+  },
+  {
+   "id": "large-v3",
+   "label": "Large v3",
+   "pythonModelSizeMb": 3100,
+   "recommendedRepo": "onnx-community/whisper-large-v3-ONNX",
+   "wordTimestampsRepo": null,
+   "wordTimestampsAvailable": false,
+   "alignmentHeads": 9,
+   "layers": {
+    "encoder": 32,
+    "decoder": 32,
+    "d_model": 1280,
+    "heads": 20
+   },
+   "mixes": {
+    "wasmDefault": {
+     "device": "wasm",
+     "dtype": {
+      "encoder_model": "q8",
+      "decoder_model_merged": "q8"
+     },
+     "downloadMB": 1821.9
+    },
+    "webgpuF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "fp16"
+     },
+     "downloadMB": 3089.7
+    },
+    "webgpuF16SmallDecoder": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp16",
+      "decoder_model_merged": "q4f16"
+     },
+     "downloadMB": 1883.9
+    },
+    "webgpuNoShaderF16": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "q4"
+     },
+     "downloadMB": 3345.5
+    },
+    "webgpuFp32": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "fp32"
+     },
+     "downloadMB": 6176.7
+    }
+   },
+   "repos": [
+    {
+     "repo": "onnx-community/whisper-large-v3-ONNX",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-04-23T22:15:14.000Z",
+     "downloadsLast30d": 996,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 2548.3,
+       "decoder": 3628.4,
+       "total": 6176.7,
+       "externalData": true
+      },
+      "fp16": {
+       "encoder": 1274.3,
+       "decoder": 1815.3,
+       "total": 3089.7,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 644.8,
+       "decoder": 1177.1,
+       "total": 1821.9,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 644.8,
+       "decoder": 1177.1,
+       "total": 1821.9,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 644.8,
+       "decoder": 1177.1,
+       "total": 1821.9,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 424.9,
+       "decoder": 797.3,
+       "total": 1222.2,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 369.9,
+       "decoder": 609.6,
+       "total": 979.5,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 385.6,
+       "decoder": 744.8,
+       "total": 1130.4,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "Xenova/whisper-large-v3",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-12-16T18:48:31.000Z",
+     "downloadsLast30d": 550,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 2548.6,
+       "decoder": 3629.2,
+       "total": 6177.8,
+       "externalData": true
+      },
+      "fp16": {
+       "encoder": 1274.4,
+       "decoder": null,
+       "total": null,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 645.3,
+       "decoder": 915.1,
+       "total": 1560.3,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 644.8,
+       "decoder": null,
+       "total": null,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 425,
+       "decoder": null,
+       "total": null,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 370,
+       "decoder": null,
+       "total": null,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 385.6,
+       "decoder": null,
+       "total": null,
+       "externalData": false
+      }
+     }
+    }
+   ],
+   "measuredOnThisMachine": {
+    "status": "measured (WebGPU q4f16; see matrix)",
+    "note": "model-matrix track: webgpu q4f16/q4f16: works",
+    "runs": [
+     {
+      "file": "large-large-v3-webgpu-q4f16.json",
+      "repo": "onnx-community/whisper-large-v3-ONNX",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 21987,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 1010636928,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 1.9,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 1.77,
+        "werPercent": 1.1,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 7697,
+      "peakRendererMB": 3175,
+      "peakGpuProcessMB": 3602,
+      "calibMs": 127
+     }
+    ]
+   },
+   "status": "measured (WebGPU q4f16; see matrix)",
+   "matrix": {
+    "status": "probed in the model-matrix track (onnx-community/whisper-large-v3-ONNX webgpu q4f16/q4f16 works)",
+    "runs": [
+     {
+      "file": "large-large-v3-webgpu-q4f16.json",
+      "repo": "onnx-community/whisper-large-v3-ONNX",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 21987,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 1010636928,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 1.9,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 1.77,
+        "werPercent": 1.1,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 7697,
+      "peakRendererMB": 3175,
+      "peakGpuProcessMB": 3602,
+      "calibMs": 127
+     }
+    ],
+    "sources": "results/matrix-summary.json (big.large-v3)"
+   }
+  },
+  {
+   "id": "distil-large-v3",
+   "label": "Distil Large v3",
+   "pythonModelSizeMb": 1500,
+   "recommendedRepo": "distil-whisper/distil-large-v3",
+   "wordTimestampsRepo": null,
+   "wordTimestampsAvailable": false,
+   "alignmentHeads": 20,
+   "layers": {
+    "encoder": 32,
+    "decoder": 2,
+    "d_model": 1280,
+    "heads": 20
+   },
+   "mixes": {
+    "wasmDefault": {
+     "device": "wasm",
+     "dtype": {
+      "encoder_model": "q8",
+      "decoder_model_merged": "q8"
+     },
+     "downloadMB": 766.8
+    },
+    "webgpuFp32": {
+     "device": "webgpu",
+     "dtype": {
+      "encoder_model": "fp32",
+      "decoder_model_merged": "fp32"
+     },
+     "downloadMB": 3026.5
+    }
+   },
+   "repos": [
+    {
+     "repo": "distil-whisper/distil-large-v3",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2026-04-21T08:00:18.000Z",
+     "downloadsLast30d": 696656,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 2548.5,
+       "decoder": 477.9,
+       "total": 3026.5,
+       "externalData": true
+      },
+      "q8": {
+       "encoder": 645.2,
+       "decoder": 121.6,
+       "total": 766.8,
+       "externalData": false
+      }
+     }
+    },
+    {
+     "repo": "distil-whisper/distil-large-v3.5-ONNX",
+     "exists": true,
+     "timestampedExport": false,
+     "lastModified": "2025-03-25T05:45:16.000Z",
+     "downloadsLast30d": 50,
+     "sizesMB": {
+      "fp32": {
+       "encoder": 2548.3,
+       "decoder": 477.9,
+       "total": 3026.2,
+       "externalData": true
+      },
+      "fp16": {
+       "encoder": 1274.3,
+       "decoder": 239,
+       "total": 1513.4,
+       "externalData": false
+      },
+      "q8": {
+       "encoder": 644.8,
+       "decoder": 385.3,
+       "total": 1030.1,
+       "externalData": false
+      },
+      "int8": {
+       "encoder": 644.8,
+       "decoder": 385.3,
+       "total": 1030.1,
+       "externalData": false
+      },
+      "uint8": {
+       "encoder": 644.8,
+       "decoder": 385.3,
+       "total": 1030.1,
+       "externalData": false
+      },
+      "q4": {
+       "encoder": 424.9,
+       "decoder": 301,
+       "total": 725.9,
+       "externalData": false
+      },
+      "q4f16": {
+       "encoder": 369.9,
+       "decoder": 163.7,
+       "total": 533.6,
+       "externalData": false
+      },
+      "bnb4": {
+       "encoder": 385.6,
+       "decoder": 297.7,
+       "total": 683.3,
+       "externalData": false
+      }
+     }
+    }
+   ],
+   "measuredOnThisMachine": {
+    "status": "measured: distil-whisper/distil-large-v3.5-ONNX q4f16 on WebGPU (RTF 0.82-0.92) and the exact distil-whisper/distil-large-v3 q8 on WASM (RTF 4.53); no word timestamps in either",
+    "note": "model-matrix track: wasm q/8: works; webgpu q4f16/q4f16: works",
+    "runs": [
+     {
+      "file": "large-distil-large-v3-wasm-q8.json",
+      "repo": "distil-whisper/distil-large-v3",
+      "device": "wasm",
+      "dtype": "q8",
+      "works": true,
+      "loadMs": 16608,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 796486078,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 4.53,
+        "werPercent": 0,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 3917,
+      "peakRendererMB": 2825,
+      "peakGpuProcessMB": 142,
+      "calibMs": 185
+     },
+     {
+      "file": "large-distil-large-v3.5-webgpu-q4f16.json",
+      "repo": "distil-whisper/distil-large-v3.5-ONNX",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 8232,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 564757235,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 0.92,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 0.82,
+        "werPercent": 1.7,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 4507,
+      "peakRendererMB": 2043,
+      "peakGpuProcessMB": 1695,
+      "calibMs": 129
+     }
+    ]
+   },
+   "status": "measured: distil-whisper/distil-large-v3.5-ONNX q4f16 on WebGPU (RTF 0.82-0.92) and the exact distil-whisper/distil-large-v3 q8 on WASM (RTF 4.53); no word timestamps in either",
+   "matrix": {
+    "status": "probed in the model-matrix track (distil-whisper/distil-large-v3 wasm q/8 works; distil-whisper/distil-large-v3.5-ONNX webgpu q4f16/q4f16 works)",
+    "runs": [
+     {
+      "file": "large-distil-large-v3-wasm-q8.json",
+      "repo": "distil-whisper/distil-large-v3",
+      "device": "wasm",
+      "dtype": "q8",
+      "works": true,
+      "loadMs": 16608,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 796486078,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 4.53,
+        "werPercent": 0,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 3917,
+      "peakRendererMB": 2825,
+      "peakGpuProcessMB": 142,
+      "calibMs": 185
+     },
+     {
+      "file": "large-distil-large-v3.5-webgpu-q4f16.json",
+      "repo": "distil-whisper/distil-large-v3.5-ONNX",
+      "device": "webgpu",
+      "dtype": {
+       "encoder_model": "q4f16",
+       "decoder_model_merged": "q4f16"
+      },
+      "works": true,
+      "loadMs": 8232,
+      "loadError": null,
+      "warmupError": null,
+      "firstVisitBytes": 564757235,
+      "runs": [
+       {
+        "clip": "passage-b",
+        "rtf": 0.92,
+        "werPercent": 0,
+        "error": null
+       },
+       {
+        "clip": "passage-a",
+        "rtf": 0.82,
+        "werPercent": 1.7,
+        "error": null
+       }
+      ],
+      "peakTotalWsMB": 4507,
+      "peakRendererMB": 2043,
+      "peakGpuProcessMB": 1695,
+      "calibMs": 129
+     }
+    ],
+    "sources": "results/matrix-summary.json (big.distil-large-v3)"
+   }
+  }
+ ],
+ "generatedBy": "asr spike: merge-results.mjs (results/catalog-base.json + results/bench-*, qual-*, q10-mem-*) then annotated by the asr-finish agent; model-matrix track: merge-matrix.mjs added `matrix` per model and the big-model probes",
+ "machine": "Ryzen 7 7730U 8C/16T, 15 GB RAM, AMD Radeon RDNA-2 iGPU, Windows 11, Chrome 155 headless; shared machine, times are indicative (see cpuCalibrationMs)"
+}
