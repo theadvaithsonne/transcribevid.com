@@ -1,0 +1,6 @@
+Good morning, everyone. Today I want to walk you through how our team moved the billing service to Kubernetes last quarter. The project started on March 3rd, and by the end of the month we had spent 1,250 dollars on test clusters.
+We chose PostgreSQL for the main database, because it handles heavy write loads well. Our engineers in Hyderabad built the first migration scripts, and they finished them in 14 days.
+Why did we pick this approach? Honestly, we didn't have much choice. The old servers were failing every week, and customers weren't happy about the delays.
+There were three main steps. First, we copied the data. Second, we tested every query. Third, we switched traffic over slowly, over a period of 2 weeks.
+It's worth saying that about 85 percent of requests are now served in under 200 milliseconds. That's twice as fast as before.
+If you're planning something similar, don't rush the testing phase. Thank you for listening, and let's open the floor for questions.
