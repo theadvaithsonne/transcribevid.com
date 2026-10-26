@@ -1,0 +1,120 @@
+<div class="page-doc guide">
+  <article class="doc">
+    <header>
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a routerLink="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <a [routerLink]="guidesPath">Guides</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{{ meta().label }}</span>
+      </nav>
+      <h1 class="page-title">{{ c().h1 }}</h1>
+      <p class="meta">
+        <time [attr.datetime]="meta().updated">Updated {{ updatedLabel() }}</time>
+        <span aria-hidden="true">·</span>
+        <span>{{ c().readingMinutes }} min read</span>
+      </p>
+      <p class="lede">{{ c().lead }}</p>
+    </header>
+
+    @for (b of blocks(); track $index) {
+      <section [attr.aria-labelledby]="'g-title-' + $index">
+        <h2 [id]="'g-title-' + $index">{{ b.title }}</h2>
+        @for (p of b.paragraphs ?? []; track $index) {
+          <p>{{ p }}</p>
+        }
+        @if (b.steps?.length) {
+          <ol class="g-steps">
+            @for (s of b.steps; track $index) {
+              <li>
+                <b>{{ s.title }}</b>
+                {{ s.text }}
+              </li>
+            }
+          </ol>
+        }
+        @if (b.bullets?.length) {
+          <ul class="g-bullets">
+            @for (x of b.bullets; track $index) {
+              <li>
+                @if (x.title) {
+                  <b>{{ x.title }}</b>
+                }
+                {{ x.text }}
+              </li>
+            }
+          </ul>
+        }
+        @if (b.code; as code) {
+          <pre class="code mono" tabindex="0" [attr.aria-label]="code.label">{{ code.text }}</pre>
+        }
+        @if (b.table; as t) {
+          <div class="tablewrap" tabindex="0" role="region" [attr.aria-label]="t.caption">
+            <table>
+              <caption>
+                {{ t.caption }}
+              </caption>
+              <thead>
+                <tr>
+                  @for (h of t.head; track $index) {
+                    <th scope="col">{{ h }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of t.rows; track $index) {
+                  <tr>
+                    @for (cell of row; track $index) {
+                      @if ($first) {
+                        <th scope="row">{{ cell }}</th>
+                      } @else {
+                        <td>{{ cell }}</td>
+                      }
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+        @for (p of b.after ?? []; track $index) {
+          <p>{{ p }}</p>
+        }
+      </section>
+      @if ($index === 1) {
+        <!-- tablet and phone: one in-flow ad unit after the second section, away from the headline and the buttons -->
+        <app-ad-slot placement="inline" />
+      }
+    }
+
+    <section class="faq" aria-labelledby="g-faq-title">
+      <h2 id="g-faq-title">Common questions</h2>
+      <div class="qas">
+        @for (f of faqs(); track $index) {
+          <details class="qa">
+            <summary>{{ f.question }}<span class="pm" aria-hidden="true"></span></summary>
+            <p>{{ f.answer }}</p>
+          </details>
+        }
+      </div>
+    </section>
+
+    @if (c().links.length) {
+      <section class="links" aria-labelledby="g-links-title">
+        <h2 id="g-links-title">Keep reading</h2>
+        <ul class="link-list">
+          @for (l of c().links; track l.path) {
+            <li>
+              <a [routerLink]="l.path">{{ l.label }}</a>
+              <span>{{ l.note }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <div class="end">
+      <a class="btn big ghost" [routerLink]="c().toolPath">{{ c().toolCta }}</a>
+    </div>
+  </article>
+</div>

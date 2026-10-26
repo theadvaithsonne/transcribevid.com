@@ -7,6 +7,7 @@ import { routes } from './app.routes';
 import { adFreeDocument } from './core/ads.service';
 import { OPERATOR } from './core/operator';
 import { BrandTitleStrategy } from './core/title.service';
+import { GUIDES, guideRoutePath } from './features/guides/guides.list';
 import { TOOL_PAGES } from './features/tool-pages/tool-pages.list';
 import { silentLog } from './testing/fakes';
 
@@ -52,7 +53,7 @@ describe('routes', () => {
 
   describe('the pages', () => {
     it.each([
-      ['/', 'Transcribe a video or audio file'],
+      ['/', 'Video to text: transcribe a video or audio file'],
       ['/how-it-works', 'How TranscribeVid works'],
       ['/faq', 'Frequently asked questions'],
       ['/privacy', 'Privacy policy'],
@@ -111,6 +112,9 @@ describe('routes', () => {
         'about',
         'contact',
         ...TOOL_PAGES.map((t) => t.path.slice(1)),
+        'tools',
+        'guides',
+        ...GUIDES.map(guideRoutePath),
         'privacy',
         'terms',
         'logs',
@@ -133,7 +137,8 @@ describe('routes', () => {
 
     it('every page that can be found by a search engine has a title and a description of its own', () => {
       const indexable = routes.filter((r) => !r.redirectTo && !(r.data as { noindex?: boolean } | undefined)?.noindex);
-      expect(indexable.length).toBe(5 + TOOL_PAGES.length + 2); // home, how it works, faq, about, contact, the keyword pages, privacy, terms
+      // home, how it works, faq, about, contact, the keyword pages, All tools, Guides, each guide, privacy, terms
+      expect(indexable.length).toBe(5 + TOOL_PAGES.length + 2 + GUIDES.length + 2);
       for (const r of indexable) {
         expect(typeof r.title, r.path).toBe('string');
         expect((r.data as { description?: string }).description!.length, r.path).toBeGreaterThan(40);
@@ -152,9 +157,9 @@ describe('routes', () => {
       for (const r of routes.filter((x) => !x.redirectTo)) expect(typeof r.loadComponent, r.path).toBe('function');
     });
 
-    it('ads: only home, how it works, FAQ and the tool pages are ad pages; a transcript only once finished (adsense.md 16)', () => {
+    it('ads: only home, how it works, FAQ, the tool pages and the guides are ad pages; a transcript only once finished (adsense.md 16)', () => {
       const flag = (path: string) => (routes.find((r) => r.path === path)?.data as { ads?: unknown } | undefined)?.ads;
-      const adPages = ['', 'how-it-works', 'faq', ...TOOL_PAGES.map((t) => t.path.slice(1))];
+      const adPages = ['', 'how-it-works', 'faq', ...TOOL_PAGES.map((t) => t.path.slice(1)), ...GUIDES.map(guideRoutePath)];
       for (const r of routes) {
         const f = (r.data as { ads?: unknown } | undefined)?.ads;
         if (adPages.includes(r.path!)) expect(f, r.path).toBe(true);

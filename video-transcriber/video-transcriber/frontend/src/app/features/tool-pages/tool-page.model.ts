@@ -27,6 +27,30 @@ export interface ToolFaq {
   browser?: { question?: string; answer: string };
 }
 
+/**
+ * An extra, page-specific section (an H2 with paragraphs and/or a short list), shown right after "why". This is where a
+ * page says what only it can say: how to save a WhatsApp voice note, what an iPhone .mov is, which accents a language
+ * page handles. Where a sentence is only true for one edition, `browser` replaces the paragraphs / list in the in-browser edition.
+ */
+export interface ToolSection {
+  title: string;
+  paragraphs?: string[];
+  /** a short list: bold lead-in, then the text */
+  bullets?: ToolTip[];
+  /** the in-browser edition's paragraphs / list, where the server's are not true there */
+  browser?: { paragraphs?: string[]; bullets?: ToolTip[] };
+}
+
+/** A contextual link to another page of this site, with the sentence that says why it helps (shown under "Related reading"). */
+export interface ToolLink {
+  /** the link text: descriptive, never "click here" */
+  label: string;
+  /** an address of this site: a tool page, a guide, or another page */
+  path: string;
+  /** one sentence after the link, saying what the reader finds there */
+  note: string;
+}
+
 export interface ToolDownload {
   /** format name, e.g. "SRT" */
   name: string;
@@ -55,6 +79,9 @@ export interface ToolPageContent {
   why: string[];
   /** the in-browser edition's paragraphs, when one of `why` is only true for the server */
   browserWhy?: string[];
+  /** page-specific sections shown after "why" (optional, up to four) */
+  sections?: ToolSection[];
+
   howTitle: string;
   /** one sentence for the HowTo data */
   howToDescription: string;
@@ -73,4 +100,6 @@ export interface ToolPageContent {
   tips: ToolTip[];
   /** four or five questions that are specific to this page */
   faqs: ToolFaq[];
+  /** "Related reading": two to four contextual links to guides and sibling tool pages */
+  links?: ToolLink[];
 }

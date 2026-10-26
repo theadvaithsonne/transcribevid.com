@@ -5,6 +5,7 @@ import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
 import { DropKind } from './tool-page.model';
+import type { ToolPreset } from './tool-pages.list';
 
 /** The same list the main uploader gives its file picker (features/upload/upload.html): video and audio. */
 export const ACCEPT_VIDEO_AND_AUDIO = 'video/*,audio/*,.mkv,.mov,.avi,.m4a,.flac,.opus,.wmv,.ts';
@@ -150,6 +151,8 @@ export class ToolDrop {
   readonly formats = input<readonly string[]>([]);
   /** the announced size / length limits, e.g. "Up to 500 MB and 60 minutes per file." */
   readonly limits = input('');
+  /** what the uploader starts with after the file is handed over (a language page: its language, or "translate") */
+  readonly preset = input<ToolPreset | null | undefined>(null);
 
   readonly dragging = signal(false);
   readonly error = signal('');
@@ -211,7 +214,7 @@ export class ToolDrop {
     }
     this.error.set('');
     this.wrongKind.set(false);
-    this.pending.set(file);
+    this.pending.set(file, this.preset());
     this.toast.dismiss(this.refusedToast); // an earlier "File not added" is out of date now
     this.refusedToast = 0;
     this.toast.success(`"${file.name}" is ready. Press Transcribe to start.`, 'File added');

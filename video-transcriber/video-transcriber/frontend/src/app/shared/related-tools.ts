@@ -1,10 +1,12 @@
 import { Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { TOOL_PAGES } from '../features/tool-pages/tool-pages.list';
+import { CORE_TOOLS, TOOL_PAGES, ToolPageLink } from '../features/tool-pages/tool-pages.list';
 
 /**
  * "More free tools": plain links to the keyword pages (video to text, audio to text, ...). Drop it at the bottom of a
- * page: `<app-related-tools />`, or `<app-related-tools current="/mp3-to-text" />` to leave the current page out.
+ * page: `<app-related-tools />` (the core tools), or `<app-related-tools current="/mp3-to-text" />` on a tool page: it
+ * leaves that page out and shows its neighbours first (same group), then the core tools, up to `max` links. The last
+ * link always goes to "All free tools", so every page stays reachable.
  * Needs no data from the server, so it renders for crawlers too. Quiet on purpose: a thin line above, a small heading
  * and a row of underlined links (no boxes), so it never competes with the page's main button.
  */
@@ -20,6 +22,9 @@ import { TOOL_PAGES } from '../features/tool-pages/tool-pages.list';
             <a [routerLink]="t.path">{{ t.label }}</a>
           </li>
         }
+        <li class="all">
+          <a routerLink="/tools">All free tools</a>
+        </li>
       </ul>
     </section>
   `,
@@ -75,9 +80,16 @@ export class RelatedTools {
   /** the page the visitor is on (it is left out of the list), e.g. "/mp3-to-text" */
   readonly current = input('');
   readonly heading = input('More free tools');
+  /** the most links shown on a tool page (not counting "All free tools") */
+  readonly max = input(8);
 
-  readonly tools = computed(() => {
+  readonly tools = computed<readonly ToolPageLink[]>(() => {
     const here = this.current().replace(/^\/?/, '/');
-    return TOOL_PAGES.filter((t) => t.path !== here);
+    const page = TOOL_PAGES.find((t) => t.path === here);
+    if (!page) return CORE_TOOLS; // home, FAQ, ...: the main tools
+    const others = TOOL_PAGES.filter((t) => t.path !== here);
+    // up to four neighbours (same group), then the core tools, then whatever is left
+    const picked = [...others.filter((t) => t.group === page.group).slice(0, 4), ...others.filter((t) => t.group === 'core'), ...others];
+    return picked.filter((t, i) => picked.indexOf(t) === i).slice(0, this.max());
   });
 }

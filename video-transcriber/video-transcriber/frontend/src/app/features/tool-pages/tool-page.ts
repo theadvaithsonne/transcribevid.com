@@ -6,9 +6,9 @@ import { PUBLIC_DEFAULTS, SiteService } from '../../core/site.service';
 import { StructuredDataService } from '../../core/structured-data.service';
 import { FreeChips } from '../../shared/free-chips';
 import { RelatedTools } from '../../shared/related-tools';
-import { TOOL_CONTENT } from './content';
 import { ToolDrop } from './tool-drop';
-import { ToolFaq, ToolPageContent, ToolStep, ToolTip } from './tool-page.model';
+import { ToolFaq, ToolPageContent, ToolSection, ToolStep, ToolTip } from './tool-page.model';
+import { TOOL_PAGES } from './tool-pages.list';
 import { AdSlot } from '../../shared/ad-slot';
 
 /** The text of a page as one edition reads it: the in-browser edition takes each item's `browser` variant where there is one. */
@@ -18,8 +18,14 @@ export function editionText(c: ToolPageContent, inBrowser: boolean) {
     question: (inBrowser && f.browser?.question) || f.question,
     answer: (inBrowser && f.browser?.answer) || f.answer,
   });
+  const section = (s: ToolSection) => ({
+    title: s.title,
+    paragraphs: (inBrowser && s.browser?.paragraphs) || s.paragraphs || [],
+    bullets: (inBrowser && s.browser?.bullets) || s.bullets || [],
+  });
   return {
     why: (inBrowser && c.browserWhy) || c.why,
+    sections: (c.sections ?? []).map(section),
     steps: c.steps.map(step),
     tips: c.tips.map(step),
     faqs: c.faqs.map(faq),
@@ -30,9 +36,10 @@ export function editionText(c: ToolPageContent, inBrowser: boolean) {
 export const DEFAULT_LIMITS = `Up to ${fmtBytesShort(PUBLIC_DEFAULTS.maxUploadMb * 1024 * 1024)} and ${PUBLIC_DEFAULTS.maxDurationMin} minutes per file.`;
 
 /**
- * One keyword landing page ("MP4 to text", "SRT subtitle generator", ...). The route says which one (`data.tool` is the
- * route path, e.g. "mp4-to-text"); the text lives in ./content, one small file per page, all in this lazy chunk so a
- * visit is a single request. The visible questions and steps also feed the FAQPage / HowTo data.
+ * One keyword landing page ("MP4 to text", "SRT subtitle generator", "Hindi audio to text", ...). The route says which one
+ * (`data.tool` is the route path, e.g. "mp4-to-text") and its resolver loads the text (`data.content`, from ./content: one
+ * small file per page, a chunk of its own, so a visit downloads only the page it opens). The visible questions and steps
+ * also feed the FAQPage / HowTo data.
  */
 @Component({
   selector: 'app-tool-page',
@@ -47,11 +54,14 @@ export class ToolPage {
   private structured = inject(StructuredDataService);
 
   private slug = computed(() => String(this.data()['tool'] ?? ''));
-  readonly c = computed<ToolPageContent>(() => TOOL_CONTENT[this.slug()] ?? TOOL_CONTENT['video-to-text']);
+  /** the page's text, loaded by the route's resolver before the page is shown */
+  readonly c = computed<ToolPageContent>(() => this.data()['content'] as ToolPageContent);
   /** short name of the page, e.g. "MP4 to text" */
   readonly label = computed(() => String(this.data()['label'] ?? this.c().eyebrow));
   readonly path = computed(() => '/' + this.slug());
-  /** why, steps, tips and questions in this edition's words (the in-browser edition has no upload, limit or queue) */
+  /** what a file dropped here starts the uploader with (a language page: its language), if anything */
+  readonly preset = computed(() => TOOL_PAGES.find((t) => t.path === this.path())?.preset ?? null);
+  /** why, sections, steps, tips and questions in this edition's words (the in-browser edition has no upload, limit or queue) */
   readonly text = computed(() => editionText(this.c(), this.site.inBrowser()));
 
   readonly limits = computed(() => {

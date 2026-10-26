@@ -1,6 +1,9 @@
 import { Route, Routes } from '@angular/router';
 import { adFreeDocument } from './core/ads.service';
 import { DEFAULT_DESCRIPTION } from './core/title.service';
+import { GUIDES, GUIDES_PATH, GuideLink, guideRoutePath } from './features/guides/guides.list';
+import { guideContentResolver } from './features/guides/guide-content.resolver';
+import { toolContentResolver } from './features/tool-pages/tool-content.resolver';
 import { TOOL_PAGES, ToolPageLink, toolRoutePath } from './features/tool-pages/tool-pages.list';
 
 /** A keyword landing page: its title, description and label come from TOOL_PAGES, its text from features/tool-pages/content. */
@@ -8,7 +11,17 @@ const toolRoute = (t: ToolPageLink): Route => ({
   path: toolRoutePath(t),
   title: t.title,
   data: { description: t.description, label: t.label, tool: toolRoutePath(t), app: true, ads: true },
+  resolve: { content: toolContentResolver },
   loadComponent: () => import('./features/tool-pages/tool-page').then((m) => m.ToolPage),
+});
+
+/** A guide (an article): its title, description and label come from GUIDES, its text from features/guides/content. */
+const guideRoute = (g: GuideLink): Route => ({
+  path: guideRoutePath(g),
+  title: g.title,
+  data: { description: g.description, label: g.label, guide: g.slug, parent: { label: 'Guides', path: GUIDES_PATH }, ads: true },
+  resolve: { content: guideContentResolver },
+  loadComponent: () => import('./features/guides/guide').then((m) => m.GuidePage),
 });
 
 /**
@@ -74,6 +87,26 @@ export const routes: Routes = [
   },
   // keyword landing pages: /video-to-text, /audio-to-text, /mp4-to-text, /mp3-to-text, /srt-subtitle-generator, /voice-recording-to-text
   ...TOOL_PAGES.map(toolRoute),
+  {
+    path: 'tools',
+    title: 'All free tools',
+    data: {
+      description:
+        'Every free video and audio to text tool in one list: by file type, by use, subtitle files and languages. No login, no daily limit, 50+ languages.',
+    },
+    loadComponent: () => import('./features/tool-pages/all-tools').then((m) => m.AllToolsPage),
+  },
+  // the guides: /guides lists them, one route per article
+  {
+    path: 'guides',
+    title: 'Guides',
+    data: {
+      description:
+        'Practical guides on transcripts and subtitles: SRT or VTT, how to add subtitles to a video, how to get an accurate transcript, and private transcription.',
+    },
+    loadComponent: () => import('./features/guides/guides-index').then((m) => m.GuidesIndexPage),
+  },
+  ...GUIDES.map(guideRoute),
   {
     path: 'privacy',
     title: 'Privacy policy',

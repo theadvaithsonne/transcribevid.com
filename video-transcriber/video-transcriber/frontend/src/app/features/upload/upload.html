@@ -1,6 +1,6 @@
 <div class="page upload" [class.ready]="files().length > 0">
   <header class="hero">
-    <h1 class="page-title">Transcribe a video or audio file</h1>
+    <h1 class="page-title">Video to text: transcribe a video or audio file</h1>
     <ul class="trust" aria-label="Free, unlimited, and no login needed">
       <li class="tint-mint" style="--c: var(--tint-mint)"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Free</li>
       <li class="tint-sky" style="--c: var(--tint-sky)"><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" /></svg></span>Unlimited</li>
@@ -165,6 +165,7 @@
                 <option value="transcribe">Transcribe (same language)</option>
                 <option value="translate" [disabled]="opts.engine === 'qwen'">Translate to English</option>
               </select>
+              @if (translateWarning(); as why) { <span class="hint" role="note">{{ why }}</span> }
             </div>
             <div class="field">
               <label for="prompt">Vocabulary hint <span class="muted">(optional)</span></label>

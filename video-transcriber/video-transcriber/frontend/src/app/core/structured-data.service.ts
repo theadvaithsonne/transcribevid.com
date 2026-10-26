@@ -20,6 +20,19 @@ export interface HowToInput {
   steps: HowToStepInput[];
 }
 
+/** An article (a guide): what the page shows about itself, so the data can say the same. */
+export interface ArticleInput {
+  headline: string;
+  description: string;
+  /** path without query string, e.g. "/guides/srt-vs-vtt" */
+  path: string;
+  /** ISO dates (YYYY-MM-DD): when it was first published and when its text last really changed */
+  published: string;
+  updated: string;
+  /** number of words of the visible text (optional) */
+  wordCount?: number;
+}
+
 /** What the title strategy knows about the page that was just opened. */
 export interface RouteSchemaInput {
   /** path without query string, e.g. "/faq" */
@@ -28,6 +41,8 @@ export interface RouteSchemaInput {
   name: string;
   /** the name to show in the breadcrumb (defaults to `name`) */
   crumb?: string;
+  /** pages between Home and this one in the breadcrumb (a guide: "Guides") */
+  parents?: { name: string; path: string }[];
   description: string;
   /** false for private pages and the 404 page: they get no structured data at all */
   indexable: boolean;
@@ -119,6 +134,33 @@ export class StructuredDataService {
     });
   }
 
+  /**
+   * Article data for a guide, from what the page shows (headline, dates). Pass the object or a signal. Call it from a
+   * constructor / field initialiser. The dates are the ones printed on the page: never a build time or "now".
+   */
+  article(input: MaybeSignal<ArticleInput>): void {
+    this.pageBlock('article', input, (a) => {
+      const base = this.site.brand().url;
+      const url = base + a.path;
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        '@id': `${url}#article`,
+        headline: clean(a.headline),
+        description: clean(a.description),
+        url,
+        mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+        datePublished: a.published,
+        dateModified: a.updated,
+        inLanguage: 'en',
+        image: `${base}/og-image.png`,
+        ...(a.wordCount ? { wordCount: a.wordCount } : {}),
+        author: this.publisher(base),
+        publisher: { ...this.publisher(base), logo: { '@type': 'ImageObject', url: `${base}/icon-512.png` } },
+      };
+    });
+  }
+
   // ------------------------------------------------------------------------------------------ route API
 
   /** Called by the title strategy after every navigation. Replaces the previous route's blocks. */
@@ -132,7 +174,11 @@ export class StructuredDataService {
         blocks['app'] = this.webApplication(base, '/', page.description);
       } else {
         const crumb = clean(page.crumb || page.name);
-        blocks['breadcrumb'] = this.breadcrumbs(base, [{ name: 'Home', path: '/' }, { name: crumb, path: page.path }]);
+        blocks['breadcrumb'] = this.breadcrumbs(base, [
+          { name: 'Home', path: '/' },
+          ...(page.parents ?? []),
+          { name: crumb, path: page.path },
+        ]);
         if (page.app) blocks['app'] = this.webApplication(base, page.path, page.description, crumb);
       }
     }

@@ -20,8 +20,14 @@ JOB = "a" * 32
 PROJECT = config.PROJECT_DIR
 PUBLIC_FILES = PROJECT / "frontend" / "public"
 TOOL_PAGES_TS = PROJECT / "frontend" / "src" / "app" / "features" / "tool-pages" / "tool-pages.list.ts"
-TOOLS = ["video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator", "voice-recording-to-text"]
-INFO_PAGES = ["how-it-works", "faq", "about", "contact", "privacy", "terms", "logs"]
+GUIDES_TS = PROJECT / "frontend" / "src" / "app" / "features" / "guides" / "guides.list.ts"
+CORE_TOOLS = ["video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator", "voice-recording-to-text"]
+# every keyword page, read from the frontend list so the test cannot drift from it (the six core ones must stay)
+TOOLS = (re.findall(r"^\s*path:\s*'/([a-z0-9-]+)'", TOOL_PAGES_TS.read_text(encoding="utf-8"), re.M)
+         if TOOL_PAGES_TS.is_file() else CORE_TOOLS)
+GUIDES = (re.findall(r"^\s*path:\s*'/(guides/[a-z0-9-]+)'", GUIDES_TS.read_text(encoding="utf-8"), re.M)
+          if GUIDES_TS.is_file() else [])
+INFO_PAGES = ["how-it-works", "faq", "about", "contact", "privacy", "terms", "logs", "tools", "guides"] + GUIDES
 SHELL = '<!doctype html><html><body><app-root>CSR-SHELL</app-root></body></html>'
 SECRET = "TOP-SECRET-DO-NOT-SERVE"
 
@@ -167,7 +173,9 @@ def test_every_sitemap_url_is_a_known_app_page_that_answers_200(dist, client):
         assert is_app_page(page), f"{loc} is in the sitemap but main.APP_PAGES does not know it (it would be a 404)"
         r = client.get(u.path or "/")
         assert r.status_code == 200 and "<app-root" in r.text, loc
-    assert {urlsplit(loc).path.lstrip("/") for loc in locs} >= set(TOOLS)  # the six keyword pages are all submitted
+    submitted = {urlsplit(loc).path.lstrip("/") for loc in locs}
+    assert submitted >= set(TOOLS) >= set(CORE_TOOLS)  # every keyword page is submitted, and the six core ones are among them
+    assert submitted >= set(GUIDES) | {"tools", "guides"}  # so are the guides and the two index pages
 
 
 @pytest.mark.skipif(not ((PUBLIC_FILES / "sitemap.xml").is_file() and (PUBLIC_FILES / "robots.txt").is_file()),
@@ -200,8 +208,9 @@ def test_ads_txt_is_served_as_plain_text_from_the_root(dist, client):
 @pytest.mark.skipif(not TOOL_PAGES_TS.is_file(), reason="the frontend sources are missing")
 def test_the_backend_knows_every_tool_page_the_frontend_defines():
     paths = re.findall(r"^\s*path:\s*'/([a-z0-9-]+)'", TOOL_PAGES_TS.read_text(encoding="utf-8"), re.M)
-    assert paths and set(paths) == set(TOOLS)
+    assert paths and set(paths) == set(TOOLS) and set(CORE_TOOLS) <= set(paths)
     assert all(p in APP_PAGES for p in paths)
+    assert all(p in APP_PAGES for p in GUIDES)
 
 
 def test_every_route_a_build_prerendered_is_a_known_page():

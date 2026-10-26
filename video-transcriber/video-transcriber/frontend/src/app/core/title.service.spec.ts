@@ -3,6 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { Router, TitleStrategy, provideRouter } from '@angular/router';
 import { routes } from '../app.routes';
+import { GUIDES } from '../features/guides/guides.list';
 import { TOOL_PAGES } from '../features/tool-pages/tool-pages.list';
 import { makePublicHealth, silentLog } from '../testing/fakes';
 import { JobsStore } from './jobs.store';
@@ -282,7 +283,8 @@ describe('BrandTitleStrategy with the real routes', () => {
     const indexable = routes.filter((r) => typeof r.title === 'string' && r.path !== '**' && !(r.data as { noindex?: boolean })?.noindex);
 
     it('every public page: a full title of at most 60 characters and a description of 120 to 160, none shared', () => {
-      expect(indexable.length).toBe(7 + TOOL_PAGES.length); // home, how it works, faq, about, contact, privacy, terms + the keyword pages
+      // home, how it works, faq, about, contact, privacy, terms, All tools, Guides + the keyword pages + each guide
+      expect(indexable.length).toBe(9 + TOOL_PAGES.length + GUIDES.length);
       const titles = new Set<string>();
       const descriptions = new Set<string>();
       for (const r of indexable) {

@@ -10,7 +10,9 @@ import { Health } from '../../core/models';
 import { PUBLIC_DEFAULTS } from '../../core/site.service';
 import { BrandTitleStrategy } from '../../core/title.service';
 import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
-import { TOOL_CONTENT } from './content';
+import { loadToolContent } from './content';
+import { toolContentResolver } from './tool-content.resolver';
+import { ToolPageContent } from './tool-page.model';
 import { DEFAULT_LIMITS, ToolPage, editionText } from './tool-page';
 import { TOOL_PAGES, toolRoutePath } from './tool-pages.list';
 
@@ -53,7 +55,10 @@ describe('ToolPage (a keyword landing page)', () => {
   const qa = (sel: string) => Array.from(page.querySelectorAll(sel)) as HTMLElement[];
 
   describe.each(TOOL_PAGES.map((t) => [t.path, t] as const))('%s', (path, t) => {
-    const content = TOOL_CONTENT[toolRoutePath(t)];
+    let content: ToolPageContent;
+    beforeAll(async () => {
+      content = await loadToolContent(toolRoutePath(t));
+    });
 
     beforeEach(() => open(path));
 
@@ -84,7 +89,7 @@ describe('ToolPage (a keyword landing page)', () => {
       expect(q('dl.facts')).toBeNull(); // no facts box repeating the chips
     });
 
-    it(content.record ? 'offers recording with the microphone under the drop box' : 'has no recording link (not what this page is about)', () => {
+    it('offers recording with the microphone only where the page is about recording', () => {
       const rec = q('.hero-drop .alt a');
       if (content.record) {
         expect(rec!.getAttribute('href')).toBe('/');
@@ -125,10 +130,26 @@ describe('ToolPage (a keyword landing page)', () => {
       expect(clean(page.textContent)).not.toContain('{limits}'); // every placeholder was filled in
     });
 
-    it('lists the other tools, not this one', () => {
+    it('links to its neighbours first, then the core tools, then "All free tools"; never to itself', () => {
       const hrefs = qa('app-related-tools a').map((a) => a.getAttribute('href'));
-      expect(hrefs).toEqual(TOOL_PAGES.map((x) => x.path).filter((p) => p !== path));
-      expect(hrefs.length).toBe(TOOL_PAGES.length - 1);
+      expect(hrefs).not.toContain(path);
+      expect(hrefs.at(-1)).toBe('/tools');
+      const tools = hrefs.slice(0, -1);
+      expect(tools.length).toBe(Math.min(8, TOOL_PAGES.length - 1));
+      expect(new Set(tools).size).toBe(tools.length);
+      const neighbours = TOOL_PAGES.filter((x) => x.group === t.group && x.path !== path)
+        .slice(0, 4)
+        .map((x) => x.path);
+      expect(tools.slice(0, neighbours.length)).toEqual(neighbours);
+    });
+
+    it('shows its own extra sections, and the related links it lists (each to a page of this site)', () => {
+      const titles = qa('section[aria-labelledby^="sec-title-"] h2').map((h) => clean(h.textContent));
+      expect(titles).toEqual((content.sections ?? []).map((s) => s.title));
+      const related = qa('section.links .link-list a').map((a) => a.getAttribute('href'));
+      expect(related).toEqual((content.links ?? []).map((l) => l.path));
+      if (content.links?.length) expect(clean(q('#links-title')!.textContent)).toBe('Related reading');
+      else expect(q('section.links')).toBeNull();
     });
 
     it('ends with one quiet way to start (not a second main button)', () => {
@@ -229,7 +250,7 @@ describe('ToolPage (a keyword landing page)', () => {
 
     it('mp4-to-text: the steps, tips and questions in the browser wording, also in the structured data', async () => {
       await open('/mp4-to-text', makeBrowserHealth());
-      const c = TOOL_CONTENT['mp4-to-text'];
+      const c = await loadToolContent('mp4-to-text');
       const b = editionText(c, true);
       const steps = qa('ol.steps > li');
       expect(steps.map((x) => clean(x.querySelector('h3')!.textContent))).toEqual(b.steps.map((x) => x.title));
@@ -274,8 +295,8 @@ describe('ToolPage (a keyword landing page)', () => {
   });
 
   describe('editionText', () => {
-    it('takes each browser variant only in the in-browser edition, and keeps the rest', () => {
-      const c = TOOL_CONTENT['mp4-to-text'];
+    it('takes each browser variant only in the in-browser edition, and keeps the rest', async () => {
+      const c = await loadToolContent('mp4-to-text');
       const server = editionText(c, false);
       expect(server.steps).toEqual(c.steps.map((x) => ({ title: x.title, text: x.text })));
       expect(server.tips).toEqual(c.tips.map((x) => ({ title: x.title, text: x.text })));
@@ -286,7 +307,8 @@ describe('ToolPage (a keyword landing page)', () => {
       expect(browser.steps[0].text).toBe(c.steps[0].browser!.text);
       expect(browser.steps[2]).toEqual({ title: c.steps[2].title, text: c.steps[2].text }); // no variant: unchanged
       expect(browser.why).toEqual(c.why); // no browserWhy on this page
-      expect(editionText(TOOL_CONTENT['mp3-to-text'], true).why).toEqual(TOOL_CONTENT['mp3-to-text'].browserWhy);
+      const mp3 = await loadToolContent('mp3-to-text');
+      expect(editionText(mp3, true).why).toEqual(mp3.browserWhy);
     });
   });
 
@@ -297,7 +319,7 @@ describe('ToolPage (a keyword landing page)', () => {
       await harness.navigateByUrl('/mp4-to-text');
       harness.detectChanges();
       TestBed.tick();
-      expect(ldBlock('page:faq').mainEntity.map((e: { name: string }) => e.name)).toEqual(TOOL_CONTENT['mp4-to-text'].faqs.map((f) => f.question));
+      expect(ldBlock('page:faq').mainEntity.map((e: { name: string }) => e.name)).toEqual((await loadToolContent('mp4-to-text')).faqs.map((f) => f.question));
       expect(ldBlock('route:breadcrumb').itemListElement[1].item).toBe('https://transcribevid.com/mp4-to-text');
       await harness.navigateByUrl('/privacy');
       harness.detectChanges();
@@ -311,12 +333,12 @@ describe('ToolPage (a keyword landing page)', () => {
   describe('a page that is not in the list', () => {
     it('falls back to the video page text instead of failing', async () => {
       const fixture = TestBed.configureTestingModule({
-        providers: [silentLog, provideHttpClient(), provideHttpClientTesting(), provideRouter([{ path: 'x', component: ToolPage, data: { tool: 'does-not-exist' } }])],
+        providers: [silentLog, provideHttpClient(), provideHttpClientTesting(), provideRouter([{ path: 'x', component: ToolPage, data: { tool: 'does-not-exist' }, resolve: { content: toolContentResolver } }])],
       });
       expect(fixture).toBeDefined();
       harness = await RouterTestingHarness.create();
       await harness.navigateByUrl('/x');
-      expect(clean(harness.routeNativeElement!.querySelector('h1')!.textContent)).toBe(TOOL_CONTENT['video-to-text'].h1);
+      expect(clean(harness.routeNativeElement!.querySelector('h1')!.textContent)).toBe((await loadToolContent('video-to-text')).h1);
     });
   });
 });

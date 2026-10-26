@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Every public page, at its one canonical address (no trailing slash). The backend's APP_PAGES must know each of them
-     (backend/tests/test_spa.py checks it). No <lastmod>: a date is only useful to Google when it is always accurate, and
-     nothing here could keep it so; ask Google to recrawl a changed page in Search Console instead (deploy/SEO.md). -->
+     (backend/tests/test_spa.py checks it). No <lastmod> in this source file on purpose: a date is only useful to Google when
+     it is always accurate, so scripts/pages-postbuild.mjs adds one to the built copy, taken from the last real change of each
+     page's own text (git for the tool pages and information pages, the "updated" date printed on a guide) and left out where
+     it cannot know. To ask Google to recrawl a changed page, use Search Console (deploy/SEO.md). Written by
+     scripts/gen-sitemap.mjs from the page lists: edit the lists, then run it, not this file. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://transcribevid.com/</loc>
@@ -23,6 +26,81 @@
   </url>
   <url>
     <loc>https://transcribevid.com/voice-recording-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/wav-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/m4a-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/webm-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/mov-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/whatsapp-voice-message-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/meeting-recording-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/lecture-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/podcast-transcript-generator</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/interview-transcription</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/vtt-subtitle-generator</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/youtube-subtitle-generator</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/hindi-audio-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/hinglish-transcription</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/translate-audio-to-english</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/spanish-audio-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/portuguese-audio-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/french-audio-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/german-audio-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/tools</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides/srt-vs-vtt</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides/how-to-add-subtitles-to-a-video</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides/transcribe-video-without-uploading</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides/accurate-transcripts</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides/what-is-whisper</loc>
   </url>
   <url>
     <loc>https://transcribevid.com/how-it-works</loc>

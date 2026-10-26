@@ -1,0 +1,247 @@
+/* A guide: one plain reading column like the legal pages, with a headline, a short answer at the top, sections, and white
+   question cards at the end (the same look as the questions on the tool pages). Nothing else is boxed or coloured. */
+:host {
+  display: block;
+}
+.doc {
+  max-width: 820px;
+  margin-inline: auto;
+  font-size: var(--fs-lg);
+  line-height: 1.75;
+  color: var(--text);
+  b {
+    color: var(--text-strong);
+  }
+  a:not(.btn) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+  }
+  a:focus-visible,
+  .btn:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+  .page-title {
+    font-size: clamp(32px, 3.2vw, 48px);
+    line-height: 1.15;
+  }
+  h2 {
+    margin: 48px 0 12px;
+    font-size: clamp(24px, 2vw, 30px);
+    font-weight: 750;
+    line-height: 1.25;
+  }
+  p {
+    margin: 0 0 16px;
+  }
+}
+.crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 10px;
+  margin-bottom: 8px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+  margin: 12px 0 20px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+/* the short answer at the top: the one boxed element, as on the legal pages */
+.lede {
+  margin: 0 0 24px;
+  padding: 20px 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  font-size: var(--fs-lg);
+  line-height: 1.6;
+  color: var(--text-strong);
+}
+.g-steps,
+.g-bullets {
+  margin: 0 0 16px;
+  padding-left: 28px;
+  li {
+    margin-bottom: 12px;
+    padding-left: 4px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+.code {
+  margin: 8px 0 20px;
+  padding: 18px 22px;
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  white-space: pre;
+  /* "-->" must stay three plain characters, not an arrow ligature */
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0, 'calt' 0;
+  color: var(--text-strong);
+}
+.tablewrap {
+  margin: 8px 0 20px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  caption {
+    padding: 14px 18px 6px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+  th,
+  td {
+    padding: 12px 18px;
+    text-align: left;
+    vertical-align: top;
+    border-top: 1px solid var(--line);
+  }
+  thead th {
+    color: var(--text-strong);
+    background: var(--surface-2);
+  }
+  tbody th {
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+}
+
+/* related links: a link and why */
+.link-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  li {
+    padding: 10px 0;
+    & + li {
+      border-top: 1px solid var(--line);
+    }
+  }
+  a {
+    display: inline-block;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+}
+
+/* questions: plain white cards, like the tool pages */
+.qas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.qa {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  &[open] {
+    border-color: var(--line-strong);
+  }
+  > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 68px;
+    padding: 16px 22px 16px 24px;
+    list-style: none;
+    cursor: pointer;
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text-strong);
+    border-radius: calc(var(--r-lg) - 1px);
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &:hover {
+      background: var(--surface-2);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+  }
+  > p {
+    margin: 8px 24px 24px;
+    font-size: var(--fs-base);
+    line-height: 1.65;
+  }
+}
+.pm {
+  position: relative;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    border-radius: 2px;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+  }
+  &::before {
+    width: 20px;
+    height: 3px;
+  }
+  &::after {
+    width: 3px;
+    height: 20px;
+  }
+}
+.qa[open] > summary .pm::after {
+  display: none;
+}
+
+.end {
+  margin-top: 40px;
+}
+
+@media (max-width: 560px) {
+  .qa > summary {
+    padding: 14px 16px 14px 18px;
+    gap: 14px;
+  }
+  .qa > p {
+    margin-inline: 18px;
+  }
+  .end .btn {
+    width: 100%;
+  }
+}

@@ -16,6 +16,38 @@ describe('PendingFileService', () => {
     expect(pending.take()).toBeNull();
   });
 
+  describe('the preset a language page hands over with the file', () => {
+    it('comes with the file, once', () => {
+      const pending = TestBed.inject(PendingFileService);
+      const f = mp3();
+      pending.set(f, { language: 'hi', output_script: 'original' });
+      expect(pending.takeWithPreset()).toEqual({ file: f, preset: { language: 'hi', output_script: 'original' } });
+      expect(pending.takeWithPreset()).toBeNull();
+      expect(pending.file()).toBeNull();
+    });
+
+    it('is null for a file that came without one, and a new file never inherits an earlier preset', () => {
+      const pending = TestBed.inject(PendingFileService);
+      const first = mp3();
+      const second = mp3();
+      pending.set(first, { task: 'translate' });
+      pending.set(second);
+      expect(pending.takeWithPreset()).toEqual({ file: second, preset: null });
+    });
+
+    it('is forgotten when the file is taken the old way, or cleared', () => {
+      const pending = TestBed.inject(PendingFileService);
+      const f = mp3();
+      pending.set(f, { language: 'es' });
+      expect(pending.take()).toBe(f);
+      pending.set(mp3());
+      expect(pending.takeWithPreset()!.preset).toBeNull();
+      pending.set(f, { language: 'es' });
+      pending.set(null, { language: 'es' });
+      expect(pending.takeWithPreset()).toBeNull();
+    });
+  });
+
   it('starts empty', () => {
     const pending = TestBed.inject(PendingFileService);
     expect(pending.file()).toBeNull();

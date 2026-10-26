@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { JobsStore } from '../../core/jobs.store';
 import { Health } from '../../core/models';
-import { TOOL_PAGES } from '../tool-pages/tool-pages.list';
+import { CORE_TOOLS } from '../tool-pages/tool-pages.list';
 import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { HowItWorksPage } from './how-it-works';
 
@@ -251,7 +251,7 @@ describe('HowItWorksPage', () => {
   });
 
   describe('links', () => {
-    it('ends with one quiet way to start (not a second main button) and the "More free tools" links to every keyword page', () => {
+    it('ends with one quiet way to start (not a second main button) and the "More free tools" links to the core keyword pages and all tools', () => {
       setup(makePublicHealth());
       const end = q('.end a.btn')!;
       expect(end.getAttribute('href')).toBe('/');
@@ -259,7 +259,7 @@ describe('HowItWorksPage', () => {
       expect(end.classList.contains('primary')).toBe(false);
       expect(q('section.cta')).toBeNull();
       expect(clean(q('app-related-tools h2')?.textContent)).toBe('More free tools');
-      expect(qa('app-related-tools a').map((a) => a.getAttribute('href'))).toEqual(TOOL_PAGES.map((t) => t.path));
+      expect(qa('app-related-tools a').map((a) => a.getAttribute('href'))).toEqual([...CORE_TOOLS.map((t) => t.path), '/tools']);
     });
 
     it('has no link to the old /about address', () => {

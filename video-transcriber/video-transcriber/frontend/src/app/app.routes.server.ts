@@ -1,4 +1,5 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
+import { GUIDES, guideRoutePath } from './features/guides/guides.list';
 import { TOOL_PAGES, toolRoutePath } from './features/tool-pages/tool-pages.list';
 
 /**
@@ -24,6 +25,10 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'terms', renderMode: RenderMode.Prerender },
   // keyword landing pages: /video-to-text, /audio-to-text, /mp4-to-text, ... (one list: tool-pages.list.ts)
   ...TOOL_PAGES.map((t): ServerRoute => ({ path: toolRoutePath(t), renderMode: RenderMode.Prerender })),
+  // the tools index, the guides index and every guide (one list: guides.list.ts)
+  { path: 'tools', renderMode: RenderMode.Prerender },
+  { path: 'guides', renderMode: RenderMode.Prerender },
+  ...GUIDES.map((g): ServerRoute => ({ path: guideRoutePath(g), renderMode: RenderMode.Prerender })),
 
   // private or dynamic: never prerendered
   { path: 'jobs/:id', renderMode: RenderMode.Client }, // a visitor's own transcript, noindex

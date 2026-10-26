@@ -5,6 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { JobsStore } from '../../core/jobs.store';
 import { ModelInfo } from '../../core/models';
 import { PendingFileService } from '../../core/pending-file.service';
+import type { ToolPreset } from '../tool-pages/tool-pages.list';
 import { httpError, makeHealth, makePublicHealth, makeSummary, silentLog } from '../../testing/fakes';
 import { UploadPage } from './upload';
 import { ToastService } from '../../core/toast.service';
@@ -59,8 +60,8 @@ describe('UploadPage', () => {
   let navigate: ReturnType<typeof vi.fn>;
   let getUserMedia: ReturnType<typeof vi.fn>;
 
-  /** `waiting`: a file chosen on a keyword page that is already waiting when the page opens. */
-  function setup(waiting?: File) {
+  /** `waiting`: a file chosen on a keyword page that is already waiting when the page opens (`preset`: what that page pre-selects). */
+  function setup(waiting?: File, preset?: ToolPreset) {
     TestBed.configureTestingModule({
       providers: [silentLog, provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     });
@@ -69,7 +70,7 @@ describe('UploadPage', () => {
     for (const r of ctl.match(() => true)) r.flush(r.request.url.endsWith('/health') ? { status: 'ok' } : []);
     navigate = vi.fn(() => Promise.resolve(true));
     TestBed.inject(Router).navigate = navigate as unknown as Router['navigate'];
-    if (waiting) TestBed.inject(PendingFileService).set(waiting);
+    if (waiting) TestBed.inject(PendingFileService).set(waiting, preset);
     fixture = TestBed.createComponent(UploadPage);
     page = fixture.componentInstance;
   }
@@ -618,7 +619,7 @@ describe('UploadPage', () => {
       setup();
       fixture.detectChanges();
       expect(qa('h1').length).toBe(1);
-      expect(clean(q('h1'))).toBe('Transcribe a video or audio file');
+      expect(clean(q('h1'))).toBe('Video to text: transcribe a video or audio file');
       const chips = q('ul.trust')!;
       expect(chips.getAttribute('aria-label')).toBe('Free, unlimited, and no login needed');
       expect(qa('ul.trust li').map((li) => clean(li))).toEqual(['Free', 'Unlimited', 'No login']);
@@ -970,6 +971,47 @@ describe('UploadPage', () => {
     });
   });
 
+  describe('translating with a model that cannot translate', () => {
+    it('warns for Large v3 Turbo and Distil Large v3, and only while Output is "Translate to English"', () => {
+      setup();
+      expect(page.translateWarning()).toBe('');
+      page.opts.task = 'translate';
+      page.opts.model = 'large-v3-turbo';
+      expect(page.translateWarning()).toContain('High accuracy (Large v3 Turbo) was not trained to translate');
+      expect(page.translateWarning()).toContain('Standard or Best accuracy');
+      page.opts.model = 'distil-large-v3';
+      expect(page.translateWarning()).toContain('English speech only');
+      for (const ok of ['tiny', 'base', 'small', 'medium', 'large-v3']) {
+        page.opts.model = ok;
+        expect(page.translateWarning(), ok).toBe('');
+      }
+      page.opts.model = 'large-v3-turbo';
+      page.opts.task = 'transcribe';
+      expect(page.translateWarning()).toBe('');
+    });
+
+    const note = () => fixture.nativeElement.querySelector('#task')?.parentElement?.querySelector('.hint[role="note"]') as HTMLElement | null;
+
+    it('shows as a note under the Output choice', () => {
+      setup();
+      page.showAdvanced.set(true);
+      page.opts.task = 'translate';
+      page.opts.model = 'large-v3-turbo';
+      fixture.detectChanges();
+      expect(note()?.textContent).toContain('not trained to translate');
+    });
+
+    it('shows no note for a model that translates', () => {
+      setup();
+      page.showAdvanced.set(true);
+      page.opts.task = 'translate';
+      page.opts.model = 'large-v3';
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('#task')).not.toBeNull();
+      expect(note()).toBeNull();
+    });
+  });
+
   describe('a file waiting from a keyword page (PendingFileService)', () => {
     const waitingFile = () => new File(['x'], 'talk.mp3', { type: 'audio/mpeg' });
 
@@ -993,6 +1035,52 @@ describe('UploadPage', () => {
     it('nothing waiting: the list starts empty', () => {
       setup();
       expect(page.files()).toEqual([]);
+    });
+
+    describe('the preset of a language page', () => {
+      it('Hindi page: starts with Hindi and the original script (Devanagari)', () => {
+        setup(waitingFile(), { language: 'hi', output_script: 'original' });
+        expect(page.opts.language).toBe('hi');
+        expect(page.opts.output_script).toBe('original');
+        expect(page.opts.task).toBe('transcribe');
+        expect(page.showAdvanced()).toBe(false);
+      });
+
+      it('Hinglish page: starts with Hindi written in Roman letters', () => {
+        setup(waitingFile(), { language: 'hi', output_script: 'hinglish' });
+        expect(page.opts.language).toBe('hi');
+        expect(page.opts.output_script).toBe('hinglish');
+      });
+
+      it('translate page: starts with "Translate to English", language left on auto-detect, and shows More options so it is seen', () => {
+        setup(waitingFile(), { task: 'translate' });
+        expect(page.opts.task).toBe('translate');
+        expect(page.opts.language).toBeNull();
+        expect(page.showAdvanced()).toBe(true);
+      });
+
+      it('a Spanish page picks Spanish and leaves everything else alone', () => {
+        setup(waitingFile(), { language: 'es' });
+        expect(page.opts.language).toBe('es');
+        expect(page.opts.task).toBe('transcribe');
+        expect(page.opts.model).toBeTruthy();
+      });
+
+      it('a file without a preset changes nothing, and the preset is used once: a later visit starts from the defaults', () => {
+        setup(waitingFile());
+        expect(page.opts.language).toBeNull();
+        TestBed.inject(PendingFileService).set(waitingFile(), { language: 'fr' });
+        const first = TestBed.createComponent(UploadPage).componentInstance;
+        expect(first.opts.language).toBe('fr');
+        const later = TestBed.createComponent(UploadPage).componentInstance;
+        expect(later.files()).toEqual([]);
+      });
+
+      it('the visitor can still change what the page picked', () => {
+        setup(waitingFile(), { language: 'de' });
+        page.opts.language = 'en';
+        expect(page.opts.language).toBe('en');
+      });
     });
 
     it('is not uploaded by itself: the visitor still presses Transcribe', () => {

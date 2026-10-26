@@ -13,7 +13,7 @@ import { SessionService } from './core/session.service';
 import { SiteService, TAGLINE } from './core/site.service';
 import { StatsService } from './core/stats.service';
 import { ThemeService } from './core/theme.service';
-import { TOOL_PAGES } from './features/tool-pages/tool-pages.list';
+import { CORE_TOOLS } from './features/tool-pages/tool-pages.list';
 import { AdRail } from './shared/ad-rail';
 import { AdSlot } from './shared/ad-slot';
 import { Logo } from './shared/logo';
@@ -43,7 +43,8 @@ export class App {
   readonly tagline = TAGLINE;
   readonly year = new Date().getFullYear();
   /** the keyword landing pages: linked from the footer so every page links to them */
-  readonly tools = TOOL_PAGES;
+  /** the main tools, linked from every page's footer (the rest are one click away on "All tools") */
+  readonly tools = CORE_TOOLS;
 
   private popWrap = viewChild<ElementRef<HTMLElement>>('popWrap');
   private popBtn = viewChild<ElementRef<HTMLButtonElement>>('popBtn');

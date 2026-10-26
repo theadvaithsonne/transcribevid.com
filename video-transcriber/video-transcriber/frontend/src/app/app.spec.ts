@@ -9,7 +9,7 @@ import { Health, SiteStats } from './core/models';
 import { SessionService } from './core/session.service';
 import { StatsService } from './core/stats.service';
 import { TOAST_DURATION, ToastService } from './core/toast.service';
-import { TOOL_PAGES } from './features/tool-pages/tool-pages.list';
+import { CORE_TOOLS } from './features/tool-pages/tool-pages.list';
 import { httpError, makeHealth, makePublicHealth, makeSession, makeStats, makeSummary, silentLog, useEnglishNumbers } from './testing/fakes';
 
 @Component({ template: '' })
@@ -192,11 +192,12 @@ describe('App shell', () => {
       expect(document.activeElement).toBe(q('main'));
     });
 
-    it('offers Transcribe, How it works and FAQ as tabs', () => {
+    it('offers Transcribe, How it works, FAQ and Guides as tabs', () => {
       expect(links('header nav[aria-label="Main"] a')).toEqual([
         ['Transcribe', '/'],
         ['How it works', '/how-it-works'],
         ['FAQ', '/faq'],
+        ['Guides', '/guides'],
       ]);
     });
 
@@ -222,7 +223,7 @@ describe('App shell', () => {
       expect(logs()).toBeNull();
       show(makePublicHealth({ logs_enabled: true }));
       expect(text(logs())).toContain('Logs');
-      expect(links('header nav[aria-label="Main"] a').map((l) => l[1])).toEqual(['/', '/how-it-works', '/faq', '/logs']);
+      expect(links('header nav[aria-label="Main"] a').map((l) => l[1])).toEqual(['/', '/how-it-works', '/faq', '/guides', '/logs']);
     });
 
     it('never advertises the hardware of the public site (no CPU / GPU chip in the header)', () => {
@@ -251,11 +252,11 @@ describe('App shell', () => {
       expect(text(q('footer'))).toContain('v3.1.4');
     });
 
-    it('has a second footer row "Free tools" that links every keyword page', () => {
+    it('has a second footer row "Free tools" that links the core keyword pages and "All tools"', () => {
       const row = q('footer nav[aria-label="Free tools"]')!;
       expect(text(row.querySelector('.foot-tools-label'))).toBe('Free tools:');
-      expect(links('footer nav[aria-label="Free tools"] a')).toEqual(TOOL_PAGES.map((t) => [t.label, t.path]));
-      expect(TOOL_PAGES.length).toBeGreaterThanOrEqual(6);
+      expect(links('footer nav[aria-label="Free tools"] a')).toEqual([...CORE_TOOLS.map((t) => [t.label, t.path]), ['All tools', '/tools']]);
+      expect(CORE_TOOLS.length).toBe(6);
     });
 
     it('shows a contact e-mail in the footer only when the server has one', () => {
@@ -664,13 +665,14 @@ describe('App shell', () => {
         ['Transcribe', '/'],
         ['How it works', '/how-it-works'],
         ['FAQ', '/faq'],
+        ['Guides', '/guides'],
       ]);
     });
 
     it('has the Logs link only when the server enables logs', () => {
       show(makePublicHealth({ logs_enabled: true }));
       open();
-      expect(links('#mobile-menu nav[aria-label="Menu"] a').map((l) => l[1])).toEqual(['/', '/how-it-works', '/faq', '/logs']);
+      expect(links('#mobile-menu nav[aria-label="Menu"] a').map((l) => l[1])).toEqual(['/', '/how-it-works', '/faq', '/guides', '/logs']);
     });
 
     it('lists "Your transcripts" with the same rows as the popover, and a friendly note when there are none', () => {

@@ -11,7 +11,7 @@
     </div>
     <app-free-chips class="hero-chips" />
     <div class="hero-drop">
-      <app-tool-drop [kind]="c().dropKind" [noun]="c().dropNoun" [formats]="c().accepts" [limits]="limits()" />
+      <app-tool-drop [kind]="c().dropKind" [noun]="c().dropNoun" [formats]="c().accepts" [limits]="limits()" [preset]="preset()" />
       @if (c().record) {
         <p class="alt"><a routerLink="/">Record with your microphone</a></p>
       }
@@ -26,6 +26,29 @@
       }
     </div>
   </section>
+
+  @for (s of text().sections; track $index) {
+    <section [attr.aria-labelledby]="'sec-title-' + $index">
+      <h2 class="section-title" [id]="'sec-title-' + $index">{{ s.title }}</h2>
+      @if (s.paragraphs.length) {
+        <div class="sec-text">
+          @for (p of s.paragraphs; track $index) {
+            <p>{{ p }}</p>
+          }
+        </div>
+      }
+      @if (s.bullets.length) {
+        <ul class="sec-bullets">
+          @for (b of s.bullets; track $index) {
+            <li>
+              <b>{{ b.title }}</b>
+              {{ b.text }}
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
 
   <!-- tablet and phone: one in-flow ad unit after the first text section, well away from the drop box -->
   <app-ad-slot placement="inline" />
@@ -80,6 +103,20 @@
       }
     </ul>
   </section>
+
+  @if (c().links?.length) {
+    <section class="links" aria-labelledby="links-title">
+      <h2 class="section-title" id="links-title">Related reading</h2>
+      <ul class="link-list">
+        @for (l of c().links; track l.path) {
+          <li>
+            <a [routerLink]="l.path">{{ l.label }}</a>
+            <span>{{ l.note }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+  }
 
   <section class="faq" aria-labelledby="faq-title">
     <h2 class="section-title" id="faq-title">{{ label() }}: common questions</h2>

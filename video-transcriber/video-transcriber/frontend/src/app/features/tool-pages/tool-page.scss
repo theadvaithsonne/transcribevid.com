@@ -98,6 +98,39 @@
   }
 }
 
+/* extra, page-specific sections (after "why"): the same plain text, with an optional bullet list */
+.sec-text p {
+  max-width: 70ch;
+  margin: 0 0 16px;
+  font-size: var(--fs-base);
+  line-height: 1.7;
+  color: var(--text);
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+.sec-bullets {
+  max-width: 76ch;
+  margin: 20px 0 0;
+  padding-left: 26px;
+  font-size: var(--fs-base);
+  line-height: 1.65;
+  color: var(--text);
+  li {
+    margin-bottom: 12px;
+    padding-left: 4px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  b {
+    color: var(--text-strong);
+  }
+}
+.sec-text + .sec-bullets {
+  margin-top: 20px;
+}
+
 /* ------------------------------------------------------------------------------------ steps: number + title + words, two per row */
 .steps {
   list-style: none;
@@ -237,6 +270,28 @@
   }
   b {
     color: var(--text-strong);
+  }
+}
+
+/* ------------------------------------------------------------------------------------ related reading: a link and why */
+.link-list {
+  max-width: 76ch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-base);
+  line-height: 1.6;
+  color: var(--text);
+  li {
+    padding: 10px 0;
+    & + li {
+      border-top: 1px solid var(--line);
+    }
+  }
+  a {
+    display: inline-block;
+    margin-right: 8px;
+    font-weight: 700;
   }
 }
 

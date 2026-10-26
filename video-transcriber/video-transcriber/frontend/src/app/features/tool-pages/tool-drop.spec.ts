@@ -154,6 +154,32 @@ describe('ToolDrop (the drop box on a keyword page)', () => {
     });
   });
 
+  describe('a language page (preset)', () => {
+    it('hands the preset over with the file', () => {
+      setup();
+      fixture.componentRef.setInput('preset', { language: 'es' });
+      fixture.detectChanges();
+      const f = file('charla.mp4', 'video/mp4');
+      pick(f);
+      expect(pending.takeWithPreset()).toEqual({ file: f, preset: { language: 'es' } });
+    });
+
+    it('a page without a preset hands over none', () => {
+      setup();
+      const f = file('talk.mp4', 'video/mp4');
+      pick(f);
+      expect(pending.takeWithPreset()).toEqual({ file: f, preset: null });
+    });
+
+    it('a refused file hands over nothing, preset or not', () => {
+      setup();
+      fixture.componentRef.setInput('preset', { language: 'es' });
+      fixture.detectChanges();
+      pick(file('notes.txt', 'text/plain'));
+      expect(pending.takeWithPreset()).toBeNull();
+    });
+  });
+
   describe('a valid file', () => {
     it('chosen in the dialog: handed to the uploader (PendingFileService) and the visitor goes to the home page', () => {
       setup();

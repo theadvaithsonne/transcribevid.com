@@ -12,6 +12,7 @@ import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
 import { RelatedTools } from '../../shared/related-tools';
+import type { ToolPreset } from '../tool-pages/tool-pages.list';
 import { ConverterConsent } from '../../core/transport/converter-consent';
 import { DeviceAdvice, EngineDevice } from '../../core/transport/engine-device';
 
@@ -183,8 +184,11 @@ export class UploadPage {
   constructor() {
     this.destroyRef.onDestroy(() => this.teardown());
     // a file chosen in the drop box of a keyword page ("MP3 to text" ...) is waiting here: pick it up once
-    const waiting = this.pendingFile.take();
-    if (waiting) this.addFiles([waiting]);
+    const waiting = this.pendingFile.takeWithPreset();
+    if (waiting) {
+      this.addFiles([waiting.file]);
+      this.applyPreset(waiting.preset);
+    }
     // the server may only allow some models: never keep (or send) one that is not allowed
     effect(() => {
       this.site.allowedModels();
@@ -220,6 +224,31 @@ export class UploadPage {
           .catch(() => {});
       });
     });
+  }
+
+  /**
+   * "Translate to English" with a model that cannot translate: OpenAI documents that Large v3 Turbo ("High accuracy") was not
+   * trained for translation and returns the original language, and Distil Large v3 hears English only. A plain note, so the
+   * visitor can pick another model before the (long) job starts. '' when nothing is wrong.
+   */
+  translateWarning(): string {
+    if (this.opts.task !== 'translate') return '';
+    if (this.opts.model === 'large-v3-turbo') {
+      return 'High accuracy (Large v3 Turbo) was not trained to translate and may give you the original language. For translation choose Standard or Best accuracy.';
+    }
+    if (this.opts.model === 'distil-large-v3') return 'Distil Large v3 understands English speech only. Choose another model to translate.';
+    return '';
+  }
+
+  /** a language page ("Hindi audio to text") starts the uploader with its language / option; the visitor can still change them */
+  private applyPreset(preset: ToolPreset | null) {
+    if (!preset) return;
+    if (preset.language) this.opts.language = preset.language;
+    if (preset.output_script) this.opts.output_script = preset.output_script;
+    if (preset.task) {
+      this.opts.task = preset.task;
+      this.showAdvanced.set(true); // the Output choice lives in More options: show it, so the visitor sees what was picked
+    }
   }
 
   private ensureAllowedModel() {

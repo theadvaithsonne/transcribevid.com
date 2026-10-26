@@ -56,9 +56,18 @@ _HASHED_ASSET = re.compile(r"^[\w.-]+-[A-Z0-9]{8}\.(js|css)$")  # Angular's cont
 # tool pages and with sitemap.xml.
 APP_PAGES = (
     "how-it-works", "faq", "about", "contact", "privacy", "terms", "logs",
-    # keyword landing pages (frontend/src/app/features/tool-pages/tool-pages.list.ts)
+    # keyword landing pages (frontend/src/app/features/tool-pages/tool-pages.list.ts), the "All free tools" page and the guides
+    # (frontend/src/app/features/guides/guides.list.ts; /guides/<slug> is one path with a slash in it)
     "video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator",
-    "voice-recording-to-text",
+    "voice-recording-to-text", "wav-to-text", "m4a-to-text", "webm-to-text", "mov-to-text",
+    "whatsapp-voice-message-to-text", "meeting-recording-to-text", "lecture-to-text",
+    "podcast-transcript-generator", "interview-transcription", "vtt-subtitle-generator",
+    "youtube-subtitle-generator", "hindi-audio-to-text", "hinglish-transcription",
+    "translate-audio-to-english", "spanish-audio-to-text", "portuguese-audio-to-text",
+    "french-audio-to-text", "german-audio-to-text",
+    "tools", "guides",
+    "guides/srt-vs-vtt", "guides/how-to-add-subtitles-to-a-video",
+    "guides/transcribe-video-without-uploading", "guides/accurate-transcripts", "guides/what-is-whisper",
 )
 # Old addresses of pages that moved: one permanent redirect (301) to the new address, so links and search engines move
 # along at once. Empty since /about became a page of its own again (it used to point at /how-it-works).

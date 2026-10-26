@@ -107,6 +107,8 @@ interface RouteData {
   label?: string;
   /** a tool page: also described as a free web application */
   app?: boolean;
+  /** the page this one sits under in the breadcrumb (a guide: Guides) */
+  parent?: { label: string; path: string };
 }
 
 /**
@@ -133,6 +135,7 @@ export class BrandTitleStrategy extends TitleStrategy {
       description: data.description || DEFAULT_DESCRIPTION,
       indexable: !noindex,
       app: data.app === true,
+      parents: data.parent ? [{ name: data.parent.label, path: data.parent.path }] : undefined,
     });
   }
 }
