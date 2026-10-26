@@ -125,3 +125,22 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   (OpenAI documents that turbo was not trained for translation) and Distil Large v3 hears English only: the uploader now shows a
   note, nothing else about the engine changed. Dashboard-only items for the owner are in `deploy/SEO.md` (Search Console DNS record,
   managed robots.txt block, e-mail obfuscation, Crawler Hints). Tests: frontend 80 files / 2,882; backend 902 passed + 17 skipped.
+* 2026-10-27 (language milestone, same branch `seo/improvements`): the whole site now exists in 15 more languages (es pt fr de it id
+  ja ko th vi tr hi bn ar ur) as `/<code>` pages with localised addresses: 518 sitemap addresses (38 English + 480 translated),
+  each with `hreflang` + `x-default`, `<html lang dir>`, `og:locale`, `inLanguage`, a `Content-Language` header and translated titles
+  built on the native search terms. Choice of languages from measured demand (Google Trends by country x internet users, checked
+  against the traffic mix of seven competing tools; China, Iran, Russia left out; the Portuguese Trends request was rate limited,
+  Brazil rests on the competitor data). Every one of the 702 UI strings is wrapped (`'text' | t`, English output byte-identical),
+  15 dictionaries, 18 tool pages + 5 guides + the information pages per language, glossaries per language, an extractor
+  (`scripts/extract-i18n.mjs`) and checks that stop a half-finished language from shipping (`i18n/registry.spec.ts`,
+  `scripts/i18n-dicts.test.mjs`, the language-aware audit). A visitor is taken to their language only from the home page and only
+  from the browser's language or a saved menu choice (never the IP, never a crawler); elsewhere a small bar offers the switch. Arabic
+  and Urdu are right to left (logical CSS properties, hand-mirrored parts) and each script has its own fonts, line height and line
+  breaking. The self-hosted edition (`environment.languages=false`) stays English, 38 routes, checked. **Found and fixed on the way:**
+  the critical-CSS inliner drops rules written on `html:lang(x)` alone, which made the language fonts arrive late and shifted the
+  long Thai and Japanese pages by 0.3-0.5 on a cold browser (rule documented in I18N.md section 5; now 0.000 everywhere). Verified:
+  20 checks in a real Chrome on the Pages emulator (Spanish browser -> `/es`, menu, remembered choice, Googlebot untouched, Arabic
+  rtl, file drop -> Spanish uploader -> `/es/jobs/<id>` -> transcript); Lighthouse on eight translated pages: accessibility 100,
+  SEO 100, layout shift 0.000, desktop performance 100, mobile 93-99; frontend 91 files / 3,097 tests, backend 902 passed + 17
+  skipped, script tests 383, audit 518 pages clean. Owner items (AdSense consent message for EEA / UK / CH, Search Console) are in
+  `deploy/SEO.md` step 9. Translations are AI-written and not yet read by native speakers (legal pages carry a convenience note).
