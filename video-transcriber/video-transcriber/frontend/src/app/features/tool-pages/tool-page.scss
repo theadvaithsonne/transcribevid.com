@@ -317,6 +317,60 @@
   display: none;
 }
 
+/* ------------------------------------------------------------------------------------ comparison (the "alternative" pages)
+   A plain table in one surface card; on a phone it scrolls sideways inside its own box, never the page. */
+.table-wrap {
+  max-width: 1240px;
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+}
+.compare table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  th,
+  td {
+    padding: 14px 18px;
+    text-align: left;
+    vertical-align: top;
+    border-top: 1px solid var(--line);
+  }
+  thead th {
+    border-top: 0;
+    font-weight: 750;
+    color: var(--text-strong);
+  }
+  tbody th {
+    width: 22%;
+    font-weight: 650;
+    color: var(--text-strong);
+  }
+  td {
+    color: var(--text);
+  }
+}
+.checked {
+  max-width: 70ch;
+  margin: 20px 0 8px;
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--muted);
+}
+.sources {
+  margin: 0;
+  padding-left: 20px;
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+}
+
 /* ------------------------------------------------------------------------------------ one quiet last step */
 .end {
   margin-top: -16px;

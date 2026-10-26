@@ -168,6 +168,9 @@
                 <option value="transcribe">Transcribe (same language)</option>
                 <option value="translate" [disabled]="opts.engine === 'qwen'">Translate to English</option>
               </select>
+              @if (opts.task === 'translate' && opts.model === 'large-v3-turbo') {
+                <span class="hint warn-hint" role="status">High accuracy (Large v3 Turbo) was not trained to translate and may answer in the spoken language. For an English translation, pick Standard or Best accuracy.</span>
+              }
             </div>
             <div class="field">
               <label for="prompt">Vocabulary hint <span class="muted">(optional)</span></label>
@@ -281,6 +284,11 @@
     <li><b>Lectures and podcasts</b> turned into readable text for studying or show notes.</li>
     <li><b>Voice memos</b> written out, so you do not have to listen to them again.</li>
   </ul>
+  <p class="home-popular">
+    Popular: <a routerLink="/hindi-audio-to-text">Hindi audio to text</a>, <a routerLink="/hinglish-transcription">Hinglish transcription</a>,
+    <a routerLink="/meeting-recording-to-text">meeting recordings</a>, <a routerLink="/lecture-to-text">lectures</a> and
+    <a routerLink="/private-transcription">private transcription</a>.
+  </p>
 
   <h2 class="section-title">Tips for the best transcript</h2>
   <p>

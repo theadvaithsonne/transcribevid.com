@@ -107,4 +107,13 @@ export const CONTENT: ToolPageContent = {
         'On clear speech in a supported language it is usually very accurate, but no speech recognition is perfect. Noise, accents, music and overlapping voices lower accuracy, so check important passages against the video.',
     },
   ],
+
+  related: [
+    '/mp4-to-text',
+    '/meeting-recording-to-text',
+    '/lecture-to-text',
+    '/srt-subtitle-generator',
+    '/hindi-audio-to-text',
+    '/private-transcription',
+  ],
 };

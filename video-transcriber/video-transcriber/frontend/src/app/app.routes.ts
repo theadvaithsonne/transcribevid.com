@@ -72,7 +72,7 @@ export const routes: Routes = [
     },
     loadComponent: () => import('./features/contact/contact').then((m) => m.ContactPage),
   },
-  // keyword landing pages: /video-to-text, /audio-to-text, /mp4-to-text, /mp3-to-text, /srt-subtitle-generator, /voice-recording-to-text
+  // keyword landing pages (formats, Hindi and Hinglish, use cases, alternatives): one list, tool-pages.list.ts
   ...TOOL_PAGES.map(toolRoute),
   {
     path: 'privacy',

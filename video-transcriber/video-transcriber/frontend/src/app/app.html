@@ -169,8 +169,11 @@
     </nav>
     <nav class="foot-tools" aria-label="Free tools">
       <span class="foot-tools-label">Free tools:</span>
+      <!-- the most-used pages only (footer: true); the home page lists every tool page -->
       @for (t of tools; track t.path) {
-        <a [routerLink]="t.path">{{ t.label }}</a>
+        @if (t.footer) {
+          <a [routerLink]="t.path">{{ t.label }}</a>
+        }
       }
     </nav>
   </footer>

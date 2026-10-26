@@ -57,8 +57,11 @@ _HASHED_ASSET = re.compile(r"^[\w.-]+-[A-Z0-9]{8}\.(js|css)$")  # Angular's cont
 APP_PAGES = (
     "how-it-works", "faq", "about", "contact", "privacy", "terms", "logs",
     # keyword landing pages (frontend/src/app/features/tool-pages/tool-pages.list.ts)
-    "video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator",
-    "voice-recording-to-text",
+    "video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "wav-to-text", "m4a-to-text",
+    "hindi-audio-to-text", "hinglish-transcription", "translate-hindi-audio-to-english",
+    "srt-subtitle-generator", "subtitle-generator-for-reels", "voice-recording-to-text", "whatsapp-voice-note-to-text",
+    "meeting-recording-to-text", "interview-transcription", "lecture-to-text", "podcast-to-text",
+    "private-transcription", "turboscribe-alternative", "otter-ai-alternative",
 )
 # Old addresses of pages that moved: one permanent redirect (301) to the new address, so links and search engines move
 # along at once. Empty since /about became a page of its own again (it used to point at /how-it-works).

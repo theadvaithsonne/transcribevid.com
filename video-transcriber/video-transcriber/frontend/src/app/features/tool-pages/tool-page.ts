@@ -18,11 +18,17 @@ export function editionText(c: ToolPageContent, inBrowser: boolean) {
     question: (inBrowser && f.browser?.question) || f.question,
     answer: (inBrowser && f.browser?.answer) || f.answer,
   });
+  const cmp = c.comparison;
   return {
+    h1: (inBrowser && c.browserH1) || c.h1,
+    lead: (inBrowser && c.browserLead) || c.lead,
     why: (inBrowser && c.browserWhy) || c.why,
     steps: c.steps.map(step),
     tips: c.tips.map(step),
     faqs: c.faqs.map(faq),
+    comparison: cmp
+      ? { ...cmp, rows: cmp.rows.map((r) => ({ topic: r.topic, us: (inBrowser && r.browserUs) || r.us, them: r.them })) }
+      : null,
   };
 }
 
@@ -53,6 +59,8 @@ export class ToolPage {
   readonly path = computed(() => '/' + this.slug());
   /** why, steps, tips and questions in this edition's words (the in-browser edition has no upload, limit or queue) */
   readonly text = computed(() => editionText(this.c(), this.site.inBrowser()));
+  /** the site's own name, for the comparison table's column */
+  readonly brand = computed(() => this.site.brand().name);
 
   readonly limits = computed(() => {
     const announced = this.site.limitsText();

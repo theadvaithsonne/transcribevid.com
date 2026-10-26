@@ -106,4 +106,12 @@ Today we are looking at how subtitles work.`,
         'You can transcribe in the spoken language (more than 50 are supported) or translate speech into English. Translating into other languages is not offered.',
     },
   ],
+
+  related: [
+    '/subtitle-generator-for-reels',
+    '/video-to-text',
+    '/mp4-to-text',
+    '/hinglish-transcription',
+    '/translate-hindi-audio-to-english',
+  ],
 };

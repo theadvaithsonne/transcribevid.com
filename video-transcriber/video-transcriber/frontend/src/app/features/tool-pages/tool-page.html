@@ -6,8 +6,8 @@
         <span aria-hidden="true">/</span>
         <span aria-current="page">{{ label() }}</span>
       </nav>
-      <h1 class="page-title">{{ c().h1 }}</h1>
-      <p class="page-lead">{{ c().lead }}</p>
+      <h1 class="page-title">{{ text().h1 }}</h1>
+      <p class="page-lead">{{ text().lead }}</p>
     </div>
     <app-free-chips class="hero-chips" />
     <div class="hero-drop">
@@ -26,6 +26,42 @@
       }
     </div>
   </section>
+
+  @if (text().comparison; as cmp) {
+    <section class="compare" aria-labelledby="compare-title">
+      <h2 class="section-title" id="compare-title">{{ cmp.title }}</h2>
+      <p class="intro">{{ cmp.intro }}</p>
+      <div class="table-wrap" role="region" tabindex="0" [attr.aria-label]="cmp.title">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col"><span class="visually-hidden">Topic</span></th>
+              <th scope="col">{{ brand() }}</th>
+              <th scope="col">{{ cmp.them }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of cmp.rows; track r.topic) {
+              <tr>
+                <th scope="row">{{ r.topic }}</th>
+                <td>{{ r.us }}</td>
+                <td>{{ r.them }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <p class="checked">
+        {{ cmp.them }} details checked on {{ cmp.checked }}, from the public pages below. Plans and limits change, so check {{ cmp.them }}'s own
+        site before you decide.
+      </p>
+      <ul class="sources">
+        @for (s of cmp.sources; track s.url) {
+          <li><a [href]="s.url" target="_blank" rel="nofollow noopener noreferrer">{{ s.label }}</a></li>
+        }
+      </ul>
+    </section>
+  }
 
   <!-- tablet and phone: one in-flow ad unit after the first text section, well away from the drop box -->
   <app-ad-slot placement="inline" />
@@ -97,5 +133,5 @@
     <a class="btn big ghost" routerLink="/">Transcribe a file</a>
   </div>
 
-  <app-related-tools [current]="path()" />
+  <app-related-tools [current]="path()" [paths]="c().related" heading="Related tools" />
 </div>

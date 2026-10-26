@@ -251,11 +251,13 @@ describe('App shell', () => {
       expect(text(q('footer'))).toContain('v3.1.4');
     });
 
-    it('has a second footer row "Free tools" that links every keyword page', () => {
+    it('has a second footer row "Free tools" that links the main keyword pages (not all of them: the home page lists the rest)', () => {
       const row = q('footer nav[aria-label="Free tools"]')!;
       expect(text(row.querySelector('.foot-tools-label'))).toBe('Free tools:');
-      expect(links('footer nav[aria-label="Free tools"] a')).toEqual(TOOL_PAGES.map((t) => [t.label, t.path]));
-      expect(TOOL_PAGES.length).toBeGreaterThanOrEqual(6);
+      const footer = TOOL_PAGES.filter((t) => t.footer);
+      expect(links('footer nav[aria-label="Free tools"] a')).toEqual(footer.map((t) => [t.label, t.path]));
+      expect(footer.length).toBeGreaterThanOrEqual(6);
+      expect(footer.length).toBeLessThan(TOOL_PAGES.length);
     });
 
     it('shows a contact e-mail in the footer only when the server has one', () => {

@@ -110,4 +110,12 @@ export const CONTENT: ToolPageContent = {
         'Yes, any MP4 with speech works. Speaker names are not added to meetings, but the lines are timestamped so you can add names while editing.',
     },
   ],
+
+  related: [
+    '/video-to-text',
+    '/srt-subtitle-generator',
+    '/meeting-recording-to-text',
+    '/subtitle-generator-for-reels',
+    '/mp3-to-text',
+  ],
 };

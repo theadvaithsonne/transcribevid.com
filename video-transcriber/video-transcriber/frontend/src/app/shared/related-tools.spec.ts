@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { TOOL_PAGES } from '../features/tool-pages/tool-pages.list';
+import { TOOL_GROUPS, TOOL_PAGES } from '../features/tool-pages/tool-pages.list';
 import { RelatedTools } from './related-tools';
 
 @Component({
   imports: [RelatedTools],
-  template: `<app-related-tools [current]="current" [heading]="heading" />`,
+  template: `<app-related-tools [current]="current" [heading]="heading" [paths]="paths" />`,
 })
 class Host {
   current = '';
   heading = 'More free tools';
+  paths: string[] = [];
 }
 
 describe('RelatedTools', () => {
@@ -21,11 +22,12 @@ describe('RelatedTools', () => {
   const hrefs = () => links().map((a) => a.getAttribute('href'));
   const labels = () => links().map((a) => a.textContent!.trim());
 
-  function setup(current = '', heading?: string) {
+  function setup(current = '', heading?: string, paths: string[] = []) {
     TestBed.configureTestingModule({ providers: [provideRouter([])] });
     fixture = TestBed.createComponent(Host);
     host = fixture.componentInstance;
     host.current = current;
+    host.paths = paths;
     if (heading) host.heading = heading;
     fixture.detectChanges();
   }
@@ -82,6 +84,26 @@ describe('RelatedTools', () => {
     fixture.detectChanges();
     expect(hrefs()).toContain('/mp3-to-text');
     expect(hrefs()).not.toContain('/mp4-to-text');
+  });
+
+  it('the full list is grouped under small headings (file types, Hindi and Hinglish, uses, alternatives)', () => {
+    setup();
+    const section = fixture.nativeElement.querySelector('section.related') as HTMLElement;
+    expect(Array.from(section.querySelectorAll('h3')).map((h) => h.textContent!.trim())).toEqual(TOOL_GROUPS.map((g) => g.heading));
+    const lists = Array.from(section.querySelectorAll('ul'));
+    expect(lists.length).toBe(TOOL_GROUPS.length);
+    TOOL_GROUPS.forEach((g, i) => {
+      const inList = Array.from(lists[i].querySelectorAll('a')).map((a) => a.getAttribute('href'));
+      expect(inList).toEqual(TOOL_PAGES.filter((t) => t.group === g.id).map((t) => t.path));
+    });
+  });
+
+  it('with paths: only those pages, in that order, as one list without group headings (unknown and current ones left out)', () => {
+    setup('/mp3-to-text', undefined, ['/wav-to-text', '/mp3-to-text', '/nope', '/podcast-to-text']);
+    expect(hrefs()).toEqual(['/wav-to-text', '/podcast-to-text']);
+    expect(labels()).toEqual(['WAV to text', 'Podcast to text']);
+    expect(fixture.nativeElement.querySelectorAll('h3').length).toBe(0);
+    expect(fixture.nativeElement.querySelectorAll('ul').length).toBe(1);
   });
 
   it('has an own heading when asked', () => {

@@ -20,7 +20,11 @@ JOB = "a" * 32
 PROJECT = config.PROJECT_DIR
 PUBLIC_FILES = PROJECT / "frontend" / "public"
 TOOL_PAGES_TS = PROJECT / "frontend" / "src" / "app" / "features" / "tool-pages" / "tool-pages.list.ts"
-TOOLS = ["video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator", "voice-recording-to-text"]
+TOOLS = ["video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "wav-to-text", "m4a-to-text",
+         "hindi-audio-to-text", "hinglish-transcription", "translate-hindi-audio-to-english",
+         "srt-subtitle-generator", "subtitle-generator-for-reels", "voice-recording-to-text", "whatsapp-voice-note-to-text",
+         "meeting-recording-to-text", "interview-transcription", "lecture-to-text", "podcast-to-text",
+         "private-transcription", "turboscribe-alternative", "otter-ai-alternative"]
 INFO_PAGES = ["how-it-works", "faq", "about", "contact", "privacy", "terms", "logs"]
 SHELL = '<!doctype html><html><body><app-root>CSR-SHELL</app-root></body></html>'
 SECRET = "TOP-SECRET-DO-NOT-SERVE"
@@ -167,7 +171,7 @@ def test_every_sitemap_url_is_a_known_app_page_that_answers_200(dist, client):
         assert is_app_page(page), f"{loc} is in the sitemap but main.APP_PAGES does not know it (it would be a 404)"
         r = client.get(u.path or "/")
         assert r.status_code == 200 and "<app-root" in r.text, loc
-    assert {urlsplit(loc).path.lstrip("/") for loc in locs} >= set(TOOLS)  # the six keyword pages are all submitted
+    assert {urlsplit(loc).path.lstrip("/") for loc in locs} >= set(TOOLS)  # every keyword page is submitted
 
 
 @pytest.mark.skipif(not ((PUBLIC_FILES / "sitemap.xml").is_file() and (PUBLIC_FILES / "robots.txt").is_file()),

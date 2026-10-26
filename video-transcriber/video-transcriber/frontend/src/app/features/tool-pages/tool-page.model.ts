@@ -34,6 +34,35 @@ export interface ToolDownload {
   use: string;
 }
 
+/** A public page a comparison names as its source. */
+export interface ToolSource {
+  label: string;
+  url: string;
+}
+
+/** One row of a comparison table: a topic, what TranscribeVid does and what the other product's public pages say. */
+export interface ToolComparisonRow {
+  topic: string;
+  /** TranscribeVid, true for the server editions */
+  us: string;
+  /** TranscribeVid in the in-browser edition, where `us` is only true for the server */
+  browserUs?: string;
+  them: string;
+}
+
+/** A dated, sourced comparison with another product (the "... alternative" pages). No logos, no ratings, no claims without a source. */
+export interface ToolComparison {
+  title: string;
+  intro: string;
+  /** the other product's name (the column heading) */
+  them: string;
+  /** when the other product's facts were checked, as shown ("27 October 2026") */
+  checked: string;
+  rows: ToolComparisonRow[];
+  /** where the other product's facts come from */
+  sources: ToolSource[];
+}
+
 /** What the drop box in the hero accepts: a video page takes video and audio (like the main uploader), an audio page takes audio only. */
 export type DropKind = 'video' | 'audio';
 
@@ -42,8 +71,12 @@ export interface ToolPageContent {
   eyebrow: string;
   /** the one H1 of the page (unique per page) */
   h1: string;
+  /** the in-browser edition's H1, when `h1` is only true for the server (or the other way round) */
+  browserH1?: string;
   /** unique intro, one or two sentences */
   lead: string;
+  /** the in-browser edition's intro, when `lead` is only true for the server */
+  browserLead?: string;
   /** which files the hero drop box accepts */
   dropKind: DropKind;
   /** what the drop box asks for: "Drop your {dropNoun} here, or choose a file" (e.g. "MP3", "video", "voice recording") */
@@ -73,4 +106,8 @@ export interface ToolPageContent {
   tips: ToolTip[];
   /** four or five questions that are specific to this page */
   faqs: ToolFaq[];
+  /** a dated comparison with another product (the "... alternative" pages only) */
+  comparison?: ToolComparison;
+  /** the "Related tools" links at the end: paths of other tool pages, most useful first */
+  related: string[];
 }
