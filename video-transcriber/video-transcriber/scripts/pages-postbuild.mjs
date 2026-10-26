@@ -14,6 +14,8 @@
  *  4. Checks what Pages would refuse or silently get wrong, and exits 1 if anything is off: a file over 25 MiB, 20,000
  *     files or more, more than 100 header rules, a duplicated pattern, a line over 2,000 characters, a page left as
  *     dir/index.html, a sitemap URL without its page, a missing ads.txt.
+ *  5. Adds an accurate <lastmod> to each address of the built sitemap.xml (scripts/sitemap-lastmod.mjs): the date of the
+ *     last real change of that page's own text, never the build time.
  *
  * There is deliberately NO Cross-Origin-Opener-Policy / Cross-Origin-Embedder-Policy anywhere: ads cannot load in a
  * cross-origin-isolated document and the engine does not need isolation (docs/in-browser/PROGRESS.md, 2026-10-25 night).
@@ -22,6 +24,8 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { addLastmod } from './sitemap-lastmod.mjs';
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
 const MAX_FILES = 20_000;
@@ -191,6 +195,13 @@ if (fs.existsSync(sitemap)) {
     const page = p === '' ? 'index.html' : `${p.slice(1)}.html`;
     if (!fs.existsSync(path.join(root, page))) fail(`sitemap URL ${loc} has no ${page}`);
   }
+  // 5. <lastmod>: only where it can be known (see sitemap-lastmod.mjs)
+  const frontendDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'frontend');
+  const dated = addLastmod(fs.readFileSync(sitemap, 'utf8'), { frontendDir });
+  fs.writeFileSync(sitemap, dated);
+  const total = (dated.match(/<loc>/g) ?? []).length;
+  const withDate = (dated.match(/<lastmod>\d{4}-/g) ?? []).length;
+  console.log(`pages-postbuild: sitemap.xml: ${withDate} of ${total} addresses got an accurate <lastmod>${withDate < total ? ' (the rest have none: git could not say)' : ''}.`);
 }
 
 if (problems.length) {

@@ -111,3 +111,17 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   because the owner keeps every feature, and the server reads AVI / WMA / AMR today.
 * 2026-10-25 (night): engine dependencies pinned exactly: `@huggingface/transformers` 4.3.1, `mediabunny` 1.62.1 and
   the `onnxruntime-web` build transformers.js itself pins (one ORT copy serves Whisper, Silero VAD and Qwen).
+* 2026-10-27 (SEO milestone, branch `seo/improvements` from d68dbf4, built in a separate git worktree because two other
+  sessions were editing the shared working tree): the site grew from 13 to 38 public pages. 18 new tool pages (file types WAV /
+  M4A / WebM / MOV; uses: WhatsApp voice notes, meetings, lectures, podcasts, interviews; subtitle files: VTT, YouTube; languages:
+  Hindi, Hinglish, translate-to-English, Spanish, Portuguese, French, German), the "All free tools" page, a Guides section with
+  five articles (SRT vs VTT, adding subtitles, transcribing without uploading, accuracy, Whisper), Article + 3-level breadcrumb data,
+  per-page lazy content (resolvers), a language/option **preset** that a dropped file hands to the uploader, accurate sitemap
+  `<lastmod>` (scripts/sitemap-lastmod.mjs), `scripts/gen-sitemap.mjs`, `scripts/audit-prerender.mjs` and a rewritten
+  `deploy/SEO.md` for Cloudflare Pages. Home h1 now starts with "Video to text". Every new page was fact-checked against the code by
+  an independent reviewer and corrected (one-file drop box, Search/Replace instead of Ctrl+F, real option labels, sizes incl. the
+  word-timing download, honest limits). Measured, not enabled: Angular hydration (performance 92 vs 91, same LCP, +12 kB).
+  **Product finding:** "Translate to English" with Large v3 Turbo ("High accuracy") probably returns the original language
+  (OpenAI documents that turbo was not trained for translation) and Distil Large v3 hears English only: the uploader now shows a
+  note, nothing else about the engine changed. Dashboard-only items for the owner are in `deploy/SEO.md` (Search Console DNS record,
+  managed robots.txt block, e-mail obfuscation, Crawler Hints). Tests: frontend 80 files / 2,882; backend 902 passed + 17 skipped.
