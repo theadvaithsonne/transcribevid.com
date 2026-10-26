@@ -59,6 +59,8 @@ export interface JobRunnerDeps {
   now?: () => number;
   newId?: () => string;
   log?: RunnerLog;
+  /** navigator.onLine (tests replace it) */
+  online?: () => boolean;
 }
 
 const ACTIVE = new Set(['queued', 'running']);
@@ -69,6 +71,8 @@ type RunFailure = { cancelled?: boolean; code?: string; userMessage?: string; me
 const MAX_WORKER_RETRIES = 1;
 /** a model-download line is re-sent at most this often (the engine reports every chunk) */
 const DOWNLOAD_EMIT_MS = 250;
+/** how often the reached download size is written to the job (a reload loop with no download progress is stuck) */
+const DOWNLOAD_WRITE_MS = 3000;
 
 function randomHex(): string {
   const b = new Uint8Array(16);
@@ -76,6 +80,24 @@ function randomHex(): string {
   else for (let i = 0; i < b.length; i++) b[i] = Math.floor(Math.random() * 256);
   return [...b].map((x) => x.toString(16).padStart(2, '0')).join('');
 }
+
+/** A File the browser can no longer read: moved, deleted or changed on disk after it was chosen, or a cloud file gone. */
+export const UNREADABLE_FILE =
+  'This file could not be read. It may have been moved, renamed or changed after you chose it. Choose it again.';
+/** The DOMException names of a File whose data is gone (Chrome / Firefox / Safari). */
+const UNREADABLE_NAMES = new Set(['NotReadableError', 'NotFoundError']);
+export const NO_STORED_FILE = 'The file of this transcript is no longer stored in this browser. Choose it again.';
+/**
+ * A run that failed without a reason of its own while the device is offline. The first run fetches the engine's code
+ * (the worker script, the runtime) besides the model, and a worker whose script cannot load reads as a crash ("a
+ * smaller model needs less memory"), which sends the visitor the wrong way.
+ */
+export const OFFLINE_ERROR =
+  'This device is offline. The first transcription needs the internet to fetch the speech engine. Connect, then use ' +
+  'Re-transcribe; what was already downloaded is kept.';
+/** Failures that say nothing about the file: offline, they are most likely the missing connection. */
+const NETWORK_SUSPECT_CODES = new Set(['worker-crashed', 'failed']);
+const browserOnline = () => (globalThis as { navigator?: { onLine?: boolean } }).navigator?.onLine !== false;
 
 function storeError(e: unknown): never {
   if (e instanceof RunnerError) throw e;
@@ -85,7 +107,67 @@ function storeError(e: unknown): never {
   if (err?.name === 'QuotaExceededError') {
     throw new RunnerError(507, 'This browser has no room left to keep the file. Delete old transcripts or free some space.', err.message);
   }
+  if (err?.name && UNREADABLE_NAMES.has(err.name)) throw new RunnerError(400, UNREADABLE_FILE, `${err.name}: ${err.message}`);
   throw e;
+}
+
+/** Reads the first byte, which is where a File whose data is gone fails (instead of deep inside the store or the decoder). */
+async function readFirstByte(file: Blob): Promise<void> {
+  const head = file.slice(0, 1);
+  if (typeof head.arrayBuffer === 'function') {
+    await head.arrayBuffer();
+    return;
+  }
+  await new Promise<void>((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve();
+    r.onerror = () => reject(r.error);
+    r.readAsArrayBuffer(head);
+  });
+}
+
+const isCount = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v) && v >= 0;
+const isTime = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+
+/**
+ * The stored checkpoint when a worker can continue from it, else null (the job then starts again from the beginning).
+ * It was written by the worker of an earlier page, which may be an older version of the site with another shape, or a
+ * store that lost a write: a field that is missing or of the wrong kind must not crash the run or keep the wrong lines.
+ * `lines` = the lines stored with the job; the checkpoint may not claim more.
+ */
+export function usableCheckpoint(cp: unknown, lines: number): ResumeState | null {
+  if (!cp || typeof cp !== 'object') return null;
+  const c = cp as Partial<Record<keyof ResumeState, unknown>>;
+  const f = c.filter as Partial<Record<string, unknown>> | null | undefined;
+  const d = f?.['dropped'] as Partial<Record<string, unknown>> | null | undefined;
+  const ok =
+    c.redecode === true &&
+    isCount(c.seek) &&
+    isCount(c.emitted) &&
+    c.emitted <= lines &&
+    isCount(c.windowsDone) &&
+    isCount(c.samples) &&
+    isTime(c.duration) &&
+    isTime(c.lastSpeechTimestamp) &&
+    typeof c.scale === 'number' &&
+    Number.isFinite(c.scale) &&
+    typeof c.languageProbability === 'number' &&
+    Number.isFinite(c.languageProbability) &&
+    (c.language === null || typeof c.language === 'string') &&
+    typeof c.context === 'string' &&
+    typeof c.wordTimestamps === 'boolean' &&
+    (c.streaming === undefined || typeof c.streaming === 'boolean') &&
+    !!f &&
+    isCount(f['repeats']) &&
+    isCount(f['kept']) &&
+    (f['lastNorm'] === null || typeof f['lastNorm'] === 'string') &&
+    !!d &&
+    isCount(d['empty']) &&
+    isCount(d['no_speech']) &&
+    isCount(d['repetition']);
+  if (!ok) return null;
+  // the audio is decoded again on resume: whatever a checkpoint carries there is replaced, never trusted
+  return { ...(c as ResumeState), pcm: new Int16Array(0), chunks: null, qwen: undefined };
 }
 
 export class JobRunner {
@@ -99,6 +181,7 @@ export class JobRunner {
   /** the model download of the running job (memory only, like the server's live fields) */
   private readonly downloads = new Map<string, ModelDownload>();
   private lastDownloadEmit = 0;
+  private lastDownloadWrite = 0;
 
   private readonly busyListeners = new Set<(busy: boolean) => void>();
 
@@ -179,6 +262,12 @@ export class JobRunner {
   /** POST /api/jobs: the file stays in this browser (IndexedDB), the job is queued. */
   async create(file: File, options: Partial<JobOptions>): Promise<StoredJob> {
     if (!file.size) throw new RunnerError(400, 'The uploaded file is empty.');
+    try {
+      await readFirstByte(file);
+    } catch (e) {
+      const err = e as { name?: string; message?: string } | null;
+      throw new RunnerError(400, UNREADABLE_FILE, `${err?.name ?? 'Error'}: ${err?.message ?? e}`);
+    }
     const opts = await this.validate(options);
     const job: Job = {
       id: (this.deps.newId ?? randomHex)(),
@@ -210,6 +299,9 @@ export class JobRunner {
       storeError(e);
     }
     this.log('INFO', `job ${stored.id.slice(0, 8)} queued: ${file.name} (model=${opts.model}, language=${opts.language ?? 'auto'})`);
+    if (this.store.mediaOnlyInPage(stored.id)) {
+      this.log('WARNING', `job ${stored.id.slice(0, 8)}: this browser would not keep a copy of the file (no room); keep this page open until it is done`);
+    }
     this.emit({ type: 'job', job: stored });
     this.enqueue(stored.id);
     return stored;
@@ -221,7 +313,8 @@ export class JobRunner {
     if (!src) throw new RunnerError(404, 'Job not found');
     if (ACTIVE.has(src.status)) throw new RunnerError(409, 'This job is still in progress.');
     const media = await this.store.getMedia(id);
-    if (!media) throw new RunnerError(404, 'Job not found');
+    // the transcript is there, its file is not (the browser had no room for a copy, and the page was reloaded)
+    if (!media) throw new RunnerError(409, NO_STORED_FILE);
     const opts = await this.validate({ ...src.options, ...changes });
     const job: Job = {
       ...src,
@@ -371,6 +464,16 @@ export class JobRunner {
     }
   }
 
+  /** The device plan's reason why `model` cannot run here now, null when it can (or the plan cannot be asked). */
+  private async whyNotHere(model: string): Promise<string | null> {
+    if (!this.deps.gate) return null;
+    try {
+      return (await this.deps.gate())(model);
+    } catch {
+      return null;
+    }
+  }
+
   // ------------------------------------------------------------------ the queue
   private enqueue(id: string, first = false) {
     const wasBusy = this.busy;
@@ -433,12 +536,26 @@ export class JobRunner {
     if (!job || job.status !== 'queued') return; // cancelled or deleted while waiting
     const media = await this.store.getMedia(id);
     if (!media) {
-      await this.finish(id, 'error', { error: 'The file of this transcript is no longer stored in this browser. Choose it again.' });
+      await this.finish(id, 'error', { error: NO_STORED_FILE });
+      return;
+    }
+    // A job continued after a reload was checked against this device when it was created, not now: a browser that lost
+    // WebGPU after a crash of its graphics process no longer offers the big models. Say so instead of trying anyway.
+    const why = await this.whyNotHere(job.options.model);
+    if (why) {
+      this.log('WARNING', `job ${id.slice(0, 8)}: ${job.options.model} is not offered on this device any more (${why})`);
+      await this.finish(id, 'error', {
+        error: `The model '${job.options.model}' cannot run in this browser now: ${why.replace(/\.$/, '')}. Run it again with another model.`,
+      });
       return;
     }
     // a job continued after its page went away keeps the lines it had up to its checkpoint (later ones come again)
     // low-memory mode streams the audio; it gives the same windows and lines as the whole-file path (timeline.ts)
-    const resume: ResumeState | null = job.checkpoint ? { ...job.checkpoint, ...(job.low_memory ? { streaming: true } : {}) } : null;
+    const checkpoint = job.checkpoint ? usableCheckpoint(job.checkpoint, job.segments.length) : null;
+    if (job.checkpoint && !checkpoint) {
+      this.log('WARNING', `job ${id.slice(0, 8)}: its saved position cannot be used (an older version of the site?); starting it again from the beginning`);
+    }
+    const resume: ResumeState | null = checkpoint ? { ...checkpoint, ...(job.low_memory ? { streaming: true } : {}) } : null;
     const kept = resume ? job.segments.slice(0, resume.emitted) : [];
     let current = await this.patch(id, {
       status: 'running',
@@ -446,6 +563,7 @@ export class JobRunner {
       progress: resume ? job.progress : 0,
       error: null,
       segments: kept,
+      ...(job.checkpoint && !checkpoint ? { checkpoint: null } : {}),
     });
     this.log(
       'INFO',
@@ -465,12 +583,19 @@ export class JobRunner {
     let transcribingSince: number | null = null;
     let chain: Promise<unknown> = Promise.resolve();
     let failure: unknown = null;
+    let cancelSeen = false;
     // events arrive synchronously; their handling (store writes, Hinglish) runs in order on this chain
     const onEvent = (e: EngineEvent) => {
       chain = chain
         .then(() => this.onEngineEvent(id, e, options, segments, () => transcribingSince, (t) => (transcribingSince = t)))
         .then((j) => {
-          if (j) current = j;
+          if (!j) return;
+          current = j;
+          // Cancel pressed in another tab: that tab only marks the stored job, the engine runs here. Stop it.
+          if (j.cancel_requested && !cancelSeen) {
+            cancelSeen = true;
+            this.deps.engine.cancel(id);
+          }
         })
         .catch((err) => {
           failure ??= err;
@@ -519,7 +644,10 @@ export class JobRunner {
         this.enqueue(id, true);
       } else {
         this.log('ERROR', `job ${id.slice(0, 8)} failed: ${runError.technical ?? runError.message}`);
-        await this.finish(id, 'error', { error: runError.userMessage ?? runError.message ?? 'Transcription failed.' });
+        const offline = NETWORK_SUSPECT_CODES.has(runError.code ?? '') && !(this.deps.online ?? browserOnline)();
+        await this.finish(id, 'error', {
+          error: offline ? OFFLINE_ERROR : (runError.userMessage ?? runError.message ?? 'Transcription failed.'),
+        });
       }
       return;
     }
@@ -562,9 +690,15 @@ export class JobRunner {
         const t = this.now();
         if (t - this.lastDownloadEmit < DOWNLOAD_EMIT_MS && e.loaded < e.total) return null;
         this.lastDownloadEmit = t;
+        if (t - this.lastDownloadWrite >= DOWNLOAD_WRITE_MS || e.loaded >= e.total) {
+          this.lastDownloadWrite = t;
+          const written = await this.store.patch(id, { downloaded_bytes: e.loaded });
+          this.emit({ type: 'job', job: written });
+          return written;
+        }
         const job = await this.store.get(id);
         if (job) this.emit({ type: 'job', job });
-        return null;
+        return job; // (a long download is where a cancel from another tab is noticed)
       }
       case 'language':
         return this.patch(id, {
@@ -593,8 +727,7 @@ export class JobRunner {
       }
       case 'checkpoint':
         // where a reloaded page continues: stored with the job, after the lines it covers (same chain, in order)
-        await this.store.patch(id, { checkpoint: e.state });
-        return null;
+        return this.store.patch(id, { checkpoint: e.state });
       case 'warning':
         this.log('WARNING', `job ${id.slice(0, 8)}: ${e.message}`);
         return null;

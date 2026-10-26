@@ -1305,6 +1305,19 @@ describe('JobPage', () => {
         ctl.expectNone((r) => r.method === 'PATCH');
       });
 
+      it('in the browser edition the open line is saved in this browser, not sent to a server that is not there', () => {
+        show({});
+        store.health.set(makeBrowserHealth());
+        const send = vi.fn(() => Promise.resolve(new Response(null)));
+        vi.stubGlobal('fetch', send);
+        list().edit(page.job()!.segments[1]);
+        list().draft = 'world, kept';
+        window.dispatchEvent(new Event('pagehide'));
+        expect(send).not.toHaveBeenCalled();
+        expect(patch('a').request.body).toEqual({ segments: [{ id: 1, text: 'world, kept' }] }); // through the transport
+        expect(list().editingId()).toBeNull();
+      });
+
       it('closing or reloading the tab with an unsaved change (or a save on its way) makes the browser ask first', () => {
         show({});
         const leave = () => {

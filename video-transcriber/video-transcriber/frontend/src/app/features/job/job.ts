@@ -611,7 +611,14 @@ export class JobPage {
   onPageHide() {
     const j = this.job();
     const edit = this.list?.pendingEdit();
-    if (!j || !edit || typeof fetch !== 'function') return;
+    if (!j || !edit) return;
+    // in-browser edition: there is no server to send it to (the request went to the static host and the edit was
+    // lost); it is written to this browser's storage instead, which a page that is going away still completes
+    if (this.site.inBrowser()) {
+      this.flushEdit(j.id);
+      return;
+    }
+    if (typeof fetch !== 'function') return;
     this.list?.editingId.set(null);
     try {
       void fetch(`/api/jobs/${encodeURIComponent(j.id)}`, {

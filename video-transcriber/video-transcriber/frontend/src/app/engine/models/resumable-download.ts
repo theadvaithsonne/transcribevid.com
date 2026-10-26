@@ -894,17 +894,37 @@ function linkSignals(...signals: (AbortSignal | undefined)[]): {
   };
 }
 
-/** Fires when no byte arrived for `ms` (paused while a part is written). One interval, not a timer per read. */
-class Watchdog {
+/**
+ * Fires when no byte arrived for `ms` (paused while a part is written). One interval, not a timer per read.
+ *
+ * A tick that comes more than `ms` after the previous one means the timer itself was not running: the phone froze the
+ * tab in the background, the laptop slept, or a hidden tab's timers were held back for a minute. The bytes of that
+ * time may be waiting in the network stack, unread, so that is not a dead connection: the window starts again instead
+ * of aborting a download that is fine.
+ */
+export class Watchdog {
   fired = false;
-  private last = Date.now();
+  private last: number;
+  private lastTick: number;
   private paused = false;
   private readonly timer: ReturnType<typeof setInterval>;
 
-  constructor(ms: number, onStall: () => void) {
+  constructor(
+    ms: number,
+    onStall: () => void,
+    private readonly now: () => number = Date.now,
+  ) {
+    this.last = this.lastTick = now();
     this.timer = setInterval(
       () => {
-        if (this.paused || this.fired || Date.now() - this.last < ms) return;
+        const t = this.now();
+        const frozen = t - this.lastTick > ms;
+        this.lastTick = t;
+        if (frozen) {
+          this.last = t;
+          return;
+        }
+        if (this.paused || this.fired || t - this.last < ms) return;
         this.fired = true;
         onStall();
       },
@@ -913,7 +933,7 @@ class Watchdog {
   }
 
   feed(): void {
-    this.last = Date.now();
+    this.last = this.now();
   }
 
   pause(): void {
@@ -922,7 +942,7 @@ class Watchdog {
 
   resume(): void {
     this.paused = false;
-    this.last = Date.now();
+    this.last = this.now();
   }
 
   stop(): void {

@@ -14,6 +14,7 @@ import {
   PartStore,
   pruneDownloads,
   savedDownload,
+  Watchdog,
 } from './resumable-download';
 
 // The resumable downloader against a fake server that serves byte ranges and can drop the connection mid-body, ignore
@@ -510,5 +511,58 @@ describe('saved parts housekeeping', () => {
     expect(parseContentRange('bytes 0-100/100')).toBeNull();
     expect(parseContentRange(null)).toBeNull();
     expect(parseContentRange('items 0-1/2')).toBeNull();
+  });
+});
+
+describe('Watchdog (the stall timer of one request)', () => {
+  // a clock of its own: the specs move it without the timers (a frozen tab) or together with them
+  let t = 0;
+  const now = () => t;
+  beforeEach(() => {
+    vi.useFakeTimers();
+    t = 1_000_000;
+  });
+  afterEach(() => vi.useRealTimers());
+  /** `ms` of real time: the clock and the timers move together */
+  const pass = (ms: number) => {
+    for (let i = 0; i < ms / 50; i++) {
+      t += 50;
+      vi.advanceTimersByTime(50);
+    }
+  };
+
+  it('fires after `ms` without a byte, not while bytes keep coming or a part is being written', () => {
+    const stall = vi.fn();
+    const w = new Watchdog(1000, stall, now);
+    pass(900);
+    w.feed();
+    pass(900);
+    expect(stall).not.toHaveBeenCalled();
+    w.pause();
+    pass(3000);
+    expect(stall).not.toHaveBeenCalled();
+    w.resume();
+    pass(900);
+    expect(stall).not.toHaveBeenCalled();
+    pass(400); // (the interval ticks every 250 ms)
+    expect(stall).toHaveBeenCalledTimes(1);
+    expect(w.fired).toBe(true);
+    w.stop();
+  });
+
+  it('a tab that was frozen in the background is not a stalled connection: the window starts again', () => {
+    const stall = vi.fn();
+    const w = new Watchdog(1000, stall, now);
+    pass(500);
+    t += 60_000; // the phone froze the page for a minute: the clock moved, no timer ran
+    vi.advanceTimersByTime(250); // the first tick after it wakes
+    expect(stall).not.toHaveBeenCalled();
+    pass(800); // the bytes that were waiting are read now
+    w.feed();
+    pass(800);
+    expect(stall).not.toHaveBeenCalled();
+    pass(400); // and a connection that is really dead is still caught
+    expect(stall).toHaveBeenCalledTimes(1);
+    w.stop();
   });
 });

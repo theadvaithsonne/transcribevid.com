@@ -37,17 +37,22 @@ export const DEFAULT_STALE_AFTER_SECONDS = 600;
 /** The Cache API cache Transformers.js keeps the model files in. */
 export const MODEL_CACHE_NAME = 'transformers-cache';
 export const INTERRUPTED_ERROR = 'The page was closed or reloaded while this job was running. Run it again.';
+/** `resumeInterrupted`, when the job's file is not stored (the browser had no room for a copy): "Run it again" cannot work. */
+export const INTERRUPTED_NO_FILE_ERROR =
+  'The page was closed or reloaded while this job was running, and this browser could not keep a copy of the file. ' +
+  'Choose the file again to transcribe it.';
 /** `resumeInterrupted`: a job that keeps losing its page without getting any further ends with one of these. */
 export const STUCK_ERROR =
   'This page reloaded several times while working on this file without getting any further, which usually means the ' +
   'device ran out of memory. Try the Fastest quality, or a shorter file.';
 export const STUCK_LOADING_ERROR =
-  'This page reloaded several times while the speech model was loading. Press Try again: the part of the model that ' +
-  'is already downloaded is kept.';
-/** Interruptions in a row without a new line of transcript before the job ends (a reload or crash loop). */
+  'This page reloaded several times while the speech model was loading, which usually means the device ran out of ' +
+  'memory for this model. Try the Fastest quality. The downloaded part of the model is kept.';
+/**
+ * Interruptions in a row without progress before the job ends (a reload or crash loop). Progress is a new line of
+ * transcript, or more of the model downloaded: a refresh during a slow download continues and never counts.
+ */
 export const MAX_STUCK_RESUMES = 3;
-/** The same while the model loads: a refresh during a slow download is common and continues where it stopped. */
-export const MAX_STUCK_RESUMES_LOADING = 8;
 const META_KEY = 'session';
 
 export interface LanguageCandidate {
@@ -73,6 +78,10 @@ export interface StoredJob extends Job {
   stuck_count?: number;
   /** segment_count at the last interruption: more lines since then is progress */
   resume_mark?: number;
+  /** bytes of the model download reached so far (the runner writes it every few seconds while downloading) */
+  downloaded_bytes?: number;
+  /** downloaded_bytes at the last interruption: more since then is progress */
+  download_mark?: number;
   /** run it in low-memory mode: set after an interruption without progress, or after the engine worker crashed */
   low_memory?: boolean;
   /** automatic restarts after the engine worker itself crashed (the page stayed) */
@@ -80,7 +89,16 @@ export interface StoredJob extends Job {
 }
 
 /** The bookkeeping of resuming: never copied into a re-run, never shown on the page. */
-export const RESUME_FIELDS = ['checkpoint', 'resume_count', 'stuck_count', 'resume_mark', 'low_memory', 'worker_retries'] as const;
+export const RESUME_FIELDS = [
+  'checkpoint',
+  'resume_count',
+  'stuck_count',
+  'resume_mark',
+  'downloaded_bytes',
+  'download_mark',
+  'low_memory',
+  'worker_retries',
+] as const;
 
 /** Input of put(): bookkeeping fields are optional, the store fills them. */
 export type JobInput = Job &
@@ -101,9 +119,11 @@ export interface SessionEnded {
   jobCount: number;
 }
 
+/** navigator.locks, the parts the store uses. The callback gets null when `ifAvailable` found the lock taken. */
 export interface LockManagerLike {
-  request(name: string, callback: () => Promise<void>): Promise<unknown>;
-  query(): Promise<{ held?: { name?: string }[] }>;
+  request(name: string, callback: (lock: unknown) => Promise<void>): Promise<unknown>;
+  request(name: string, options: { ifAvailable?: boolean }, callback: (lock: unknown) => Promise<void>): Promise<unknown>;
+  query(): Promise<{ held?: { name?: string }[]; pending?: { name?: string }[] }>;
 }
 
 export interface CacheStorageLike {
@@ -187,6 +207,17 @@ export class SessionStore {
   /** jobs queued again for this page after their page went away (resumeInterrupted), oldest first, not yet taken */
   private readonly recovered: string[] = [];
   private readonly recoveredListeners = new Set<() => void>();
+  /**
+   * Jobs a background check found without their page for the first time. They are taken over at the next check, so
+   * that a page that is only reloading (it opens within seconds and continues the job itself) keeps its own job: the
+   * job then shows live in the tab the visitor is looking at, not in another tab in the background.
+   */
+  private readonly suspects = new Set<string>();
+  /**
+   * Source files this browser would not store (no room left, or Safari refusing a large Blob): kept for this page only,
+   * so the job still runs now. A reload loses them, and the job then ends with INTERRUPTED_NO_FILE_ERROR.
+   */
+  private readonly pageMedia = new Map<string, Blob>();
   private endedState: SessionEnded | null = null;
   private closed = false;
   /** serialises read-modify-write operations so two quick patches cannot lose each other */
@@ -209,7 +240,7 @@ export class SessionStore {
     const store = new SessionStore(backend, opts);
     const meta = await backend.get<SessionMeta>('meta', META_KEY);
     store.meta = meta ?? (await store.newMeta());
-    await store.checkExpiry();
+    await store.check(true);
     const every = opts.checkIntervalMs ?? DEFAULT_CHECK_INTERVAL_MS;
     if (every > 0) {
       store.timer = setInterval(() => {
@@ -259,7 +290,12 @@ export class SessionStore {
 
   /** The source file of a job (for the player and re-run), or null. */
   async getMedia(id: string): Promise<Blob | null> {
-    return (await this.backend.get<Blob>('media', id)) ?? null;
+    return this.pageMedia.get(id) ?? (await this.backend.get<Blob>('media', id)) ?? null;
+  }
+
+  /** True when the browser would not store the job's file and only this page holds it (a reload loses the job). */
+  mediaOnlyInPage(id: string): boolean {
+    return this.pageMedia.has(id);
   }
 
   // ------------------------------------------------------------------ writes
@@ -283,7 +319,23 @@ export class SessionStore {
       ];
       if (media) ops.push({ store: 'media', key: job.id, value: media });
       ops.push(this.touchOp());
-      await this.backend.write(ops);
+      try {
+        await this.backend.write(ops);
+        if (media) this.pageMedia.delete(job.id); // stored now: the browser keeps it
+      } catch (e) {
+        // a file whose data is gone (moved or deleted after it was chosen) is no better kept in the page
+        const name = (e as { name?: string } | null)?.name;
+        if (!media || name === 'NotReadableError' || name === 'NotFoundError') throw e;
+        // The copy of the file is what failed, most likely (a 2 GB video on a phone with little room, Safari's "Error
+        // preparing Blob/File data"): store the job without it and keep the file in this page, so it is transcribed
+        // now. When the job itself cannot be written either, the original error is the one to report.
+        try {
+          await this.backend.write(ops.filter((op) => op.store !== 'media'));
+        } catch {
+          throw e;
+        }
+        this.pageMedia.set(job.id, media);
+      }
       this.track(rec);
       return { ...rec, segments };
     });
@@ -389,6 +441,7 @@ export class SessionStore {
         { store: 'media', key: id, delete: true },
         this.touchOp(),
       ]);
+      this.pageMedia.delete(id);
       this.release(id);
     });
   }
@@ -401,6 +454,7 @@ export class SessionStore {
     return this.serial(async () => {
       const n = (await this.backend.getAll<JobRecord>('jobs')).length;
       await this.backend.clear();
+      this.pageMedia.clear();
       for (const id of [...this.ownLocks.keys()]) this.release(id);
       this.meta = await this.newMeta();
       return n;
@@ -472,16 +526,23 @@ export class SessionStore {
    * when it has been idle for `idleMinutes` with no job in progress. True when it ended the session now.
    */
   checkExpiry(): Promise<boolean> {
+    return this.check(false);
+  }
+
+  /** `atOpen`: the check of a page that just opened takes over a job without its page at once (see `suspects`). */
+  private check(atOpen: boolean): Promise<boolean> {
     return this.serial(async () => {
       if (this.closed) return false;
       await this.refreshMeta();
       const jobs = await this.backend.getAll<JobRecord>('jobs');
+      if (!this.locks) await this.heartbeat(jobs);
       const alive = await this.aliveJobs(jobs);
-      await this.recoverInterrupted(jobs, alive);
-      if (alive.length > 0) return false;
+      const waiting = await this.recoverInterrupted(jobs, alive, atOpen);
+      if (alive.length > 0 || waiting > 0) return false;
       const idle = this.nowSeconds() - this.meta.last_activity;
       if (idle <= this.idleSeconds) return false;
       await this.backend.clear();
+      this.pageMedia.clear();
       for (const id of [...this.ownLocks.keys()]) this.release(id);
       this.meta = await this.newMeta();
       // an idle session that never held anything ends silently (there is nothing the visitor lost)
@@ -499,6 +560,7 @@ export class SessionStore {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
     for (const id of [...this.ownLocks.keys()]) this.release(id);
+    this.pageMedia.clear();
   }
 
   private async refreshMeta(): Promise<void> {
@@ -511,6 +573,26 @@ export class SessionStore {
         : m;
   }
 
+  /**
+   * Without Web Locks a job is alive while its last write is fresh, and a long model download or a slow window writes
+   * nothing for minutes: another tab would then take the job for one whose page went away and run it a second time.
+   * Every check refreshes the jobs this page works on (not their version: nothing in them changed).
+   */
+  private async heartbeat(jobs: JobRecord[]): Promise<void> {
+    const now = this.nowSeconds();
+    const every = (this.opts.staleAfterSeconds ?? DEFAULT_STALE_AFTER_SECONDS) / 2;
+    const ops: WriteOp[] = [];
+    for (const j of jobs) {
+      if (!ACTIVE.has(j.status) || !this.ownLocks.has(j.id) || now - (j.updated_at ?? 0) < every) continue;
+      // read again just before the write: a cancel another tab wrote a moment ago must not be lost
+      const cur = await this.backend.get<JobRecord>('jobs', j.id);
+      if (!cur || !ACTIVE.has(cur.status)) continue;
+      j.updated_at = now;
+      ops.push({ store: 'jobs', key: j.id, value: { ...cur, updated_at: now } });
+    }
+    if (ops.length) await this.backend.write(ops);
+  }
+
   /** Queued / running jobs that something is still working on: this page, another tab (lock), or a fresh write. */
   private async aliveJobs(jobs: JobRecord[]): Promise<string[]> {
     const active = jobs.filter((j) => ACTIVE.has(j.status));
@@ -519,7 +601,8 @@ export class SessionStore {
     if (this.locks) {
       try {
         const q = await this.locks.query();
-        held = new Set((q.held ?? []).map((h) => h.name ?? ''));
+        // a pending request is a page that is alive and asked for the lock a moment ago (granted any time now)
+        held = new Set([...(q.held ?? []), ...(q.pending ?? [])].map((h) => h.name ?? ''));
       } catch {
         held = new Set();
       }
@@ -536,24 +619,89 @@ export class SessionStore {
       .map((j) => j.id);
   }
 
-  private async recoverInterrupted(jobs: JobRecord[], alive: string[]): Promise<void> {
+  /**
+   * Queues again (or ends) the jobs whose page went away. Returns how many such jobs a background check leaves for the
+   * next check (`suspects`); they count as alive meanwhile, so the session is not ended under a page that is reloading.
+   */
+  private async recoverInterrupted(jobs: JobRecord[], alive: string[], atOpen: boolean): Promise<number> {
+    const dead = jobs.filter((j) => ACTIVE.has(j.status) && !alive.includes(j.id));
+    for (const id of [...this.suspects]) if (!dead.some((j) => j.id === id)) this.suspects.delete(id);
     const ops: WriteOp[] = [];
-    const requeued: JobRecord[] = [];
-    for (const j of jobs) {
-      if (!ACTIVE.has(j.status) || alive.includes(j.id)) continue;
+    const written: JobRecord[] = [];
+    let waiting = 0;
+    for (const j of dead) {
+      // without Web Locks the 10-minute heartbeat rule already waited; with them, the page itself may be reopening
+      if (this.locks && !atOpen && !this.suspects.has(j.id)) {
+        this.suspects.add(j.id);
+        waiting++;
+        continue;
+      }
+      // two tabs that open at the same moment (a browser restoring its tabs) both find the job without a lock: only
+      // the one that gets its lock continues it, so it is never transcribed twice at once
+      if (!(await this.claim(j.id))) continue;
+      const cur = await this.backend.get<JobRecord>('jobs', j.id);
+      if (!cur || !ACTIVE.has(cur.status) || cur.version !== j.version || (await this.wantedElsewhere(j.id))) {
+        this.release(j.id); // finished, deleted or taken over meanwhile, or a live page is asking for it
+        continue;
+      }
+      this.suspects.delete(j.id);
       const hasMedia = !!this.opts.resumeInterrupted && !!(await this.backend.get<Blob>('media', j.id));
-      const rec = this.afterInterruption(j, hasMedia);
+      const rec = this.afterInterruption(cur, hasMedia);
       ops.push({ store: 'jobs', key: j.id, value: rec });
-      if (rec.status === 'queued') requeued.push(rec);
+      written.push(rec);
     }
-    if (!ops.length) return;
-    await this.backend.write(ops);
-    requeued.sort((a, b) => a.created_at - b.created_at);
-    for (const r of requeued) {
-      this.track(r); // this page holds it now: another tab's check leaves it alone
-      this.recovered.push(r.id);
+    if (!ops.length) return waiting;
+    try {
+      await this.backend.write(ops);
+    } catch (e) {
+      for (const r of written) this.release(r.id);
+      throw e;
     }
+    const requeued = written.filter((r) => r.status === 'queued').sort((a, b) => a.created_at - b.created_at);
+    for (const r of written) this.track(r); // a requeued job keeps the lock claimed above; an ended one lets it go
+    for (const r of requeued) this.recovered.push(r.id);
     if (requeued.length) for (const l of [...this.recoveredListeners]) l();
+    return waiting;
+  }
+
+  /**
+   * Takes a job's Web Lock only when no page holds it (`ifAvailable`). True when this page holds it now, or when
+   * there is no working Web Locks API to ask (then the heartbeat rule alone decides, as before).
+   */
+  private async claim(id: string): Promise<boolean> {
+    if (!this.locks || this.ownLocks.has(id)) return true;
+    let release!: () => void;
+    const held = new Promise<void>((r) => (release = r));
+    const granted = await new Promise<boolean>((resolve) => {
+      let answered = false;
+      const answer = (v: boolean) => {
+        if (answered) return;
+        answered = true;
+        resolve(v);
+      };
+      try {
+        this.locks!.request(lockName(id), { ifAvailable: true }, async (lock) => {
+          answer(!!lock);
+          if (lock) await held;
+        }).catch(() => answer(true));
+      } catch {
+        answer(true);
+      }
+    });
+    if (granted) this.ownLocks.set(id, release);
+    else release();
+    return granted;
+  }
+
+  /** Another page asked for the job's lock (it is alive and running the job, but its lock was not granted yet). */
+  private async wantedElsewhere(id: string): Promise<boolean> {
+    if (!this.locks) return false;
+    try {
+      const q = await this.locks.query();
+      return (q.pending ?? []).some((p) => p.name === lockName(id));
+    } catch {
+      return false;
+    }
   }
 
   /** What a queued / running job becomes when its page went away: queued again (resumeInterrupted), or ended. */
@@ -572,15 +720,15 @@ export class SessionStore {
     });
     if (!this.opts.resumeInterrupted) return ended('error', INTERRUPTED_ERROR);
     if (j.cancel_requested) return ended('cancelled', null); // the visitor was cancelling it anyway
-    if (!hasMedia) return ended('error', INTERRUPTED_ERROR);
+    if (!hasMedia) return ended('error', INTERRUPTED_NO_FILE_ERROR);
     const lines = j.segment_count ?? 0;
+    const bytes = j.downloaded_bytes ?? 0;
     const loading = j.phase === 'loading_model';
-    // a job that never started, or wrote new lines since the last interruption, is not stuck
-    const progressed = j.status === 'queued' || lines > (j.resume_mark ?? -1);
+    // a job that never started, wrote new lines, or downloaded more of its model since the last interruption is not
+    // stuck; a model that is downloaded but crashes the tab while it loads into memory is (it never gets further)
+    const progressed = j.status === 'queued' || lines > (j.resume_mark ?? -1) || (loading && bytes > (j.download_mark ?? -1));
     const stuck = progressed ? 0 : (j.stuck_count ?? 0) + 1;
-    if (stuck >= (loading ? MAX_STUCK_RESUMES_LOADING : MAX_STUCK_RESUMES)) {
-      return ended('error', loading ? STUCK_LOADING_ERROR : STUCK_ERROR);
-    }
+    if (stuck >= MAX_STUCK_RESUMES) return ended('error', loading ? STUCK_LOADING_ERROR : STUCK_ERROR);
     return {
       ...j,
       status: 'queued',
@@ -592,6 +740,7 @@ export class SessionStore {
       resume_count: (j.resume_count ?? 0) + (j.status === 'running' ? 1 : 0),
       stuck_count: stuck,
       resume_mark: lines,
+      download_mark: bytes,
       // twice without progress outside the download: try the low-memory path from now on
       low_memory: !!j.low_memory || (stuck > 0 && !loading),
     };

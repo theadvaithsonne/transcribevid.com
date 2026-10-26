@@ -1,6 +1,6 @@
 import { NO_SPEECH, type DocumentJob } from './document';
 import { paragraphs } from './formats';
-import { canWriteJobPdf, canWritePdf, LEAD, PAGE_H, PAGE_W, pdfString, textWidth, wrapBytes, writePdf } from './pdf';
+import { canWriteJobPdf, canWritePdf, drawableTitle, LEAD, PAGE_H, PAGE_W, pdfString, textWidth, wrapBytes, writePdf } from './pdf';
 
 const MARGIN = 62; // pdf.py's page design
 const TEXT_W = PAGE_W - 2 * MARGIN;
@@ -121,6 +121,19 @@ describe('canWritePdf', () => {
     expect(canWriteJobPdf(job({ segments: [seg(0, 'hello'), seg(1, 'नमस्ते')] }))).toBe(false);
     expect(writePdf(job({ language: 'hi', segments: [seg(0, 'नमस्ते दोस्तों')] }))).toBeNull(); // the caller prints instead
     expect(canWriteJobPdf(job({ language: 'hi', segments: [seg(0, 'Namaste doston, kaise ho?')] }))).toBe(true); // Hinglish
+  });
+
+  it('a symbol only in the title (an emoji in the file name) leaves it out of the drawn title, not the whole PDF', () => {
+    expect(drawableTitle('Voice note 🎤')).toBe('Voice note');
+    expect(drawableTitle('Team🎉call ➜ notes')).toBe('Team call notes');
+    expect(drawableTitle('Board call')).toBe('Board call');
+    expect(drawableTitle('हिंदी 🎤')).toBe('हिंदी 🎤'); // letters of another script: kept, the document is printed
+    expect(drawableTitle('🎤🎤')).toBe('🎤🎤'); // nothing would be left
+    expect(canWriteJobPdf(job({ title: 'Voice note 🎤' }))).toBe(true);
+    expect(canWriteJobPdf(job({ title: 'Meeting 会议' }))).toBe(false);
+    const pdf = readPdf(writePdf(job({ title: 'Voice note 🎤' }), { now: NOW })!);
+    expect(pdf.pages[0].runs[0].text).toBe('Voice note');
+    expect(decodeHex(/\/Title <([0-9A-F]+)>/.exec(pdf.objects[5])![1])).toBe('Voice note 🎤'); // the properties keep it
   });
 });
 

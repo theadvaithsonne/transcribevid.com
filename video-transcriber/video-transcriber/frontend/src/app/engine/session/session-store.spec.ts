@@ -1,10 +1,11 @@
 import { DEFAULT_OPTIONS, Job, Segment, Stats } from '../../core/models';
 import { MemoryBackend } from './backend';
+import { openSessionBackend } from './indexeddb-backend';
 import {
   INTERRUPTED_ERROR,
+  INTERRUPTED_NO_FILE_ERROR,
   LockManagerLike,
   MAX_STUCK_RESUMES,
-  MAX_STUCK_RESUMES_LOADING,
   STUCK_ERROR,
   STUCK_LOADING_ERROR,
   MODEL_CACHE_NAME,
@@ -27,14 +28,21 @@ class Clock {
   }
 }
 
-/** navigator.locks with the parts the store uses; `external` = locks held by another tab. */
+/**
+ * navigator.locks with the parts the store uses; `external` = locks held by another tab, `externalPending` = locks
+ * another tab asked for and is waiting for. All tabs of a spec share one FakeLocks, like one browser profile.
+ */
 class FakeLocks implements LockManagerLike {
   readonly held = new Map<string, number>();
   readonly external = new Set<string>();
-  async request(name: string, cb: () => Promise<void>) {
+  readonly externalPending = new Set<string>();
+  async request(name: string, a: unknown, b?: unknown) {
+    const opts = (typeof a === 'function' ? {} : a) as { ifAvailable?: boolean };
+    const cb = (typeof a === 'function' ? a : b) as (lock: unknown) => Promise<void>;
+    if (opts.ifAvailable && (this.held.has(name) || this.external.has(name))) return cb(null);
     this.held.set(name, (this.held.get(name) ?? 0) + 1);
     try {
-      await cb();
+      await cb({ name });
     } finally {
       const n = (this.held.get(name) ?? 1) - 1;
       if (n <= 0) this.held.delete(name);
@@ -42,7 +50,10 @@ class FakeLocks implements LockManagerLike {
     }
   }
   async query() {
-    return { held: [...this.held.keys(), ...this.external].map((name) => ({ name })) };
+    return {
+      held: [...this.held.keys(), ...this.external].map((name) => ({ name })),
+      pending: [...this.externalPending].map((name) => ({ name })),
+    };
   }
 }
 
@@ -152,7 +163,8 @@ describe('SessionStore: jobs', () => {
   it('a failed write leaves nothing behind', async () => {
     const { store, backend } = await openStore();
     backend.failNextWrite = new Error('QuotaExceededError');
-    await expect(store.put(job('a'), new Blob(['x']))).rejects.toThrow('QuotaExceededError');
+    // (a write that fails only because of the file is retried without it: "a file the browser will not store" below)
+    await expect(store.put(job('a'))).rejects.toThrow('QuotaExceededError');
     expect(await store.list()).toEqual([]);
     expect(backend.size('media')).toBe(0);
   });
@@ -417,6 +429,9 @@ describe('SessionStore: reload (a new store instance on the same backend)', () =
     expect((await second.get('a'))?.status).toBe('running');
     expect(second.ended).toBeNull();
     locks.external.clear();
+    // the first background check leaves it to a page that may be reopening; the next one ends it, then the idle session
+    expect(await second.checkExpiry()).toBe(false);
+    expect((await second.get('a'))?.status).toBe('running');
     expect(await second.checkExpiry()).toBe(true); // interrupted, then idle for an hour
   });
 
@@ -432,6 +447,21 @@ describe('SessionStore: reload (a new store instance on the same backend)', () =
     clock.advance(6 * MIN);
     await second.checkExpiry();
     expect((await second.get('a'))?.status).toBe('error');
+  });
+
+  it('without Web Locks the page working on a job keeps it fresh, so another tab never runs it a second time', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const { store: tab } = await openStore(backend, clock);
+    await tab.put(job('a', { status: 'running', phase: 'loading_model' }), new Blob(['x']));
+    // a 25-minute model download without a single write of the runner; the page's check runs every minute
+    for (let m = 0; m < 25; m++) {
+      clock.advance(MIN);
+      await tab.checkExpiry();
+    }
+    const { store: other } = await openStore(backend, clock, { resumeInterrupted: true });
+    expect(other.takeRecovered()).toEqual([]);
+    expect(await other.get('a')).toMatchObject({ status: 'running', version: 1 }); // refreshed, not changed
   });
 });
 
@@ -492,11 +522,13 @@ describe('SessionStore: resumeInterrupted (a reload continues the job instead of
     expect(await second.get('a')).toMatchObject({ status: 'queued', resume_count: 0, stuck_count: 0 });
   });
 
-  it('ends a job being cancelled as cancelled, and one without its file with the old message', async () => {
+  it('ends a job being cancelled as cancelled, and one without its file with a message that asks for the file', async () => {
     expect((await (await interrupted({ cancel_requested: true })).second.get('a'))!.status).toBe('cancelled');
-    const { second } = await interrupted({}, false);
-    expect(await second.get('a')).toMatchObject({ status: 'error', error: INTERRUPTED_ERROR });
+    const { second, locks } = await interrupted({}, false);
+    // "Run it again" cannot work without the file: the message says to choose it again
+    expect(await second.get('a')).toMatchObject({ status: 'error', error: INTERRUPTED_NO_FILE_ERROR });
     expect(second.takeRecovered()).toEqual([]);
+    expect(locks.held.has('tv-job-a')).toBe(false); // an ended job does not keep the lock it was claimed with
   });
 
   it('without the option a job still ends with INTERRUPTED_ERROR', async () => {
@@ -545,13 +577,24 @@ describe('SessionStore: resumeInterrupted (a reload continues the job instead of
     expect(await store.get('a')).toMatchObject({ status: 'queued', stuck_count: 0, resume_mark: 3 });
   });
 
-  it('allows more reloads while the model loads (a slow download continues), then says so', async () => {
+  it('a reload during the model download that got further never counts; a model that crashes the tab while loading does', async () => {
     const backend = new MemoryBackend();
     const clock = new Clock();
     const locks = new FakeLocks();
     const { store: first } = await openStore(backend, clock, { locks });
     await first.put(job('a', { status: 'running', phase: 'loading_model', segments: [] }), media());
+    await first.patch('a', { downloaded_bytes: 10e6 });
     first.close();
+    // ten reloads, each after more of the model arrived: still queued, never stuck
+    for (let i = 1; i <= 10; i++) {
+      await tick();
+      const { store } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+      const rec = (await store.get('a'))!;
+      expect(rec).toMatchObject({ status: 'queued', stuck_count: 0, low_memory: false });
+      await store.patch('a', { status: 'running', phase: 'loading_model', downloaded_bytes: (10 + i) * 1e6 });
+      store.close();
+    }
+    // the download is complete, but loading it into memory kills the tab every time
     let rec: Awaited<ReturnType<SessionStore['get']>> = null;
     let opens = 0;
     for (;;) {
@@ -560,12 +603,13 @@ describe('SessionStore: resumeInterrupted (a reload continues the job instead of
       opens++;
       rec = await store.get('a');
       if (rec!.status !== 'queued') break;
-      expect(rec!.low_memory).toBe(false); // a download is not a memory problem
+      expect(rec!.low_memory).toBe(false); // the model's size, not the audio: low-memory mode does not help here
       await store.patch('a', { status: 'running', phase: 'loading_model' });
       store.close();
     }
-    expect(opens).toBe(MAX_STUCK_RESUMES_LOADING + 1);
+    expect(opens).toBe(MAX_STUCK_RESUMES + 1);
     expect(rec).toMatchObject({ status: 'error', error: STUCK_LOADING_ERROR });
+    expect(STUCK_LOADING_ERROR).toContain('Fastest');
   });
 
   it('tells the runner when a background check took over a job of a tab that went away', async () => {
@@ -581,8 +625,147 @@ describe('SessionStore: resumeInterrupted (a reload continues the job instead of
     expect(heard).not.toHaveBeenCalled(); // the tab still holds it
     tab.close();
     await tick();
+    // the first check after the tab went away gives a reloading page the chance to take its own job back
+    expect(await other.checkExpiry()).toBe(false);
+    expect(heard).not.toHaveBeenCalled();
+    expect((await other.get('b'))?.status).toBe('running');
     await other.checkExpiry();
     expect(heard).toHaveBeenCalledTimes(1);
     expect(other.takeRecovered()).toEqual(['b']);
+  });
+
+  it('a page that reloads takes its job back before another tab\'s background check does', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: other } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+    const { store: tab } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+    await tab.put(job('b', { status: 'running', phase: 'transcribing' }), media());
+    tab.close(); // the visitor presses reload
+    await tick();
+    await other.checkExpiry(); // the other tab's timer fires in the gap
+    const { store: reloaded } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+    expect(reloaded.takeRecovered()).toEqual(['b']);
+    await other.checkExpiry();
+    expect(other.takeRecovered()).toEqual([]); // the reloaded page holds it now
+    expect((await other.get('b'))?.status).toBe('queued');
+  });
+
+  it('two tabs opening at the same moment never both continue the same job', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: first } = await openStore(backend, clock, { locks });
+    await first.put(job('a', { status: 'running', phase: 'transcribing' }), media());
+    first.close();
+    await tick();
+    // a browser restoring two tabs: both checks read the job before either has claimed it
+    const [one, two] = await Promise.all([
+      openStore(backend, clock, { locks, resumeInterrupted: true }),
+      openStore(backend, clock, { locks, resumeInterrupted: true }),
+    ]);
+    const taken = [...one.store.takeRecovered(), ...two.store.takeRecovered()];
+    expect(taken).toEqual(['a']);
+    expect(await one.store.get('a')).toMatchObject({ status: 'queued', resume_count: 1 });
+  });
+
+  it('leaves a job to the page that is waiting for its lock (alive, the lock not granted yet)', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: first } = await openStore(backend, clock, { locks: null });
+    await first.put(job('c', { status: 'running', phase: 'transcribing' }), media());
+    first.close();
+    locks.externalPending.add('tv-job-c');
+    const { store: third } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+    expect(third.takeRecovered()).toEqual([]);
+    expect((await third.get('c'))?.status).toBe('running');
+  });
+});
+
+describe('openSessionBackend: memory where IndexedDB cannot be used', () => {
+  /** An IDBFactory whose open() request fails, never finishes, or throws at once. */
+  const factory = (how: 'error' | 'hang' | 'throw') =>
+    ({
+      open() {
+        if (how === 'throw') throw Object.assign(new Error('access denied'), { name: 'SecurityError' });
+        const req: { error?: unknown; onerror?: () => void } = {};
+        if (how === 'error') {
+          setTimeout(() => {
+            req.error = Object.assign(new Error('A mutation operation was attempted on a database that did not allow mutations.'), {
+              name: 'InvalidStateError',
+            });
+            req.onerror?.();
+          });
+        }
+        return req;
+      },
+    }) as unknown as IDBFactory;
+
+  it.each([
+    ['no IndexedDB at all', null, 'no IndexedDB'],
+    ['open() fails (Firefox private window)', factory('error'), 'InvalidStateError'],
+    ['open() throws (site data blocked)', factory('throw'), 'SecurityError'],
+    ['open() never finishes', factory('hang'), 'did not open'],
+  ])('%s: a working session in memory, and the reason for the Logs page', async (_name, f, why) => {
+    const reasons: string[] = [];
+    const backend = await openSessionBackend({ factory: f, timeoutMs: 20, onFallback: (r) => reasons.push(r) });
+    expect(backend).toBeInstanceOf(MemoryBackend);
+    expect(reasons).toHaveLength(1);
+    expect(reasons[0]).toContain(why);
+    const store = await SessionStore.open(backend, { locks: null, caches: null, checkIntervalMs: 0 });
+    await store.put(job('a'), new Blob(['x']));
+    expect((await store.list()).map((j) => j.id)).toEqual(['a']);
+  });
+});
+
+describe('SessionStore: a file the browser will not store', () => {
+  it('keeps the job and holds the file in this page only, so it can still be transcribed now', async () => {
+    const { store, backend } = await openStore();
+    const quota = Object.assign(new Error('The quota has been exceeded.'), { name: 'QuotaExceededError' });
+    const write = backend.write.bind(backend);
+    // the browser refuses every write that carries the big file (quota, Safari's Blob error), the rest succeeds
+    backend.write = async (ops) => {
+      if (ops.some((op) => op.store === 'media' && 'value' in op)) throw quota;
+      return write(ops);
+    };
+    const file = new Blob([new Uint8Array(10)], { type: 'video/mp4' });
+    const stored = await store.put(job('big', { status: 'queued' }), file);
+    expect(stored).toMatchObject({ id: 'big', media_type: 'video/mp4' });
+    expect(backend.size('media')).toBe(0);
+    expect(await store.getMedia('big')).toBe(file);
+    expect(store.mediaOnlyInPage('big')).toBe(true);
+    await store.patch('big', { status: 'done' });
+    expect(await store.getMedia('big')).toBe(file); // a patch keeps it
+    await store.delete('big');
+    expect(await store.getMedia('big')).toBeNull();
+  });
+
+  it('reports the original error when the job itself cannot be written either', async () => {
+    const { store, backend } = await openStore();
+    const quota = Object.assign(new Error('full'), { name: 'QuotaExceededError' });
+    backend.write = async () => {
+      throw quota;
+    };
+    await expect(store.put(job('x'), new Blob(['x']))).rejects.toBe(quota);
+    expect(store.mediaOnlyInPage('x')).toBe(false);
+  });
+
+  it('after a reload such a job ends with the message that asks for the file again', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: first } = await openStore(backend, clock, { locks });
+    const write = backend.write.bind(backend);
+    backend.write = async (ops) => {
+      if (ops.some((op) => op.store === 'media' && 'value' in op)) throw Object.assign(new Error('full'), { name: 'QuotaExceededError' });
+      return write(ops);
+    };
+    await first.put(job('a', { status: 'running', phase: 'transcribing' }), new Blob(['abc']));
+    first.close();
+    await new Promise((r) => setTimeout(r, 0));
+    const { store: second } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+    expect(await second.get('a')).toMatchObject({ status: 'error', error: INTERRUPTED_NO_FILE_ERROR });
+    expect(await second.getMedia('a')).toBeNull();
   });
 });

@@ -4,7 +4,7 @@ import { MemoryBackend } from '../session/backend';
 import { SessionStore } from '../session/session-store';
 import type { ResumeState } from '../worker/protocol';
 import { EngineRunError } from '../worker/worker-client';
-import type { RunnerEvent } from './job-runner';
+import { NO_STORED_FILE, OFFLINE_ERROR, UNREADABLE_FILE, usableCheckpoint, type RunnerEvent } from './job-runner';
 import { QWEN_BROWSER_REASON, QWEN_LANGUAGE_REFUSED, QWEN_TRANSLATE_REFUSED } from './options';
 
 describe('JobRunner (the in-browser job queue)', () => {
@@ -385,5 +385,151 @@ describe('JobRunner: a job continues after its page went away, or its engine wor
     engine.last.onEvent({ type: 'progress', id: job.id, kind: 'download', loaded: 10, total: 100, note: 'Waiting for the internet connection…' });
     await settle();
     expect(runner.download(job.id)).toEqual({ loaded: 10, total: 100, file: undefined, note: 'Waiting for the internet connection…' });
+  });
+
+  it('a checkpoint it cannot use (another version of the site wrote it) starts the job again from the beginning', async () => {
+    const backend = new MemoryBackend();
+    let t = 2_000_000_000_000;
+    const now = () => t;
+    const logs: string[] = [];
+    const pageA = await SessionStore.open(backend, { checkIntervalMs: 0, locks: null, caches: null, now });
+    const a = await makeRunner({ store: pageA, now });
+    const job = await a.runner.create(mediaFile(), { output_script: 'original' });
+    await settle();
+    const id = job.id;
+    const r1 = a.engine.last;
+    r1.onEvent({ type: 'segments', id, segments: [engineSegment(0, 0, 2, 'one'), engineSegment(1, 2, 4, 'two')], since: 0, progress: 0.3, language: 'en', duration: 90 });
+    // an older shape: no filter state (a newer worker would crash restoring it)
+    const { filter: _f, ...old } = checkpoint(2, 3000);
+    r1.onEvent({ type: 'checkpoint', id, state: old as unknown as ResumeState });
+    await settle();
+    pageA.close();
+    t += 11 * 60_000;
+    const pageB = await SessionStore.open(backend, { checkIntervalMs: 0, locks: null, caches: null, now, resumeInterrupted: true });
+    const b = await makeRunner({ store: pageB, now, log: (_l, m) => logs.push(m) });
+    await settle();
+    expect(b.engine.last.req.resume).toBeUndefined();
+    const stored = (await pageB.get(id))!;
+    expect(stored).toMatchObject({ status: 'running', progress: 0, checkpoint: null, segment_count: 0 });
+    expect(logs.some((m) => m.includes('starting it again from the beginning'))).toBe(true);
+  });
+
+  it('usableCheckpoint: accepts what the worker writes, refuses missing or wrong fields and more lines than are stored', () => {
+    const good = checkpoint(2, 3000);
+    expect(usableCheckpoint(good, 2)).toMatchObject({ emitted: 2, seek: 3000, redecode: true });
+    expect(usableCheckpoint({ ...good, pcm: new Int16Array(5) }, 2)!.pcm.length).toBe(0); // audio is never trusted
+    expect(usableCheckpoint(good, 1)).toBeNull(); // claims a line the store does not have
+    expect(usableCheckpoint(null, 2)).toBeNull();
+    expect(usableCheckpoint('x', 2)).toBeNull();
+    expect(usableCheckpoint({ ...good, seek: -1 }, 2)).toBeNull();
+    expect(usableCheckpoint({ ...good, seek: Number.NaN }, 2)).toBeNull();
+    expect(usableCheckpoint({ ...good, emitted: 1.5 }, 2)).toBeNull();
+    expect(usableCheckpoint({ ...good, redecode: undefined }, 2)).toBeNull(); // a recycle state carries the audio
+    expect(usableCheckpoint({ ...good, context: null }, 2)).toBeNull();
+    expect(usableCheckpoint({ ...good, filter: { ...good.filter, dropped: undefined } }, 2)).toBeNull();
+    expect(usableCheckpoint({ ...good, language: 7 }, 2)).toBeNull();
+  });
+
+  it('a job whose model this device no longer offers (WebGPU lost after a crash) ends with a clear message', async () => {
+    let offered = true;
+    const { runner, engine, store } = await makeRunner({ gate: async () => () => (offered ? null : 'needs WebGPU.') });
+    await runner.create(mediaFile('a.mp3'), {});
+    const b = await runner.create(mediaFile('b.mp3'), {});
+    await settle();
+    offered = false;
+    playSuccess(engine.last);
+    await settle();
+    expect(engine.runs).toHaveLength(1); // b never reached the engine
+    expect((await store.get(b.id))!.status).toBe('error');
+    expect((await store.get(b.id))!.error).toBe(
+      `The model '${b.options.model}' cannot run in this browser now: needs WebGPU. Run it again with another model.`,
+    );
+  });
+
+  it('a cancel pressed in another tab stops the run in this one', async () => {
+    const { runner, engine, store } = await makeRunner();
+    const job = await runner.create(mediaFile(), { output_script: 'original' });
+    await settle();
+    const run = engine.last;
+    await store.patch(job.id, { cancel_requested: true }); // what the other tab's runner.cancel writes
+    expect(engine.cancelled).toEqual([]);
+    run.onEvent({ type: 'progress', id: job.id, kind: 'download', loaded: 10, total: 100 });
+    await settle();
+    expect(engine.cancelled).toEqual([job.id]);
+    run.onEvent({ type: 'segments', id: job.id, segments: [engineSegment(0, 0, 1, 'kept')], since: 0, progress: 0.1, language: 'en', duration: 9 });
+    await settle();
+    expect(engine.cancelled).toEqual([job.id]); // once
+    run.reject(FakeEngine.cancelledError());
+    await settle();
+    expect(await store.get(job.id)).toMatchObject({ status: 'cancelled', cancel_requested: false });
+  });
+});
+
+describe('JobRunner: files the browser cannot read or keep', () => {
+  it('refuses a file that was moved or deleted after it was chosen (NotReadableError), storing nothing', async () => {
+    const { runner, backend } = await makeRunner();
+    const file = mediaFile();
+    const gone = Object.assign(new Error('The requested file could not be read.'), { name: 'NotReadableError' });
+    file.slice = () => ({ arrayBuffer: () => Promise.reject(gone) }) as unknown as Blob;
+    await expect(runner.create(file, {})).rejects.toMatchObject({ status: 400, message: UNREADABLE_FILE });
+    expect(backend.size('jobs')).toBe(0);
+  });
+
+  it('says so when the store could not read the file either', async () => {
+    const { runner, backend } = await makeRunner();
+    backend.failNextWrite = Object.assign(new Error('File not found'), { name: 'NotFoundError' });
+    await expect(runner.create(mediaFile(), {})).rejects.toMatchObject({ status: 400, message: UNREADABLE_FILE });
+  });
+
+  it('runs a job whose file the browser would not store, from the page, and says that a reload would lose it', async () => {
+    const logs: string[] = [];
+    const { runner, engine, backend, store } = await makeRunner({ log: (_l, m) => logs.push(m) });
+    const write = backend.write.bind(backend);
+    backend.write = async (ops) => {
+      if (ops.some((op) => op.store === 'media' && 'value' in op)) throw Object.assign(new Error('full'), { name: 'QuotaExceededError' });
+      return write(ops);
+    };
+    const file = mediaFile();
+    const job = await runner.create(file, {});
+    await settle();
+    expect(engine.last.req.file).toBe(file);
+    expect(logs.some((m) => m.includes('would not keep a copy of the file'))).toBe(true);
+    playSuccess(engine.last);
+    await settle();
+    expect((await store.get(job.id))!.status).toBe('done');
+  });
+
+  it('offline, a failure without a reason of its own says so; a reason about the file is kept', async () => {
+    let online = false;
+    const { runner, engine, store } = await makeRunner({ online: () => online });
+    const a = await runner.create(mediaFile('a.mp3'), {});
+    await settle();
+    // the engine worker's script could not be fetched: it reads as a crash, twice (the low-memory retry)
+    engine.last.reject(new EngineRunError({ code: 'worker-crashed', userMessage: 'The speech engine stopped unexpectedly.', technical: 'x' }, false));
+    await settle();
+    engine.last.reject(new EngineRunError({ code: 'worker-crashed', userMessage: 'The speech engine stopped unexpectedly.', technical: 'x' }, false));
+    await settle();
+    expect((await store.get(a.id))!.error).toBe(OFFLINE_ERROR);
+    const b = await runner.create(mediaFile('b.mp3'), {});
+    await settle();
+    engine.last.reject(new EngineRunError({ code: 'NO_AUDIO_TRACK', userMessage: 'This file has no audio track.', technical: 'x' }, false));
+    await settle();
+    expect((await store.get(b.id))!.error).toBe('This file has no audio track.');
+    online = true;
+    const c = await runner.create(mediaFile('c.mp3'), {});
+    await settle();
+    engine.last.reject(new EngineRunError({ code: 'failed', userMessage: 'Something went wrong.', technical: 'x' }, false));
+    await settle();
+    expect((await store.get(c.id))!.error).toBe('Something went wrong.');
+  });
+
+  it('re-run of a transcript whose file is gone says to choose the file again (not "Job not found")', async () => {
+    const { runner, engine, backend } = await makeRunner();
+    const job = await runner.create(mediaFile(), {});
+    await settle();
+    playSuccess(engine.last);
+    await settle();
+    await backend.write([{ store: 'media', key: job.id, delete: true }]);
+    await expect(runner.rerun(job.id, {})).rejects.toMatchObject({ status: 409, message: NO_STORED_FILE });
   });
 });

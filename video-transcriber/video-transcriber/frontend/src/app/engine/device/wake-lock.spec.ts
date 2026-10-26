@@ -51,6 +51,35 @@ function setup(fail = false) {
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
 describe('WakeLock', () => {
+  it('asks once while the browser is still answering: no second sentinel that is never released', async () => {
+    const sentinels: FakeSentinel[] = [];
+    let answer!: () => void;
+    const nav = {
+      wakeLock: {
+        request: () =>
+          new Promise<FakeSentinel>((resolve) => {
+            answer = () => {
+              const s = new FakeSentinel();
+              sentinels.push(s);
+              resolve(s);
+            };
+          }),
+      },
+    };
+    const doc = new FakeDocument();
+    const lock = new WakeLock({ navigator: nav, document: doc });
+    const a = lock.start();
+    const b = lock.start(); // the next job starts at once (the first one failed fast)
+    doc.set('visible'); // or a tab switch fires meanwhile
+    answer();
+    expect(await a).toBe(true);
+    expect(await b).toBe(true);
+    expect(sentinels).toHaveLength(1);
+    await lock.stop();
+    expect(sentinels[0].released).toBe(true);
+    expect(lock.stats.requests).toBe(1);
+  });
+
   it('requests the screen lock on job start and releases it on finish', async () => {
     const { lock, sentinels, doc } = setup();
     expect(await lock.start()).toBe(true);

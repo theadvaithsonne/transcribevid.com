@@ -67,9 +67,33 @@ const documentStrings = (doc: TranscriptDocument): string[] => [
   ...doc.paragraphs.map((p) => p.text),
 ];
 
+/**
+ * The title as the PDF draws it. Symbols the standard fonts lack (an emoji or an arrow in a file name, "Voice note 🎤")
+ * are left out, so a transcript in a Latin script is not sent to the print view for its title alone. A letter or digit
+ * of another script keeps the title as it is, and the whole document then goes to the print view as before: a title in
+ * Hindi must not vanish. The document properties (/Title) keep the full title either way.
+ */
+export function drawableTitle(title: string): string {
+  const text = pdfText(title);
+  if (encode(text)) return title;
+  let out = '';
+  for (const ch of text) {
+    if (encode(ch)) out += ch;
+    else if (/[\p{L}\p{N}]/u.test(ch)) return title;
+    else out += ' ';
+  }
+  return cleanText(out) || title;
+}
+
+/** The document with the title the PDF draws (drawableTitle). */
+const drawnDocument = (job: DocumentJob): TranscriptDocument => {
+  const doc = transcriptDocument(job);
+  return { ...doc, title: drawableTitle(doc.title) };
+};
+
 /** True when the transcript (title, facts, text) can be written as a direct PDF. */
 export function canWriteJobPdf(job: DocumentJob): boolean {
-  return documentStrings(transcriptDocument(job)).every(canWritePdf);
+  return documentStrings(drawnDocument(job)).every(canWritePdf);
 }
 
 // ------------------------------------------------------------------------------------------- font metrics
@@ -369,8 +393,9 @@ function layout(doc: TranscriptDocument, footer: number[] | null): Op[][] {
  * the caller then prints instead).
  */
 export function writePdf(job: DocumentJob, options: PdfOptions = {}): Uint8Array<ArrayBuffer> | null {
-  const doc = transcriptDocument(job);
+  const doc = drawnDocument(job);
   if (!documentStrings(doc).every(canWritePdf)) return null;
+  const fullTitle = transcriptDocument(job).title;
   const footer = options.footer ? encode(pdfText(options.footer)) : null;
   const pages = layout(doc, footer);
 
@@ -384,7 +409,7 @@ export function writePdf(job: DocumentJob, options: PdfOptions = {}): Uint8Array
   objects[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
   const creator = options.creator ? pdfUnicode(options.creator) : '';
   objects[5] =
-    `<< /Title ${pdfUnicode(doc.title)}${creator ? ` /Creator ${creator} /Producer ${creator}` : ''}` +
+    `<< /Title ${pdfUnicode(fullTitle)}${creator ? ` /Creator ${creator} /Producer ${creator}` : ''}` +
     ` /CreationDate (${pdfDate(options.now ?? new Date())}) >>`;
   pages.forEach((ops, n) => {
     const stream = contentStream(ops);

@@ -10,7 +10,7 @@ import { PLAN_REASON_NEEDS_8GB, PLAN_REASON_NEEDS_SHADER_F16, QWEN_DEVICE_REASON
 import { makeFakeBrowserEngine, mediaFile, playSuccess, settle } from '../../testing/engine-fakes';
 import { silentLog } from '../../testing/fakes';
 import { DEFAULT_OPTIONS } from '../models';
-import { BROWSER_ENGINE, BrowserTransport } from './browser-transport';
+import { BROWSER_ENGINE, BrowserTransport, MAX_PREVIEWS, OTHER_TAB_POLL_MS } from './browser-transport';
 import { CONVERTER_PROMPT, ConverterConsent } from './converter-consent';
 import { EngineDevice, LOW_MEMORY_GB } from './engine-device';
 
@@ -116,6 +116,90 @@ describe('BrowserTransport player of files the browser cannot play (M5b)', () =>
     const id = await finished(t, engine, mediaFile('talk.mp3'));
     expect(await first(t.mediaPreview(id))).toEqual({ url: expect.stringMatching(/^blob:test/), audioOnly: false });
     expect(previews).toHaveLength(0);
+  });
+
+  it(`keeps only the last ${MAX_PREVIEWS} WAV players in memory; an older one is built again when it is opened`, async () => {
+    const revoked: string[] = [];
+    const revoke = URL.revokeObjectURL;
+    URL.revokeObjectURL = (u: string) => void revoked.push(u);
+    try {
+      const { t, engine, previews } = await setup(GPU8);
+      const ids: string[] = [];
+      for (const name of ['a.mkv', 'b.mkv', 'c.mkv']) ids.push(await finished(t, engine, mediaFile(name, 'mkv', 'video/x-matroska')));
+      for (const id of ids) await first(t.mediaPreview(id));
+      expect(previews).toHaveLength(3);
+      expect(revoked).toEqual(['blob:test/1']); // the first one's WAV is let go
+      expect((await first(t.getJob(ids[0]))).media_url).toBeNull();
+      expect((await first(t.getJob(ids[2]))).media_url).toBe('blob:test/3');
+      expect(await first(t.mediaPreview(ids[0]))).toEqual({ url: 'blob:test/4', audioOnly: true });
+      expect(previews).toHaveLength(4);
+      expect(revoked).toEqual(['blob:test/1', 'blob:test/2']);
+    } finally {
+      URL.revokeObjectURL = revoke;
+    }
+  });
+});
+
+describe('BrowserTransport when the session expires', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('lets the player URLs go (the files behind them were deleted)', async () => {
+    const revoked: string[] = [];
+    const create = URL.createObjectURL;
+    const revoke = URL.revokeObjectURL;
+    URL.createObjectURL = (() => 'blob:test/player') as typeof URL.createObjectURL;
+    URL.revokeObjectURL = (u: string) => void revoked.push(u);
+    vi.useFakeTimers({ toFake: ['Date'] }); // the store's clock; the timers stay real
+    try {
+      const { t, engine } = await setup(GPU8);
+      engine.engine.autoplay = (run) => playSuccess(run);
+      const s = await first(t.createJob(mediaFile('screen.mkv', 'mkv', 'video/x-matroska'), { ...DEFAULT_OPTIONS }));
+      await settle(20);
+      await first(t.mediaPreview(s.job!.id));
+      vi.setSystemTime(Date.now() + 31 * 60_000); // 31 idle minutes
+      expect(await engine.store.checkExpiry()).toBe(true);
+      expect(revoked).toEqual(['blob:test/player']);
+    } finally {
+      URL.createObjectURL = create;
+      URL.revokeObjectURL = revoke;
+    }
+  });
+});
+
+describe('BrowserTransport watch() of a job that another tab runs', () => {
+  afterEach(() => vi.useRealTimers());
+
+  it('follows the stored job (lines, status) until it ends: the runner of this tab never hears of it', async () => {
+    const { t, engine } = await setup(GPU8);
+    const store = engine.store;
+    // the other tab's runner wrote this job; this tab's runner is idle
+    const job = await store.put(
+      {
+        ...(await first(t.createJob(mediaFile('x.mp3'), { ...DEFAULT_OPTIONS }))).job!,
+        id: 'other'.padEnd(32, '0'),
+        status: 'running',
+        phase: 'transcribing',
+        segments: [],
+      } as never,
+      new Blob(['abc']),
+    );
+    vi.useFakeTimers();
+    const events: { type: string; data: unknown }[] = [];
+    let completed = false;
+    const sub = t.watch(job.id).subscribe({ next: (e) => events.push(e), complete: () => (completed = true) });
+    await vi.advanceTimersByTimeAsync(10);
+    expect(events.map((e) => e.type)).toEqual(['job']);
+    await store.patch(job.id, { progress: 0.5, segments: [{ id: 0, start: 0, end: 1, text: 'hello', words: null, confidence: 0.9 }] });
+    await vi.advanceTimersByTimeAsync(OTHER_TAB_POLL_MS + 10);
+    expect(events.map((e) => e.type)).toEqual(['job', 'segments', 'job']);
+    expect(events[1].data).toEqual([expect.objectContaining({ text: 'hello' })]);
+    await vi.advanceTimersByTimeAsync(OTHER_TAB_POLL_MS + 10);
+    expect(events).toHaveLength(3); // nothing changed: nothing sent
+    await store.patch(job.id, { status: 'done', phase: null, progress: 1 });
+    await vi.advanceTimersByTimeAsync(OTHER_TAB_POLL_MS + 10);
+    expect(events.at(-1)).toMatchObject({ type: 'job', data: expect.objectContaining({ status: 'done' }) });
+    expect(completed).toBe(true);
+    sub.unsubscribe();
   });
 });
 

@@ -52,6 +52,10 @@ export const BROWSER_ENGINE = new InjectionToken<() => Promise<BrowserEngine>>('
 });
 
 const FINAL = new Set(['done', 'error', 'cancelled']);
+/** watch(): how often the store is read for a job that another tab of this browser runs (its runner's events stay there). */
+export const OTHER_TAB_POLL_MS = 2000;
+/** WAV players are the decoded audio held in memory (an hour is over 100 MB): only the most recent ones are kept. */
+export const MAX_PREVIEWS = 2;
 /** Qwen3-ASR returns chunk times only (the server's `words: null`). */
 const QWEN_WORD_TIMING_NOTE = 'not available with Qwen (times are per chunk)';
 const BOOKKEEPING = [
@@ -63,6 +67,8 @@ const BOOKKEEPING = [
   'checkpoint',
   'stuck_count',
   'resume_mark',
+  'downloaded_bytes',
+  'download_mark',
   'low_memory',
   'worker_retries',
 ] as const;
@@ -105,14 +111,30 @@ export class BrowserTransport implements Transport {
   private readonly mediaUrls = new Map<string, string>();
   /** WAV previews of files the browser cannot play, being built or built (object URL; null = nothing to play) */
   private readonly previews = new Map<string, Promise<MediaPreview | null>>();
+  /** the jobs with a built WAV player, oldest first (MAX_PREVIEWS) */
+  private readonly previewOrder: string[] = [];
   private readonly consent = inject(ConverterConsent);
 
   private get(): Promise<BrowserEngine> {
-    this.engine ??= this.createEngine().catch((e) => {
-      this.engine = null; // e.g. IndexedDB blocked: try again on the next call
-      throw e;
-    });
+    this.engine ??= this.createEngine().then(
+      (engine) => {
+        // the session expired (30 minutes idle): its files are deleted, and their player URLs must not keep them alive
+        engine.store.onEnded(() => this.forgetAllMedia());
+        return engine;
+      },
+      (e) => {
+        this.engine = null; // try again on the next call
+        throw e;
+      },
+    );
     return this.engine;
+  }
+
+  private forgetAllMedia() {
+    for (const url of this.mediaUrls.values()) URL.revokeObjectURL(url);
+    this.mediaUrls.clear();
+    this.previews.clear();
+    this.previewOrder.length = 0;
   }
 
   // ------------------------------------------------------------------ reference data
@@ -231,9 +253,7 @@ export class BrowserTransport implements Transport {
       await store.clear();
       if (opts.deleteModels) await store.deleteModels();
       this.consent.forget();
-      for (const url of this.mediaUrls.values()) URL.revokeObjectURL(url);
-      this.mediaUrls.clear();
-      this.previews.clear();
+      this.forgetAllMedia();
     });
   }
 
@@ -290,11 +310,26 @@ export class BrowserTransport implements Transport {
     return call(async () => {
       const { runner } = await this.get();
       await runner.delete(id);
-      const url = this.mediaUrls.get(id);
-      if (url) URL.revokeObjectURL(url);
-      this.mediaUrls.delete(id);
-      this.previews.delete(id);
+      this.forgetMedia(id);
     });
+  }
+
+  /** Lets the player source of a job go (its object URL, and the WAV it points to). */
+  private forgetMedia(id: string) {
+    const url = this.mediaUrls.get(id);
+    if (url) URL.revokeObjectURL(url);
+    this.mediaUrls.delete(id);
+    this.previews.delete(id);
+    const i = this.previewOrder.indexOf(id);
+    if (i >= 0) this.previewOrder.splice(i, 1);
+  }
+
+  /** A WAV player was built for `id`: the oldest ones beyond MAX_PREVIEWS go (they are rebuilt if opened again). */
+  private keepPreview(id: string) {
+    const i = this.previewOrder.indexOf(id);
+    if (i >= 0) this.previewOrder.splice(i, 1);
+    this.previewOrder.push(id);
+    while (this.previewOrder.length > MAX_PREVIEWS) this.forgetMedia(this.previewOrder[0]);
   }
 
   /**
@@ -321,6 +356,7 @@ export class BrowserTransport implements Transport {
         .then((wav): MediaPreview => {
           const url = URL.createObjectURL(wav);
           this.mediaUrls.set(id, url);
+          this.keepPreview(id);
           return { url, audioOnly: true };
         })
         .catch((e) => {
@@ -426,10 +462,41 @@ export class BrowserTransport implements Transport {
   watch(id: string, since = 0): Observable<JobEvent> {
     return new Observable<JobEvent>((sub) => {
       let off: (() => void) | null = null;
+      let poll: ReturnType<typeof setInterval> | null = null;
       let closed = false;
       let sent = since;
       let replaying = true;
       const buffered: RunnerEvent[] = [];
+      /**
+       * A job that another tab of this browser runs (or one whose page went away, until a tab takes it over): this
+       * tab's runner never hears of it, so the stored job is read every OTHER_TAB_POLL_MS. Without this the job page
+       * stood still at "Waiting in line…" until it was reloaded.
+       */
+      const followStore = (engine: BrowserEngine, version: number) => {
+        let seen = version;
+        let reading = false;
+        poll = setInterval(() => {
+          if (closed || reading || engine.runner.isActive(id)) return; // run here: the runner's events come
+          reading = true;
+          engine.store
+            .get(id)
+            .then(async (j) => {
+              if (closed) return;
+              if (!j) return sub.complete();
+              if (j.version === seen) return;
+              seen = j.version;
+              const segs = j.segments.slice(sent);
+              if (segs.length) {
+                sent += segs.length;
+                sub.next({ type: 'segments', data: segs });
+              }
+              sub.next({ type: 'job', data: await this.summary(engine, j) });
+              if (FINAL.has(j.status)) sub.complete();
+            })
+            .catch(() => undefined) // the next read tries again
+            .finally(() => (reading = false));
+        }, OTHER_TAB_POLL_MS);
+      };
       const forward = async (engine: BrowserEngine, e: RunnerEvent) => {
         if (e.type === 'segments') {
           if (e.id !== id) return;
@@ -469,11 +536,13 @@ export class BrowserTransport implements Transport {
           }
           replaying = false;
           for (const e of buffered.splice(0)) await forward(engine, e);
+          if (!closed) followStore(engine, job.version);
         })
         .catch((e) => sub.error(asTransportError(e)));
       return () => {
         closed = true;
         off?.();
+        if (poll) clearInterval(poll);
       };
     });
   }

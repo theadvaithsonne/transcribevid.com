@@ -67,12 +67,14 @@ export class ModelPrefetch {
       }
       if (signal.aborted) return;
       const transport = this.transport as unknown as BrowserTransport;
-      const downloaded = await transport.prefetchModel(model, {
-        signal,
-        onProgress: (loaded, total, note) => {
-          if (!signal.aborted) this.state.set({ model, loaded, total, done: false, ...(note ? { note } : {}) });
-        },
-      });
+      const downloaded = await inOneTab(() =>
+        transport.prefetchModel(model, {
+          signal,
+          onProgress: (loaded, total, note) => {
+            if (!signal.aborted) this.state.set({ model, loaded, total, done: false, ...(note ? { note } : {}) });
+          },
+        }),
+      );
       if (signal.aborted) return;
       if (downloaded) {
         this.log.info(`model ${model} downloaded in the background`);
@@ -103,6 +105,36 @@ export class ModelPrefetch {
       return false;
     }
     return true;
+  }
+}
+
+/** The Web Lock the background download holds while it runs. */
+export const PREFETCH_LOCK = 'tv-model-prefetch';
+
+interface PrefetchLocks {
+  request(name: string, options: { ifAvailable: boolean }, callback: (lock: unknown) => Promise<boolean> | boolean): Promise<unknown>;
+}
+
+/**
+ * Runs the background download in one tab at a time (Web Locks). Two tabs of the home page would otherwise both fetch
+ * the same 250 MB - 1.6 GB, and the one that finished first drops the saved parts the other is still counting on. A
+ * tab that finds the lock taken leaves the download to the other one (false: nothing downloaded here). Without Web
+ * Locks (old Safari) it runs as before.
+ */
+async function inOneTab(fn: () => Promise<boolean>): Promise<boolean> {
+  const locks = (globalThis as { navigator?: { locks?: PrefetchLocks } }).navigator?.locks;
+  if (typeof locks?.request !== 'function') return fn();
+  let ran = false;
+  try {
+    const r = await locks.request(PREFETCH_LOCK, { ifAvailable: true }, (lock) => {
+      if (!lock) return false;
+      ran = true;
+      return fn();
+    });
+    return r === true;
+  } catch (e) {
+    if (ran) throw e; // the download's own error
+    return fn(); // the Web Locks API itself refused (an unusual context): download without it
   }
 }
 

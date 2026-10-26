@@ -34,6 +34,7 @@ export class WakeLock {
   private sentinel: WakeLockSentinelLike | null = null;
   private wanted = false;
   private listening = false;
+  private pending: Promise<boolean> | null = null;
   /** how many requests were made and how many failed; the Logs page shows them */
   readonly stats = { requests: 0, failures: 0 };
 
@@ -80,7 +81,16 @@ export class WakeLock {
     if (this.wanted && this.env.document?.visibilityState === 'visible' && !this.held) void this.request();
   };
 
-  private async request(): Promise<boolean> {
+  /**
+   * One request at a time: a second start() or a tab switch while the browser is still answering would otherwise get
+   * a second sentinel, and the first one would never be released (the screen stays on after the job).
+   */
+  private request(): Promise<boolean> {
+    this.pending ??= this.ask().finally(() => (this.pending = null));
+    return this.pending;
+  }
+
+  private async ask(): Promise<boolean> {
     if (!this.wanted || !this.supported || this.held) return this.held;
     if (this.env.document && this.env.document.visibilityState === 'hidden') return false;
     this.stats.requests++;

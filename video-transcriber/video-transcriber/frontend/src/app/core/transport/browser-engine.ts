@@ -14,7 +14,7 @@ import { requestPersistentStorage } from '../../engine/models/resumable-download
 import type { ProgressInfo } from '../../engine/asr/types';
 import { isQwenModel } from '../../engine/models/qwen-catalog';
 import { computeStats } from '../../engine/post/stats';
-import { IndexedDbBackend } from '../../engine/session/indexeddb-backend';
+import { openSessionBackend } from '../../engine/session/indexeddb-backend';
 import { SessionStore } from '../../engine/session/session-store';
 import type { WorkerPlan } from '../../engine/worker/protocol';
 import { WorkerClient } from '../../engine/worker/worker-client';
@@ -68,7 +68,10 @@ function guardLeaving(runner: JobRunner) {
 }
 
 export async function createBrowserEngine(deps: BrowserEngineDeps): Promise<BrowserEngine> {
-  const backend = await IndexedDbBackend.open();
+  const backend = await openSessionBackend({
+    onFallback: (why) =>
+      deps.log('WARNING', `this browser does not let the site keep data (${why}): transcripts last until this tab is closed`),
+  });
   const store = await SessionStore.open(backend, {
     computeStats: (segments, duration) => computeStats(segments, duration),
     // a reload, a closed tab or a phone that dropped the tab: the job continues from its checkpoint, not "failed"
