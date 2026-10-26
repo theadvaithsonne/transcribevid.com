@@ -15,7 +15,7 @@ compatibility_date = "2026-10-01"
 
 # Same origin as the pages (environment.browser.ts: counterUrl "https://transcribevid.com/api"). Needs the domain's zone in
 # this Cloudflare account; until then comment it out and use the workers.dev address as counterUrl.
-workers_dev = true
+workers_dev = false
 routes = [{ pattern = "transcribevid.com/api/*", zone_name = "transcribevid.com" }]
 
 [vars]
@@ -25,7 +25,7 @@ ALLOWED_ORIGINS = "https://transcribevid.com"
 [[d1_databases]]
 binding = "DB"
 database_name = "tv-counter"
-database_id = "REPLACE_WITH_THE_ID_PRINTED_BY_wrangler_d1_create"
+database_id = "8654fb89-a76a-4f60-a401-8c5f80770fc2"
 
 # Per-IP limit on POST /count: Cloudflare's Workers Rate Limiting binding (free). If this wrangler version rejects the
 # block, delete it: src/index.ts then falls back to a per-isolate in-memory limit with the same numbers.
