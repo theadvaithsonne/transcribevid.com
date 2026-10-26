@@ -39,7 +39,7 @@
   @if (dataNote(); as note) {
     <div class="pop-foot">
       <p class="session-note" role="note" [title]="sessionNote()">{{ note }}</p>
-      @if (site.isPublic() && session.minutesLeft(); as left) {
+      @if ((site.isPublic() || site.inBrowser()) && session.minutesLeft(); as left) {
         <p class="session-left">Session time left: about {{ left }} min</p>
       }
       <button type="button" class="wipe" (click)="deleteMyData()" [disabled]="deleting()">Delete my data now</button>

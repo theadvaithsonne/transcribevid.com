@@ -2,9 +2,65 @@ import { ErrorHandler, Injectable, inject } from '@angular/core';
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { getLogsToken, logsAuthHeaders } from './logs-token';
+import { LogBatch, LogEntry } from './models';
 import { IS_BROWSER } from './platform';
 
 type Level = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR';
+
+/** How many lines the in-page log keeps (the Logs page shows at most 3000 too). */
+export const LOG_RING_SIZE = 3000;
+
+/**
+ * The in-page log: the newest LOG_RING_SIZE lines this tab wrote, numbered like the server's log (`seq` from 1). The
+ * browser edition has no server log, so its Logs page reads this (BrowserTransport.logs / logsStream). Lines stay in
+ * memory only; nothing here is stored or sent anywhere.
+ */
+@Injectable({ providedIn: 'root' })
+export class LogRing {
+  private rows: LogEntry[] = [];
+  private seq = 0;
+  private listeners = new Set<(e: LogEntry) => void>();
+
+  push(level: string, logger: string, message: string, context?: unknown) {
+    let text = message;
+    if (context !== undefined) {
+      let ctx: string;
+      try {
+        ctx = typeof context === 'string' ? context : JSON.stringify(context);
+      } catch {
+        ctx = String(context);
+      }
+      if (ctx) text += ` ${ctx.slice(0, 1000)}`;
+    }
+    const entry: LogEntry = { seq: ++this.seq, ts: Date.now() / 1000, level, logger, message: text };
+    this.rows.push(entry);
+    if (this.rows.length > LOG_RING_SIZE) this.rows.splice(0, this.rows.length - LOG_RING_SIZE);
+    for (const l of this.listeners) {
+      try {
+        l(entry);
+      } catch {
+        /* a listener must never break logging */
+      }
+    }
+  }
+
+  /** Lines after `after` (at most `limit`, the newest ones), and the highest number written so far. */
+  batch(after = 0, limit = 1000): LogBatch {
+    const fresh = this.rows.filter((e) => e.seq > after);
+    return { entries: fresh.slice(Math.max(0, fresh.length - limit)), last_seq: this.seq };
+  }
+
+  /** Calls `listener` for every new line until the returned function is called. */
+  subscribe(listener: (e: LogEntry) => void): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  /** Empties the log; numbering continues, so a page that already showed lines does not see old numbers again. */
+  clear() {
+    this.rows = [];
+  }
+}
 
 /**
  * Browser-side logging. Always writes to the console; warn/error (and info, for key events) are also
@@ -16,6 +72,8 @@ type Level = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR';
 export class LogService {
   /** nothing is sent to the server while a page is prerendered (there is none, and no visitor) */
   private browser = inject(IS_BROWSER);
+  /** every line also goes to the in-page log (the browser edition's Logs page) */
+  private ring = inject(LogRing);
   private sent: number[] = [];
   private last = '';
   private lastAt = 0;
@@ -50,6 +108,7 @@ export class LogService {
       const fn = level === 'ERROR' ? console.error : level === 'WARNING' ? console.warn : level === 'DEBUG' ? console.debug : console.info;
       if (context === undefined) fn(`[${level}] ${message}`);
       else fn(`[${level}] ${message}`, context);
+      if (this.browser) this.ring.push(level, 'browser', message, context);
       if (remote) this.send(level, message, context);
     } catch {
       /* logging must never throw */

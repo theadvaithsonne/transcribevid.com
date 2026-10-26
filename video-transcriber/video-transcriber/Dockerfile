@@ -16,9 +16,10 @@ ENV NG_CLI_ANALYTICS=false \
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY frontend/ ./
-# The production build prerenders the public pages (src/app/app.routes.server.ts) and writes index.csr.html, the shell for
-# every client-rendered page: fail the image build if that did not happen.
-RUN npm run build -- --configuration production \
+# The self-hosted build (the app talks to the Python API of this image; `production` is the static in-browser
+# website) prerenders the public pages (src/app/app.routes.server.ts) and writes index.csr.html, the shell for every
+# client-rendered page: fail the image build if that did not happen.
+RUN npm run build -- --configuration self-hosted \
  && test -f dist/frontend/browser/index.csr.html \
  && test -f dist/frontend/browser/faq/index.html \
  && test -f dist/frontend/browser/how-it-works/index.html

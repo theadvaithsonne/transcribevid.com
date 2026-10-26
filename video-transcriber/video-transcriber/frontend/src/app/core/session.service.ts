@@ -47,7 +47,8 @@ export class SessionService {
     effect(() => {
       // only once the server has really said "public" (the assumed defaults of a prerendered page are not an answer),
       // and never while a page is prerendered
-      const on = this.browser && this.site.answered() && this.site.isPublic();
+      // the in-browser edition ends idle sessions too (engine/session SessionStore), so it is watched the same way
+      const on = this.browser && this.site.answered() && (this.site.isPublic() || this.site.inBrowser());
       untracked(() => (on ? this.start() : this.stop()));
     });
     // A history that suddenly empties is the first hint that the session expired: look at once instead of waiting

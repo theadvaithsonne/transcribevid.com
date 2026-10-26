@@ -74,6 +74,10 @@
       <p class="muted none">{{ entries().length ? 'No entries match the current filters.' : 'No log entries yet.' }}</p>
     }
   </div>
-  <p class="muted foot">Showing at most 3000 recent lines. Logs live only in memory and are erased when the server stops.</p>
+  @if (site.inBrowser()) {
+    <p class="muted foot">Showing at most 3000 recent lines of this tab. They live only in this tab's memory, are never sent anywhere, and are erased when the tab closes.</p>
+  } @else {
+    <p class="muted foot">Showing at most 3000 recent lines. Logs live only in memory and are erased when the server stops.</p>
+  }
 </div>
 }

@@ -1,6 +1,7 @@
 import { Component, DestroyRef, ElementRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { errorDetail } from '../../core/http-error';
 import { LogService } from '../../core/log.service';
@@ -33,7 +34,7 @@ export function displayLevel(level: string): string {
 export class LogsPage {
   private api = inject(ApiService);
   private log = inject(LogService);
-  private site = inject(SiteService);
+  protected site = inject(SiteService);
   private toast = inject(ToastService);
   private destroyRef = inject(DestroyRef);
 
@@ -54,7 +55,8 @@ export class LogsPage {
 
   private lastSeq = 0;
   private pending: LogEntry[] = [];
-  private es?: EventSource;
+  /** the live stream (the server's EventSource, or the in-page log of the browser edition) */
+  private streamSub?: Subscription;
   private retry?: ReturnType<typeof setTimeout>;
   private closed = false;
   private viewport = viewChild<ElementRef<HTMLElement>>('viewport');
@@ -82,7 +84,7 @@ export class LogsPage {
     else this.connect(true);
     this.destroyRef.onDestroy(() => {
       this.closed = true;
-      this.es?.close();
+      this.streamSub?.unsubscribe();
       clearTimeout(this.retry);
     });
     // keep the view pinned to the newest line while following
@@ -96,7 +98,7 @@ export class LogsPage {
   /** (Re)load what we missed, then follow the live stream. Safe to call again after a drop. */
   private connect(initial = false) {
     if (this.closed) return;
-    this.es?.close();
+    this.streamSub?.unsubscribe();
     this.conn.set(initial ? 'connecting' : 'reconnecting');
     this.api.logs(initial ? 0 : this.lastSeq).subscribe({
       next: (b: LogBatch) => {
@@ -121,12 +123,12 @@ export class LogsPage {
     if (e?.status === 401) {
       this.access.set(getLogsToken() ? 'denied' : 'token');
       setLogsToken(null); // a refused token is no use: ask again
-      this.es?.close();
+      this.streamSub?.unsubscribe();
       return true;
     }
     if (e?.status === 404) {
       this.access.set('disabled');
-      this.es?.close();
+      this.streamSub?.unsubscribe();
       return true;
     }
     this.scheduleRetry();
@@ -149,21 +151,15 @@ export class LogsPage {
 
   private stream() {
     if (this.closed) return;
-    const es = new EventSource(this.api.logsStreamUrl(this.lastSeq));
-    this.es = es;
-    es.onopen = () => this.conn.set('live');
-    es.addEventListener('log', (ev) => {
-      try {
-        this.ingest([JSON.parse((ev as MessageEvent).data) as LogEntry]);
-      } catch {
-        /* ignore malformed event */
-      }
-    });
-    es.onerror = () => {
+    this.streamSub?.unsubscribe();
+    this.streamSub = this.api.logsStream(this.lastSeq).subscribe({
+      next: (ev) => {
+        if (ev.type === 'open') this.conn.set('live');
+        else this.ingest([ev.entry]);
+      },
       // we reconnect ourselves so `after` always reflects what we already have
-      es.close();
-      this.scheduleRetry();
-    };
+      error: () => this.scheduleRetry(),
+    });
   }
 
   private scheduleRetry() {
@@ -220,7 +216,8 @@ export class LogsPage {
   }
 
   clear() {
-    if (this.clearing() || !confirm('Clear all log entries on the server?')) return;
+    const local = this.site.inBrowser();
+    if (this.clearing() || !confirm(local ? 'Clear all log entries of this tab?' : 'Clear all log entries on the server?')) return;
     this.clearing.set(true);
     this.api.clearLogs().subscribe({
       next: () => {
@@ -228,7 +225,7 @@ export class LogsPage {
         this.entries.set([]);
         this.pending = [];
         this.pendingCount.set(0);
-        this.toast.success('The server log is empty now.', 'Logs cleared');
+        this.toast.success(local ? 'The log of this tab is empty now.' : 'The server log is empty now.', 'Logs cleared');
       },
       error: (e: { status?: number }) => {
         this.clearing.set(false);

@@ -1,4 +1,4 @@
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, ElementRef, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -13,6 +13,7 @@ import { SessionService } from '../../core/session.service';
 import { SiteService } from '../../core/site.service';
 import { TitleService } from '../../core/title.service';
 import { ToastService } from '../../core/toast.service';
+import { printTranscript } from '../../core/transport/print-view';
 import { TranscriptView, findActiveId } from './transcript';
 
 /** The download formats, most wanted first. The hint says in plain words what each one is for. */
@@ -35,20 +36,8 @@ const PHASE_TEXT: Record<string, string> = {
   transcribing: 'Transcribing…',
 };
 
-/** The file name from a Content-Disposition header (RFC 5987 `filename*=` first, then `filename=`), or null. */
-export function fileNameFrom(header: string | null): string | null {
-  if (!header) return null;
-  const star = /filename\*\s*=\s*(?:UTF-8|utf-8)''([^;]+)/.exec(header);
-  if (star) {
-    try {
-      return decodeURIComponent(star[1].trim());
-    } catch {
-      /* a malformed name: try the plain one */
-    }
-  }
-  const plain = /filename\s*=\s*"?([^";]+)"?/.exec(header);
-  return plain ? plain[1].trim() : null;
-}
+/** The file name from a Content-Disposition header (moved to core/transport, kept here for its callers and spec). */
+export { fileNameFrom } from '../../core/transport/file-name';
 
 /** Hands a file to the browser's downloads (the server's name is kept). */
 function saveFile(blob: Blob, name: string) {
@@ -108,7 +97,6 @@ export class JobPage {
   id = input.required<string>();
 
   private api = inject(ApiService);
-  private http = inject(HttpClient);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private log = inject(LogService);
@@ -181,8 +169,14 @@ export class JobPage {
     return this.store.models().filter((m) => this.site.modelAllowed(m.id) && (m.engine ?? 'whisper') === this.rerunEngine);
   }
   qwenAvailable = computed(() => this.store.models().some((m) => m.engine === 'qwen' && this.site.modelAllowed(m.id)));
+  /** Qwen3-ASR is listed but cannot run here (in-browser edition): the reason, '' when at least one Qwen model can. */
+  qwenBlocked = computed(() => {
+    const qwen = this.store.models().filter((m) => m.engine === 'qwen' && this.site.modelAllowed(m.id));
+    return qwen.length && qwen.every((m) => m.reason) ? (qwen[0].reason as string) : '';
+  });
   changeRerunEngine() {
-    this.rerunModel = this.rerunModels()[0]?.id ?? 'small';
+    const list = this.rerunModels();
+    this.rerunModel = (list.find((m) => !m.reason) ?? list[0])?.id ?? 'small';
   }
   conversionWarning = computed(() => this.job()?.segments.find((s) => s.conversion_warning)?.conversion_warning ?? '');
 
@@ -240,6 +234,11 @@ export class JobPage {
     const parts: string[] = [];
     // floor, so 99.6% never reads "100%" before it is done (the tiny nudge keeps 0.29 from reading 28%)
     if (j.status === 'running' && j.phase === 'transcribing') parts.push(`${Math.floor(j.progress * 100 + 1e-6)}% done`);
+    // in-browser edition: the first use of a model downloads it into this browser
+    if (j.status === 'running' && j.phase === 'loading_model' && j.download?.total) {
+      const mb = (n: number) => (n >= 1e9 ? `${(n / 1e9).toFixed(2)} GB` : `${Math.round(n / 1e6)} MB`);
+      parts.push(`Downloading the speech model (first time only): ${mb(j.download.loaded)} of ${mb(j.download.total)}`);
+    }
     if (j.eta_seconds) parts.push(fmtEta(j.eta_seconds));
     return parts.join(' · ');
   });
@@ -388,7 +387,7 @@ export class JobPage {
   private gone(id: string) {
     this.log.warn(`Job not found or failed to load: ${id}`);
     this.job.set(null);
-    if (!this.site.isPublic()) {
+    if (!this.site.isPublic() && !this.site.inBrowser()) {
       this.notFound.set(true);
       return;
     }
@@ -683,12 +682,19 @@ export class JobPage {
     if (this.lastExport.fmt === fmt && Date.now() - this.lastExport.at < 1500) return;
     this.lastExport = { fmt, at: Date.now() };
     const extra: Record<string, number> = fmt === 'srt' || fmt === 'vtt' ? { max_chars: this.subtitleChars } : {};
+    if (fmt === 'pdf' && this.api.kind === 'browser') {
+      // no PDF generator in the browser: the print dialog makes it ("Save as PDF")
+      printTranscript(j);
+      this.log.info('Export printed: pdf', { id: j.id });
+      this.toast.info('Choose "Save as PDF" in the print dialog.', 'Print to PDF');
+      return;
+    }
     this.exporting.set(fmt);
-    this.http.get(this.api.exportUrl(j.id, fmt, extra), { observe: 'response', responseType: 'blob' }).subscribe({
-      next: (res: HttpResponse<Blob>) => {
+    this.api.exportBlob(j.id, fmt, extra).subscribe({
+      next: (file) => {
         this.exporting.set(null);
-        const name = fileNameFrom(res.headers.get('Content-Disposition')) ?? `${j.title}.${e.ext}`;
-        saveFile(res.body ?? new Blob([]), name);
+        const name = file.filename ?? `${j.title}.${e.ext}`;
+        saveFile(file.blob, name);
         this.log.info(`Export downloaded: ${fmt}`, { id: j.id });
         this.toast.success(`${e.label}. Look for it in your downloads.`, 'Download started');
       },

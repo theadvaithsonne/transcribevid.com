@@ -59,6 +59,11 @@ export class SiteService {
     return !h ? 'unknown' : h.public === true ? 'public' : 'local';
   });
   readonly isPublic = computed(() => this.mode() === 'public');
+  /**
+   * The in-browser edition (no server: the file never leaves this device, jobs live in this browser for the session).
+   * Its wording is the local install's (mode 'local'), plus the few places that say 'this browser'.
+   */
+  readonly inBrowser = computed(() => this.store.health()?.runs_in === 'browser');
   readonly isLocal = computed(() => this.mode() === 'local');
 
   readonly brand = computed<Brand>(() => {
@@ -120,6 +125,7 @@ export class SiteService {
 
   /** A developer running the UI on this computer: worth telling how to start the backend when it is down. */
   readonly devHint = computed(() => {
+    if (this.inBrowser()) return false; // there is no backend to start
     const m = this.mode();
     if (m === 'local') return true;
     if (m === 'public') return false;

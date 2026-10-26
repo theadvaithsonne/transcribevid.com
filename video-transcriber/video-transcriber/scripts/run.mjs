@@ -186,7 +186,8 @@ if (mode === 'setup') {
   setup();
   const built = ['index.html', 'index.csr.html'].some((f) => existsSync(join(frontend, 'dist/frontend/browser', f)));
   if (!built) {
-    run(npm, ['run', 'build', '--', '--configuration', 'production'], frontend, 'Building the Angular app (one-time)…');
+    // self-hosted = the app talks to the Python API (`production` is the static in-browser website)
+    run(npm, ['run', 'build', '--', '--configuration', 'self-hosted'], frontend, 'Building the Angular app (one-time)…');
   }
   start(venvPython, ['run.py'], backend, py({ NO_BROWSER: '1' }));
   waitFor(`http://127.0.0.1:${API_PORT}/api/health`)

@@ -11,6 +11,7 @@ import { DEFAULT_OPTIONS, JobOptions } from '../../core/models';
 import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
+import { DeviceAdvice, EngineDevice } from '../../core/transport/engine-device';
 
 const KEY = 'vt-options';
 const MEDIA_EXT = /\.(mp4|mkv|mov|avi|webm|mp3|wav|m4a|aac|flac|ogg|opus|wmv|flv|m4v|3gp|ts|mts)$/i;
@@ -50,6 +51,7 @@ export class UploadPage {
   private destroyRef = inject(DestroyRef);
   private pendingFile = inject(PendingFileService);
   private toast = inject(ToastService);
+  private device = inject(EngineDevice);
   store = inject(JobsStore);
   site = inject(SiteService);
 
@@ -79,6 +81,8 @@ export class UploadPage {
   private stream?: MediaStream;
   private recTimer?: ReturnType<typeof setInterval>;
 
+  /** the model remembered from earlier in this session ('' = none: the in-browser device plan may pick one) */
+  private savedModel = '';
   opts: JobOptions = this.restore();
 
   fmtBytes = fmtBytes;
@@ -91,9 +95,10 @@ export class UploadPage {
     { model: 'large-v3', title: 'Best accuracy', blurb: 'Fewest mistakes. Takes the longest.', speed: 1, speedLabel: 'Slowest' },
   ];
 
-  /** the hover text of a choice */
+  /** the hover text of a choice (with the reason when this device cannot run it) */
   tip(p: Preset) {
-    return `${p.title}. ${p.blurb}`;
+    const why = this.unavailableReason(p.model);
+    return why ? `${p.title}. ${p.blurb} Not available on this device: ${why}.` : `${p.title}. ${p.blurb}`;
   }
 
   /** the one line of help under the choices: what the picked one means (plus a first-time download, if any) */
@@ -101,7 +106,48 @@ export class UploadPage {
     const p = this.presets.find((x) => x.model === this.opts.model);
     if (!p) return '';
     const note = this.downloadNote(p.model);
-    return note ? `${p.title}: ${p.blurb} ${note}.` : `${p.title}: ${p.blurb}`;
+    const timing = this.modelInfo(p.model)?.word_timing_note;
+    const base = note ? `${p.title}: ${p.blurb} ${note}.` : `${p.title}: ${p.blurb}`;
+    return timing ? `${base} Word timing: ${timing}.` : base;
+  }
+
+  /**
+   * In-browser edition: why this device cannot run the model (the device plan's reason, or "being added" for Qwen),
+   * '' when it can. Such models stay in the pickers, disabled, with this text: never hidden, never swapped silently.
+   */
+  unavailableReason(id: string): string {
+    return this.modelInfo(id)?.reason ?? '';
+  }
+
+  /** Qwen3-ASR is listed but cannot run here (in-browser edition): the reason, '' when at least one Qwen model can. */
+  qwenBlocked = computed(() => {
+    const qwen = this.store.models().filter((m) => m.engine === 'qwen' && this.site.modelAllowed(m.id));
+    return qwen.length && qwen.every((m) => m.reason) ? (qwen[0].reason as string) : '';
+  });
+
+  /** In-browser edition: the time estimate and warnings for the chosen files on this device (weak device, long file). */
+  advice = signal<DeviceAdvice | null>(null);
+  /** In-browser edition: the device plan's honest notes (no WebGPU, memory assumed, phone speeds estimated). */
+  planNotes = signal<string[]>([]);
+  private adviceSeq = 0;
+
+  /** Recomputes the estimate (files or model changed). Only the in-browser edition has one. */
+  refreshAdvice() {
+    if (!this.site.inBrowser()) return;
+    const seq = ++this.adviceSeq;
+    const files = this.files();
+    if (!files.length) {
+      this.advice.set(null);
+      return;
+    }
+    this.device
+      .advice(files, this.opts.model)
+      .then((a) => {
+        if (seq === this.adviceSeq && !this.destroyed) this.advice.set(a);
+      })
+      .catch(() => {
+        if (seq === this.adviceSeq) this.advice.set(null);
+      });
   }
 
   /** the presets the server allows (all of them unless it restricts the models) */
@@ -114,13 +160,16 @@ export class UploadPage {
   qwenAvailable = computed(() => this.store.models().some((m) => m.engine === 'qwen' && this.site.modelAllowed(m.id)));
 
   changeEngine() {
-    this.opts.model = this.selectableModels()[0]?.id ?? 'small';
+    const list = this.selectableModels();
+    this.opts.model = (list.find((m) => !m.reason) ?? list[0])?.id ?? 'small';
     if (this.opts.engine === 'qwen') this.opts.task = 'transcribe';
+    this.refreshAdvice();
   }
 
   choosePreset(model: string) {
     this.opts.engine = 'whisper';
     this.opts.model = model;
+    this.refreshAdvice();
   }
 
   totalSize = computed(() => this.files().reduce((n, f) => n + f.size, 0));
@@ -140,6 +189,32 @@ export class UploadPage {
         if (noPresets) this.showAdvanced.set(true); // the select is then the only way to choose
       });
     });
+    // in-browser edition: the device plan picks the starting model (unless the visitor chose one this session), and a
+    // remembered model this device cannot run is replaced by the plan's default in plain sight, before anything starts
+    effect(() => {
+      const models = this.store.models();
+      untracked(() => {
+        if (!this.site.inBrowser() || !models.length) return;
+        const suggested = models.find((m) => m.default && !m.reason)?.id;
+        const current = models.find((m) => m.id === this.opts.model);
+        if (suggested && (!this.savedModel || current?.reason)) {
+          this.opts.engine = 'whisper';
+          this.opts.model = suggested;
+        }
+        this.refreshAdvice();
+      });
+    });
+    effect(() => {
+      if (!this.site.inBrowser()) return;
+      untracked(() => {
+        this.device
+          .plan()
+          .then((p) => {
+            if (!this.destroyed) this.planNotes.set(p.notes);
+          })
+          .catch(() => {});
+      });
+    });
   }
 
   private ensureAllowedModel() {
@@ -156,7 +231,11 @@ export class UploadPage {
     return this.store.models().find((m) => m.id === id);
   }
   available(id: string) {
-    return this.site.modelAllowed(id) && (this.store.models().length === 0 || !!this.modelInfo(id));
+    return (
+      this.site.modelAllowed(id) &&
+      (this.store.models().length === 0 || !!this.modelInfo(id)) &&
+      !this.unavailableReason(id)
+    );
   }
   /** "3.1 GB": the size of a model that is not on this machine yet; '' once it is (nothing to say then) */
   private downloadSize(id: string) {
@@ -284,11 +363,13 @@ export class UploadPage {
     if (dup) this.toast.info(dup === 1 ? 'That file is already in the list.' : `${dup} of those files are already in the list.`, 'Already added');
     this.error.set(problems.join(' '));
     this.files.update((cur) => [...cur, ...fresh]);
+    if (fresh.length) this.refreshAdvice();
   }
 
   removeFile(i: number) {
     if (this.uploading()) return;
     this.files.update((cur) => cur.filter((_, k) => k !== i));
+    this.refreshAdvice();
   }
 
   /** A clear message when the file is bigger than the server accepts, so it is never sent. */
@@ -377,6 +458,13 @@ export class UploadPage {
       }
     }
     this.ensureAllowedModel();
+    const blocked = this.unavailableReason(this.opts.model);
+    if (blocked) {
+      // never swapped for another model at this point: the visitor decides
+      const label = this.modelInfo(this.opts.model)?.label ?? this.opts.model;
+      this.error.set(`The ${label} model cannot run on this device: ${blocked}. Choose another one.`);
+      return;
+    }
     this.persist();
     this.error.set('');
     this.uploading.set(true);
@@ -482,6 +570,7 @@ export class UploadPage {
     try {
       // `prompt` is never persisted; ignore one left behind by an older version too
       const saved = JSON.parse(sessionStorage.getItem(KEY) ?? '{}');
+      this.savedModel = typeof saved?.model === 'string' ? saved.model : '';
       return { ...DEFAULT_OPTIONS, ...saved, output_script: saved?.output_script === 'original' ? 'original' : 'hinglish', prompt: '' };
     } catch {
       return { ...DEFAULT_OPTIONS };

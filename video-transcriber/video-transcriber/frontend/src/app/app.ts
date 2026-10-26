@@ -55,6 +55,11 @@ export class App {
   sessionNote = computed(() => {
     const h = this.store.health();
     if (!h) return '';
+    if (this.site.inBrowser()) {
+      const idle = this.site.idleText();
+      const when = idle ? `after ${idle} of inactivity` : 'when the session ends';
+      return `Your files never leave this device. Transcripts are kept in this browser only and deleted automatically ${when}, or when you press "Delete my data now". Export what you need before you leave.`;
+    }
     if (this.site.isPublic()) {
       const idle = this.site.idleText();
       const when = idle ? `after ${idle} of inactivity` : 'when it ends';
@@ -66,6 +71,7 @@ export class App {
   /** The one quiet line next to "Delete my data now". */
   dataNote = computed(() => {
     if (!this.sessionNote()) return '';
+    if (this.site.inBrowser()) return 'Stored on this device only, never uploaded.';
     return this.site.isPublic() ? 'Kept only for this session, then deleted automatically.' : 'Session only — nothing is saved.';
   });
 
@@ -178,6 +184,14 @@ export class App {
     if (ev.dataTransfer?.types?.includes('Files')) ev.preventDefault();
   }
 
+  /** The in-browser engine works in this tab: closing or reloading it would stop a transcription, so ask first. */
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(ev: BeforeUnloadEvent) {
+    if (!this.site.inBrowser() || !this.busy()) return;
+    ev.preventDefault();
+    ev.returnValue = '';
+  }
+
   /** "Skip to main content": a plain #fragment link would navigate to the base href, so move the focus ourselves. */
   skipToContent(ev: Event) {
     ev.preventDefault();
@@ -187,19 +201,33 @@ export class App {
   }
 
   // ------------------------------------------------------------------ data
-  /** Wipes every transcript and uploaded file of this visitor on the server, then resets the page. */
+  /**
+   * Wipes every transcript and uploaded file of this visitor (on the server, or in this browser), then resets the page.
+   * The browser edition also offers to delete the downloaded speech models (large files, not personal data).
+   */
   deleteMyData() {
     if (this.deleting()) return;
-    if (!confirm('Delete all your transcripts and uploaded files now?\n\nThis cannot be undone. Export anything you want to keep first.')) return;
+    const local = this.site.inBrowser();
+    const what = local
+      ? 'Delete all your transcripts and the files kept in this browser now?'
+      : 'Delete all your transcripts and uploaded files now?';
+    if (!confirm(`${what}\n\nThis cannot be undone. Export anything you want to keep first.`)) return;
+    const deleteModels =
+      local && confirm('Also delete the downloaded speech models?\n\nThey are downloaded again the next time you transcribe.');
     this.deleting.set(true);
-    this.api.deleteSession().subscribe({
+    this.api.deleteSession(local ? { deleteModels } : undefined).subscribe({
       next: () => {
         this.deleting.set(false);
         this.session.reset();
         this.store.clearAll();
+        if (deleteModels) this.store.refreshModels();
         this.closeAll();
         this.router.navigateByUrl('/');
-        this.store.notify('Your transcripts and files were removed from the server.', 'success', 'All your data was deleted');
+        this.store.notify(
+          local ? 'Your transcripts and files were removed from this device.' : 'Your transcripts and files were removed from the server.',
+          'success',
+          'All your data was deleted',
+        );
       },
       error: (e) => {
         this.deleting.set(false);

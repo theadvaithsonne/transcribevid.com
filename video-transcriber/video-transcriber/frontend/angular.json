@@ -72,6 +72,29 @@
               ],
               "outputHashing": "all",
               "outputMode": "static",
+              "server": "src/main.server.ts",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.browser.ts"
+                }
+              ]
+            },
+            "self-hosted": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "16kB",
+                  "maximumError": "24kB"
+                }
+              ],
+              "outputHashing": "all",
+              "outputMode": "static",
               "server": "src/main.server.ts"
             },
             "development": {
@@ -87,6 +110,9 @@
           "configurations": {
             "production": {
               "buildTarget": "frontend:build:production"
+            },
+            "self-hosted": {
+              "buildTarget": "frontend:build:self-hosted"
             },
             "development": {
               "buildTarget": "frontend:build:development"

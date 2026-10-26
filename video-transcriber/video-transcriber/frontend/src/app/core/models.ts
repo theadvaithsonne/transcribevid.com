@@ -75,6 +75,18 @@ export interface JobSummary {
   media_url?: string | null;
   options: JobOptions;
   segment_count: number;
+  /**
+   * In-browser engine only: the model files being downloaded while phase is 'loading_model' (bytes so far / in all,
+   * the file being fetched). Never sent by the server.
+   */
+  download?: ModelDownload | null;
+}
+
+/** Progress of the first-time model download of the in-browser engine. */
+export interface ModelDownload {
+  loaded: number;
+  total: number;
+  file?: string;
 }
 
 export interface Job extends JobSummary {
@@ -92,6 +104,15 @@ export interface ModelInfo {
   accuracy: number;
   note: string;
   downloaded: boolean;
+  /**
+   * In-browser engine only: why this model cannot run on this device (or is not available in the browser yet). The
+   * pickers list it disabled with this text; it is never silently replaced by another model.
+   */
+  reason?: string | null;
+  /** In-browser engine only: the model the device plan suggests for this device. */
+  default?: boolean;
+  /** In-browser engine only: 'not available for this size' when the model has no word timing. */
+  word_timing_note?: string | null;
 }
 
 export interface Language {
@@ -129,6 +150,11 @@ export interface Health {
   logs_require_token?: boolean;
   /** when a list, only these models may be chosen; null / missing = all */
   allowed_models?: string[] | null;
+  /**
+   * 'browser': this answer was made up by the in-browser edition (there is no server; files never leave the device).
+   * Missing in every real server answer.
+   */
+  runs_in?: 'browser';
 }
 
 /**

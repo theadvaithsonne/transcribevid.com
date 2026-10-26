@@ -91,11 +91,14 @@
                 <div class="field"><label for="re">Recognition engine</label>
                   <select id="re" [(ngModel)]="rerunEngine" (ngModelChange)="changeRerunEngine()" [disabled]="j.options.task === 'translate'">
                     <option value="whisper">Whisper</option>
-                    @if (qwenAvailable()) { <option value="qwen">Qwen3 ASR (experimental)</option> }
+                    @if (qwenAvailable()) { <option value="qwen" [disabled]="!!qwenBlocked()">Qwen3 ASR (experimental){{ qwenBlocked() ? ' — ' + qwenBlocked() : '' }}</option> }
                   </select></div>
                 <div class="field"><label for="rm">Quality</label>
                   <select id="rm" [(ngModel)]="rerunModel">
-                    @for (m of rerunModels(); track m.id) { <option [value]="m.id">{{ m.label }}{{ m.downloaded ? '' : ' (first use downloads ' + m.size_mb + ' MB)' }}</option> }
+                    @for (m of rerunModels(); track m.id) {
+                      @if (m.reason) { <option [value]="m.id" disabled>{{ m.label }} — {{ m.reason }}</option> }
+                      @else { <option [value]="m.id">{{ m.label }}{{ m.downloaded ? '' : ' (first use downloads ' + m.size_mb + ' MB)' }}</option> }
+                    }
                   </select></div>
                 <div class="field"><label for="rl">Language</label>
                   <select id="rl" [(ngModel)]="rerunLanguage">

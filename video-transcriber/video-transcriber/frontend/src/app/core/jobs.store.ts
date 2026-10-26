@@ -44,7 +44,8 @@ export class JobsStore {
     this.api.health().subscribe({
       next: (h) => {
         this.health.set(h);
-        this.log.configure({ enabled: h.logs_enabled !== false, needsToken: h.logs_require_token === true });
+        // the in-browser edition has no server to send client logs to (its Logs page reads the in-page log)
+        this.log.configure({ enabled: h.logs_enabled !== false && h.runs_in !== 'browser', needsToken: h.logs_require_token === true });
       },
       error: () => this.setOffline(true),
     });

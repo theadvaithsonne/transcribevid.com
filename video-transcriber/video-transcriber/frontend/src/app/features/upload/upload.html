@@ -68,14 +68,14 @@
             <div class="ok-row">
               <span class="tick" aria-hidden="true">✓</span>
               <div>
-                <b>Upload complete</b>
+                <b>{{ site.inBrowser() ? 'Ready' : 'Upload complete' }}</b>
                 <div class="up-sub">Opening your transcript…</div>
               </div>
             </div>
           } @else {
             <div class="up-row">
               <div class="up-title">
-                <span class="up-label">Uploading</span>
+                <span class="up-label">{{ site.inBrowser() ? 'Preparing' : 'Uploading' }}</span>
                 <b>{{ files()[uploadIndex()]?.name }}</b>
               </div>
               <span class="pct">{{ (uploadProgress() * 100).toFixed(0) }}<small>%</small></span>
@@ -85,7 +85,7 @@
               <span>{{ fmtBytes(uploadedBytes()) }} of {{ fmtBytes(uploadTotal()) }}@if (files().length > 1) { · file {{ uploadIndex() + 1 }} of {{ files().length }} }</span>
               @if (uploadSpeed() > 0) { <span>{{ fmtBytes(uploadSpeed()) }}/s</span> }
             </div>
-            <p class="up-keep">Keep this page open until the upload is done.</p>
+            <p class="up-keep">{{ site.inBrowser() ? 'Your file stays on this device. Keep this tab open while it is transcribed.' : 'Keep this page open until the upload is done.' }}</p>
           }
         </section>
       }
@@ -110,6 +110,9 @@
               }
             </div>
             <p class="quality-help" aria-live="polite">{{ selectedHelp() }}</p>
+            @for (n of planNotes(); track n) {
+              <p class="quality-help device-note">{{ n }}</p>
+            }
           </fieldset>
         }
 
@@ -144,9 +147,9 @@
               <label for="engine">Recognition engine</label>
               <select id="engine" [(ngModel)]="opts.engine" (ngModelChange)="changeEngine()">
                 <option value="whisper">Whisper</option>
-                @if (qwenAvailable()) { <option value="qwen">Qwen3 ASR (experimental)</option> }
+                @if (qwenAvailable()) { <option value="qwen" [disabled]="!!qwenBlocked()">Qwen3 ASR (experimental){{ qwenBlocked() ? ' — ' + qwenBlocked() : '' }}</option> }
               </select>
-              <span class="hint">Qwen uses chunk timestamps and does not provide word confidence. Compare a short sample before choosing it.</span>
+              <span class="hint">@if (qwenBlocked(); as why) { {{ why }} } @else { Qwen uses chunk timestamps and does not provide word confidence. Compare a short sample before choosing it. }</span>
             </div>
             <div class="field">
               <label for="romanizer">Hinglish conversion</label>
@@ -170,9 +173,13 @@
             </div>
             <div class="field">
               <label for="model">Model</label>
-              <select id="model" [(ngModel)]="opts.model">
+              <select id="model" [(ngModel)]="opts.model" (ngModelChange)="refreshAdvice()">
                 @for (m of selectableModels(); track m.id) {
-                  <option [value]="m.id">{{ m.label }} — {{ m.note }}{{ downloadShort(m.id) ? ' (' + downloadShort(m.id) + ')' : '' }}</option>
+                  @if (m.reason) {
+                    <option [value]="m.id" disabled>{{ m.label }} — {{ m.reason }}</option>
+                  } @else {
+                    <option [value]="m.id">{{ m.label }} — {{ m.note }}{{ downloadShort(m.id) ? ' (' + downloadShort(m.id) + ')' : '' }}</option>
+                  }
                 }
                 @if (!store.models().length) {
                   <option [value]="opts.model">{{ opts.model }}</option>
@@ -197,14 +204,20 @@
       <div class="submit">
         <button class="btn primary big go" [disabled]="!files().length || uploading() || recording()" (click)="start()">
           @if (uploading()) {
-            Uploading…
+            {{ site.inBrowser() ? 'Preparing…' : 'Uploading…' }}
           } @else if (!files().length) {
             Choose a file first
           } @else {
             Transcribe{{ files().length > 1 ? ' ' + files().length + ' files' : '' }}
           }
         </button>
-        @if (site.isPublic()) {
+        @if (advice(); as a) {
+          @if (a.text) { <p class="note device-advice" role="status">{{ a.text }}</p> }
+          @for (w of a.warnings; track w) { <p class="note device-warning" role="status">{{ w }}</p> }
+        }
+        @if (site.inBrowser()) {
+          <p class="note">Your file never leaves your device. <a routerLink="/privacy">Privacy</a></p>
+        } @else if (site.isPublic()) {
           <p class="note">Your files are deleted automatically. <a routerLink="/privacy">Privacy</a></p>
         } @else {
           <p class="note">Nothing is saved. Export what you need.</p>

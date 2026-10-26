@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node scripts/run.mjs dev",
     "start": "node scripts/run.mjs start",
-    "build": "npm --prefix frontend run build -- --configuration production",
+    "build": "npm --prefix frontend run build -- --configuration self-hosted",
     "test": "node scripts/run.mjs test",
     "setup": "node scripts/run.mjs setup",
     "test:real": "node scripts/run.mjs test-real",
