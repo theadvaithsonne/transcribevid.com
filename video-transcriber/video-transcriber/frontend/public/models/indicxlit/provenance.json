@@ -1,0 +1,51 @@
+{
+ "model": "AI4Bharat IndicXlit v1 (Indic -> Roman), transformer, Hindi source language token __hi__",
+ "source": "https://github.com/AI4Bharat/IndicXlit/releases/download/v1.0/indicxlit-indic-en-v1.0.zip",
+ "checkpoint_sha256": "45ffecef88d990ae12f915939b91267a3fc8f69f26331baa59f7932005976f28",
+ "license": "MIT",
+ "license_notice": "Copyright (c) 2022 AI4Bharat. MIT License; the full text is in LICENSE next to this file.",
+ "format": "indicxlit-int8-v1",
+ "weights": "int8 tensors, per-row scales, biases and layer norms copied unchanged from the server's CTranslate2 model.bin (spec TransformerSpec rev 7, binary v6) which backend/tools/prepare_indicxlit.py built from the checkpoint above",
+ "conversion": [
+  "cd backend",
+  ".venv/Scripts/python.exe -m pip install -r requirements-indicxlit.txt",
+  ".venv/Scripts/python.exe -m tools.prepare_indicxlit",
+  ".venv/Scripts/python.exe -m tools.export_indicxlit_browser"
+ ],
+ "files": {
+  "indicxlit.bin": {
+   "bytes": 12636256,
+   "sha256": "c4519ea9bd35a4f8a269a438eabae7c03b95da434d2069b046adfe41712207cb"
+  },
+  "indicxlit.json": {
+   "bytes": 50961,
+   "sha256": "695cce50fc8c7375d4b6d7ed51d0933868c753a2e107bdad8db840a643aa3fb2"
+  },
+  "LICENSE": {
+   "bytes": 1088,
+   "sha256": "97ba9030f7ffa04466a790ce2ff774c2f6e8f7455c784221d20a378e33f3687a"
+  },
+  "wordcache.tsv": {
+   "bytes": 246137,
+   "sha256": "703de3663b0763df4e1ba2080f8503a043823f4cf728ba56d6fb9854828df4cc"
+  }
+ },
+ "wordcache": {
+  "what": "outputs of the server pipeline (app.indicxlit.IndicXlit, beam 4, max 96) for the most frequent Hindi words",
+  "words": 10000,
+  "word_list": "OpenSubtitles Hindi word-frequency list 2018 (hermitdave/FrequencyWords, data CC BY-SA 4.0); only the words themselves are used",
+  "model_sha256": "c4519ea9bd35a4f8a269a438eabae7c03b95da434d2069b046adfe41712207cb",
+  "regenerate": ".venv/Scripts/python.exe -m tools.export_indicxlit_wordcache --words <list> --limit 10000"
+ },
+ "kernels": {
+  "source": "kernels/indicxlit-kernels.as.ts",
+  "source_sha256": "340b27480bd6afea7b2adb93d29c226fc439b32d05aab45f53011c18ddd5fba2",
+  "compiler": "AssemblyScript 0.28.2 --optimize --noAssert --runtime stub --importMemory --initialMemory 1 [--enable simd]",
+  "embedded_in": "frontend/src/app/engine/hinglish/indicxlit-kernels.wasm.ts",
+  "build": ".venv/Scripts/python.exe -m tools.export_indicxlit_kernels",
+  "wasm_bytes": {
+   "simd": 5221,
+   "portable": 3751
+  }
+ }
+}

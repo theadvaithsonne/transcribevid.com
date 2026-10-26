@@ -1,0 +1,3165 @@
+{
+ "format": "indicxlit-int8-v1",
+ "model": "AI4Bharat IndicXlit v1 Indic-to-Roman, Hindi, int8 (CTranslate2 int8 tensors, unchanged)",
+ "dims": {
+  "d_model": 256,
+  "heads": 4,
+  "ffn": 1024,
+  "enc_layers": 6,
+  "dec_layers": 6,
+  "head_dim": 64,
+  "source_vocab": 806,
+  "target_vocab": 54,
+  "position_rows": 1024
+ },
+ "specials": {
+  "bos": 0,
+  "pad": 1,
+  "eos": 2,
+  "unk": 3
+ },
+ "language_token": "__hi__",
+ "scale_embeddings": {
+  "encoder": 16.0,
+  "decoder": 16.0
+ },
+ "layer_norm_epsilon": 1e-05,
+ "activation": "gelu",
+ "add_source_eos": true,
+ "add_source_bos": false,
+ "decoder_start_token": "</s>",
+ "decoding_defaults": {
+  "beam_size": 4,
+  "num_hypotheses": 1,
+  "max_decoding_length": 96,
+  "max_input_length": 1024,
+  "min_decoding_length": 1,
+  "length_penalty": 1,
+  "patience": 1
+ },
+ "source_vocabulary": [
+  "<s>",
+  "<blank>",
+  "</s>",
+  "<unk>",
+  "്",
+  "ा",
+  "्",
+  "்",
+  "र",
+  "ി",
+  "ക",
+  "ि",
+  "க",
+  "ന",
+  "न",
+  "್",
+  "ു",
+  "क",
+  "त",
+  "स",
+  "ಿ",
+  "ാ",
+  "ி",
+  "े",
+  "म",
+  "ு",
+  "ത",
+  "த",
+  "य",
+  "్",
+  "व",
+  "ल",
+  "യ",
+  "ी",
+  "प",
+  "ರ",
+  "ి",
+  "ப",
+  "ದ",
+  "ா",
+  "ो",
+  "ട",
+  "ु",
+  "ು",
+  "ు",
+  "ಾ",
+  "ட",
+  "న",
+  "ര",
+  "ా",
+  "द",
+  "മ",
+  "ர",
+  "ம",
+  "ല",
+  "െ",
+  "പ",
+  "ं",
+  "ಗ",
+  "வ",
+  "ೆ",
+  "വ",
+  "ಲ",
+  "ನ",
+  "ర",
+  "ತ",
+  "च",
+  "া",
+  "ग",
+  "ల",
+  "ವ",
+  "ன",
+  "ह",
+  "ಕ",
+  "ब",
+  "ல",
+  "ய",
+  "క",
+  "ం",
+  "ை",
+  "ണ",
+  "ള",
+  "ಸ",
+  "ം",
+  "ज",
+  "্",
+  "ા",
+  "র",
+  "റ",
+  "ट",
+  "ಯ",
+  "ள",
+  "ச",
+  "श",
+  "ಂ",
+  "സ",
+  "ప",
+  "త",
+  "ച",
+  "ற",
+  "ি",
+  "వ",
+  "ോ",
+  "ে",
+  "ન",
+  "స",
+  "ध",
+  "્",
+  "ో",
+  "ا",
+  "ట",
+  "మ",
+  "ड",
+  "भ",
+  "ద",
+  "ే",
+  "ર",
+  "ಳ",
+  "ण",
+  "ಮ",
+  "ू",
+  "ন",
+  "ങ",
+  "േ",
+  "చ",
+  "ی",
+  "డ",
+  "ष",
+  "ক",
+  "ந",
+  "య",
+  "ر",
+  "ಪ",
+  "و",
+  "గ",
+  "ಡ",
+  "ಬ",
+  "ી",
+  "ै",
+  "ே",
+  "ಟ",
+  "ે",
+  "ব",
+  "ল",
+  "স",
+  "ত",
+  "ೇ",
+  "ख",
+  "अ",
+  "ن",
+  "ম",
+  "थ",
+  "ೊ",
+  "ો",
+  "સ",
+  "ோ",
+  "ಹ",
+  "મ",
+  "ண",
+  "ദ",
+  "ெ",
+  "ક",
+  "ু",
+  "ె",
+  "િ",
+  "ં",
+  "প",
+  "ः",
+  "फ",
+  "୍",
+  "ਾ",
+  "ീ",
+  "વ",
+  "ൂ",
+  "ഷ",
+  "ശ",
+  "લ",
+  "ೋ",
+  "ା",
+  "അ",
+  "ਰ",
+  "ک",
+  "ർ",
+  "দ",
+  "ೂ",
+  "ए",
+  "ل",
+  "ഗ",
+  "ൊ",
+  "ର",
+  "ీ",
+  "م",
+  "য",
+  "ங",
+  "அ",
+  "ृ",
+  "బ",
+  "س",
+  "इ",
+  "उ",
+  "ൽ",
+  "ট",
+  "ழ",
+  "ି",
+  "પ",
+  "ொ",
+  "ુ",
+  "ো",
+  "ટ",
+  "ജ",
+  "ബ",
+  "গ",
+  "ಜ",
+  "ત",
+  "ಚ",
+  "आ",
+  "ധ",
+  "ਸ",
+  "ई",
+  "ય",
+  "ಶ",
+  "ഞ",
+  "ँ",
+  "ഹ",
+  "ూ",
+  "জ",
+  "ੀ",
+  "జ",
+  "ಣ",
+  "ூ",
+  "ഴ",
+  "ഭ",
+  "ौ",
+  "ಅ",
+  "হ",
+  "ீ",
+  "ب",
+  "ী",
+  "د",
+  "ت",
+  "छ",
+  "କ",
+  "ਿ",
+  "ಷ",
+  "ਲ",
+  "ై",
+  "ગ",
+  "இ",
+  "ೀ",
+  "ठ",
+  "শ",
+  "ਕ",
+  "అ",
+  "ડ",
+  "ই",
+  "घ",
+  "બ",
+  "ङ",
+  "ਨ",
+  "ొ",
+  "ୁ",
+  "ہ",
+  "پ",
+  "ळ",
+  "శ",
+  "ൾ",
+  "ಧ",
+  "જ",
+  "ష",
+  "ٹ",
+  "ନ",
+  "દ",
+  "ৰ",
+  "େ",
+  "హ",
+  "চ",
+  "ಭ",
+  "گ",
+  "ੋ",
+  "ൻ",
+  "ਮ",
+  "ভ",
+  "ആ",
+  "ੇ",
+  "શ",
+  "உ",
+  "ବ",
+  "હ",
+  "ഡ",
+  "ਟ",
+  "ञ",
+  "ড",
+  "ధ",
+  "ஸ",
+  "ഇ",
+  "ਪ",
+  "ਵ",
+  "ൈ",
+  "ସ",
+  "়",
+  "ମ",
+  "ج",
+  "થ",
+  "झ",
+  "భ",
+  "ਂ",
+  "ପ",
+  "ೈ",
+  "ش",
+  "எ",
+  "ତ",
+  "ਗ",
+  "ళ",
+  "ধ",
+  "ಆ",
+  "ஆ",
+  "ਜ",
+  "ও",
+  "ھ",
+  "ഥ",
+  "़",
+  "ز",
+  "ষ",
+  "ഉ",
+  "ف",
+  "ഫ",
+  "ਬ",
+  "എ",
+  "ణ",
+  "ஜ",
+  "ଲ",
+  "ণ",
+  "ચ",
+  "ఆ",
+  "ফ",
+  "ॉ",
+  "ൃ",
+  "ਤ",
+  "ੁ",
+  "એ",
+  "ફ",
+  "ભ",
+  "ഖ",
+  "অ",
+  "ಥ",
+  "ਦ",
+  "ੈ",
+  "ੰ",
+  "ڈ",
+  "ओ",
+  "আ",
+  "਼",
+  "ਆ",
+  "খ",
+  "ਡ",
+  "ং",
+  "থ",
+  "ਹ",
+  "ढ",
+  "ઓ",
+  "ଙ",
+  "ಫ",
+  "ஷ",
+  "ધ",
+  "ଦ",
+  "ऽ",
+  "ఎ",
+  "ఫ",
+  "ಎ",
+  "چ",
+  "ഒ",
+  "ಉ",
+  "ઇ",
+  "ଗ",
+  "ૂ",
+  "ଟ",
+  "উ",
+  "અ",
+  "ಖ",
+  "ೃ",
+  "ಇ",
+  "ણ",
+  "ي",
+  "এ",
+  "ছ",
+  "థ",
+  "ખ",
+  "ୋ",
+  "ୟ",
+  "ઈ",
+  "ূ",
+  "ఉ",
+  "ୀ",
+  "ଜ",
+  "ஞ",
+  "ળ",
+  "ଡ",
+  "ஒ",
+  "ହ",
+  "ഘ",
+  "ੱ",
+  "ق",
+  "ೌ",
+  "ષ",
+  "ఇ",
+  "ଣ",
+  "੍",
+  "ଇ",
+  "ਅ",
+  "ॅ",
+  "આ",
+  "ਫ",
+  "ઝ",
+  "ੂ",
+  "ৃ",
+  "ൌ",
+  "ಒ",
+  "ృ",
+  "ଶ",
+  "خ",
+  "ਚ",
+  "ঙ",
+  "ଥ",
+  "ఖ",
+  "ح",
+  "ଆ",
+  "ਈ",
+  "ஹ",
+  "ଚ",
+  "ଭ",
+  "ঞ",
+  "ଳ",
+  "ഓ",
+  "ౌ",
+  "ஏ",
+  "ઉ",
+  "ਇ",
+  "ঘ",
+  "ਖ",
+  "ଷ",
+  "ع",
+  "්",
+  "ਐ",
+  "ৈ",
+  "ಘ",
+  "ഠ",
+  "آ",
+  "ଧ",
+  "ਣ",
+  "ઘ",
+  "ঠ",
+  "ഏ",
+  "ි",
+  "ص",
+  "ৌ",
+  "ଅ",
+  "ৱ",
+  "ව",
+  "ଯ",
+  "ଏ",
+  "න",
+  "ঁ",
+  "ڑ",
+  "ੌ",
+  "ஓ",
+  "ਉ",
+  "ଖ",
+  "ஊ",
+  "ଉ",
+  "ੜ",
+  "ಠ",
+  "ය",
+  "છ",
+  "ਧ",
+  "ૃ",
+  "ਥ",
+  "ఒ",
+  "ਭ",
+  "ఏ",
+  "ଫ",
+  "ා",
+  "ਓ",
+  "ක",
+  "ऊ",
+  "ਯ",
+  "ئ",
+  "غ",
+  "ත",
+  "ఘ",
+  "ൺ",
+  "ୱ",
+  "ଠ",
+  "ઠ",
+  "ں",
+  "ଛ",
+  "ಞ",
+  "ڪ",
+  "ஈ",
+  "ර",
+  "ಏ",
+  "ه",
+  "ૈ",
+  "ਏ",
+  "ු",
+  "औ",
+  "ଂ",
+  "ම",
+  "ස",
+  "ৎ",
+  "ঝ",
+  "ط",
+  "ے",
+  "ऋ",
+  "ऐ",
+  "ظ",
+  "ୂ",
+  "ఊ",
+  "ꯤ",
+  "଼",
+  "ૌ",
+  "ଞ",
+  "ୃ",
+  "ऑ",
+  "ල",
+  "ਘ",
+  "ද",
+  "ഈ",
+  "ප",
+  "ಓ",
+  "ض",
+  "ఓ",
+  "ٽ",
+  "ꯥ",
+  "ૉ",
+  "ಛ",
+  "ஃ",
+  "ఞ",
+  "ఐ",
+  "ఈ",
+  "َ",
+  "ઢ",
+  "ഊ",
+  "ଁ",
+  "ஐ",
+  "ଘ",
+  "ௌ",
+  "ഐ",
+  "ఠ",
+  "ഛ",
+  "ේ",
+  "ෙ",
+  "ಐ",
+  "ଓ",
+  "ذ",
+  "ට",
+  "ಈ",
+  "ਛ",
+  "ග",
+  "ಢ",
+  "ਊ",
+  "ਝ",
+  "ී",
+  "ث",
+  "ء",
+  "ٕ",
+  "ِ",
+  "හ",
+  "ઞ",
+  "ڙ",
+  "ਠ",
+  "ಊ",
+  "ڻ",
+  "ঃ",
+  "ଝ",
+  "ُ",
+  "ꯅ",
+  "ꯁ",
+  "ഔ",
+  "ଢ",
+  "ঢ",
+  "ಃ",
+  "ꯕ",
+  "ꯨ",
+  "ꯔ",
+  "ഢ",
+  "ఛ",
+  "ꯣ",
+  "ꯂ",
+  "ڊ",
+  "ꯡ",
+  "ഃ",
+  "අ",
+  "ୌ",
+  "ٲ",
+  "ꯗ",
+  "ః",
+  "ୈ",
+  "ꯟ",
+  "ණ",
+  "බ",
+  "ꯃ",
+  "ං",
+  "ꯄ",
+  "ො",
+  "ꯒ",
+  "ꯦ",
+  "ශ",
+  "ꯝ",
+  "ꯇ",
+  "ಔ",
+  "ꯛ",
+  "ෂ",
+  "ਢ",
+  "ઃ",
+  "ۍ",
+  "ڏ",
+  "ෝ",
+  "ජ",
+  "ژ",
+  "ධ",
+  "ꯀ",
+  "ٚ",
+  "ಋ",
+  "ڀ",
+  "ڌ",
+  "ٿ",
+  "ઊ",
+  "ڳ",
+  "ಝ",
+  "ঐ",
+  "භ",
+  "ꯈ",
+  "ච",
+  "ٔ",
+  "ٗ",
+  "ළ",
+  "ꯌ",
+  "ఔ",
+  "ꯊ",
+  "ଃ",
+  "ꯍ",
+  "ٮ",
+  "ڇ",
+  "ඩ",
+  "۪",
+  "ٖ",
+  "ූ",
+  "ꯆ",
+  "ٛ",
+  "ഋ",
+  "ঋ",
+  "ఢ",
+  "ꯩ",
+  "ঈ",
+  "ꯑ",
+  "ۄ",
+  "ꯐ",
+  "ආ",
+  "ؤ",
+  "ઔ",
+  "ٻ",
+  "ٺ",
+  "ꯠ",
+  "ꯜ",
+  "ꯢ",
+  "උ",
+  "ఋ",
+  "ઋ",
+  "ෘ",
+  "ڦ",
+  "ॄ",
+  "ꯧ",
+  "ꯏ",
+  "ථ",
+  "ꯖ",
+  "ꯋ",
+  "ঔ",
+  "ඳ",
+  "ਔ",
+  "꯭",
+  "ැ",
+  "ꯉ",
+  "ඉ",
+  "එ",
+  "ఝ",
+  "ꯎ",
+  "ꯪ",
+  "ڍ",
+  "ۃ",
+  "ঊ",
+  "ڄ",
+  "ଋ",
+  "ّ",
+  "ඟ",
+  "ꯞ",
+  "ڃ",
+  "ઐ",
+  "ॆ",
+  "ඛ",
+  "ඹ",
+  "ඨ",
+  "ଔ",
+  "ඔ",
+  "ඝ",
+  "ඥ",
+  "ଐ",
+  "ෞ",
+  "ꯚ",
+  "ෛ",
+  "ڱ",
+  "ૅ",
+  "ઑ",
+  "ෆ",
+  "ඡ",
+  "ඵ",
+  "ଈ",
+  "ऍ",
+  "ඇ",
+  "ඊ",
+  "ඒ",
+  "॰",
+  "ഝ",
+  "ඬ",
+  "ෑ",
+  "ඤ",
+  "ඕ",
+  "ꯓ",
+  "ۭ",
+  "ఱ",
+  "ॊ",
+  "،",
+  "ઍ",
+  "ఁ",
+  "ꯙ",
+  "ඍ",
+  "ة",
+  "ఙ",
+  "ඖ",
+  "ෲ",
+  "ً",
+  "ۓ",
+  "૰",
+  "ꯘ",
+  "઼",
+  "২",
+  "ઁ",
+  "ඪ",
+  "ඓ",
+  "ਞ",
+  "ඌ",
+  "ඞ",
+  "ॠ",
+  "ؐ",
+  "ඃ",
+  "।",
+  "ـ",
+  "ਙ",
+  "ඣ",
+  "ك",
+  "ऒ",
+  "ٰ",
+  "ॐ",
+  "ଊ",
+  "ෟ",
+  "ؓ",
+  "ٌ",
+  "ٓ",
+  "۶",
+  "۾",
+  "ऌ",
+  "॑",
+  "॥",
+  "ੲ",
+  "ૐ",
+  "ୢ",
+  "ஔ",
+  "ౄ",
+  "಼",
+  "ඈ",
+  "madeupword0000",
+  "madeupword0001",
+  "madeupword0002",
+  "madeupword0003",
+  "madeupword0004",
+  "__en__",
+  "__as__",
+  "__bn__",
+  "__brx__",
+  "__gom__",
+  "__gu__",
+  "__hi__",
+  "__kn__",
+  "__ks__",
+  "__mai__",
+  "__ml__",
+  "__mni__",
+  "__mr__",
+  "__ne__",
+  "__or__",
+  "__pa__",
+  "__sa__",
+  "__sd__",
+  "__si__",
+  "__ta__",
+  "__te__",
+  "__ur__"
+ ],
+ "target_vocabulary": [
+  "<s>",
+  "<blank>",
+  "</s>",
+  "<unk>",
+  "a",
+  "i",
+  "n",
+  "h",
+  "t",
+  "r",
+  "u",
+  "e",
+  "k",
+  "l",
+  "d",
+  "s",
+  "m",
+  "o",
+  "y",
+  "p",
+  "v",
+  "g",
+  "b",
+  "c",
+  "j",
+  "w",
+  "z",
+  "f",
+  "x",
+  "q",
+  "madeupword0000",
+  "madeupword0001",
+  "__en__",
+  "__as__",
+  "__bn__",
+  "__brx__",
+  "__gom__",
+  "__gu__",
+  "__hi__",
+  "__kn__",
+  "__ks__",
+  "__mai__",
+  "__ml__",
+  "__mni__",
+  "__mr__",
+  "__ne__",
+  "__or__",
+  "__pa__",
+  "__sa__",
+  "__sd__",
+  "__si__",
+  "__ta__",
+  "__te__",
+  "__ur__"
+ ],
+ "tensors": {
+  "decoder/embeddings/weight": {
+   "dtype": "i8",
+   "shape": [
+    54,
+    256
+   ],
+   "offset": 0,
+   "bytes": 13824
+  },
+  "decoder/embeddings/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    54
+   ],
+   "offset": 13824,
+   "bytes": 216
+  },
+  "decoder/layer_0/attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 14048,
+   "bytes": 1024
+  },
+  "decoder/layer_0/attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 15072,
+   "bytes": 1024
+  },
+  "decoder/layer_0/attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 16096,
+   "bytes": 1024
+  },
+  "decoder/layer_0/attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 17120,
+   "bytes": 65536
+  },
+  "decoder/layer_0/attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 82656,
+   "bytes": 1024
+  },
+  "decoder/layer_0/attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 83680,
+   "bytes": 2048
+  },
+  "decoder/layer_0/attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    512,
+    256
+   ],
+   "offset": 85728,
+   "bytes": 131072
+  },
+  "decoder/layer_0/attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 216800,
+   "bytes": 2048
+  },
+  "decoder/layer_0/attention/linear_2/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 218848,
+   "bytes": 1024
+  },
+  "decoder/layer_0/attention/linear_2/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 219872,
+   "bytes": 65536
+  },
+  "decoder/layer_0/attention/linear_2/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 285408,
+   "bytes": 1024
+  },
+  "decoder/layer_0/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 286432,
+   "bytes": 1024
+  },
+  "decoder/layer_0/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 287456,
+   "bytes": 1024
+  },
+  "decoder/layer_0/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 288480,
+   "bytes": 4096
+  },
+  "decoder/layer_0/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 292576,
+   "bytes": 262144
+  },
+  "decoder/layer_0/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 554720,
+   "bytes": 4096
+  },
+  "decoder/layer_0/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 558816,
+   "bytes": 1024
+  },
+  "decoder/layer_0/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 559840,
+   "bytes": 262144
+  },
+  "decoder/layer_0/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 821984,
+   "bytes": 1024
+  },
+  "decoder/layer_0/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 823008,
+   "bytes": 1024
+  },
+  "decoder/layer_0/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 824032,
+   "bytes": 1024
+  },
+  "decoder/layer_0/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 825056,
+   "bytes": 3072
+  },
+  "decoder/layer_0/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 828128,
+   "bytes": 196608
+  },
+  "decoder/layer_0/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 1024736,
+   "bytes": 3072
+  },
+  "decoder/layer_0/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1027808,
+   "bytes": 1024
+  },
+  "decoder/layer_0/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 1028832,
+   "bytes": 65536
+  },
+  "decoder/layer_0/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1094368,
+   "bytes": 1024
+  },
+  "decoder/layer_1/attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1095392,
+   "bytes": 1024
+  },
+  "decoder/layer_1/attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1096416,
+   "bytes": 1024
+  },
+  "decoder/layer_1/attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1097440,
+   "bytes": 1024
+  },
+  "decoder/layer_1/attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 1098464,
+   "bytes": 65536
+  },
+  "decoder/layer_1/attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1164000,
+   "bytes": 1024
+  },
+  "decoder/layer_1/attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 1165024,
+   "bytes": 2048
+  },
+  "decoder/layer_1/attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    512,
+    256
+   ],
+   "offset": 1167072,
+   "bytes": 131072
+  },
+  "decoder/layer_1/attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 1298144,
+   "bytes": 2048
+  },
+  "decoder/layer_1/attention/linear_2/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1300192,
+   "bytes": 1024
+  },
+  "decoder/layer_1/attention/linear_2/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 1301216,
+   "bytes": 65536
+  },
+  "decoder/layer_1/attention/linear_2/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1366752,
+   "bytes": 1024
+  },
+  "decoder/layer_1/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1367776,
+   "bytes": 1024
+  },
+  "decoder/layer_1/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1368800,
+   "bytes": 1024
+  },
+  "decoder/layer_1/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 1369824,
+   "bytes": 4096
+  },
+  "decoder/layer_1/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 1373920,
+   "bytes": 262144
+  },
+  "decoder/layer_1/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 1636064,
+   "bytes": 4096
+  },
+  "decoder/layer_1/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1640160,
+   "bytes": 1024
+  },
+  "decoder/layer_1/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 1641184,
+   "bytes": 262144
+  },
+  "decoder/layer_1/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1903328,
+   "bytes": 1024
+  },
+  "decoder/layer_1/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1904352,
+   "bytes": 1024
+  },
+  "decoder/layer_1/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 1905376,
+   "bytes": 1024
+  },
+  "decoder/layer_1/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 1906400,
+   "bytes": 3072
+  },
+  "decoder/layer_1/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 1909472,
+   "bytes": 196608
+  },
+  "decoder/layer_1/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 2106080,
+   "bytes": 3072
+  },
+  "decoder/layer_1/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2109152,
+   "bytes": 1024
+  },
+  "decoder/layer_1/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 2110176,
+   "bytes": 65536
+  },
+  "decoder/layer_1/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2175712,
+   "bytes": 1024
+  },
+  "decoder/layer_2/attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2176736,
+   "bytes": 1024
+  },
+  "decoder/layer_2/attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2177760,
+   "bytes": 1024
+  },
+  "decoder/layer_2/attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2178784,
+   "bytes": 1024
+  },
+  "decoder/layer_2/attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 2179808,
+   "bytes": 65536
+  },
+  "decoder/layer_2/attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2245344,
+   "bytes": 1024
+  },
+  "decoder/layer_2/attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 2246368,
+   "bytes": 2048
+  },
+  "decoder/layer_2/attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    512,
+    256
+   ],
+   "offset": 2248416,
+   "bytes": 131072
+  },
+  "decoder/layer_2/attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 2379488,
+   "bytes": 2048
+  },
+  "decoder/layer_2/attention/linear_2/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2381536,
+   "bytes": 1024
+  },
+  "decoder/layer_2/attention/linear_2/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 2382560,
+   "bytes": 65536
+  },
+  "decoder/layer_2/attention/linear_2/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2448096,
+   "bytes": 1024
+  },
+  "decoder/layer_2/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2449120,
+   "bytes": 1024
+  },
+  "decoder/layer_2/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2450144,
+   "bytes": 1024
+  },
+  "decoder/layer_2/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 2451168,
+   "bytes": 4096
+  },
+  "decoder/layer_2/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 2455264,
+   "bytes": 262144
+  },
+  "decoder/layer_2/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 2717408,
+   "bytes": 4096
+  },
+  "decoder/layer_2/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2721504,
+   "bytes": 1024
+  },
+  "decoder/layer_2/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 2722528,
+   "bytes": 262144
+  },
+  "decoder/layer_2/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2984672,
+   "bytes": 1024
+  },
+  "decoder/layer_2/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2985696,
+   "bytes": 1024
+  },
+  "decoder/layer_2/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 2986720,
+   "bytes": 1024
+  },
+  "decoder/layer_2/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 2987744,
+   "bytes": 3072
+  },
+  "decoder/layer_2/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 2990816,
+   "bytes": 196608
+  },
+  "decoder/layer_2/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 3187424,
+   "bytes": 3072
+  },
+  "decoder/layer_2/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3190496,
+   "bytes": 1024
+  },
+  "decoder/layer_2/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 3191520,
+   "bytes": 65536
+  },
+  "decoder/layer_2/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3257056,
+   "bytes": 1024
+  },
+  "decoder/layer_3/attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3258080,
+   "bytes": 1024
+  },
+  "decoder/layer_3/attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3259104,
+   "bytes": 1024
+  },
+  "decoder/layer_3/attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3260128,
+   "bytes": 1024
+  },
+  "decoder/layer_3/attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 3261152,
+   "bytes": 65536
+  },
+  "decoder/layer_3/attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3326688,
+   "bytes": 1024
+  },
+  "decoder/layer_3/attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 3327712,
+   "bytes": 2048
+  },
+  "decoder/layer_3/attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    512,
+    256
+   ],
+   "offset": 3329760,
+   "bytes": 131072
+  },
+  "decoder/layer_3/attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 3460832,
+   "bytes": 2048
+  },
+  "decoder/layer_3/attention/linear_2/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3462880,
+   "bytes": 1024
+  },
+  "decoder/layer_3/attention/linear_2/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 3463904,
+   "bytes": 65536
+  },
+  "decoder/layer_3/attention/linear_2/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3529440,
+   "bytes": 1024
+  },
+  "decoder/layer_3/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3530464,
+   "bytes": 1024
+  },
+  "decoder/layer_3/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3531488,
+   "bytes": 1024
+  },
+  "decoder/layer_3/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 3532512,
+   "bytes": 4096
+  },
+  "decoder/layer_3/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 3536608,
+   "bytes": 262144
+  },
+  "decoder/layer_3/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 3798752,
+   "bytes": 4096
+  },
+  "decoder/layer_3/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 3802848,
+   "bytes": 1024
+  },
+  "decoder/layer_3/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 3803872,
+   "bytes": 262144
+  },
+  "decoder/layer_3/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4066016,
+   "bytes": 1024
+  },
+  "decoder/layer_3/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4067040,
+   "bytes": 1024
+  },
+  "decoder/layer_3/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4068064,
+   "bytes": 1024
+  },
+  "decoder/layer_3/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 4069088,
+   "bytes": 3072
+  },
+  "decoder/layer_3/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 4072160,
+   "bytes": 196608
+  },
+  "decoder/layer_3/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 4268768,
+   "bytes": 3072
+  },
+  "decoder/layer_3/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4271840,
+   "bytes": 1024
+  },
+  "decoder/layer_3/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 4272864,
+   "bytes": 65536
+  },
+  "decoder/layer_3/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4338400,
+   "bytes": 1024
+  },
+  "decoder/layer_4/attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4339424,
+   "bytes": 1024
+  },
+  "decoder/layer_4/attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4340448,
+   "bytes": 1024
+  },
+  "decoder/layer_4/attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4341472,
+   "bytes": 1024
+  },
+  "decoder/layer_4/attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 4342496,
+   "bytes": 65536
+  },
+  "decoder/layer_4/attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4408032,
+   "bytes": 1024
+  },
+  "decoder/layer_4/attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 4409056,
+   "bytes": 2048
+  },
+  "decoder/layer_4/attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    512,
+    256
+   ],
+   "offset": 4411104,
+   "bytes": 131072
+  },
+  "decoder/layer_4/attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 4542176,
+   "bytes": 2048
+  },
+  "decoder/layer_4/attention/linear_2/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4544224,
+   "bytes": 1024
+  },
+  "decoder/layer_4/attention/linear_2/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 4545248,
+   "bytes": 65536
+  },
+  "decoder/layer_4/attention/linear_2/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4610784,
+   "bytes": 1024
+  },
+  "decoder/layer_4/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4611808,
+   "bytes": 1024
+  },
+  "decoder/layer_4/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4612832,
+   "bytes": 1024
+  },
+  "decoder/layer_4/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 4613856,
+   "bytes": 4096
+  },
+  "decoder/layer_4/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 4617952,
+   "bytes": 262144
+  },
+  "decoder/layer_4/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 4880096,
+   "bytes": 4096
+  },
+  "decoder/layer_4/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 4884192,
+   "bytes": 1024
+  },
+  "decoder/layer_4/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 4885216,
+   "bytes": 262144
+  },
+  "decoder/layer_4/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5147360,
+   "bytes": 1024
+  },
+  "decoder/layer_4/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5148384,
+   "bytes": 1024
+  },
+  "decoder/layer_4/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5149408,
+   "bytes": 1024
+  },
+  "decoder/layer_4/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 5150432,
+   "bytes": 3072
+  },
+  "decoder/layer_4/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 5153504,
+   "bytes": 196608
+  },
+  "decoder/layer_4/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 5350112,
+   "bytes": 3072
+  },
+  "decoder/layer_4/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5353184,
+   "bytes": 1024
+  },
+  "decoder/layer_4/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 5354208,
+   "bytes": 65536
+  },
+  "decoder/layer_4/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5419744,
+   "bytes": 1024
+  },
+  "decoder/layer_5/attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5420768,
+   "bytes": 1024
+  },
+  "decoder/layer_5/attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5421792,
+   "bytes": 1024
+  },
+  "decoder/layer_5/attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5422816,
+   "bytes": 1024
+  },
+  "decoder/layer_5/attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 5423840,
+   "bytes": 65536
+  },
+  "decoder/layer_5/attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5489376,
+   "bytes": 1024
+  },
+  "decoder/layer_5/attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 5490400,
+   "bytes": 2048
+  },
+  "decoder/layer_5/attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    512,
+    256
+   ],
+   "offset": 5492448,
+   "bytes": 131072
+  },
+  "decoder/layer_5/attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    512
+   ],
+   "offset": 5623520,
+   "bytes": 2048
+  },
+  "decoder/layer_5/attention/linear_2/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5625568,
+   "bytes": 1024
+  },
+  "decoder/layer_5/attention/linear_2/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 5626592,
+   "bytes": 65536
+  },
+  "decoder/layer_5/attention/linear_2/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5692128,
+   "bytes": 1024
+  },
+  "decoder/layer_5/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5693152,
+   "bytes": 1024
+  },
+  "decoder/layer_5/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5694176,
+   "bytes": 1024
+  },
+  "decoder/layer_5/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 5695200,
+   "bytes": 4096
+  },
+  "decoder/layer_5/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 5699296,
+   "bytes": 262144
+  },
+  "decoder/layer_5/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 5961440,
+   "bytes": 4096
+  },
+  "decoder/layer_5/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 5965536,
+   "bytes": 1024
+  },
+  "decoder/layer_5/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 5966560,
+   "bytes": 262144
+  },
+  "decoder/layer_5/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6228704,
+   "bytes": 1024
+  },
+  "decoder/layer_5/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6229728,
+   "bytes": 1024
+  },
+  "decoder/layer_5/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6230752,
+   "bytes": 1024
+  },
+  "decoder/layer_5/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 6231776,
+   "bytes": 3072
+  },
+  "decoder/layer_5/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 6234848,
+   "bytes": 196608
+  },
+  "decoder/layer_5/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 6431456,
+   "bytes": 3072
+  },
+  "decoder/layer_5/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6434528,
+   "bytes": 1024
+  },
+  "decoder/layer_5/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 6435552,
+   "bytes": 65536
+  },
+  "decoder/layer_5/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6501088,
+   "bytes": 1024
+  },
+  "decoder/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6502112,
+   "bytes": 1024
+  },
+  "decoder/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6503136,
+   "bytes": 1024
+  },
+  "decoder/layernorm_embedding/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6504160,
+   "bytes": 1024
+  },
+  "decoder/layernorm_embedding/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 6505184,
+   "bytes": 1024
+  },
+  "positions": {
+   "dtype": "f32",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 6506208,
+   "bytes": 1048576
+  },
+  "decoder/projection/weight": {
+   "dtype": "i8",
+   "shape": [
+    54,
+    256
+   ],
+   "offset": 7554784,
+   "bytes": 13824
+  },
+  "decoder/projection/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    54
+   ],
+   "offset": 7568608,
+   "bytes": 216
+  },
+  "encoder/embeddings_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    806,
+    256
+   ],
+   "offset": 7568832,
+   "bytes": 206336
+  },
+  "encoder/embeddings_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    806
+   ],
+   "offset": 7775168,
+   "bytes": 3224
+  },
+  "encoder/layer_0/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 7778400,
+   "bytes": 1024
+  },
+  "encoder/layer_0/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 7779424,
+   "bytes": 1024
+  },
+  "encoder/layer_0/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 7780448,
+   "bytes": 4096
+  },
+  "encoder/layer_0/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 7784544,
+   "bytes": 262144
+  },
+  "encoder/layer_0/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 8046688,
+   "bytes": 4096
+  },
+  "encoder/layer_0/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8050784,
+   "bytes": 1024
+  },
+  "encoder/layer_0/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 8051808,
+   "bytes": 262144
+  },
+  "encoder/layer_0/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8313952,
+   "bytes": 1024
+  },
+  "encoder/layer_0/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8314976,
+   "bytes": 1024
+  },
+  "encoder/layer_0/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8316000,
+   "bytes": 1024
+  },
+  "encoder/layer_0/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 8317024,
+   "bytes": 3072
+  },
+  "encoder/layer_0/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 8320096,
+   "bytes": 196608
+  },
+  "encoder/layer_0/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 8516704,
+   "bytes": 3072
+  },
+  "encoder/layer_0/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8519776,
+   "bytes": 1024
+  },
+  "encoder/layer_0/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 8520800,
+   "bytes": 65536
+  },
+  "encoder/layer_0/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8586336,
+   "bytes": 1024
+  },
+  "encoder/layer_1/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8587360,
+   "bytes": 1024
+  },
+  "encoder/layer_1/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8588384,
+   "bytes": 1024
+  },
+  "encoder/layer_1/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 8589408,
+   "bytes": 4096
+  },
+  "encoder/layer_1/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 8593504,
+   "bytes": 262144
+  },
+  "encoder/layer_1/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 8855648,
+   "bytes": 4096
+  },
+  "encoder/layer_1/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 8859744,
+   "bytes": 1024
+  },
+  "encoder/layer_1/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 8860768,
+   "bytes": 262144
+  },
+  "encoder/layer_1/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9122912,
+   "bytes": 1024
+  },
+  "encoder/layer_1/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9123936,
+   "bytes": 1024
+  },
+  "encoder/layer_1/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9124960,
+   "bytes": 1024
+  },
+  "encoder/layer_1/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 9125984,
+   "bytes": 3072
+  },
+  "encoder/layer_1/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 9129056,
+   "bytes": 196608
+  },
+  "encoder/layer_1/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 9325664,
+   "bytes": 3072
+  },
+  "encoder/layer_1/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9328736,
+   "bytes": 1024
+  },
+  "encoder/layer_1/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 9329760,
+   "bytes": 65536
+  },
+  "encoder/layer_1/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9395296,
+   "bytes": 1024
+  },
+  "encoder/layer_2/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9396320,
+   "bytes": 1024
+  },
+  "encoder/layer_2/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9397344,
+   "bytes": 1024
+  },
+  "encoder/layer_2/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 9398368,
+   "bytes": 4096
+  },
+  "encoder/layer_2/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 9402464,
+   "bytes": 262144
+  },
+  "encoder/layer_2/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 9664608,
+   "bytes": 4096
+  },
+  "encoder/layer_2/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9668704,
+   "bytes": 1024
+  },
+  "encoder/layer_2/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 9669728,
+   "bytes": 262144
+  },
+  "encoder/layer_2/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9931872,
+   "bytes": 1024
+  },
+  "encoder/layer_2/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9932896,
+   "bytes": 1024
+  },
+  "encoder/layer_2/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 9933920,
+   "bytes": 1024
+  },
+  "encoder/layer_2/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 9934944,
+   "bytes": 3072
+  },
+  "encoder/layer_2/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 9938016,
+   "bytes": 196608
+  },
+  "encoder/layer_2/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 10134624,
+   "bytes": 3072
+  },
+  "encoder/layer_2/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10137696,
+   "bytes": 1024
+  },
+  "encoder/layer_2/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 10138720,
+   "bytes": 65536
+  },
+  "encoder/layer_2/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10204256,
+   "bytes": 1024
+  },
+  "encoder/layer_3/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10205280,
+   "bytes": 1024
+  },
+  "encoder/layer_3/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10206304,
+   "bytes": 1024
+  },
+  "encoder/layer_3/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 10207328,
+   "bytes": 4096
+  },
+  "encoder/layer_3/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 10211424,
+   "bytes": 262144
+  },
+  "encoder/layer_3/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 10473568,
+   "bytes": 4096
+  },
+  "encoder/layer_3/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10477664,
+   "bytes": 1024
+  },
+  "encoder/layer_3/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 10478688,
+   "bytes": 262144
+  },
+  "encoder/layer_3/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10740832,
+   "bytes": 1024
+  },
+  "encoder/layer_3/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10741856,
+   "bytes": 1024
+  },
+  "encoder/layer_3/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10742880,
+   "bytes": 1024
+  },
+  "encoder/layer_3/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 10743904,
+   "bytes": 3072
+  },
+  "encoder/layer_3/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 10746976,
+   "bytes": 196608
+  },
+  "encoder/layer_3/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 10943584,
+   "bytes": 3072
+  },
+  "encoder/layer_3/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 10946656,
+   "bytes": 1024
+  },
+  "encoder/layer_3/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 10947680,
+   "bytes": 65536
+  },
+  "encoder/layer_3/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11013216,
+   "bytes": 1024
+  },
+  "encoder/layer_4/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11014240,
+   "bytes": 1024
+  },
+  "encoder/layer_4/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11015264,
+   "bytes": 1024
+  },
+  "encoder/layer_4/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 11016288,
+   "bytes": 4096
+  },
+  "encoder/layer_4/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 11020384,
+   "bytes": 262144
+  },
+  "encoder/layer_4/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 11282528,
+   "bytes": 4096
+  },
+  "encoder/layer_4/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11286624,
+   "bytes": 1024
+  },
+  "encoder/layer_4/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 11287648,
+   "bytes": 262144
+  },
+  "encoder/layer_4/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11549792,
+   "bytes": 1024
+  },
+  "encoder/layer_4/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11550816,
+   "bytes": 1024
+  },
+  "encoder/layer_4/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11551840,
+   "bytes": 1024
+  },
+  "encoder/layer_4/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 11552864,
+   "bytes": 3072
+  },
+  "encoder/layer_4/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 11555936,
+   "bytes": 196608
+  },
+  "encoder/layer_4/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 11752544,
+   "bytes": 3072
+  },
+  "encoder/layer_4/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11755616,
+   "bytes": 1024
+  },
+  "encoder/layer_4/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 11756640,
+   "bytes": 65536
+  },
+  "encoder/layer_4/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11822176,
+   "bytes": 1024
+  },
+  "encoder/layer_5/ffn/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11823200,
+   "bytes": 1024
+  },
+  "encoder/layer_5/ffn/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 11824224,
+   "bytes": 1024
+  },
+  "encoder/layer_5/ffn/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 11825248,
+   "bytes": 4096
+  },
+  "encoder/layer_5/ffn/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    1024,
+    256
+   ],
+   "offset": 11829344,
+   "bytes": 262144
+  },
+  "encoder/layer_5/ffn/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    1024
+   ],
+   "offset": 12091488,
+   "bytes": 4096
+  },
+  "encoder/layer_5/ffn/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12095584,
+   "bytes": 1024
+  },
+  "encoder/layer_5/ffn/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    1024
+   ],
+   "offset": 12096608,
+   "bytes": 262144
+  },
+  "encoder/layer_5/ffn/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12358752,
+   "bytes": 1024
+  },
+  "encoder/layer_5/self_attention/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12359776,
+   "bytes": 1024
+  },
+  "encoder/layer_5/self_attention/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12360800,
+   "bytes": 1024
+  },
+  "encoder/layer_5/self_attention/linear_0/bias": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 12361824,
+   "bytes": 3072
+  },
+  "encoder/layer_5/self_attention/linear_0/weight": {
+   "dtype": "i8",
+   "shape": [
+    768,
+    256
+   ],
+   "offset": 12364896,
+   "bytes": 196608
+  },
+  "encoder/layer_5/self_attention/linear_0/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    768
+   ],
+   "offset": 12561504,
+   "bytes": 3072
+  },
+  "encoder/layer_5/self_attention/linear_1/bias": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12564576,
+   "bytes": 1024
+  },
+  "encoder/layer_5/self_attention/linear_1/weight": {
+   "dtype": "i8",
+   "shape": [
+    256,
+    256
+   ],
+   "offset": 12565600,
+   "bytes": 65536
+  },
+  "encoder/layer_5/self_attention/linear_1/weight_scale": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12631136,
+   "bytes": 1024
+  },
+  "encoder/layer_norm/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12632160,
+   "bytes": 1024
+  },
+  "encoder/layer_norm/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12633184,
+   "bytes": 1024
+  },
+  "encoder/layernorm_embedding/beta": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12634208,
+   "bytes": 1024
+  },
+  "encoder/layernorm_embedding/gamma": {
+   "dtype": "f32",
+   "shape": [
+    256
+   ],
+   "offset": 12635232,
+   "bytes": 1024
+  }
+ },
+ "bin": {
+  "file": "indicxlit.bin",
+  "bytes": 12636256,
+  "sha256": "c4519ea9bd35a4f8a269a438eabae7c03b95da434d2069b046adfe41712207cb"
+ }
+}
