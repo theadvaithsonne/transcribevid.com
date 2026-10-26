@@ -48,20 +48,28 @@ Baseline measured on this machine before any change:
   downloads need a downloader service URL; Qwen only if the spike finds no browser route), never silently
   removed.
 
-## Milestones
+## Milestones (lean plan, 2026-10-26: owner asked to spend the usage limit wisely)
 
 | # | What | Status | Commit |
 | --- | --- | --- | --- |
 | M0 | Branch on `swapnil`, dependencies, baseline tests | done | - |
-| M1 | Spike (plan step 1): fixtures, Whisper / audio / VAD probes in real Chrome, feature inventory, Qwen / Cloudflare / AdSense research | done | `432d10d`, `2ee2207`, spike reports |
-| M1b | IndicXlit ported to the browser, parity measured, independently verified | fixes in progress | |
-| M2 | Architecture written (`ARCHITECTURE.md`), `PARITY.md` merged; owner sign-off of section 4 decisions still open | done | |
-| M3 | Engine core with unit + real-browser tests (audio, VAD, Whisper + models, post + exports, device + session store, then the job runner / worker / browser transport) | running | |
-| M4 | Browser transport + UI integration (upload, job, shell) | todo | |
-| M5 | Parity work: Hinglish, Qwen decision, PDF, logs | todo | |
-| M6 | 20% ad rail, responsive layout, AdSense (inert), consent, legal text | todo | |
-| M7 | Cloudflare Pages config, counter Worker, docs, scripts | todo | |
-| M8 | Accuracy check, cross-browser run, adversarial review, parity audit | todo | |
+| M1 | Spike: fixtures, probes, inventory, research (Whisper, audio, VAD, IndicXlit, Qwen, hosting, ads) | done | `432d10d` .. `5da4cd9` |
+| M2 | `ARCHITECTURE.md`, `PARITY.md` | done | `6be67da` |
+| M3 | Engine modules (audio, VAD, Whisper + models, post + exports, device + session) + IndicXlit fixes | done (not yet tested) | `0121728` .. this commit |
+| M4 | Integration, one agent: job runner, worker, browser transport, upload / job pages on the engine | running | |
+| M5 | Site, one agent: 20% ad rail + responsive layout, inert ads, privacy / FAQ / terms text, Cloudflare `_headers` / `_redirects` / post-build, counter Worker | todo | |
+| M6 | Final check, one agent: full test suites, one real-Chrome end-to-end run, accuracy on the fixtures, fix what fails | todo | |
+
+Rules for spending: no more research or multi-agent reviews; one agent per milestone; reuse the spike harnesses.
+**Implement everything first (M3-M5b), test everything once (M6)** (owner, 2026-10-26): while building, agents
+write the specs but only type-check; M6 runs all suites, the browser checks and the parity runs, then fixes.
+Commits during M3-M5b are marked "not yet tested" in their message.
+
+Nothing is deferred (owner, 2026-10-26: "don't compromise features"). The three heavy items get their own milestone:
+
+| M5b | Full parity, one agent: Qwen3-ASR 0.6B / 1.7B in the browser (desktop WebGPU; spike harness + ported adapter reused), word timing and confidence for large-v3 / distil-large-v3 (their text aligned by the turbo `_timestamped` model, which shares the tokenizer; word probability from the transcribing model's own token scores), ffmpeg.wasm as a lazy, opt-in fallback for AVI / WMA / AMR / FLV etc. (loaded from jsDelivr, GPL notice and source link on the licences page) | todo | |
+
+Only things this machine cannot do stay open: measurements on Safari, Firefox and real phones.
 
 ## Spike result (plan step 1): GO
 
@@ -99,8 +107,7 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
 * 2026-10-25 (night), after the spike: **no cross-origin isolation anywhere** in v1. Ads cannot load on an isolated
   document and WebGPU (the fast path) does not need isolation; single-thread WASM is the fallback. A separate isolated
   transcriber document can be added later if phone / CPU speed demands it.
-* 2026-10-25 (night): **ffmpeg.wasm is not shipped in v1** (its GPL core cannot be self-hosted within the Pages limit
-  and needs an owner licensing decision); unsupported codecs get the small lazy WASM codecs where they exist and a
-  clear "convert this file first" message otherwise.
+* 2026-10-26: ffmpeg.wasm **is** shipped (reverses the earlier note): lazy, opt-in, from jsDelivr, with its GPL notice,
+  because the owner keeps every feature, and the server reads AVI / WMA / AMR today.
 * 2026-10-25 (night): engine dependencies pinned exactly: `@huggingface/transformers` 4.3.1, `mediabunny` 1.62.1 and
   the `onnxruntime-web` build transformers.js itself pins (one ORT copy serves Whisper, Silero VAD and Qwen).
