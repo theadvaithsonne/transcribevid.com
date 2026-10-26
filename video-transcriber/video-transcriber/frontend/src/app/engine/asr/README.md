@@ -29,9 +29,23 @@ const r = await engine.transcribeWindow(window16k, {
   onPartial,
 });
 nextStart = start + r.consumedSeconds; // the seek loop: never jump a fixed 30 s
-engine.cancel(); // the running call rejects with CancelledError
+engine.cancel(); // the running call rejects with CancelledError (and reaches an attached aligner)
 await engine.dispose();
+
+// large-v3 / distil-large-v3 (no `_timestamped` export): word timing from the turbo `_timestamped` model
+const aligner = new WhisperEngine();
+await manager.ensure('large-v3-turbo', 'webgpu', aligner, { gpu });
+engine.attachAligner(aligner); // engine.hasWordTimestamps is now true
+await engine.transcribeWindow(window16k, { wordTimestamps: true }); // words: aligner's times, own probabilities
 ```
+
+With an aligner attached, after the window is decoded the aligner runs its own encoder and the teacher-forced
+cross-attention pass over the transcribing model's text tokens (`alignExternal`, same tokenizer, head
+`[sot, lang, task, notimestamps]`), so the word start / end are the turbo model's DTW times; each word's probability
+is the mean of the transcribing model's own token probabilities of that decode (`textTokenProbabilities`: exp of the
+processed-distribution log-probs, what CTranslate2 scores with). The pipeline (engine/worker) loads it lazily, only
+for those two sizes and only with word timing on; if it cannot load, the job runs with per-line times and the
+"not available" warning.
 
 Normally `engine/models`' `ModelManager.ensure(id, device, engine)` calls `load()` (repo, dtype, ORT
 runtime settings, quota). The ORT runtime must be configured before `load()` (`configureOrtRuntime`).
@@ -94,8 +108,11 @@ difference to the spike's reference run (`qual-*-v2.json`), language detection, 
 
 ## Known limits
 
-- large-v3 and distil-large-v3 have no `*_timestamped` export: no word timing and no per-word confidence
-  (`hasWordTimestamps` is false, `words` stay empty, `confidence` falls back to `exp(avg_logprob)`).
+- large-v3 and distil-large-v3 have no `*_timestamped` export: their word timing comes from the attached
+  large-v3-turbo aligner (one more encoder pass per window, +564 MB download once). The server computes word times
+  with the same model that transcribes; the browser's times come from turbo's alignment heads (faster-whisper's DTW
+  rules, same tokens), not measured against the server yet (M6). Without the aligner, `words` stay empty and
+  `confidence` falls back to `exp(avg_logprob)` as before.
 - WebGPU: the GPU process grows across windows (not classified as pool or leak). Recycling the worker
   every 40 windows is the caller's job (engine/worker), not the engine's.
 - Beam search is sequential per hypothesis (no batching): 4-6x the greedy decode cost.

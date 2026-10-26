@@ -10,6 +10,7 @@ import type { ModelGate } from '../../engine/jobs/options';
 import { MODEL_UI } from '../../engine/jobs/reference-data';
 import { catalogEntry } from '../../engine/models/catalog';
 import { ModelManager } from '../../engine/models/model-manager';
+import { isQwenModel } from '../../engine/models/qwen-catalog';
 import { computeStats } from '../../engine/post/stats';
 import { IndexedDbBackend } from '../../engine/session/indexeddb-backend';
 import { SessionStore } from '../../engine/session/session-store';
@@ -21,6 +22,8 @@ export interface BrowserEngine {
   runner: JobRunner;
   /** every file of the model's download for this device is in the Cache API */
   isCached(id: string, backend: 'webgpu' | 'wasm', shaderF16: boolean): Promise<boolean>;
+  /** the player source of a stored file the browser cannot play (engine/audio preview.ts) */
+  buildPreview?(file: Blob, o: { converter: boolean; signal?: AbortSignal }): Promise<Blob>;
 }
 
 export interface BrowserEngineDeps {
@@ -50,6 +53,7 @@ export async function createBrowserEngine(deps: BrowserEngineDeps): Promise<Brow
     store,
     runner,
     isCached: (id, device, shaderF16) =>
-      catalogEntry(id) ? manager.isCached(id, device, { shaderF16 }).catch(() => false) : Promise.resolve(false),
+      catalogEntry(id) || isQwenModel(id) ? manager.isCached(id, device, { shaderF16 }).catch(() => false) : Promise.resolve(false),
+    buildPreview: async (file, o) => (await import('../../engine/audio/preview')).buildWavPreview(file, o),
   };
 }

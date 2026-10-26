@@ -58,7 +58,7 @@ Baseline measured on this machine before any change:
 | M3 | Engine modules (audio, VAD, Whisper + models, post + exports, device + session) + IndicXlit fixes | done (not yet tested) | `0121728` .. this commit |
 | M4 | Integration, one agent: job runner, worker, browser transport, upload / job pages on the engine | done (not yet tested) | this commit |
 | M5 | Site, one agent: 20% ad rail + responsive layout, inert ads, privacy / FAQ / terms text, Cloudflare `_headers` / `_redirects` / post-build, counter Worker | done (not yet tested) | this commit |
-| M6 | Final check, one agent: full test suites, one real-Chrome end-to-end run, accuracy on the fixtures, fix what fails | todo | |
+| M6 | Final check, one agent: full test suites, one real-Chrome end-to-end run, accuracy on the fixtures, fix what fails | running | |
 
 Rules for spending: no more research or multi-agent reviews; one agent per milestone; reuse the spike harnesses.
 **Implement everything first (M3-M5b), test everything once (M6)** (owner, 2026-10-26): while building, agents
@@ -67,7 +67,7 @@ Commits during M3-M5b are marked "not yet tested" in their message.
 
 Nothing is deferred (owner, 2026-10-26: "don't compromise features"). The three heavy items get their own milestone:
 
-| M5b | Full parity, one agent: Qwen3-ASR 0.6B / 1.7B in the browser (desktop WebGPU; spike harness + ported adapter reused), word timing and confidence for large-v3 / distil-large-v3 (their text aligned by the turbo `_timestamped` model, which shares the tokenizer; word probability from the transcribing model's own token scores), ffmpeg.wasm as a lazy, opt-in fallback for AVI / WMA / AMR / FLV etc. (loaded from jsDelivr, GPL notice and source link on the licences page) | running | |
+| M5b | Full parity, one agent: Qwen3-ASR 0.6B / 1.7B in the browser (desktop WebGPU; spike harness + ported adapter reused), word timing and confidence for large-v3 / distil-large-v3 (their text aligned by the turbo `_timestamped` model, which shares the tokenizer; word probability from the transcribing model's own token scores), ffmpeg.wasm as a lazy, opt-in fallback for AVI / WMA / AMR / FLV etc. (loaded from jsDelivr, GPL notice and source link on the licences page) | done (not yet tested) | this commit |
 
 Only things this machine cannot do stay open: measurements on Safari, Firefox and real phones.
 

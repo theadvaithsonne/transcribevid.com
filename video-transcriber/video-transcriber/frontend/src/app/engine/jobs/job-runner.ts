@@ -513,7 +513,9 @@ export class JobRunner {
         });
       case 'segments': {
         let segs = e.segments;
-        if (shouldRomanize(options, e.language)) segs = await this.deps.hinglish.convert(segs, options.romanizer ?? 'auto');
+        // Qwen3-ASR converts each chunk by the language detected in it (qwen_engine `detected or language`)
+        const romanizeAs = e.romanizeLanguage !== undefined ? e.romanizeLanguage : e.language;
+        if (shouldRomanize(options, romanizeAs)) segs = await this.deps.hinglish.convert(segs, options.romanizer ?? 'auto');
         const from = segments.length;
         segments.push(...segs);
         const t0 = since();

@@ -2,8 +2,10 @@
  * The job pipeline of the in-browser engine (ARCHITECTURE.md section 3), as one async function with its I/O passed in
  * (`PipelineDeps`), so the worker runs it with the real decoder / VAD / Whisper and the specs with fakes.
  *
- *   decodeMedia (+ clean-up, 16 kHz) --chunks--> StreamingVad --> planWindows  .......... phase 'extracting'
- *   model manager: ensure the files (Cache API) --> WhisperEngine.load  ................. phase 'loading_model'
+ *   model manager: ensure the files (Cache API) --> WhisperEngine.load (+ the word-timing aligner) ... started first,
+ *                                                     in parallel with the decoding (engine.py _BackgroundLoad)
+ *   decodeMedia (+ clean-up, 16 kHz) --chunks--> StreamingVad --> speech chunks ............ phase 'extracting'
+ *   wait for the model ..................................................................... phase 'loading_model'
  *   faster-whisper's seek loop over the speech timeline (all speech pieces back to back) . phase 'transcribing'
  *     detect the language on up to 4 x 30 s (unless the user chose one)
  *     transcribeWindow(30 s from `seek`) -> no-speech window skip -> seek rule (consumedSeconds, last word)
@@ -13,11 +15,15 @@
  * It mirrors faster-whisper 1.2.1 `transcribe(vad_filter=True)` + `generate_segments` and backend/app/engine.py
  * `_recognise`: the VAD's speech is joined into one timeline, windows restart at `seek` (never fixed 30 s steps), and
  * times are restored with SpeechTimestampsMap. VAD off = the whole file is the timeline.
+ *
+ * Low-memory devices (`plan.lowMemory`, deviceMemory <= 4) decode with `collect: false` into a StreamingTimeline that
+ * keeps only the speech around the current window; the seek loop runs while the file is still being decoded.
+ * Qwen3-ASR has its own pipeline (qwen-pipeline.ts), chosen here by `options.engine === 'qwen'`.
  */
 import type { Segment } from '../../core/models';
-import type { LanguageResult, LoadInfo, LoadOptions, ProgressInfo, TranscribeOptions, WindowResult } from '../asr/types';
-import { CancelledError } from '../asr/types';
-import type { DecodeMediaOptions, DecodeResult } from '../audio';
+import type { LanguageResult, ProgressInfo, WindowResult } from '../asr/types';
+import { isCancelled } from '../asr/types';
+import type { DecodeResult } from '../audio';
 import { int16ToFloat32 } from '../audio/pcm';
 import { GuardSegment, getEnd, hallucinationGuard, shouldSkipWindow } from '../post/guards';
 import { pyRound, pyStrip } from '../post/py';
@@ -25,7 +31,20 @@ import { RawSegment, SegmentFilter, segmentProgress, withOriginalText } from '..
 import { SpeechChunk, restoreSpeechTimestamps } from '../post/words';
 import type { SpeechSegment } from '../vad/types';
 import { WHISPER_PLAN, planWindows } from '../vad/windows';
-import type { EngineEvent, FilterState, JobResult, ResumeState, RunRequest } from './protocol';
+import {
+  AsrEngine,
+  PipelineContext,
+  PipelineDeps,
+  PipelineError,
+  PipelineOutcome,
+  throwIfAborted,
+  untilAborted,
+} from './pipeline-common';
+import type { FilterState, ResumeState, RunRequest } from './protocol';
+import { runQwenPipeline } from './qwen-pipeline';
+import { StreamingTimeline, TimelineLike } from './timeline';
+
+export * from './pipeline-common';
 
 export const SAMPLE_RATE = 16000;
 /** faster-whisper works in 10 ms mel frames: 160 samples */
@@ -40,57 +59,12 @@ export const LANGUAGE_DETECTION_THRESHOLD = 0.5;
 export const PROMPT_RESET_ON_TEMPERATURE = 0.5;
 /** the engine needs at least 0.1 s of audio per window */
 const MIN_WINDOW_SAMPLES = SAMPLE_RATE / 10;
-export const QWEN_NOT_YET = 'Qwen3-ASR in the browser is being added; use Whisper for now.';
-
-/** What the pipeline needs from WhisperEngine (engine/asr). */
-export interface AsrEngine {
-  readonly hasWordTimestamps: boolean;
-  load(o: LoadOptions, onProgress?: (p: ProgressInfo) => void): Promise<LoadInfo>;
-  detectLanguage(audio: Float32Array): Promise<LanguageResult>;
-  transcribeWindow(audio: Float32Array, o?: TranscribeOptions): Promise<WindowResult>;
-  cancel(): void;
-  dispose(): Promise<void>;
-}
-
-export interface VadLike {
-  push(chunk: Float32Array): Promise<SpeechSegment[]>;
-  flush(): Promise<SpeechSegment[]>;
-}
-
-export interface PipelineDeps {
-  decode(file: Blob, o: DecodeMediaOptions): Promise<DecodeResult>;
-  /** Silero (with the canary self-test and the energy fallback) behind StreamingVad(WHISPER_VAD) */
-  createVad(signal: AbortSignal): Promise<VadLike>;
-  createEngine(): AsrEngine;
-  /** engine/models ModelManager.ensure: quota check, per-file download progress, then engine.load */
-  ensureModel(
-    id: string,
-    device: 'webgpu' | 'wasm',
-    engine: AsrEngine,
-    o: { gpu: { shaderF16: boolean }; onProgress: (p: ProgressInfo) => void },
-  ): Promise<unknown>;
-}
-
-export interface PipelineContext {
-  signal: AbortSignal;
-  emit: (e: EngineEvent) => void;
-  /** the engine of this run, so a cancel message can reach its decoder loop */
-  onEngine?: (engine: AsrEngine | null) => void;
-}
-
-export type PipelineOutcome = { kind: 'done'; result: JobResult } | { kind: 'recycle'; state: ResumeState };
-
-/** An error with the page's text (userMessage) and the Logs page's text (technical). */
-export class PipelineError extends Error {
-  constructor(
-    readonly code: string,
-    readonly userMessage: string,
-    readonly technical = userMessage,
-  ) {
-    super(userMessage);
-    this.name = 'PipelineError';
-  }
-}
+/**
+ * Low-memory mode reads this much past a window before deciding it (so the hallucination guard's "content ends within
+ * 2 s" test sees the same answer as with the whole file).
+ */
+const LOOKAHEAD_SAMPLES = 3 * SAMPLE_RATE;
+export const NO_WORD_TIMING = 'Word timing is not available for this model size; times are per line.';
 
 function filterState(f: SegmentFilter): FilterState {
   // SegmentFilter keeps its loop-breaker state private; it is plain data, read here for a recycle
@@ -110,14 +84,15 @@ function restoreFilter(state: FilterState): SegmentFilter {
 }
 
 /** The speech timeline: the speech pieces of the original audio back to back (or the whole file). */
-export class SpeechTimeline {
+export class SpeechTimeline implements TimelineLike {
   readonly samples: number;
+  readonly done = true;
   private readonly offsets: number[] = [];
 
   constructor(
     private readonly pcm: Int16Array,
     private readonly scale: number,
-    private readonly chunks: readonly SpeechChunk[] | null,
+    readonly chunks: readonly SpeechChunk[] | null,
   ) {
     if (!chunks) {
       this.samples = pcm.length;
@@ -133,6 +108,14 @@ export class SpeechTimeline {
 
   get frames(): number {
     return Math.floor(this.samples / FRAME_SAMPLES);
+  }
+
+  waitFor(): Promise<void> {
+    return Promise.resolve();
+  }
+
+  release(): void {
+    // everything stays in memory in this mode
   }
 
   /** Timeline samples [from, to) as float audio for the recogniser. */
@@ -180,111 +163,131 @@ function toRaw(s: WindowResult['segments'][number], words: boolean): RawSegment 
   };
 }
 
-function throwIfAborted(signal: AbortSignal) {
-  if (signal.aborted) throw new CancelledError();
+export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: PipelineContext): Promise<PipelineOutcome> {
+  if (req.options.engine === 'qwen' || req.options.model.startsWith('qwen3-asr-')) return runQwenPipeline(req, deps, ctx);
+  return runWhisperPipeline(req, deps, ctx);
 }
 
-export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: PipelineContext): Promise<PipelineOutcome> {
+/** Download progress of the main model, then the aligner's continuing the same total (the job page shows one bar). */
+function downloadReporter(emit: (loaded: number, total: number, file?: string) => void) {
+  let mainTotal = 0;
+  return {
+    main: (p: ProgressInfo) => {
+      mainTotal = Math.max(mainTotal, p.total);
+      emit(p.loaded, p.total, p.file);
+    },
+    aligner: (p: ProgressInfo) => emit(mainTotal + p.loaded, mainTotal + p.total, p.file),
+  };
+}
+
+async function runWhisperPipeline(req: RunRequest, deps: PipelineDeps, ctx: PipelineContext): Promise<PipelineOutcome> {
   const { id, options: o, plan } = req;
   const { signal, emit } = ctx;
   const log = (level: 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR', message: string) => emit({ type: 'log', id, level, message });
-  if (o.engine === 'qwen' || o.model.startsWith('qwen3-asr-')) {
-    throw new PipelineError('unsupported', QWEN_NOT_YET);
-  }
+  const streaming = req.resume ? !!req.resume.streaming : !!plan.lowMemory;
+  const wantWords = req.resume ? req.resume.wordTimestamps : o.word_timestamps;
 
-  // ---------------------------------------------------------------- 1. audio + VAD (skipped on a resume)
-  let state = req.resume;
-  if (!state) {
-    emit({ type: 'phase', id, phase: 'extracting', progress: 0, eta: null });
-    const vad = o.vad ? await deps.createVad(signal) : null;
-    const speech: SpeechSegment[] = [];
-    const decoded = await deps.decode(req.file, {
-      signal,
-      collect: true,
-      pipeline: { cleanup: o.enhance_audio ? 'native' : false },
-      onProgress: (p) => {
-        if (p.totalSeconds) {
-          emit({ type: 'progress', id, kind: 'decode', loaded: p.processedSeconds, total: p.totalSeconds });
-        }
-      },
-      onChunk: vad ? (chunk) => vad.push(chunk).then((segs) => void speech.push(...segs)) : undefined,
-    });
-    if (vad) speech.push(...(await vad.flush()));
-    throwIfAborted(signal);
-    for (const w of decoded.warnings) emit({ type: 'warning', id, code: w.type, message: w.message });
-    const duration = decoded.durationSeconds;
-    if (duration < 0.3) throw new PipelineError('too-short', 'The audio is too short to transcribe.');
-    const chunks = vad ? speechChunks(speech, decoded.samples) : null;
-    log('INFO', `audio: ${duration.toFixed(1)} s via ${decoded.path}; speech ${vad ? `${speech.length} segment(s)` : 'not filtered (VAD off)'}`);
-    state = {
-      pcm: decoded.pcm,
-      scale: decoded.scale,
-      samples: decoded.samples,
-      duration,
-      chunks,
-      seek: 0,
-      emitted: 0,
-      filter: filterState(new SegmentFilter()),
-      language: o.language || null,
-      languageProbability: o.language ? 1 : 0,
-      context: '',
-      lastSpeechTimestamp: 0,
-      windowsDone: 0,
-      wordTimestamps: o.word_timestamps,
-    };
-  }
-
-  const timeline = new SpeechTimeline(state.pcm, state.scale, state.chunks);
-  const duration = state.duration;
-  const contentFrames = timeline.frames;
-  if (contentFrames * FRAME_SAMPLES < MIN_WINDOW_SAMPLES) {
-    // no speech at all: nothing reaches the recogniser (silence and music are never sent)
-    log('INFO', 'no speech found');
-    return {
-      kind: 'done',
-      result: {
-        language: state.language,
-        language_probability: pyRound(state.languageProbability, 3),
-        duration: pyRound(duration, 2),
-        dropped: { ...state.filter.dropped },
-        windows: state.windowsDone,
-      },
-    };
-  }
-
-  // ---------------------------------------------------------------- 2. model
-  emit({ type: 'phase', id, phase: 'loading_model', progress: 0, eta: null });
+  // ---------------------------------------------------------------- 0. the model, in parallel with the decoding
   const engine = deps.createEngine();
   ctx.onEngine?.(engine);
+  let aligner: AsrEngine | null = null;
+  let loadSettled = false;
+  const progress = downloadReporter((loaded, total, file) => emit({ type: 'progress', id, kind: 'download', loaded, total, file }));
+  const loading = (async (): Promise<AsrEngine | null> => {
+    await deps.ensureModel(o.model, plan.backend, engine, { gpu: { shaderF16: plan.shaderF16 }, onProgress: progress.main });
+    const alignerId = wantWords && !engine.hasWordTimestamps && engine.attachAligner ? (deps.alignerFor?.(o.model) ?? null) : null;
+    if (!alignerId) return null;
+    const a = deps.createEngine();
+    try {
+      await deps.ensureModel(alignerId, plan.backend, a, { gpu: { shaderF16: plan.shaderF16 }, onProgress: progress.aligner });
+      engine.attachAligner!(a);
+      log('INFO', `word timing: ${o.model} is aligned with the ${alignerId} timing model`);
+      return a;
+    } catch (e) {
+      await a.dispose().catch(() => undefined);
+      if (isCancelled(e)) throw e;
+      log('WARNING', `the ${alignerId} word-timing model could not be loaded: ${(e as Error)?.message ?? e}`);
+      return null;
+    }
+  })();
+  loading.then(
+    (a) => {
+      aligner = a;
+      loadSettled = true;
+    },
+    () => (loadSettled = true),
+  );
+
+  const decodeAbort = new AbortController();
+  const onAbort = () => decodeAbort.abort();
+  signal.addEventListener('abort', onAbort, { once: true });
+  let decoding: Promise<unknown> | null = null;
+  let stream: StreamingTimeline | null = null;
   try {
-    await deps.ensureModel(o.model, plan.backend, engine, {
-      gpu: { shaderF16: plan.shaderF16 },
-      onProgress: (p) => emit({ type: 'progress', id, kind: 'download', loaded: p.loaded, total: p.total, file: p.file }),
-    });
+    // ---------------------------------------------------------------- 1. audio + VAD (skipped on a plain resume)
+    let state: ResumeState;
+    let timeline: TimelineLike;
+    let durationNow: () => number;
+    if (streaming) {
+      const s = await startStreaming(req, deps, ctx, decodeAbort.signal, log);
+      state = s.state;
+      timeline = stream = s.timeline;
+      durationNow = s.duration;
+      decoding = s.decoding;
+    } else {
+      state = req.resume ?? (await decodeAll(req, deps, ctx, log));
+      timeline = new SpeechTimeline(state.pcm, state.scale, state.chunks);
+      const d = state.duration;
+      durationNow = () => d;
+    }
+
+    // no speech at all: nothing reaches the recogniser (silence and music are never sent), and nobody waits for the
+    // model download the run started
+    await timeline.waitFor(MIN_WINDOW_SAMPLES);
+    throwIfAborted(signal);
+    if (timeline.done && Math.floor(timeline.samples / FRAME_SAMPLES) * FRAME_SAMPLES < MIN_WINDOW_SAMPLES) {
+      log('INFO', 'no speech found');
+      if (decoding) await decoding;
+      return {
+        kind: 'done',
+        result: {
+          language: state.language,
+          language_probability: pyRound(state.languageProbability, 3),
+          duration: pyRound(durationNow(), 2),
+          dropped: { ...state.filter.dropped },
+          windows: state.windowsDone,
+        },
+      };
+    }
+
+    // ---------------------------------------------------------------- 2. model
+    emit({ type: 'phase', id, phase: 'loading_model', progress: 0, eta: null });
+    await untilAborted(loading, signal);
     throwIfAborted(signal);
     const words = state.wordTimestamps && engine.hasWordTimestamps;
     if (state.wordTimestamps && !engine.hasWordTimestamps) {
-      emit({
-        type: 'warning',
-        id,
-        code: 'no-word-timing',
-        message: 'Word timing is not available for this model size; times are per line.',
-      });
+      emit({ type: 'warning', id, code: 'no-word-timing', message: NO_WORD_TIMING });
       state.wordTimestamps = false;
     }
 
     // ---------------------------------------------------------------- 3. recognition
     emit({ type: 'phase', id, phase: 'transcribing', progress: 0, eta: null });
-    const window = (seek: number, frames: number) =>
-      timeline.slice(seek * FRAME_SAMPLES, (seek + frames) * FRAME_SAMPLES);
+    const window = async (seek: number, frames: number) => {
+      await timeline.waitFor((seek + frames) * FRAME_SAMPLES + LOOKAHEAD_SAMPLES);
+      throwIfAborted(signal);
+      const known = Math.floor(timeline.samples / FRAME_SAMPLES);
+      const n = Math.max(0, Math.min(frames, known - seek));
+      return timeline.slice(seek * FRAME_SAMPLES, (seek + n) * FRAME_SAMPLES);
+    };
+    const knownFrames = () => Math.floor(timeline.samples / FRAME_SAMPLES);
 
     if (!state.language) {
       const seen = new Map<string, number[]>();
       let first: LanguageResult | null = null;
       for (let i = 0; i < LANGUAGE_DETECTION_SEGMENTS; i++) {
         const from = i * WINDOW_FRAMES;
-        if (from >= contentFrames) break;
-        const audio = window(from, Math.min(WINDOW_FRAMES, contentFrames - from));
+        const audio = await window(from, WINDOW_FRAMES);
+        if (from >= knownFrames()) break;
         if (audio.length < MIN_WINDOW_SAMPLES) break;
         const r = await engine.detectLanguage(audio);
         throwIfAborted(signal);
@@ -313,16 +316,21 @@ export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
     const filter = restoreFilter(state.filter);
     const initialPrompt = pyStrip(o.prompt ?? '');
     let windowsHere = 0;
-    while (state.seek < contentFrames) {
+    for (;;) {
       throwIfAborted(signal);
+      const previousSeek = state.seek;
+      timeline.release(previousSeek * FRAME_SAMPLES);
+      const audio = await window(previousSeek, WINDOW_FRAMES);
+      if (timeline.done && previousSeek >= knownFrames()) break;
       if (plan.recycleEvery > 0 && windowsHere >= plan.recycleEvery) {
         state.filter = filterState(filter);
         log('DEBUG', `recycling the worker after ${windowsHere} windows`);
+        if (streaming) state.chunks = null; // the fresh worker decodes again and finds them itself
         return { kind: 'recycle', state };
       }
-      const previousSeek = state.seek;
-      const segFrames = Math.min(WINDOW_FRAMES, contentFrames - previousSeek);
-      const audio = window(previousSeek, segFrames);
+      // the whole content is known once a window is not full (streaming) or always (whole file)
+      const contentFrames = timeline.done ? knownFrames() : Number.POSITIVE_INFINITY;
+      const segFrames = Math.min(WINDOW_FRAMES, knownFrames() - previousSeek);
       if (audio.length < MIN_WINDOW_SAMPLES) break;
       const timeOffset = previousSeek / FRAMES_PER_SECOND;
       const prompt = [initialPrompt, o.condition_on_previous ? state.context : ''].filter(Boolean).join(' ');
@@ -356,8 +364,9 @@ export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
           timeOffset,
           segmentDuration: segFrames / FRAMES_PER_SECOND,
           windowEndTime: (previousSeek + WINDOW_FRAMES) / FRAMES_PER_SECOND,
+          // streaming: what is known is at least 3 s past this window, which answers the guard's "< 2 s" test alike
           contentDuration: timeline.samples / SAMPLE_RATE,
-          contentFrames,
+          contentFrames: Number.isFinite(contentFrames) ? contentFrames : knownFrames(),
           previousSeek,
           seek,
           lastSpeechTimestamp: state.lastSpeechTimestamp,
@@ -373,15 +382,16 @@ export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
       // never stall on a window that consumed nothing
       state.seek = seek > previousSeek ? Math.min(seek, contentFrames) : previousSeek + segFrames;
 
+      const duration = durationNow();
       const raws = segments.map((s) => toRaw(s, words));
-      const restored = state.chunks ? restoreSpeechTimestamps(raws, state.chunks) : raws;
+      const restored = timeline.chunks ? restoreSpeechTimestamps(raws, timeline.chunks) : raws;
       const kept: Segment[] = [];
-      let progress = 0;
+      let segProgress = 0;
       for (const raw of restored) {
         const seg = filter.accept(raw);
         if (!seg) continue;
         kept.push(withOriginalText(seg, raw));
-        progress = segmentProgress(raw, duration);
+        segProgress = duration > 0 ? segmentProgress(raw, duration) : 0;
       }
       if (kept.length) {
         emit({
@@ -389,7 +399,7 @@ export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
           id,
           segments: kept,
           since: state.emitted,
-          progress,
+          progress: segProgress,
           language: state.language,
           duration,
         });
@@ -399,6 +409,7 @@ export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
         state.context = r.temperature > PROMPT_RESET_ON_TEMPERATURE ? '' : pyStrip(`${state.context} ${r.text}`);
       }
     }
+    if (decoding) await decoding;
     const summary = filter.summary();
     if (summary) log('INFO', summary);
     return {
@@ -406,13 +417,160 @@ export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
       result: {
         language: state.language,
         language_probability: pyRound(state.languageProbability, 3),
-        duration: pyRound(duration, 2),
+        duration: pyRound(durationNow(), 2),
         dropped: { ...filter.dropped },
         windows: state.windowsDone,
       },
     };
   } finally {
+    signal.removeEventListener('abort', onAbort);
+    decodeAbort.abort();
+    (stream as StreamingTimeline | null)?.close(); // a decoder waiting for room must not wait forever
+    if (decoding) await decoding.catch(() => undefined);
     ctx.onEngine?.(null);
-    await engine.dispose().catch(() => undefined);
+    if (!loadSettled) {
+      // engine.py's loader is a daemon thread that simply finishes; here the page replaces the worker instead
+      ctx.markDirty?.();
+      void loading.then(
+        (a) => a?.dispose(),
+        () => undefined,
+      ).finally(() => engine.dispose().catch(() => undefined));
+    } else {
+      const a = aligner as AsrEngine | null;
+      await a?.dispose().catch(() => undefined);
+      await engine.dispose().catch(() => undefined);
+    }
   }
+}
+
+/** Whole-file mode: decode with `collect: true`, VAD on the chunks as they come, the speech chunks at the end. */
+async function decodeAll(
+  req: RunRequest,
+  deps: PipelineDeps,
+  ctx: PipelineContext,
+  log: (level: 'INFO', message: string) => void,
+): Promise<ResumeState> {
+  const { id, options: o, plan } = req;
+  const { signal, emit } = ctx;
+  emit({ type: 'phase', id, phase: 'extracting', progress: 0, eta: null });
+  const vad = o.vad ? await deps.createVad(signal) : null;
+  const speech: SpeechSegment[] = [];
+  const decoded: DecodeResult = await deps.decode(req.file, {
+    signal,
+    collect: true,
+    pipeline: { cleanup: o.enhance_audio ? 'native' : false },
+    ffmpeg: plan.converter ? {} : undefined,
+    onProgress: (p) => {
+      if (p.totalSeconds) emit({ type: 'progress', id, kind: 'decode', loaded: p.processedSeconds, total: p.totalSeconds });
+    },
+    onChunk: vad ? (chunk) => vad.push(chunk).then((segs) => void speech.push(...segs)) : undefined,
+  });
+  if (vad) speech.push(...(await vad.flush()));
+  throwIfAborted(signal);
+  for (const w of decoded.warnings) emit({ type: 'warning', id, code: w.type, message: w.message });
+  const duration = decoded.durationSeconds;
+  if (duration < 0.3) throw new PipelineError('too-short', 'The audio is too short to transcribe.');
+  const chunks = vad ? speechChunks(speech, decoded.samples) : null;
+  log('INFO', `audio: ${duration.toFixed(1)} s via ${decoded.path}; speech ${vad ? `${speech.length} segment(s)` : 'not filtered (VAD off)'}`);
+  return {
+    pcm: decoded.pcm,
+    scale: decoded.scale,
+    samples: decoded.samples,
+    duration,
+    chunks,
+    seek: 0,
+    emitted: 0,
+    filter: filterState(new SegmentFilter()),
+    language: o.language || null,
+    languageProbability: o.language ? 1 : 0,
+    context: '',
+    lastSpeechTimestamp: 0,
+    windowsDone: 0,
+    wordTimestamps: o.word_timestamps,
+  };
+}
+
+/**
+ * Low-memory mode: the decoder streams into a StreamingTimeline (VAD-confirmed speech only, from the current window
+ * on) while the seek loop runs. A resumed run (after a WebGPU recycle) decodes again and skips to its `seek`.
+ */
+async function startStreaming(
+  req: RunRequest,
+  deps: PipelineDeps,
+  ctx: PipelineContext,
+  decodeSignal: AbortSignal,
+  log: (level: 'INFO', message: string) => void,
+): Promise<{ state: ResumeState; timeline: StreamingTimeline; duration: () => number; decoding: Promise<unknown> }> {
+  const { id, options: o, plan } = req;
+  const { signal, emit } = ctx;
+  const resumed = req.resume ?? null;
+  if (!resumed) emit({ type: 'phase', id, phase: 'extracting', progress: 0, eta: null });
+  const timeline = new StreamingTimeline(o.vad);
+  if (resumed) timeline.release(resumed.seek * FRAME_SAMPLES);
+  const vad = o.vad ? await deps.createVad(signal) : null;
+  let estimate: number | null = resumed?.duration || null;
+  let final: number | null = null;
+  const state: ResumeState = resumed
+    ? { ...resumed, chunks: null }
+    : {
+        pcm: new Int16Array(0),
+        scale: 1 / 32768,
+        samples: 0,
+        duration: 0,
+        chunks: null,
+        seek: 0,
+        emitted: 0,
+        filter: filterState(new SegmentFilter()),
+        language: o.language || null,
+        languageProbability: o.language ? 1 : 0,
+        context: '',
+        lastSpeechTimestamp: 0,
+        windowsDone: 0,
+        wordTimestamps: o.word_timestamps,
+        streaming: true,
+      };
+  const decoding = deps
+    .decode(req.file, {
+      signal: decodeSignal,
+      collect: false,
+      pipeline: { cleanup: o.enhance_audio ? 'native' : false },
+      ffmpeg: plan.converter ? {} : undefined,
+      onProgress: (p) => {
+        if (!p.totalSeconds) return;
+        estimate = p.totalSeconds;
+        if (!resumed) emit({ type: 'progress', id, kind: 'decode', loaded: p.processedSeconds, total: p.totalSeconds });
+      },
+      onChunk: async (chunk) => {
+        timeline.pushDecoded(chunk);
+        if (vad) {
+          for (const s of await vad.push(chunk)) timeline.pushSpeech(s);
+          if (vad.retainFrom !== undefined) timeline.trimRaw(vad.retainFrom);
+        }
+        await timeline.waitForSpace();
+      },
+    })
+    .then(async (decoded) => {
+      if (vad) for (const s of await vad.flush()) timeline.pushSpeech(s);
+      final = decoded.durationSeconds;
+      state.duration = final;
+      state.samples = decoded.samples;
+      if (!resumed) for (const w of decoded.warnings) emit({ type: 'warning', id, code: w.type, message: w.message });
+      log(
+        'INFO',
+        `audio: ${final.toFixed(1)} s via ${decoded.path} (low-memory mode, ${(timeline.buffered / SAMPLE_RATE).toFixed(0)} s buffered at the end); ` +
+          `speech ${timeline.chunks ? `${timeline.chunks.length} piece(s)` : 'not filtered (VAD off)'}`,
+      );
+      timeline.finish();
+    })
+    .catch((e) => {
+      timeline.fail(e);
+      throw e;
+    });
+  decoding.catch(() => undefined); // observed through the timeline; awaited by the caller
+  return {
+    state,
+    timeline,
+    decoding,
+    duration: () => final ?? estimate ?? timeline.samples / SAMPLE_RATE,
+  };
 }

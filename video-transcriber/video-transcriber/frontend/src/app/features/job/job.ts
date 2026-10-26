@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, ElementRef, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injector, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subscription, firstValueFrom } from 'rxjs';
@@ -14,6 +14,8 @@ import { SiteService } from '../../core/site.service';
 import { TitleService } from '../../core/title.service';
 import { ToastService } from '../../core/toast.service';
 import { printTranscript } from '../../core/transport/print-view';
+import { TRANSPORT } from '../../core/transport/token';
+import type { Transport } from '../../core/transport/transport';
 import { TranscriptView, findActiveId } from './transcript';
 
 /** The download formats, most wanted first. The hint says in plain words what each one is for. */
@@ -97,6 +99,7 @@ export class JobPage {
   id = input.required<string>();
 
   private api = inject(ApiService);
+  private injector = inject(Injector);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private log = inject(LogService);
@@ -184,7 +187,13 @@ export class JobPage {
   activeSeg = computed(() => findActiveId(this.job()?.segments ?? [], this.time()));
   active = computed(() => ['queued', 'running'].includes(this.job()?.status ?? ''));
   hasMedia = computed(() => !!this.job()?.media_url);
-  hasVideo = computed(() => this.hasMedia() && this.job()?.media_kind === 'video');
+  /**
+   * In-browser edition: the player plays a WAV made from the decoded audio, because the browser cannot play the file
+   * itself (.mkv, .avi ...): an audio player, even for a video file (the server's preview.mp3 is audio too).
+   */
+  audioPreview = signal(false);
+  private previewSub?: Subscription;
+  hasVideo = computed(() => this.hasMedia() && this.job()?.media_kind === 'video' && !this.audioPreview());
   /** Completion means decoding finished; it does not establish transcript accuracy. */
   qualityConcern = computed(() => {
     const j = this.job();
@@ -287,8 +296,36 @@ export class JobPage {
   private cancelPending() {
     this.fetchSub?.unsubscribe();
     this.watchSub?.unsubscribe();
-    this.fetchSub = this.watchSub = undefined;
+    this.previewSub?.unsubscribe();
+    this.fetchSub = this.watchSub = this.previewSub = undefined;
     clearTimeout(this.retryTimer);
+  }
+
+  /**
+   * In-browser edition: a finished transcript of a file the browser cannot play gets a player made from the decoded
+   * audio (built in the background; the transcript is usable meanwhile), shown as an audio player. The server
+   * edition never needs this (its media_url is the original or its preview.mp3).
+   */
+  private requestPreview(j: Job) {
+    if (j.status !== 'done' || !this.site.inBrowser()) return;
+    let preview: Transport['mediaPreview'];
+    try {
+      const t = this.injector.get(TRANSPORT);
+      preview = t.mediaPreview?.bind(t);
+    } catch {
+      return;
+    }
+    if (!preview) return;
+    const id = j.id;
+    this.previewSub = preview(id).subscribe({
+      next: (r) => {
+        const now = this.job();
+        if (!r || !this.current(id) || now?.id !== id) return;
+        this.audioPreview.set(r.audioOnly);
+        if (now.media_url !== r.url) this.job.set({ ...now, media_url: r.url });
+      },
+      error: () => undefined, // no player, the transcript is unaffected
+    });
   }
 
   // ------------------------------------------------------------------ loading + live updates
@@ -310,6 +347,7 @@ export class JobPage {
       this.renaming.set(false);
       this.cancelling.set(false);
       this.restyling.set(false);
+      this.audioPreview.set(false);
     }
     this.fetchSub = this.api.getJob(id).subscribe({
       next: (j) => {
@@ -331,6 +369,7 @@ export class JobPage {
         }
         this.afterStatus(j);
         if (j.status === 'queued' || j.status === 'running') this.watch(id, j.segments.length);
+        else this.requestPreview(this.job() ?? j);
       },
       error: (e) => {
         if (!this.current(id)) return;

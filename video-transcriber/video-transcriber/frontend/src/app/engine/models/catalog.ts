@@ -30,6 +30,12 @@ export interface CatalogEntry {
   label: string;
   /** The repo has a *_timestamped export (cross-attention outputs): per-word times and confidence. */
   wordTimestamps: boolean;
+  /**
+   * No `_timestamped` export: word start / end come from this model (same tokenizer, its alignment heads) aligning the
+   * transcribing model's tokens; word probability from the transcribing model's own token scores (engine/asr
+   * WhisperEngine.attachAligner). Loaded only when word timing is on.
+   */
+  aligner?: ModelId;
   variants: Record<VariantKind, ModelVariant | null>;
   /** Measured total peak working set + ~1 GB for the OS and browser, rounded up (model-matrix.md 2). */
   minRamGb: { wasm: number; webgpu: number };
@@ -122,6 +128,7 @@ export const MODEL_CATALOG: readonly CatalogEntry[] = [
     id: 'large-v3',
     label: 'Large v3',
     wordTimestamps: false,
+    aligner: 'large-v3-turbo',
     variants: {
       wasm: variant('onnx-community/whisper-large-v3-ONNX', ['q8', 644.8], ['q8', 1177.1], false),
       webgpu: variant(
@@ -138,6 +145,7 @@ export const MODEL_CATALOG: readonly CatalogEntry[] = [
     id: 'distil-large-v3',
     label: 'Distil Large v3',
     wordTimestamps: false,
+    aligner: 'large-v3-turbo',
     variants: {
       wasm: variant('distil-whisper/distil-large-v3', ['q8', 645.2], ['q8', 121.6], true),
       webgpu: variant(
@@ -155,6 +163,12 @@ export const MODEL_CATALOG: readonly CatalogEntry[] = [
 
 export function catalogEntry(id: string): CatalogEntry | undefined {
   return MODEL_CATALOG.find((m) => m.id === id);
+}
+
+/** The aligner a model needs for word timing (null when it has its own or none). */
+export function alignerOf(id: string): CatalogEntry | null {
+  const a = catalogEntry(id)?.aligner;
+  return a ? (catalogEntry(a) ?? null) : null;
 }
 
 export function variantKind(device: Device, shaderF16: boolean): VariantKind {

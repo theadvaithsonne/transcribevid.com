@@ -88,6 +88,20 @@ export interface Transport {
 
   /** Live progress + newly recognised segments for one job; completes when the job reached a final state. */
   watch(id: string, since?: number): Observable<JobEvent>;
+
+  /**
+   * In-browser edition only: the player source of a finished job. For a file the browser cannot play it is the
+   * server's preview.mp3 counterpart, a WAV object URL of the decoded 16 kHz mono audio built on demand
+   * (`audioOnly`). Emits null when there is nothing to play. The server edition has no such call (its media_url
+   * already points at the preview).
+   */
+  mediaPreview?(id: string): Observable<MediaPreview | null>;
+}
+
+export interface MediaPreview {
+  url: string;
+  /** a decoded-audio WAV: play it in an audio player even for a video file */
+  audioOnly: boolean;
 }
 
 /**

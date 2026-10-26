@@ -7,7 +7,8 @@
  *
  * Recycle: on WebGPU the worker asks to be replaced every `plan.recycleEvery` windows (GPU-process growth, see
  * ARCHITECTURE section 3). It sends its state ('recycle'); the client terminates it, starts a new worker and continues
- * the same run there. The caller sees one run.
+ * the same run there. The caller sees one run. A result with `restart: true` (the run left a model download running)
+ * also ends that worker; the next run gets a fresh one.
  */
 import type { EngineEvent, EngineMessage, EngineRequest, JobResult, RunRequest, WorkerError } from './protocol';
 
@@ -181,6 +182,8 @@ export class WorkerClient implements EngineRunner {
       return;
     }
     if (m.type === 'result') {
+      // a model load the run started is still going in that worker (no speech, an error, a cancel): start afresh
+      if (m.restart) this.kill();
       if (m.ok) this.finish(c, () => c.resolve(m.result));
       else this.finish(c, () => c.reject(new EngineRunError(m.error, m.cancelled || c.cancelling)));
       return;

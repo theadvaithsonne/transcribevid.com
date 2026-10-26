@@ -5,10 +5,12 @@
 import { decodeMedia } from '../audio';
 import { isCancelled } from '../asr/types';
 import { WhisperEngine } from '../asr/whisper-engine';
+import { catalogEntry } from '../models/catalog';
 import { ModelManager } from '../models/model-manager';
 import { ortWasmPaths } from '../models/ort-config';
+import { QwenEngine } from '../qwen/qwen-engine';
 import { EnergyVadModel, FrameModel, SileroVad, StreamingVad, WHISPER_VAD, selfTest } from '../vad';
-import { AsrEngine, PipelineDeps, runPipeline } from './pipeline';
+import { Cancellable, PipelineDeps, runPipeline } from './pipeline';
 import type { EngineMessage, EngineRequest, WorkerError } from './protocol';
 
 /** Where the page serves the VAD model (frontend/public/models/vad). */
@@ -36,12 +38,19 @@ export function defaultDeps(log: (m: string) => void = () => {}): PipelineDeps {
   let vad: Promise<FrameModel> | null = null;
   return {
     decode: (file, o) => decodeMedia(file, o),
-    async createVad(signal) {
+    async createVad(signal, params = WHISPER_VAD) {
       vad ??= loadVadModel(log);
-      return new StreamingVad(await vad, WHISPER_VAD, { signal });
+      return new StreamingVad(await vad, params, { signal });
     },
     createEngine: () => new WhisperEngine(),
     ensureModel: (id, device, engine, o) => manager.ensure(id, device, engine, o),
+    alignerFor: (model) => catalogEntry(model)?.aligner ?? null,
+    createQwenEngine: () => new QwenEngine(),
+    ensureQwen: (id, engine, o) =>
+      manager.ensureQwen(id, engine as QwenEngine, {
+        ...o,
+        onCacheError: (file, e) => log(`${file} could not be kept in the browser cache (${(e as Error)?.message ?? e}); it downloads again next time`),
+      }),
   };
 }
 
@@ -82,7 +91,7 @@ export type Post = (message: EngineMessage, transfer?: Transferable[]) => void;
 
 /** Handles 'run' and 'cancel'. A cancel reaches a running pipeline at its next cancel point (20-80 ms). */
 export function createEngineWorkerHandler(post: Post, deps?: PipelineDeps): (req: EngineRequest) => Promise<void> {
-  const runs = new Map<string, { controller: AbortController; engine: AsrEngine | null }>();
+  const runs = new Map<string, { controller: AbortController; engine: Cancellable | null }>();
   const pipelineDeps = deps ?? defaultDeps((m) => post({ type: 'log', id: '', level: 'WARNING', message: m }));
   return async (req) => {
     if (req.op === 'cancel') {
@@ -94,20 +103,21 @@ export function createEngineWorkerHandler(post: Post, deps?: PipelineDeps): (req
       return;
     }
     const controller = new AbortController();
-    const run = { controller, engine: null as AsrEngine | null };
+    const run = { controller, engine: null as Cancellable | null, dirty: false };
     runs.set(req.id, run);
     try {
       const out = await runPipeline(req, pipelineDeps, {
         signal: controller.signal,
         emit: (event) => post(event),
         onEngine: (engine) => (run.engine = engine),
+        markDirty: () => (run.dirty = true),
       });
       if (out.kind === 'recycle') post({ type: 'recycle', id: req.id, state: out.state }, [out.state.pcm.buffer as ArrayBuffer]);
-      else post({ type: 'result', id: req.id, ok: true, result: out.result });
+      else post({ type: 'result', id: req.id, ok: true, result: out.result, ...(run.dirty ? { restart: true } : {}) });
     } catch (e) {
       const error = toWorkerError(e);
       const cancelled = controller.signal.aborted || error.code === 'cancelled' || error.code === 'CANCELLED';
-      post({ type: 'result', id: req.id, ok: false, cancelled, error });
+      post({ type: 'result', id: req.id, ok: false, cancelled, error, ...(run.dirty ? { restart: true } : {}) });
     } finally {
       runs.delete(req.id);
     }

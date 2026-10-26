@@ -12,6 +12,12 @@
  *
  * The library is imported lazily inside load() (or injected through the constructor) so that this module
  * can be imported by unit specs without pulling onnxruntime in.
+ *
+ * Sizes without a `_timestamped` export (large-v3, distil-large-v3) get word timing from an aligner: a second
+ * WhisperEngine with the same tokenizer and alignment heads (large-v3-turbo `_timestamped`, engine/models catalog
+ * `aligner`), attached with `attachAligner()`. After a window is decoded, the aligner runs its own encoder and the
+ * teacher-forced pass over the transcribing model's tokens (`alignExternal`), which gives the word start / end; the
+ * word probability comes from the transcribing model's own token log-probabilities of that decode.
  */
 import {
   AlignedWord,
@@ -172,6 +178,8 @@ export class WhisperEngine {
   /** One-time self-test: can the merged decoder's cache branch take several new tokens at once? */
   private multiTokenCacheOk: boolean | null = null;
   private info: LoadInfo | null = null;
+  /** word timing for a model without cross-attention outputs (see the header) */
+  private aligner: ExternalAligner | null = null;
 
   constructor(
     private readonly transformers: () => Promise<TransformersModule> = loadTransformers,
@@ -185,8 +193,24 @@ export class WhisperEngine {
     return this.info;
   }
 
+  /** Word timing on this engine: its own alignment heads, or an attached aligner's. */
   get hasWordTimestamps(): boolean {
+    return this.hasOwnWordTimestamps || !!this.aligner?.hasOwnWordTimestamps;
+  }
+
+  /** The loaded repo returns cross-attentions and has alignment heads (a `_timestamped` export). */
+  get hasOwnWordTimestamps(): boolean {
     return this.hasCrossAttn && this.alignmentHeads.length > 0;
+  }
+
+  /**
+   * Word timing from another loaded WhisperEngine with the same tokenizer (null detaches it). The caller owns it and
+   * disposes it; cancel() reaches it too.
+   */
+  attachAligner(aligner: unknown): void {
+    const a = aligner as ExternalAligner | null;
+    if (a && typeof a.alignExternal !== 'function') throw new Error('WhisperEngine: the aligner cannot align');
+    this.aligner = a;
   }
 
   // ---------------------------------------------------------------- load / dispose / cancel
@@ -296,6 +320,7 @@ export class WhisperEngine {
   /** Cooperative cancel: the running call rejects with CancelledError at its next cancel point. */
   cancel(): void {
     this.cancelFlag = true;
+    this.aligner?.cancel();
   }
 
   async dispose(): Promise<void> {
@@ -671,8 +696,9 @@ export class WhisperEngine {
     head: number[],
     textTokens: number[],
     audioSeconds: number,
+    probsOverride?: Float32Array,
   ): Promise<AlignedWord[]> {
-    if (!this.hasWordTimestamps || !textTokens.length) return [];
+    if (!this.hasOwnWordTimestamps || !textTokens.length) return [];
     const { eot } = this.ids;
     const seq = [...head, ...textTokens, eot];
     const S = seq.length;
@@ -680,7 +706,10 @@ export class WhisperEngine {
       ? await this.run(encoderOut, [seq], { ...crossKV, ...this.emptyDecoderKV() })
       : await this.run(encoderOut, [seq], null);
     const lg: TensorLike = out.logits.type === 'float32' ? out.logits : out.logits.to('float32');
-    const probs = tokenProbabilities(lg.data as Float32Array, lg.dims[2], head.length, textTokens);
+    const probs =
+      probsOverride && probsOverride.length === textTokens.length
+        ? probsOverride
+        : tokenProbabilities(lg.data as Float32Array, lg.dims[2], head.length, textTokens);
     const encFrames = encoderFramesFor(audioSeconds);
     const rows = textTokens.length + 1; // [notimestamps, w1..wn]: row k attends where token k+1 is spoken
     const layers = new Map<number, CrossAttentionLayer>();
@@ -705,6 +734,38 @@ export class WhisperEngine {
     const [words, tokens, indices] = this.tokenizer.splitTokensOnSpaces([...textTokens, eot]);
     const aligned = wordsFromJumps({ words, tokens, indices }, jumps, probs);
     return mergePunctuation(cleanWordDurations(aligned));
+  }
+
+  /**
+   * The aligner's side of `attachAligner`: word times for tokens another model with the same tokenizer decoded on
+   * this audio. Runs this engine's encoder and its teacher-forced pass over [sot, lang, task, notimestamps, text,
+   * eot]; `tokenProbs` (the other model's token probabilities) replace this model's own in the word probabilities.
+   */
+  async alignExternal(audio: Float32Array, req: ExternalAlignRequest): Promise<AlignedWord[]> {
+    this.requireModel();
+    this.cancelFlag = false;
+    this.busy = true;
+    try {
+      if (!this.hasOwnWordTimestamps) throw new Error('WhisperEngine: the aligner has no alignment heads');
+      if (!req.textTokens.length) return [];
+      const { encoderOut, audioSeconds } = await this.encode(audio, {});
+      const first = await this.firstStep(encoderOut);
+      try {
+        let head = [this.ids.sot];
+        if (this.multilingual) {
+          const langId = this.langToId[`<|${req.language}|>`];
+          if (langId === undefined) throw new Error(`unknown language "${req.language}"`);
+          head = [this.ids.sot, langId, req.task === 'translate' ? this.ids.translate : this.ids.transcribe];
+        }
+        if (req.alignPrefix !== 'sot-lang-task') head = [...head, this.ids.noTimestamps];
+        await this.check();
+        return await this.alignWords(encoderOut, first.crossKV, head, req.textTokens, audioSeconds, req.tokenProbs);
+      } finally {
+        this.releaseCrossKV(first.crossKV);
+      }
+    } finally {
+      this.busy = false;
+    }
   }
 
   // ---------------------------------------------------------------- public: one window (<= 30 s)
@@ -811,12 +872,24 @@ export class WhisperEngine {
 
     // 5. word timestamps + word probabilities
     let wordsAll: AlignedWord[] = [];
-    if (r.wordTimestamps && textTokens.length) {
+    if (r.wordTimestamps && textTokens.length && this.hasOwnWordTimestamps) {
       await this.check();
       t = performance.now();
       const alignHead =
         r.alignPrefix === 'sot-lang-task' ? [...head] : [...head, this.ids.noTimestamps];
       wordsAll = await this.alignWords(encoderOut, crossKV, alignHead, textTokens, audioSeconds);
+      timings['align'] = ms(t);
+    } else if (r.wordTimestamps && textTokens.length && this.aligner?.hasOwnWordTimestamps) {
+      // large-v3 / distil-large-v3: the turbo `_timestamped` model times this model's tokens
+      await this.check();
+      t = performance.now();
+      wordsAll = await this.aligner.alignExternal(audio, {
+        language: language!,
+        task: r.task,
+        textTokens,
+        tokenProbs: textTokenProbabilities(best.tokens, best.logprobs, this.ids.eot),
+        alignPrefix: r.alignPrefix,
+      });
       timings['align'] = ms(t);
     }
 
@@ -885,6 +958,33 @@ export class WhisperEngine {
       timings,
     };
   }
+}
+
+/** What `alignExternal` needs: the transcribing model's text tokens of one window and their probabilities. */
+export interface ExternalAlignRequest {
+  language: string;
+  task: 'transcribe' | 'translate';
+  textTokens: number[];
+  /** probability of each text token in the transcribing model's own decode (textTokenProbabilities) */
+  tokenProbs?: Float32Array;
+  alignPrefix?: 'notimestamps' | 'sot-lang-task';
+}
+
+/** The part of WhisperEngine an aligner needs to expose. */
+export interface ExternalAligner {
+  readonly hasOwnWordTimestamps: boolean;
+  alignExternal(audio: Float32Array, req: ExternalAlignRequest): Promise<AlignedWord[]>;
+  cancel(): void;
+}
+
+/**
+ * exp(log-prob) of the text tokens (< eot) of a decoded sequence, in order: the tokens the segments carry. `logprobs`
+ * are the processed distribution's, as CTranslate2 / OpenAI score a hypothesis.
+ */
+export function textTokenProbabilities(tokens: readonly number[], logprobs: readonly number[], eot: number): Float32Array {
+  const out: number[] = [];
+  for (let i = 0; i < tokens.length; i++) if (tokens[i] < eot) out.push(Math.exp(logprobs[i] ?? -Infinity));
+  return Float32Array.from(out);
 }
 
 function ms(since: number): number {

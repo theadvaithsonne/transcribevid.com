@@ -6,15 +6,18 @@
  *   int16ToFloat32(r.pcm, r.scale, start, end)      a window for the VAD / Whisper
  *   r.warnings                                      truncated file, late start, several audio tracks, gaps ...
  *
- * Decoder order (spike/audio.md section 10, without ffmpeg.wasm by owner decision):
+ * Decoder order (spike/audio.md section 10):
  *   1. WebCodecs through mediabunny (streaming, any size, window or worker)
  *   2. decodeAudioData, on the main thread only, when WebCodecs is missing or could not read the file
- *   3. the first error, which for unknown containers says "convert this file to MP3, M4A or WAV first"
+ *   3. ffmpeg.wasm (ffmpeg.ts), in a worker only and only with `ffmpeg` set (the visitor agreed to the 9 MB download),
+ *      for AVI, WMA / WMV, FLV, MPG, AMR, AIFF / AU / CAF, ALAC, AC-3 / E-AC-3 / DTS and the like
+ *   4. the first error, which for unknown containers says "convert this file to MP3, M4A or WAV first"
  * Errors that no other decoder can fix (empty, no audio track, cut-off MP4, DRM, cancelled, too short, out of memory)
  * are thrown at once.
  */
 import { decodeWithWebCodecs, hasWebCodecsAudio } from './decode';
 import { DecodeError, DecodeErrorCode, toDecodeError } from './errors';
+import { canRunFfmpeg, decodeWithFfmpeg, FFMPEG_RETRY_CODES, FfmpegFallbackOptions } from './ffmpeg';
 import type { DecodeOptions, DecodePath, DecodeResult } from './types';
 import { WebAudioOptions, decodeWithWebAudio, hasDecodeAudioData } from './webaudio';
 
@@ -48,6 +51,8 @@ export type {
   OpenedMedia,
 } from './media-source';
 export type { PipelineOptions } from './pipeline';
+export { canRunFfmpeg, FFMPEG_CORE_BASE, FFMPEG_CORE_FILES, FFMPEG_CORE_VERSION, FFMPEG_DOWNLOAD_MB } from './ffmpeg';
+export type { FfmpegFallbackOptions } from './ffmpeg';
 
 export interface DecodeMediaOptions extends DecodeOptions {
   /** Allow decodeAudioData as a fallback (main thread only). Default true. */
@@ -56,6 +61,13 @@ export interface DecodeMediaOptions extends DecodeOptions {
   webAudio?: Pick<WebAudioOptions, 'memoryBudgetBytes' | 'assumeChannels' | 'mediaDuration'>;
   /** Tells the UI which decoder is being tried, and why the previous one gave up. */
   onPath?: (path: DecodePath, why?: DecodeError) => void;
+  /**
+   * Allow the ffmpeg.wasm converter as the last decoder (worker only). Only set it when the visitor agreed to the
+   * download; absent / null = the file ends with the browser decoders' error.
+   */
+  ffmpeg?: FfmpegFallbackOptions | null;
+  /** specs only: skip the worker check (they pass a fake core through `ffmpeg.loadCore`) */
+  ffmpegAnywhere?: boolean;
 }
 
 /** Errors no alternative decoder can fix. */
@@ -108,5 +120,11 @@ export async function decodeMedia(
     }
   }
   if (opts.signal?.aborted) throw new DecodeError({ code: 'CANCELLED' });
+  if (opts.ffmpeg && FFMPEG_RETRY_CODES.has(first.code) && (opts.ffmpegAnywhere || canRunFfmpeg())) {
+    opts.onPath?.('ffmpeg-wasm', first);
+    // ffmpeg reads everything the browser does and more: its answer (corrupt, no audio, not media, cancelled,
+    // converter unavailable) is the one to show
+    return decodeWithFfmpeg(file, { ...opts, ffmpeg: opts.ffmpeg });
+  }
   throw first;
 }

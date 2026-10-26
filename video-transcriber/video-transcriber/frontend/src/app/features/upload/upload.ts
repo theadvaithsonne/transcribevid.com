@@ -11,6 +11,7 @@ import { DEFAULT_OPTIONS, JobOptions } from '../../core/models';
 import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
+import { ConverterConsent } from '../../core/transport/converter-consent';
 import { DeviceAdvice, EngineDevice } from '../../core/transport/engine-device';
 
 const KEY = 'vt-options';
@@ -52,6 +53,9 @@ export class UploadPage {
   private pendingFile = inject(PendingFileService);
   private toast = inject(ToastService);
   private device = inject(EngineDevice);
+  private converter = inject(ConverterConsent);
+  /** the converter question is being prepared (the files are probed): a second click must not start twice */
+  private converterCheck = false;
   store = inject(JobsStore);
   site = inject(SiteService);
 
@@ -112,7 +116,7 @@ export class UploadPage {
   }
 
   /**
-   * In-browser edition: why this device cannot run the model (the device plan's reason, or "being added" for Qwen),
+   * In-browser edition: why this device cannot run the model (the device plan's reason; Qwen's own sentence),
    * '' when it can. Such models stay in the pickers, disabled, with this text: never hidden, never swapped silently.
    */
   unavailableReason(id: string): string {
@@ -446,7 +450,8 @@ export class UploadPage {
   }
 
   // ------------------------------------------------------------------ submit
-  start() {
+  /** `converterChecked`: the converter question was already settled for these files (the second pass). */
+  start(converterChecked = false) {
     const files = this.files();
     if (!files.length || this.uploading() || this.recording() || this.destroyed) return;
     for (const f of files) {
@@ -462,7 +467,28 @@ export class UploadPage {
     if (blocked) {
       // never swapped for another model at this point: the visitor decides
       const label = this.modelInfo(this.opts.model)?.label ?? this.opts.model;
-      this.error.set(`The ${label} model cannot run on this device: ${blocked}. Choose another one.`);
+      this.error.set(`The ${label} model cannot run on this device: ${blocked.replace(/\.$/, '')}. Choose another one.`);
+      return;
+    }
+    // in-browser edition: a file only ffmpeg.wasm can read (AVI, WMA, FLV, AMR ...) needs the visitor's yes to the
+    // 9 MB converter first; the page asks once and remembers a yes
+    if (this.site.inBrowser() && !converterChecked && this.converter.answer() === null) {
+      if (this.converterCheck) return;
+      this.converterCheck = true;
+      Promise.resolve()
+        .then(() => Promise.all(files.map((f) => this.device.needsConverter(f))))
+        .then((needs) => {
+          if (needs.some(Boolean) && !this.destroyed) {
+            const yes = this.converter.ask((text) => window.confirm(text));
+            this.log.info(`Converter for ${needs.filter(Boolean).length} file(s): ${yes ? 'allowed' : 'declined'}`);
+          }
+        })
+        .catch(() => undefined)
+        .finally(() => {
+          this.converterCheck = false;
+          if (this.destroyed || this.uploading()) return;
+          this.start(true);
+        });
       return;
     }
     this.persist();

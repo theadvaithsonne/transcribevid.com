@@ -3,7 +3,9 @@ import { Observable, defer, map, of } from 'rxjs';
 import type { DevicePlan } from '../../engine/device';
 import type { RunnerEvent } from '../../engine/jobs/job-runner';
 import { MODEL_UI, languageList, playableByName } from '../../engine/jobs/reference-data';
-import { QWEN_BROWSER_REASON } from '../../engine/jobs/options';
+import { alignerOf } from '../../engine/models/catalog';
+import { qwenEntry } from '../../engine/models/qwen-catalog';
+import { qwenReason } from '../../engine/qwen/qwen-capability';
 import { exportFilename, render } from '../../engine/export/formats';
 import type { StoredJob } from '../../engine/session/session-store';
 import { LogRing, LogService } from '../log.service';
@@ -20,8 +22,9 @@ import {
   SiteStats,
 } from '../models';
 import type { BrowserEngine } from './browser-engine';
+import { ConverterConsent } from './converter-consent';
 import { EngineDevice } from './engine-device';
-import { ExportFile, JobEvent, LogStreamEvent, PatchBody, Transport, TransportError, UploadState } from './transport';
+import { ExportFile, JobEvent, LogStreamEvent, MediaPreview, PatchBody, Transport, TransportError, UploadState } from './transport';
 
 /** Creates the engine runtime (IndexedDB session, job queue, workers) on first use. Specs provide fakes. */
 export const BROWSER_ENGINE = new InjectionToken<() => Promise<BrowserEngine>>('BROWSER_ENGINE', {
@@ -46,6 +49,8 @@ export const BROWSER_ENGINE = new InjectionToken<() => Promise<BrowserEngine>>('
 });
 
 const FINAL = new Set(['done', 'error', 'cancelled']);
+/** Qwen3-ASR returns chunk times only (the server's `words: null`). */
+const QWEN_WORD_TIMING_NOTE = 'not available with Qwen (times are per chunk)';
 const BOOKKEEPING = ['updated_at', 'version', 'media_type', 'language_candidates'] as const;
 
 /** Store / runner errors as HTTP-shaped errors (status + detail), so every page's error handling stays as it is. */
@@ -84,6 +89,9 @@ export class BrowserTransport implements Transport {
   private engine: Promise<BrowserEngine> | null = null;
   /** object URLs of the stored source files (the player), revoked when the job or the session goes */
   private readonly mediaUrls = new Map<string, string>();
+  /** WAV previews of files the browser cannot play, being built or built (object URL; null = nothing to play) */
+  private readonly previews = new Map<string, Promise<MediaPreview | null>>();
+  private readonly consent = inject(ConverterConsent);
 
   private get(): Promise<BrowserEngine> {
     this.engine ??= this.createEngine().catch((e) => {
@@ -135,22 +143,31 @@ export class BrowserTransport implements Transport {
   private async modelInfo(m: (typeof MODEL_UI)[number], plan: DevicePlan, engine: BrowserEngine | null): Promise<ModelInfo> {
     const offered = plan.offered.find((o) => o.id === m.id);
     const hidden = plan.hidden.find((h) => h.id === m.id);
+    const qwen = qwenEntry(m.id);
     const base: ModelInfo = {
       engine: m.engine,
       id: m.id,
       label: m.label,
-      size_mb: offered ? Math.round(offered.downloadMB) : m.size_mb,
+      // Qwen: the pinned files' real total (qwen-catalog.ts), not the plan's rounded figure
+      size_mb: qwen ? Math.round(qwen.bytes / 1e6) : offered ? Math.round(offered.downloadMB) : m.size_mb,
       speed: m.speed,
       accuracy: m.accuracy,
       note: m.note,
       downloaded: false,
       reason: null,
       default: m.id === plan.defaultModel,
-      word_timing_note: offered?.wordTimestampsNote ?? null,
+      word_timing_note: qwen ? QWEN_WORD_TIMING_NOTE : (offered?.wordTimestampsNote ?? null),
     };
-    if (m.engine === 'qwen') return { ...base, default: false, reason: QWEN_BROWSER_REASON };
+    if (m.engine === 'qwen' && !offered) return { ...base, default: false, reason: qwenReason(hidden?.reason) };
     if (!offered) return { ...base, default: false, reason: hidden?.reason ?? 'not available in this browser' };
     const downloaded = engine ? await engine.isCached(m.id, plan.backend, plan.shaderF16) : false;
+    const aligner = alignerOf(m.id);
+    if (aligner && !qwen) {
+      // large-v3 / distil-large-v3: word timing comes from the turbo timing model, downloaded once next to it
+      const v = plan.backend === 'webgpu' ? (plan.shaderF16 ? aligner.variants.webgpu : aligner.variants.webgpuNoF16) : aligner.variants.wasm;
+      const alignerReady = engine ? await engine.isCached(aligner.id, plan.backend, plan.shaderF16) : false;
+      base.word_timing_note = alignerReady || !v ? null : `first time only, also downloads the ${Math.round(v.bytes / 1e6)} MB word-timing model`;
+    }
     return { ...base, downloaded };
   }
 
@@ -185,8 +202,10 @@ export class BrowserTransport implements Transport {
       for (let i = 0; i < 40 && runner.busy; i++) await new Promise((r) => setTimeout(r, 50));
       await store.clear();
       if (opts.deleteModels) await store.deleteModels();
+      this.consent.forget();
       for (const url of this.mediaUrls.values()) URL.revokeObjectURL(url);
       this.mediaUrls.clear();
+      this.previews.clear();
     });
   }
 
@@ -246,6 +265,43 @@ export class BrowserTransport implements Transport {
       const url = this.mediaUrls.get(id);
       if (url) URL.revokeObjectURL(url);
       this.mediaUrls.delete(id);
+      this.previews.delete(id);
+    });
+  }
+
+  /**
+   * The player of a finished job. A file the browser cannot play is decoded again (no clean-up filters) into a WAV
+   * object URL, once per job and page visit (the server's preview.mp3, made after a successful transcription);
+   * afterwards getJob() carries it as media_url. A playable file answers with its own object URL.
+   */
+  mediaPreview(id: string): Observable<MediaPreview | null> {
+    return call(async () => {
+      const have = this.previews.get(id);
+      if (have) return have;
+      const engine = await this.get();
+      const job = await engine.store.get(id);
+      if (!job) throw new TransportError(404, 'Job not found');
+      if (job.status !== 'done' || typeof URL.createObjectURL !== 'function') return null;
+      if (playableByName(job.filename) || (job.media_type && this.canPlay(job.media_type, job.media_kind))) {
+        const url = await this.mediaUrl(engine, job);
+        return url ? { url, audioOnly: false } : null;
+      }
+      const media = await engine.store.getMedia(id);
+      if (!media || !engine.buildPreview) return null;
+      const build = engine
+        .buildPreview(media, { converter: this.consent.allowed() })
+        .then((wav): MediaPreview => {
+          const url = URL.createObjectURL(wav);
+          this.mediaUrls.set(id, url);
+          return { url, audioOnly: true };
+        })
+        .catch((e) => {
+          this.previews.delete(id); // try again on the next visit of the page
+          this.ring.push('WARNING', 'engine', `no player for ${job.filename}: ${(e as Error)?.message ?? e}`);
+          return null;
+        });
+      this.previews.set(id, build);
+      return build;
     });
   }
 

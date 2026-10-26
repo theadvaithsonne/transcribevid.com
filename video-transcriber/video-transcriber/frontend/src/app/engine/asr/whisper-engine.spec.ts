@@ -1,6 +1,7 @@
 import { DEFAULT_TOKEN_IDS } from './logits';
 import { CancelledError, PartialInfo, ProgressInfo } from './types';
-import { TensorLike, TransformersModule, WhisperEngine } from './whisper-engine';
+import type { AlignedWord } from './alignment';
+import { ExternalAlignRequest, TensorLike, TransformersModule, WhisperEngine, textTokenProbabilities } from './whisper-engine';
 
 // A scripted stand-in for Transformers.js: the "decoder" always makes the next token of a script the
 // most likely one (logit 20, everything else 0), so the engine's own decode loop, logit rules, seek
@@ -354,5 +355,81 @@ describe('WhisperEngine.detectLanguage', () => {
     expect(r.probabilities.length).toBe(2);
     expect(r.noSpeechProb).toBeGreaterThan(0);
     expect(calls).toEqual([[ids.sot]]);
+  });
+});
+
+describe('WhisperEngine word timing through an aligner (large-v3 / distil-large-v3)', () => {
+  // The fake model has no alignment heads, like the large-v3 export: on its own it has no word timing.
+  function fakeAligner(words: AlignedWord[]) {
+    const requests: { audio: number; req: ExternalAlignRequest }[] = [];
+    return {
+      requests,
+      cancels: 0,
+      hasOwnWordTimestamps: true,
+      cancel() {
+        this.cancels++;
+      },
+      async alignExternal(audio: Float32Array, req: ExternalAlignRequest) {
+        requests.push({ audio: audio.length, req });
+        return words;
+      },
+    };
+  }
+  const w = (word: string, tok: number, start: number, end: number): AlignedWord => ({
+    word,
+    tokens: [tok],
+    idx: [],
+    start,
+    end,
+    // the real aligner (WhisperEngine.alignExternal) puts the transcribing model's token probabilities in here
+    probability: 0.77,
+  });
+
+  it("times the model's own tokens with the aligner; the words keep the aligner's times", async () => {
+    const { engine } = await loaded({ script: fromList(TWO_SEGMENTS) });
+    expect(engine.hasWordTimestamps).toBe(false);
+    const a = fakeAligner([w(' Hello', 100, 0.1, 0.5), w(' world.', 101, 0.5, 0.9), w(' Next', 102, 1.3, 1.7), w(' line.', 103, 1.7, 2.4)]);
+    engine.attachAligner(a);
+    expect(engine.hasWordTimestamps).toBe(true);
+    expect(engine.hasOwnWordTimestamps).toBe(false);
+    const r = await engine.transcribeWindow(audio(3), { language: 'en', wordTimestamps: true, offsetSeconds: 10 });
+    expect(a.requests).toHaveLength(1);
+    const { req } = a.requests[0];
+    expect(a.requests[0].audio).toBe(3 * SR);
+    expect(req).toMatchObject({ language: 'en', task: 'transcribe', textTokens: [100, 101, 102, 103] });
+    // word probability = the transcribing model's own token probabilities (here ~1: the script's logit dominates)
+    expect(req.tokenProbs).toHaveLength(4);
+    for (const p of req.tokenProbs!) expect(p).toBeGreaterThan(0.5);
+    const r2 = (x: number) => Math.round(x * 100) / 100;
+    expect(r.words.every((x) => x.probability === 0.77)).toBe(true);
+    expect(r.segments.map((s) => s.words.map((x) => [x.word, r2(x.start), r2(x.end)]))).toEqual([
+      [
+        [' Hello', 10.1, 10.5],
+        [' world.', 10.5, 10.9],
+      ],
+      [
+        [' Next', 11.3, 11.7],
+        [' line.', 11.7, 12.4],
+      ],
+    ]);
+  });
+
+  it('is not asked when word timing is off, and a cancel reaches it', async () => {
+    const { engine } = await loaded({ script: fromList(TWO_SEGMENTS) });
+    const a = fakeAligner([]);
+    engine.attachAligner(a);
+    const r = await engine.transcribeWindow(audio(3), { language: 'en', wordTimestamps: false });
+    expect(a.requests).toHaveLength(0);
+    expect(r.words).toEqual([]);
+    engine.cancel();
+    expect(a.cancels).toBe(1);
+    engine.attachAligner(null);
+    expect(engine.hasWordTimestamps).toBe(false);
+    expect(() => engine.attachAligner({ hasOwnWordTimestamps: true })).toThrow(/cannot align/);
+  });
+
+  it('textTokenProbabilities: exp(log-prob) of the text tokens only, in order', () => {
+    const p = textTokenProbabilities([ids.tsBegin, 100, 101, ids.tsBegin + 50], [-0.1, Math.log(0.5), Math.log(0.25), -0.2], ids.eot);
+    expect(Array.from(p)).toEqual([expect.closeTo(0.5, 6), expect.closeTo(0.25, 6)]);
   });
 });

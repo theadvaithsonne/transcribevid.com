@@ -3,7 +3,8 @@ import type { MediaOpener } from './media-source';
 import type { PipelineOptions } from './pipeline';
 import type { CleanupActivity } from './cleanup';
 
-export type DecodePath = 'webcodecs' | 'webaudio';
+/** 'ffmpeg-wasm': the opt-in converter (ffmpeg.ts), only in a worker and only after the visitor agreed. */
+export type DecodePath = 'webcodecs' | 'webaudio' | 'ffmpeg-wasm';
 
 export interface DecodeProgress {
   /** Seconds of source audio processed so far. */

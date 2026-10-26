@@ -3,8 +3,10 @@
  * logic and tests), a plain-language `userMessage` (the page shows only this) and a `technical` reason (the Logs page).
  * The CORRUPT, NO_AUDIO_TRACK and TOO_SHORT sentences are the Python engine's own (backend/app/engine.py).
  *
- * v1 ships no ffmpeg.wasm (owner decision), so containers the browser path cannot parse (AVI, WMA, FLV, MPG, raw AMR,
- * AIFF, CAF ...) end as NOT_MEDIA with the "convert this file first" advice.
+ * Containers the browser path cannot parse (AVI, WMA, FLV, MPG, raw AMR, AIFF, CAF ...) go to the opt-in ffmpeg.wasm
+ * converter (ffmpeg.ts) when the visitor agreed to load it; otherwise (and when it fails too) they end as NOT_MEDIA /
+ * UNSUPPORTED_CODEC with the "convert this file first" advice. CONVERTER_UNAVAILABLE: the converter could not be
+ * downloaded or failed its hash check.
  */
 
 export type DecodeErrorCode =
@@ -31,7 +33,9 @@ export type DecodeErrorCode =
   /** the AbortSignal fired */
   | 'CANCELLED'
   /** anything else; the reason is in `technical` */
-  | 'DECODE_FAILED';
+  | 'DECODE_FAILED'
+  /** the ffmpeg.wasm converter this file needs could not be downloaded or failed its hash check */
+  | 'CONVERTER_UNAVAILABLE';
 
 export const DECODE_ERROR_CODES: readonly DecodeErrorCode[] = [
   'EMPTY_FILE',
@@ -46,6 +50,7 @@ export const DECODE_ERROR_CODES: readonly DecodeErrorCode[] = [
   'NO_WEBCODECS',
   'CANCELLED',
   'DECODE_FAILED',
+  'CONVERTER_UNAVAILABLE',
 ];
 
 /** What the page can offer next. */
@@ -88,6 +93,7 @@ function defaultSuggestion(code: DecodeErrorCode): DecodeSuggestion {
     case 'NOT_MEDIA':
     case 'UNSUPPORTED_CODEC':
     case 'DECODE_FAILED':
+    case 'CONVERTER_UNAVAILABLE':
       return 'convert-first';
     case 'CORRUPT':
       return 'redownload';
@@ -134,6 +140,8 @@ export function messageFor(init: Pick<DecodeErrorInit, 'code' | 'codec'>): strin
       return 'This browser is too old to read this kind of file. Please update it, or use a recent version of Chrome, Edge, Firefox or Safari.';
     case 'CANCELLED':
       return 'Cancelled.';
+    case 'CONVERTER_UNAVAILABLE':
+      return `This file needs the converter that runs in your browser, and it could not be downloaded. Check the connection and try again. ${CONVERT_HINT}`;
     case 'DECODE_FAILED':
     default:
       return 'This file could not be read. Try converting it to MP3, M4A or WAV and adding it again.';

@@ -3,10 +3,18 @@
  * model the device plan does not offer is refused with the plan's reason, never swapped for another one.
  */
 import { DEFAULT_OPTIONS, JobOptions } from '../../core/models';
+import { QWEN_DEVICE_REASON } from '../qwen/qwen-capability';
+import { isQwenLanguage } from '../qwen/qwen-languages';
 import { LANGUAGES } from './reference-data';
 
-/** Qwen3-ASR runs on the self-hosted server today; the browser port is a later milestone (M5). */
-export const QWEN_BROWSER_REASON = 'Qwen3-ASR in the browser is being added; use Whisper for now.';
+/**
+ * Why Qwen3-ASR is disabled on a device the plan does not offer it on (M5b: it runs in the browser on desktop WebGPU).
+ * The pickers show engine/qwen qwenReason(), which adds the plan's memory / shader detail.
+ */
+export const QWEN_BROWSER_REASON = QWEN_DEVICE_REASON;
+/** schemas.py `_backend_options` for Qwen. */
+export const QWEN_TRANSLATE_REFUSED = 'Select Whisper for English translation.';
+export const QWEN_LANGUAGE_REFUSED = 'This language is not supported by the Qwen adapter.';
 
 export class OptionsError extends Error {
   constructor(message: string) {
@@ -42,8 +50,11 @@ export function validateOptions(input: Partial<JobOptions> | null | undefined, g
   if (knownModels && !knownModels.includes(o.model)) throw new OptionsError(`Unknown model '${o.model}'`);
   const isQwen = o.model.startsWith('qwen3-asr-');
   if (isQwen !== (o.engine === 'qwen')) throw new OptionsError('Choose a model belonging to the selected recognition engine.');
-  if (isQwen) throw new OptionsError(QWEN_BROWSER_REASON);
+  if (isQwen) {
+    if (o.task !== 'transcribe') throw new OptionsError(QWEN_TRANSLATE_REFUSED);
+    if (o.language && !isQwenLanguage(o.language)) throw new OptionsError(QWEN_LANGUAGE_REFUSED);
+  }
   const why = gate?.(o.model);
-  if (why) throw new OptionsError(`The model '${o.model}' cannot run in this browser: ${why}.`);
+  if (why) throw new OptionsError(`The model '${o.model}' cannot run in this browser: ${why.replace(/\.$/, '')}.`);
   return o;
 }

@@ -51,6 +51,8 @@ comes back transferred. The engine worker (`engine/worker/`) can call `decodeMed
 | `errors.ts` | error taxonomy, messages, (de)serialisation, `classifyError` |
 | `audio-worker-core.ts`, `audio.worker.ts` | worker protocol and entry |
 | `golden-fixtures.ts` | ffmpeg 7.1 outputs used by `dsp.spec.ts` (generated, do not edit) |
+| `ffmpeg.ts` | the opt-in ffmpeg.wasm converter: pinned core, SHA-256, WORKERFS, segments, error classes |
+| `wav.ts`, `preview.ts` | 16 kHz mono WAV Blobs; `buildWavPreview(file)`: the player of a file the browser cannot play (decoded again in the decode worker, no clean-up filters) |
 
 ## Defaults (parity with the Python engine)
 
@@ -66,7 +68,7 @@ comes back transferred. The engine worker (`engine/worker/`) can call `decodeMed
   what was decoded is kept (at least 1 s) and a warning is added.
 * `padStart: false` (the offset is reported instead), `gapFill: 'none'`, `minSeconds: 0.3`.
 
-## Decoder order and limits (`spike/audio.md` section 10, without ffmpeg.wasm)
+## Decoder order and limits (`spike/audio.md` section 10)
 
 1. **WebCodecs through mediabunny** (Chrome / Edge 94+, Firefox 130+ desktop, Safari 26+, Chrome Android), in a
    window or worker. Formats: WAV, MP3, M4A / MP4 / MOV / ADTS / TS (AAC), FLAC, Ogg Vorbis, Opus (Ogg / WebM / MKV),
@@ -76,10 +78,18 @@ comes back transferred. The engine worker (`engine/worker/`) can call `decodeMed
    under 2 GiB, within a budget of 1.5 GiB on desktop and 384 MiB on phones or devices with `deviceMemory <= 4`
    (about 79 / 20 min of mono audio). This path blocks the UI between chunks and cannot be cancelled inside the
    browser's own decode.
-3. Otherwise the first error is reported. When WebCodecs is missing, the fallback's own error is reported instead.
-   AVI, WMA / WMV, FLV, MPG, raw AMR, GSM, AIFF / AU / CAF end as `NOT_MEDIA`, and AMR-in-3GP, ALAC, Speex,
-   AC-3 / E-AC-3 and DTS end as `UNSUPPORTED_CODEC` naming the codec. Both messages say "Convert it to MP3, M4A or
-   WAV first".
+3. **ffmpeg.wasm** (`ffmpeg.ts`), in a worker only and only with `ffmpeg` set, i.e. after the visitor answered yes to
+   "This file needs a 9 MB converter that runs in your browser. Load it?" (core/transport ConverterConsent, asked once
+   by the upload page; the engine worker gets `plan.converter`). Tried after `NOT_MEDIA`, `UNSUPPORTED_CODEC`,
+   `NO_WEBCODECS`, `DECODE_FAILED`, `TOO_LARGE`: AVI, WMA / WMV, FLV, MPG, raw AMR and AMR-in-3GP, GSM, AIFF / AU /
+   CAF, Speex, ALAC, AC-3 / E-AC-3 / DTS. `@ffmpeg/core` 0.12.10 (GPL-2.0-or-later, docs/in-browser/LICENCES.md) comes
+   from `https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm/`, is checked against its SHA-256 and runs in this
+   worker (WORKERFS mount, nothing copied into the wasm heap; 30 min segments with 6 s discarded overlap above 36 min;
+   the Python engine's own `-af` chain). Its answer is final; a failed download is `CONVERTER_UNAVAILABLE`.
+4. Otherwise the first error is reported. When WebCodecs is missing, the fallback's own error is reported instead.
+   Without the converter, AVI, WMA / WMV, FLV, MPG, raw AMR, GSM, AIFF / AU / CAF end as `NOT_MEDIA`, and AMR-in-3GP,
+   ALAC, Speex, AC-3 / E-AC-3 and DTS end as `UNSUPPORTED_CODEC` naming the codec. Both messages say "Convert it to
+   MP3, M4A or WAV first".
 
 Errors no other decoder could fix (`EMPTY_FILE`, `NO_AUDIO_TRACK`, `CORRUPT`, `DRM_PROTECTED`, `CANCELLED`,
 `TOO_SHORT`, `OUT_OF_MEMORY`) are thrown immediately.
@@ -104,7 +114,7 @@ Errors no other decoder could fix (`EMPTY_FILE`, `NO_AUDIO_TRACK`, `CORRUPT`, `D
 
 Changes made in this port, compared with the spike's reference code:
 
-* ffmpeg.wasm is not shipped (owner decision for v1), so `NOT_MEDIA` now carries the convert-first advice.
+* ffmpeg.wasm is opt-in (M5b, `ffmpeg.ts`); without the visitor's yes `NOT_MEDIA` carries the convert-first advice.
 * The `DECODE_FAILED` message no longer embeds the technical reason, so the page never shows it.
 * A browser without WebCodecs reports the fallback's error (for example `TOO_LARGE`) instead of `NO_WEBCODECS`.
 * `pcm` is an empty `Int16Array` with `collect: false`, not `null`.
@@ -145,6 +155,7 @@ is monotonic.
   wired in. `probeMedia` reports `needsExtension: 'ac3' | 'dts'` for such tracks. Adding them means adding the two
   packages (1.62.1, MPL-2.0, +0.24 / +0.32 MB brotli, lazy chunks), registering the decoder before decoding, and
   allowing `worker-src blob:` in the CSP (spike/audio.md section 10).
-* ffmpeg.wasm for AVI / WMA / FLV / AMR and the like: out of v1 (GPL core, 9 MB download).
+* ffmpeg.wasm is in (M5b, opt-in, `ffmpeg.ts`). The MPL `@mediabunny/ac3` / `@mediabunny/dts` extensions would
+  decode AC-3 / DTS without the GPL converter and 30x smaller; still not added (two npm packages).
 * Spilling PCM to OPFS for very long files on phones: not implemented. Use `collect: false` with `onChunk`.
 * Safari and Firefox are untested; the spike measured Chrome and Edge only.

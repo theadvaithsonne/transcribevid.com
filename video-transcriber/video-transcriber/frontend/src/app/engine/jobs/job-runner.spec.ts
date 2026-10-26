@@ -1,7 +1,7 @@
 import { DEFAULT_OPTIONS } from '../../core/models';
 import { FakeEngine, engineSegment, makeRunner, mediaFile, playSuccess, settle } from '../../testing/engine-fakes';
 import type { RunnerEvent } from './job-runner';
-import { QWEN_BROWSER_REASON } from './options';
+import { QWEN_BROWSER_REASON, QWEN_LANGUAGE_REFUSED, QWEN_TRANSLATE_REFUSED } from './options';
 
 describe('JobRunner (the in-browser job queue)', () => {
   it('creates a queued job like POST /api/jobs: title from the file name, media kind by extension, file stored', async () => {
@@ -13,14 +13,29 @@ describe('JobRunner (the in-browser job queue)', () => {
     expect((await runner.create(mediaFile('clip.mov'), {})).media_kind).toBe('video');
   });
 
-  it('refuses an empty file (400), an unknown model, Qwen (with the exact reason) and a model the device cannot run (422)', async () => {
+  it('refuses an empty file (400), an unknown model, Qwen where it cannot run or translate, and a model the device cannot run (422)', async () => {
     const { runner } = await makeRunner();
     await expect(runner.create(mediaFile('x.mp3', ''), {})).rejects.toMatchObject({ status: 400, message: 'The uploaded file is empty.' });
     await expect(runner.create(mediaFile(), { model: 'huge' })).rejects.toMatchObject({ status: 422, message: "Unknown model 'huge'" });
-    await expect(runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-0.6b' })).rejects.toMatchObject({
+    // schemas.py _backend_options
+    await expect(runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-0.6b', task: 'translate' })).rejects.toMatchObject({
       status: 422,
-      message: QWEN_BROWSER_REASON,
+      message: QWEN_TRANSLATE_REFUSED,
     });
+    await expect(runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-0.6b', language: 'af' })).rejects.toMatchObject({
+      status: 422,
+      message: QWEN_LANGUAGE_REFUSED,
+    });
+    await expect(runner.create(mediaFile(), { engine: 'whisper', model: 'qwen3-asr-0.6b' })).rejects.toMatchObject({ status: 422 });
+    // the device gate's sentence (EngineDevice gives Qwen its own: "needs a desktop browser with WebGPU ...")
+    const gated = await makeRunner({ gate: async () => (id: string) => (id.startsWith('qwen') ? QWEN_BROWSER_REASON : null) });
+    await expect(gated.runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-1.7b' })).rejects.toMatchObject({
+      status: 422,
+      message: `The model 'qwen3-asr-1.7b' cannot run in this browser: ${QWEN_BROWSER_REASON}`,
+    });
+    // where the plan offers it, a Qwen job is queued like any other
+    const ok = await runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-0.6b', language: 'hi' });
+    expect(ok.options).toMatchObject({ engine: 'qwen', model: 'qwen3-asr-0.6b', language: 'hi', task: 'transcribe' });
     await expect(runner.create(mediaFile(), { model: 'large-v3' })).rejects.toMatchObject({
       status: 422,
       message: "The model 'large-v3' cannot run in this browser: needs 8 GB.",
@@ -193,5 +208,25 @@ describe('JobRunner (the in-browser job queue)', () => {
     expect(engine.last.req.plan).toEqual({ backend: 'wasm', shaderF16: false, recycleEvery: 0 });
     expect(engine.last.req.options).toMatchObject({ model: 'tiny', beam_size: 1 });
     expect(engine.last.req.file).toBeInstanceOf(Blob);
+  });
+
+  it('converts Qwen segments by the language detected in their chunk (romanizeLanguage), not only the job language', async () => {
+    const { runner, engine, store, hinglish } = await makeRunner();
+    const job = await runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-0.6b' });
+    await settle();
+    const run = engine.last;
+    const id = run.req.id;
+    run.onEvent({ type: 'phase', id, phase: 'transcribing', progress: 0, eta: null });
+    const seg = (n: number, text: string) => engineSegment(n, n * 25, n * 25 + 25, text, { words: null, confidence: null, timing: 'chunk' });
+    // the job language is French (first chunk), the second chunk was detected as Hindi: only that one is converted
+    run.onEvent({ type: 'segments', id, segments: [seg(0, 'bonjour')], since: 0, progress: 0.3, language: 'fr', duration: 75, romanizeLanguage: 'fr' });
+    run.onEvent({ type: 'segments', id, segments: [seg(1, 'namaste')], since: 1, progress: 0.6, language: 'fr', duration: 75, romanizeLanguage: 'hi' });
+    run.resolve({ language: 'fr', language_probability: null, duration: 75, dropped: { empty: 0, no_speech: 0, repetition: 0 }, windows: 2 });
+    await settle();
+    const done = (await store.get(job.id))!;
+    expect(done.status).toBe('done');
+    expect(done.segments.map((s) => s.text)).toEqual(['bonjour', 'namaste (roman)']);
+    expect(done.language_probability).toBeNull();
+    expect(hinglish.calls.filter((c) => c.kind === 'convert')).toHaveLength(1);
   });
 });

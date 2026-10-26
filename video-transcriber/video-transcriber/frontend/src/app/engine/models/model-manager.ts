@@ -19,6 +19,8 @@ import {
   reposOf,
   variantFiles,
 } from './catalog';
+import { fetchQwenFiles, FetchLike, missingQwenFiles, QwenCacheLike, QwenFileSet } from './qwen-files';
+import { isQwenModel, QwenCatalogEntry, qwenEntry, qwenFileUrl, QWEN_CATALOG } from './qwen-catalog';
 import {
   chooseVariant,
   configureOrtRuntime,
@@ -78,6 +80,29 @@ export interface ModelManagerOptions {
   runtime?: OrtRuntimeOptions;
   cacheName?: string;
   host?: string;
+  /** Default: globalThis.fetch (the Qwen downloads). */
+  fetch?: FetchLike;
+}
+
+/** What ensureQwen() loads with: QwenEngine (engine/qwen) or a test double. */
+export interface QwenModelLoader {
+  load(files: QwenFileSet, entry: QwenCatalogEntry): Promise<unknown>;
+}
+
+export interface EnsureQwenOptions {
+  gpu?: GpuFeatures;
+  onProgress?: (p: ProgressInfo) => void;
+  signal?: AbortSignal;
+  ignoreQuota?: boolean;
+  /** a file could not be kept in the cache (it still loads) */
+  onCacheError?: (file: string, e: unknown) => void;
+}
+
+export interface EnsureQwenResult {
+  entry: QwenCatalogEntry;
+  wasCached: boolean;
+  quota: QuotaCheck;
+  info: unknown;
 }
 
 export interface ModelPlan {
@@ -215,6 +240,7 @@ export class ModelManager {
 
   async isCached(id: string, device: Device, gpu?: GpuFeatures): Promise<boolean> {
     if (!this.caches) return false;
+    if (isQwenModel(id)) return (await missingQwenFiles(this.qwen(id), await this.openCache(), this.host)).length === 0;
     return (await this.missingFiles(this.plan(id, device, gpu))).length === 0;
   }
 
@@ -288,8 +314,74 @@ export class ModelManager {
     }
   }
 
+  /**
+   * Qwen3-ASR: checks the adapter (`shader-f16`) and the quota, reads the pinned files from the cache or downloads and
+   * verifies them (qwen-files.ts) with whole-model byte progress, then hands them to `loader` (QwenEngine.load).
+   * Errors: ModelError 'unsupported' / 'quota' / 'model-download'; a cancel passes through.
+   */
+  async ensureQwen(id: string, loader: QwenModelLoader, o: EnsureQwenOptions = {}): Promise<EnsureQwenResult> {
+    const entry = this.qwen(id);
+    if (o.gpu && !o.gpu.shaderF16) {
+      throw new ModelError(
+        'unsupported',
+        `${entry.label} needs 16-bit shader support (shader-f16) in the graphics driver.`,
+        `${id} without shader-f16`,
+      );
+    }
+    // the real Cache has put(); qwen-files stores the downloads itself (Transformers.js does that for Whisper)
+    const cache = (await this.openCache()) as QwenCacheLike | null;
+    const missing = await missingQwenFiles(entry, cache, this.host);
+    const quota = await this.quotaFor(missing.reduce((n, f) => n + f.bytes, 0));
+    if (!quota.ok && !o.ignoreQuota) {
+      throw new ModelError(
+        'quota',
+        `Not enough browser storage for the ${entry.label} model (${formatDownloadSize(quota.needed)} ` +
+          'needed). Free some space or pick a smaller model.',
+        `needed ${quota.needed} free ${quota.free} quota ${quota.quota} usage ${quota.usage}`,
+      );
+    }
+    let files: QwenFileSet;
+    try {
+      files = await fetchQwenFiles(entry, {
+        cache,
+        fetch: this.options.fetch,
+        host: this.host,
+        signal: o.signal,
+        onProgress: o.onProgress,
+        onCacheError: o.onCacheError,
+      });
+    } catch (e) {
+      if (isCancelled(e)) throw e;
+      const err = e as Error;
+      throw new ModelError(
+        'model-download',
+        `The ${entry.label} model could not be downloaded. Check the connection and try again; files ` +
+          'that finished downloading are kept.',
+        `${err?.name}: ${err?.message ?? String(e)}`,
+      );
+    }
+    try {
+      const info = await loader.load(files, entry);
+      return { entry, wasCached: missing.length === 0, quota, info };
+    } catch (e) {
+      if (isCancelled(e)) throw e;
+      const err = e as Error;
+      throw new ModelError(
+        'model-download',
+        `The ${entry.label} model could not be started on this graphics device. Try again, or pick a Whisper model.`,
+        `${err?.name}: ${err?.message ?? String(e)}`,
+      );
+    }
+  }
+
+  /** Download size of a Qwen model, as the UI shows it. */
+  qwenSizeText(id: string): string {
+    return formatDownloadSize(this.qwen(id).bytes);
+  }
+
   /** Removes every cached file of the model (all of its repos); the ORT runtime stays. */
   async delete(id: string): Promise<DeleteResult> {
+    if (isQwenModel(id)) return this.deleteQwen(this.qwen(id));
     const entry = this.entry(id);
     const cache = await this.openCache();
     if (!cache) return { entries: 0, bytes: 0 };
@@ -312,7 +404,47 @@ export class ModelManager {
     if (!cache) return [];
     const urls = (await cache.keys()).map(urlOf);
     const has = (repo: string) => urls.some((u) => u.startsWith(`${this.host}${repo}/resolve/`));
-    return MODEL_CATALOG.filter((m) => reposOf(m).some(has)).map((m) => m.id);
+    const whisper: string[] = MODEL_CATALOG.filter((m) => reposOf(m).some(has)).map((m) => m.id);
+    const qwen = QWEN_CATALOG.filter((m) => m.files.some((f) => urls.includes(qwenFileUrl(f, this.host)))).map((m) => m.id);
+    return [...whisper, ...qwen] as ModelId[];
+  }
+
+  /** Exact URLs only: the fused-decoder repo is shared by both Qwen sizes. */
+  private async deleteQwen(entry: QwenCatalogEntry): Promise<DeleteResult> {
+    const cache = await this.openCache();
+    if (!cache) return { entries: 0, bytes: 0 };
+    let entries = 0;
+    let bytes = 0;
+    for (const f of entry.files) {
+      const url = qwenFileUrl(f, this.host);
+      if (!(await cache.match(url))) continue;
+      if (await cache.delete(url)) {
+        entries++;
+        bytes += f.bytes;
+      }
+    }
+    return { entries, bytes };
+  }
+
+  private qwen(id: string): QwenCatalogEntry {
+    const entry = qwenEntry(id);
+    if (!entry) throw new ModelError('unknown-model', `Unknown model "${id}".`, `id ${id}`);
+    return entry;
+  }
+
+  /** The storage estimate against `bytes` still to download. Unknown quota counts as ok. */
+  private async quotaFor(needed: number): Promise<QuotaCheck> {
+    let usage: number | null = null;
+    let quota: number | null = null;
+    try {
+      const est = await this.storage?.estimate();
+      usage = est?.usage ?? null;
+      quota = est?.quota ?? null;
+    } catch {
+      // unknown quota
+    }
+    const free = quota === null ? null : Math.max(0, quota - (usage ?? 0));
+    return { usage, quota, free, needed, ok: free === null || needed <= free };
   }
 
   private async configureRuntime(): Promise<void> {

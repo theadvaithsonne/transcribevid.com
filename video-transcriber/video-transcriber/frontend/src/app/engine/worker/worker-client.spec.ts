@@ -143,4 +143,19 @@ describe('WorkerClient (engine worker host)', () => {
     await expect(done).rejects.toMatchObject({ code: 'worker-crashed', cancelled: false, technical: 'out of memory' });
     expect(FakeWorker.all[0].terminated).toBe(true);
   });
+
+  it('replaces the worker after a result with restart: true (a model download the run left running)', async () => {
+    const client = make();
+    const p = client.run(input('j1'), () => undefined);
+    const w = FakeWorker.all[0];
+    w.reply({ type: 'result', id: 'j1', ok: true, result: RESULT, restart: true });
+    await expect(p).resolves.toEqual(RESULT);
+    expect(w.terminated).toBe(true);
+    const q = client.run(input('j2'), () => undefined);
+    expect(FakeWorker.all).toHaveLength(2);
+    FakeWorker.all[1].reply({ type: 'result', id: 'j2', ok: false, cancelled: false, error: { code: 'NOT_MEDIA', userMessage: 'x', technical: 't' }, restart: true });
+    await expect(q).rejects.toMatchObject({ code: 'NOT_MEDIA' });
+    expect(FakeWorker.all[1].terminated).toBe(true);
+    expect(client.started).toBe(2);
+  });
 });

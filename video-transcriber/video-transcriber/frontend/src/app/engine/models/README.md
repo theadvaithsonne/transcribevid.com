@@ -7,7 +7,11 @@ Pure TypeScript, no Angular. Derived from `docs/in-browser/spike/model-catalog.j
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `catalog.ts`       | `MODEL_CATALOG`: per model id the repo + dtype + bytes for WASM, WebGPU and WebGPU without `shader-f16`, word-timestamp availability, measured flag, minimum RAM; `variantFiles` |
 | `ort-config.ts`    | the pinned ORT version and jsDelivr URLs, `configureOrtRuntime(env)`, `chooseVariant` / `chooseDtype`                                                                            |
-| `model-manager.ts` | `ModelManager`: `plan`, `ensure`, `isCached`, `missingFiles`, `checkQuota`, `delete`, `cachedModels`, `sizeText`; `ModelError`                                                   |
+| `model-manager.ts` | `ModelManager`: `plan`, `ensure`, `isCached`, `missingFiles`, `checkQuota`, `delete`, `cachedModels`, `sizeText`; `ensureQwen`, `qwenSizeText`; `ModelError`                    |
+| `qwen-catalog.ts`  | `QWEN_CATALOG`: Qwen3-ASR 0.6B / 1.7B, every file pinned to a commit with its size and SHA-256 (qwen.md 2b / 5)                                                                   |
+| `qwen-files.ts`    | `fetchQwenFiles` / `missingQwenFiles`: pinned URL, byte progress, SHA-256 while streaming, Cache API                                                                                |
+| `sha256.ts`        | incremental SHA-256 (no second copy of a 1 GB file, unlike WebCrypto `digest`)                                                                                                      |
+| `licences.ts`      | `THIRD_PARTY_NOTICES` (ffmpeg.wasm GPL, Qwen Apache-2.0) for the licences page (docs/in-browser/LICENCES.md)                                                                         |
 
 ## Catalog
 
@@ -20,6 +24,16 @@ Pure TypeScript, no Angular. Derived from `docs/in-browser/spike/model-catalog.j
 | large-v3-turbo  | q8 1.1 GB (not measured)      | q4f16 564 MB                                            | -                       | yes    | 8 / 8 GB           |
 | large-v3        | q8 1.8 GB (not measured)      | q4f16 980 MB                                            | -                       | **no** | 16 / 16 GB         |
 | distil-large-v3 | q8 767 MB (`distil-large-v3`) | q4f16 534 MB (`distil-large-v3.5-ONNX`, `note` says so) | -                       | **no** | 8 / 8 GB           |
+
+`large-v3` and `distil-large-v3` carry `aligner: 'large-v3-turbo'` (catalog; `alignerOf(id)`): their word timing
+comes from the turbo `_timestamped` model (+564 MB on WebGPU, downloaded only with word timing on).
+
+Qwen3-ASR (`qwen-catalog.ts`, WebGPU + `shader-f16` only): 0.6B = jiangzhuo9357/Qwen3-ASR-0.6B-ONNX@4a01b95f (prompt
+config, mel filters, tokenizer, int8 embeddings 155.6 MB, fp16 encoder 376.3 MB) + sorryhyun/qwen3-asr-onnx-gqa@075249f7
+(fused decoder 352.5 MB) = 896.5 MB; 1.7B = jiangzhuo9357/Qwen3-ASR-1.7B-ONNX@fcc238df (embeddings 311.2 MB, encoder
+639.1 MB) + the 1.7B fused decoder 985.1 MB = 1947.6 MB. They are not a Transformers.js model: `ensureQwen` fetches
+each file from `https://huggingface.co/<repo>/resolve/<commit>/<file>`, refuses a size or hash mismatch, stores it in
+'transformers-cache' (so "delete the downloaded models" removes it too), then calls `QwenEngine.load`.
 
 Word-timestamp sizes use the `onnx-community/whisper-*_timestamped` repos. Sizes are the two ONNX files
 (1 MB = 1e6 bytes); configs add ~2.5-4 MB, the ORT runtime 26.9 MB (asyncify) or 16.8 MB (jspi). Which
