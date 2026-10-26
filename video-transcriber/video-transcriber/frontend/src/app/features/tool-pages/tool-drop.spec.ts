@@ -5,7 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { JobsStore } from '../../core/jobs.store';
 import { PendingFileService } from '../../core/pending-file.service';
 import { ToastService } from '../../core/toast.service';
-import { makePublicHealth, silentLog } from '../../testing/fakes';
+import { makeBrowserHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { ACCEPT_AUDIO, ACCEPT_VIDEO_AND_AUDIO, ToolDrop } from './tool-drop';
 import { DropKind } from './tool-page.model';
 
@@ -84,6 +84,16 @@ describe('ToolDrop (the drop box on a keyword page)', () => {
       expect(hint).toContain('Audio works too.');
       expect(hint).toContain('Up to 2\u00a0GB and 60 minutes per file.');
       expect(hint).toContain('Nothing is uploaded until you press Transcribe.');
+    });
+
+    it('the in-browser edition: says the file never leaves the device, and never that it is uploaded', () => {
+      setup('video', 'video', ['MP4', 'MOV'], 'There is no size or length limit set here.');
+      TestBed.inject(JobsStore).health.set(makeBrowserHealth());
+      fixture.detectChanges();
+      const hint = clean(q('.hint'));
+      expect(hint).toContain('Your file never leaves your device.');
+      expect(hint).not.toContain('uploaded');
+      expect(hint).not.toContain('Nothing is uploaded until you press Transcribe.');
     });
 
     it('keeps "2 GB" together on one line (a non-breaking space), also for MB', () => {

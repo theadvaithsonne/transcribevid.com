@@ -65,6 +65,10 @@ export const CONTENT: ToolPageContent = {
     {
       title: 'Stay under the limit.',
       text: 'Videos longer or larger than the limit above are refused, so cut long recordings into parts first.',
+      browser: {
+        title: 'Long videos take longer.',
+        text: 'There is no size limit, but a long video takes longer on your device and needs more memory. On a phone, cut very long recordings into parts.',
+      },
     },
     {
       title: 'Check the marked lines.',
@@ -77,6 +81,10 @@ export const CONTENT: ToolPageContent = {
       question: 'Is converting video to text really free?',
       answer:
         'Yes. It is free, there is no account or login, and there is no daily or monthly quota. {limits} If many people are using the service, your file may wait in a queue for a while.',
+      browser: {
+        answer:
+          'Yes. It is free, there is no account or login, and there is no daily or monthly quota; ads keep it free. Your video is transcribed in your browser on your own device, so there is no size limit and nobody else is ahead of you: how fast it goes depends on your device.',
+      },
     },
     {
       question: 'Can I transcribe a video without speech?',

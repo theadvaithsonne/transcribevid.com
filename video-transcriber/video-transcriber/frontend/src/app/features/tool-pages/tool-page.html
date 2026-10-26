@@ -21,16 +21,19 @@
   <section aria-labelledby="why-title">
     <h2 class="section-title" id="why-title">{{ c().whyTitle }}</h2>
     <div class="why-text">
-      @for (p of c().why; track $index) {
+      @for (p of text().why; track $index) {
         <p>{{ p }}</p>
       }
     </div>
   </section>
 
+  <!-- tablet and phone: one in-flow ad unit after the first text section, well away from the drop box -->
+  <app-ad-slot placement="inline" />
+
   <section aria-labelledby="how-title">
     <h2 class="section-title" id="how-title">{{ c().howTitle }}</h2>
     <ol class="steps">
-      @for (s of c().steps; track $index) {
+      @for (s of text().steps; track $index) {
         <li>
           <span class="num" aria-hidden="true">{{ $index + 1 }}</span>
           <h3>{{ s.title }}</h3>
@@ -69,7 +72,7 @@
   <section class="tips" aria-labelledby="tips-title">
     <h2 class="section-title" id="tips-title">{{ c().tipsTitle }}</h2>
     <ul>
-      @for (t of c().tips; track $index) {
+      @for (t of text().tips; track $index) {
         <li>
           <b>{{ t.title }}</b>
           {{ t.text }}

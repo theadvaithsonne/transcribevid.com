@@ -29,6 +29,9 @@
     </ol>
   </section>
 
+  <!-- tablet and phone: one in-flow ad unit after the first full section (the desktop rail is in the app shell) -->
+  <app-ad-slot placement="inline" />
+
   <section aria-labelledby="get-title">
     <h2 class="section-title" id="get-title">What you get</h2>
     <ul class="features">
@@ -72,15 +75,19 @@
           <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>
         </span>
         <h3>Private</h3>
-        @switch (site.mode()) {
-          @case ('public') {
-            <p>No account and no tracking. Your files are kept only for your session and deleted automatically.</p>
-          }
-          @case ('local') {
-            <p>This copy runs on your own computer. Your files are processed on this machine and nothing leaves it.</p>
-          }
-          @default {
-            <p>Where your files are processed depends on how {{ site.brand().name }} is run.</p>
+        @if (site.inBrowser()) {
+          <p>Your file never leaves your device. It is transcribed right in your browser, with no account, and your transcripts stay in this browser.</p>
+        } @else {
+          @switch (site.mode()) {
+            @case ('public') {
+              <p>No account and no tracking. Your files are kept only for your session and deleted automatically.</p>
+            }
+            @case ('local') {
+              <p>This copy runs on your own computer. Your files are processed on this machine and nothing leaves it.</p>
+            }
+            @default {
+              <p>Where your files are processed depends on how {{ site.brand().name }} is run.</p>
+            }
           }
         }
       </li>
@@ -103,16 +110,38 @@
     <section class="know" aria-labelledby="know-title">
       <h2 id="know-title">Good to know</h2>
       <ul>
-        <li>
-          <b>File limits.</b>
-          @if (site.limitsText()) {
-            {{ site.limitsText() }} Larger or longer files are refused before they are processed, so split them first.
-          } @else {
-            No size or length limit is announced by the server right now. Very large files simply take longer.
-          }
-        </li>
-        <li><b>Speed.</b> It depends on the quality you pick, the length of the file and how busy the service is.</li>
-        @switch (site.mode()) {
+        @if (site.inBrowser()) {
+          <li>
+            <b>File limits.</b> None set by us. Your file is processed on your device, so very large or long files take longer and need
+            enough free memory; the page warns you on a slower device.
+          </li>
+          <li>
+            <b>Speed.</b> It depends on your device, the quality you pick and the length of the file. The first use of a quality level
+            downloads its model once: your browser fetches the model files from Hugging Face and the engine's program files from jsDelivr,
+            then keeps them cached. Keep the tab open while it works.
+          </li>
+          <li>
+            <b>Nothing is saved for later.</b> Transcripts and the file stay in this browser only and are deleted automatically after
+            @if (site.idleText()) { {{ site.idleText() }} } @else { a period }
+            of inactivity, or when you press <b>Delete my data now</b>. Export what you need before you leave. Details are in the
+            <a routerLink="/privacy">Privacy policy</a>.
+          </li>
+          <li>
+            <b>Ads.</b> Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.
+            No ad is shown while a file is being transcribed.
+          </li>
+        } @else {
+          <li>
+            <b>File limits.</b>
+            @if (site.limitsText()) {
+              {{ site.limitsText() }} Larger or longer files are refused before they are processed, so split them first.
+            } @else {
+              No size or length limit is announced by the server right now. Very large files simply take longer.
+            }
+          </li>
+          <li><b>Speed.</b> It depends on the quality you pick, the length of the file and how busy the service is.</li>
+        }
+        @switch (site.inBrowser() ? 'browser' : site.mode()) {
           @case ('public') {
             <li>
               <b>Nothing is saved for later.</b> Files and transcripts exist only for your session. Export what you need before you leave.

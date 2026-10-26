@@ -6,7 +6,7 @@ import { httpError, makeStats, makeSummary, restoreVisibility, setTabVisibility,
 import { JobsStore } from './jobs.store';
 import { JobSummary } from './models';
 import { IS_BROWSER } from './platform';
-import { StatsService } from './stats.service';
+import { COUNTER_URL, StatsService } from './stats.service';
 
 const MINUTE = 60_000;
 
@@ -540,6 +540,89 @@ describe('StatsService', () => {
       expect(svc.visible()).toBe(false);
       pollsIn(10 * MINUTE);
       ctl.expectNone('/api/stats');
+    });
+  });
+
+  describe('the static website: the counter Worker (workers/counter)', () => {
+    const WORKER = 'https://counter.test/api';
+    function setupWorker() {
+      TestBed.configureTestingModule({
+        providers: [
+          silentLog,
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: JobsStore, useClass: FakeStore },
+          { provide: IS_BROWSER, useValue: true },
+          { provide: COUNTER_URL, useValue: WORKER },
+        ],
+      });
+      ctl = TestBed.inject(HttpTestingController);
+      jobs = TestBed.inject(JobsStore) as unknown as FakeStore;
+      svc = TestBed.inject(StatsService);
+    }
+    const read = () => ctl.expectOne((r) => r.method === 'GET' && r.url === `${WORKER}/stats`);
+    const posts = () => ctl.match((r) => r.method === 'POST' && r.url === `${WORKER}/count`);
+    /** the list is loaded with these jobs (the first look only primes: nothing is reported) */
+    function list(rows: JobSummary[]) {
+      jobs.loaded.set(true);
+      jobs.jobs.set(rows);
+      TestBed.tick();
+    }
+
+    it("reads the total from the Worker, never /api/stats, and says it is reported by visitors' browsers (not verified)", () => {
+      useEnglishNumbers();
+      setupWorker();
+      ctl.expectNone('/api/stats');
+      read().flush(makeStats({ transcribed: 1234, counting: true }));
+      TestBed.tick();
+      expect(svc.visible()).toBe(true);
+      expect(svc.count()).toBe(1234);
+      expect(svc.title()).toBe("1,234 videos transcribed, as reported by visitors' browsers");
+      expect(svc.title()).not.toMatch(/verified/i);
+    });
+
+    it('hides the pill on any error (not deployed yet, over its daily limit, blocked)', () => {
+      setupWorker();
+      read().flush(...httpError(503));
+      TestBed.tick();
+      expect(svc.stats()).toBeNull();
+      expect(svc.visible()).toBe(false);
+    });
+
+    it("reports each of this tab's finished transcriptions once, with an empty POST, and shows the new total", () => {
+      setupWorker();
+      read().flush(makeStats({ transcribed: 10, counting: true }));
+      list([makeSummary({ id: 'a', status: 'running' }), makeSummary({ id: 'b', status: 'queued' })]);
+      expect(posts()).toEqual([]);
+      list([makeSummary({ id: 'a', status: 'done' }), makeSummary({ id: 'b', status: 'running' })]);
+      const first = posts();
+      expect(first.length).toBe(1);
+      expect(first[0].request.body).toBeNull();
+      first[0].flush(makeStats({ transcribed: 11, counting: true }));
+      expect(svc.count()).toBe(11);
+      list([makeSummary({ id: 'a', status: 'done', title: 'renamed' }), makeSummary({ id: 'b', status: 'done' })]);
+      const second = posts();
+      expect(second.length).toBe(1); // only b: a was reported already
+      second[0].flush(makeStats({ transcribed: 12, counting: true }));
+      expect(svc.count()).toBe(12);
+    });
+
+    it('does not report transcripts it did not see being made (the list after a reload, another tab)', () => {
+      setupWorker();
+      read().flush(makeStats({ transcribed: 10, counting: true }));
+      list([makeSummary({ id: 'a', status: 'done' })]);
+      list([makeSummary({ id: 'a', status: 'done' }), makeSummary({ id: 'b', status: 'done' })]);
+      expect(posts()).toEqual([]);
+    });
+
+    it('a failed report is silent and keeps the number shown', () => {
+      setupWorker();
+      read().flush(makeStats({ transcribed: 10, counting: true }));
+      list([makeSummary({ id: 'a', status: 'running' })]);
+      list([makeSummary({ id: 'a', status: 'done' })]);
+      posts()[0].flush(...httpError(429));
+      expect(svc.count()).toBe(10);
+      expect(svc.visible()).toBe(true);
     });
   });
 });

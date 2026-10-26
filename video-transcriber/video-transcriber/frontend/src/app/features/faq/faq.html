@@ -8,7 +8,16 @@
   <div class="faq">
     <details class="qa">
       <summary>Is it really free and unlimited? Do I need to log in?<span class="pm" aria-hidden="true"></span></summary>
-      @if (site.isLocal()) {
+      @if (site.inBrowser()) {
+        <p>
+          Yes. It is free, and there is no account or login, ever. There is no daily or monthly quota and no paywall; ads keep the
+          website free.
+        </p>
+        <p>
+          Your file is transcribed in your browser on your own device, so we set no size or length limit. Very large or long files work
+          too: they take longer and need enough free memory, and the page warns you when your device may be slow.
+        </p>
+      } @else if (site.isLocal()) {
         <p>
           Yes. It is free, and there is nothing to sign up for and no login. This copy runs on your own computer, so there is no quota and
           no paywall; how fast it works depends on your computer.
@@ -71,57 +80,103 @@
       }
     </details>
 
+    <!-- tablet and phone: one in-flow ad unit between two answers (the desktop rail is in the app shell) -->
+    <app-ad-slot placement="inline" />
+
     <details class="qa">
       <summary>Which files can I use, and what are the limits?<span class="pm" aria-hidden="true"></span></summary>
       <p>
         <b>File types.</b> Video: MP4, MKV, MOV, AVI, WEBM, WMV, FLV, M4V, 3GP, TS and MTS. Audio: MP3, WAV, M4A, AAC, FLAC, OGG and OPUS. You can
         also record straight from your microphone.
       </p>
-      @if (site.limitsText()) {
-        <p><b>Limits.</b> {{ site.limitsText() }} Larger or longer files are refused before they are processed, so split them first.</p>
+      @if (site.inBrowser()) {
+        <p>
+          <b>Limits.</b> We set no size or length limit: your file is processed on your device, so very large or long files simply take
+          longer and need enough free memory. On a slower device the page tells you before you start and estimates the time.
+        </p>
+        <p>
+          Nobody else's files are ahead of yours. If you add several files, they are transcribed one after another in your tab, so keep
+          the tab open until they are done.
+        </p>
       } @else {
-        <p><b>Limits.</b> No size or length limit is announced by the server right now. Very large files simply take longer.</p>
+        @if (site.limitsText()) {
+          <p><b>Limits.</b> {{ site.limitsText() }} Larger or longer files are refused before they are processed, so split them first.</p>
+        } @else {
+          <p><b>Limits.</b> No size or length limit is announced by the server right now. Very large files simply take longer.</p>
+        }
+        <p>If the service is busy or too many transcripts are already running, it asks you to wait and says why.</p>
       }
-      <p>If the service is busy or too many transcripts are already running, it asks you to wait and says why.</p>
     </details>
 
     <details class="qa">
       <summary>How long does it take?<span class="pm" aria-hidden="true"></span></summary>
-      <p>
-        It depends on the quality you pick, the length of the file and how busy the service is. Fastest is quick; Best accuracy takes
-        longest but makes the fewest mistakes. Progress and the time left are shown live, and a file waiting for its turn shows "Waiting in
-        queue".
-      </p>
+      @if (site.inBrowser()) {
+        <p>
+          It depends on your device, the quality you pick and the length of the file. With a capable graphics chip (WebGPU) it is fastest;
+          otherwise it runs on the processor (WebAssembly), which is slower. Fastest is quick; Best accuracy takes longest but makes the
+          fewest mistakes. Progress and the time left are shown live.
+        </p>
+        <p>
+          The first time you use a quality level, your browser downloads its speech model once and keeps it for next time, so later files
+          start sooner.
+        </p>
+      } @else {
+        <p>
+          It depends on the quality you pick, the length of the file and how busy the service is. Fastest is quick; Best accuracy takes
+          longest but makes the fewest mistakes. Progress and the time left are shown live, and a file waiting for its turn shows "Waiting in
+          queue".
+        </p>
+      }
     </details>
 
     <details class="qa">
       <summary>Is my data private?<span class="pm" aria-hidden="true"></span></summary>
-      @switch (site.mode()) {
-        @case ('public') {
-          <p>
-            Your files are uploaded to our server so they can be processed there. They are kept only for your session and deleted
-            automatically when it ends@if (site.idleText()) {, after {{ site.idleText() }} of inactivity}, or right away when you press
-            <b>Delete my data now</b> in the Transcripts menu. There is no account and no tracking, and the only cookie is one essential session
-            cookie (no analytics or advertising cookies).
-          </p>
-          <p>
-            Files and transcripts exist only for your session. Export what you need before you leave. The only thing we keep is one
-            anonymous running total of how many files have been transcribed on the site (a single number, shown in the page header); it is
-            not linked to you, your files or your session. Details are in the <a routerLink="/privacy">Privacy policy</a>.
-          </p>
-        }
-        @case ('local') {
-          <p>
-            This copy of {{ site.brand().name }} runs on your own computer. Your files are processed on this machine and nothing leaves it.
-            Nothing is saved permanently: transcripts exist only for this session, so export what you need. The
-            <a routerLink="/privacy">Privacy policy</a> describes the hosted website.
-          </p>
-        }
-        @default {
-          <p>
-            Where your files are processed depends on how {{ site.brand().name }} is run, and the server did not answer just now. See the
-            <a routerLink="/privacy">Privacy policy</a>.
-          </p>
+      @if (site.inBrowser()) {
+        <p>
+          Your file never leaves your device. It is transcribed in your browser on this device and is never uploaded to us or to anyone
+          else. Transcripts, your edits and the file are kept in this browser's storage only and deleted automatically after
+          @if (site.idleText()) { {{ site.idleText() }} } @else { a period }
+          of inactivity, or right away when you press <b>Delete my data now</b> in the Transcripts menu. There is no account. Export
+          what you need before you leave.
+        </p>
+        <p>
+          The first time you use a quality level, your browser downloads the speech model from Hugging Face and the engine's program files
+          from jsDelivr, and keeps them for next time; nothing of your file is sent with them. When a transcription finishes, your browser
+          adds one to the anonymous counter in the page header, and nothing else.
+        </p>
+        <p>
+          Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown
+          while a file is being transcribed, and this website sets no cookies of its own. Details are in the
+          <a routerLink="/privacy">Privacy policy</a>.
+        </p>
+      } @else {
+        @switch (site.mode()) {
+          @case ('public') {
+            <p>
+              Your files are uploaded to our server so they can be processed there. They are kept only for your session and deleted
+              automatically when it ends@if (site.idleText()) {, after {{ site.idleText() }} of inactivity}, or right away when you press
+              <b>Delete my data now</b> in the Transcripts menu. There is no account and no tracking, and the only cookie is one essential session
+              cookie (no analytics or advertising cookies).
+            </p>
+            <p>
+              Files and transcripts exist only for your session. Export what you need before you leave. The only thing we keep is one
+              anonymous running total of how many files have been transcribed on the site (a single number, shown in the page header); it is
+              not linked to you, your files or your session. Details are in the <a routerLink="/privacy">Privacy policy</a>.
+            </p>
+          }
+          @case ('local') {
+            <p>
+              This copy of {{ site.brand().name }} runs on your own computer. Your files are processed on this machine and nothing leaves it.
+              Nothing is saved permanently: transcripts exist only for this session, so export what you need. The
+              <a routerLink="/privacy">Privacy policy</a> describes the hosted website.
+            </p>
+          }
+          @default {
+            <p>
+              Where your files are processed depends on how {{ site.brand().name }} is run, and the server did not answer just now. See the
+              <a routerLink="/privacy">Privacy policy</a>.
+            </p>
+          }
         }
       }
     </details>

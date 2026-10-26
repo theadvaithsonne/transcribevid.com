@@ -8,7 +8,23 @@ import { FreeChips } from '../../shared/free-chips';
 import { RelatedTools } from '../../shared/related-tools';
 import { TOOL_CONTENT } from './content';
 import { ToolDrop } from './tool-drop';
-import { ToolPageContent } from './tool-page.model';
+import { ToolFaq, ToolPageContent, ToolStep, ToolTip } from './tool-page.model';
+import { AdSlot } from '../../shared/ad-slot';
+
+/** The text of a page as one edition reads it: the in-browser edition takes each item's `browser` variant where there is one. */
+export function editionText(c: ToolPageContent, inBrowser: boolean) {
+  const step = (s: ToolStep | ToolTip) => ({ title: (inBrowser && s.browser?.title) || s.title, text: (inBrowser && s.browser?.text) || s.text });
+  const faq = (f: ToolFaq) => ({
+    question: (inBrowser && f.browser?.question) || f.question,
+    answer: (inBrowser && f.browser?.answer) || f.answer,
+  });
+  return {
+    why: (inBrowser && c.browserWhy) || c.why,
+    steps: c.steps.map(step),
+    tips: c.tips.map(step),
+    faqs: c.faqs.map(faq),
+  };
+}
 
 /** The announced public limits ("Up to 500 MB and 60 minutes per file."), used until the server tells its own (SiteService assumes the same on prerendered pages). */
 export const DEFAULT_LIMITS = `Up to ${fmtBytesShort(PUBLIC_DEFAULTS.maxUploadMb * 1024 * 1024)} and ${PUBLIC_DEFAULTS.maxDurationMin} minutes per file.`;
@@ -20,7 +36,7 @@ export const DEFAULT_LIMITS = `Up to ${fmtBytesShort(PUBLIC_DEFAULTS.maxUploadMb
  */
 @Component({
   selector: 'app-tool-page',
-  imports: [RouterLink, FreeChips, RelatedTools, ToolDrop],
+  imports: [RouterLink, FreeChips, RelatedTools, ToolDrop, AdSlot],
   templateUrl: './tool-page.html',
   styleUrl: './tool-page.scss',
 })
@@ -35,6 +51,8 @@ export class ToolPage {
   /** short name of the page, e.g. "MP4 to text" */
   readonly label = computed(() => String(this.data()['label'] ?? this.c().eyebrow));
   readonly path = computed(() => '/' + this.slug());
+  /** why, steps, tips and questions in this edition's words (the in-browser edition has no upload, limit or queue) */
+  readonly text = computed(() => editionText(this.c(), this.site.inBrowser()));
 
   readonly limits = computed(() => {
     const announced = this.site.limitsText();
@@ -44,7 +62,7 @@ export class ToolPage {
 
   /** the questions as the visitor reads them ({limits} filled in) */
   readonly faqs = computed(() =>
-    this.c().faqs.map((f) => ({ question: f.question, answer: f.answer.replaceAll('{limits}', this.limits()) })),
+    this.text().faqs.map((f) => ({ question: f.question, answer: f.answer.replaceAll('{limits}', this.limits()) })),
   );
 
   constructor() {
@@ -53,7 +71,7 @@ export class ToolPage {
       computed(() => ({
         name: this.c().howTitle,
         description: this.c().howToDescription,
-        steps: this.c().steps.map((s) => ({ name: s.title, text: s.text })),
+        steps: this.text().steps.map((s) => ({ name: s.title, text: s.text })),
       })),
     );
   }

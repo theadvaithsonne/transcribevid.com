@@ -130,6 +130,27 @@ describe('TOOL_PAGES (the keyword landing pages)', () => {
       expect(['video-to-text', 'mp4-to-text', 'srt-subtitle-generator'].map(kind)).toEqual(['video', 'video', 'video']);
     });
 
+    it('the in-browser variants are complete sentences, and the browser questions are unique too', () => {
+      const all = Object.values(TOOL_CONTENT);
+      for (const c of all) {
+        for (const x of [...c.steps, ...c.tips]) {
+          if (!x.browser) continue;
+          expect(x.browser.text.trim()).not.toBe('');
+          if (x.browser.title !== undefined) expect(x.browser.title.trim()).not.toBe('');
+        }
+        for (const f of c.faqs) {
+          if (!f.browser) continue;
+          expect(f.browser.answer.trim()).not.toBe('');
+          if (f.browser.question !== undefined) expect(f.browser.question.trim().endsWith('?')).toBe(true);
+          // there are no limits in the in-browser edition, so its answers have nothing to fill in
+          expect(f.browser.answer).not.toMatch(/\{[a-z]+\}/);
+        }
+        if (c.browserWhy) expect(c.browserWhy.length).toBe(c.why.length);
+      }
+      const browserQs = all.flatMap((c) => c.faqs.map((f) => f.browser?.question ?? f.question));
+      expect(new Set(browserQs).size).toBe(browserQs.length);
+    });
+
     it('only the {limits} placeholder is used in the answers, and every placeholder is filled in by the page', () => {
       const placeholders = Object.values(TOOL_CONTENT).flatMap((c) => c.faqs.flatMap((f) => f.answer.match(/\{[a-z]+\}/g) ?? []));
       for (const p of placeholders) expect(p).toBe('{limits}');

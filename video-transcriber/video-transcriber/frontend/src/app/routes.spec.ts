@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, TitleStrategy, provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from './app.routes';
+import { adFreeDocument } from './core/ads.service';
 import { BrandTitleStrategy } from './core/title.service';
 import { TOOL_PAGES } from './features/tool-pages/tool-pages.list';
 import { silentLog } from './testing/fakes';
@@ -140,6 +141,30 @@ describe('routes', () => {
 
     it('every page is loaded lazily (the first download stays small)', () => {
       for (const r of routes.filter((x) => !x.redirectTo)) expect(typeof r.loadComponent, r.path).toBe('function');
+    });
+
+    it('ads: only home, how it works, FAQ and the tool pages are ad pages; a transcript only once finished (adsense.md 16)', () => {
+      const flag = (path: string) => (routes.find((r) => r.path === path)?.data as { ads?: unknown } | undefined)?.ads;
+      const adPages = ['', 'how-it-works', 'faq', ...TOOL_PAGES.map((t) => t.path.slice(1))];
+      for (const r of routes) {
+        const f = (r.data as { ads?: unknown } | undefined)?.ads;
+        if (adPages.includes(r.path!)) expect(f, r.path).toBe(true);
+        else if (r.path === 'jobs/:id') expect(f, r.path).toBe('job-done');
+        else expect(f, r.path).toBeUndefined();
+      }
+      for (const path of ['privacy', 'terms', 'logs', '**']) expect(flag(path), path).toBeUndefined();
+    });
+
+    it('ads: the shell draws the in-flow unit after the home page and the transcript only', () => {
+      const withEnd = routes.filter((r) => (r.data as { adSlot?: string } | undefined)?.adSlot === 'end').map((r) => r.path);
+      expect(withEnd).toEqual(['', 'jobs/:id']);
+    });
+
+    it('ads: privacy, terms and logs are opened as a fresh document once the ad script is in the tab', () => {
+      for (const path of ['privacy', 'terms', 'logs']) {
+        expect(routes.find((r) => r.path === path)!.canActivate, path).toEqual([adFreeDocument]);
+      }
+      for (const r of routes.filter((x) => (x.data as { ads?: unknown } | undefined)?.ads)) expect(r.canActivate, r.path).toBeUndefined();
     });
   });
 });

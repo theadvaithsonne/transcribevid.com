@@ -167,7 +167,8 @@ export class ToolDrop {
       named ? `${named}.` : '',
       this.kind() === 'video' ? 'Audio works too.' : '',
       this.limits(),
-      'Nothing is uploaded until you press Transcribe.',
+      // the in-browser edition never uploads the file; the server edition uploads it once Transcribe is pressed
+      this.site.inBrowser() ? 'Your file never leaves your device.' : 'Nothing is uploaded until you press Transcribe.',
     ];
     // "500 MB" stays on one line
     return parts.filter(Boolean).join(' ').replace(/(\d) (?=[KMGT]B(?![a-z]))/g, '$1\xa0');

@@ -5,7 +5,8 @@ import { LEGAL_UPDATED } from './legal-info';
 
 /**
  * TEMPLATE: review with a lawyer before launch. The operator and governing-law details are placeholders the site
- * owner must fill in (search terms.html for `class="placeholder"`).
+ * owner must fill in (search terms.html for `class="placeholder"`). The in-browser edition (the static website) has its own
+ * wording (the device does the work, no upload, funded by ads, not directed to children); the server editions keep theirs.
  */
 @Component({
   selector: 'app-terms',

@@ -1,17 +1,18 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Type } from '@angular/core';
+import { Provider, Type } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { ADS_CONFIG, ADS_EDITION } from '../../core/ads.service';
 import { JobsStore } from '../../core/jobs.store';
 import { Health } from '../../core/models';
-import { makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
+import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { LEGAL_UPDATED } from './legal-info';
 import { PrivacyPage } from './privacy';
 import { TermsPage } from './terms';
 
-function render<T>(page: Type<T>, health: Health | null): ComponentFixture<T> {
-  TestBed.configureTestingModule({ providers: [silentLog, provideHttpClient(), provideHttpClientTesting(), provideRouter([])] });
+function render<T>(page: Type<T>, health: Health | null, extra: Provider[] = []): ComponentFixture<T> {
+  TestBed.configureTestingModule({ providers: [silentLog, provideHttpClient(), provideHttpClientTesting(), provideRouter([]), ...extra] });
   TestBed.inject(JobsStore).health.set(health);
   const fixture = TestBed.createComponent(page);
   fixture.detectChanges();
@@ -19,6 +20,14 @@ function render<T>(page: Type<T>, health: Health | null): ComponentFixture<T> {
 }
 const textOf = (f: ComponentFixture<unknown>) => ((f.nativeElement as HTMLElement).textContent ?? '').replace(/\s+/g, ' ');
 const headings = (f: ComponentFixture<unknown>) => Array.from((f.nativeElement as HTMLElement).querySelectorAll('h2')).map((h) => h.textContent!.trim());
+/** The static website with every AdSense id filled in: the "Privacy and cookie settings" control exists. */
+const adsConfigured: Provider[] = [
+  { provide: ADS_EDITION, useValue: true },
+  {
+    provide: ADS_CONFIG,
+    useValue: { client: 'ca-pub-1234567890123456', slots: { rail160: '1234567890', rail300: '2345678901', inline300: '3456789012' } },
+  },
+];
 const placeholders = (f: ComponentFixture<unknown>) => Array.from((f.nativeElement as HTMLElement).querySelectorAll('mark.placeholder')).map((m) => m.textContent);
 
 describe('PrivacyPage', () => {
@@ -203,5 +212,207 @@ describe('TermsPage', () => {
   it('notes on a local install that it describes the hosted website', () => {
     const f = render(TermsPage, makeHealth());
     expect((f.nativeElement as HTMLElement).querySelector('.callout')?.textContent).toContain('describe the hosted website');
+  });
+});
+
+describe('PrivacyPage in the browser edition', () => {
+  it('has a single h1, a last-updated date and the sections the policy needs, including advertising and children', () => {
+    const f = render(PrivacyPage, makeBrowserHealth());
+    const el = f.nativeElement as HTMLElement;
+    expect(el.querySelectorAll('h1').length).toBe(1);
+    expect(textOf(f)).toContain(`Last updated: ${LEGAL_UPDATED}`);
+    const h = headings(f).join(' | ');
+    for (const part of [
+      'Who runs this website',
+      'What is processed, and where',
+      'How long it is kept',
+      'Downloads your browser makes',
+      'Advertising',
+      'Cookies and browser storage',
+      'Sharing',
+      'Children',
+      'Your rights and choices',
+    ]) {
+      expect(h).toContain(part);
+    }
+  });
+
+  it('leads with the promise: the file never leaves the device, ads only on information pages and beside finished transcripts', () => {
+    const el = render(PrivacyPage, makeBrowserHealth()).nativeElement as HTMLElement;
+    const lede = el.querySelector('.lede')!.textContent!.replace(/\s+/g, ' ');
+    expect(lede).toContain('Your file never leaves your device.');
+    expect(lede).toContain('Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.');
+  });
+
+  it("no longer makes the server edition's promises, and has no 'runs on your own computer' note", () => {
+    const f = render(PrivacyPage, makeBrowserHealth());
+    const t = textOf(f);
+    for (const old of [
+      'no tracking and no advertising',
+      'One essential session cookie',
+      'No analytics, advertising or tracking cookies',
+      'no third-party scripts',
+      'The recognition runs on our own server',
+      'files you upload',
+    ]) {
+      expect(t).not.toContain(old);
+    }
+    expect((f.nativeElement as HTMLElement).querySelector('.callout')).toBeNull();
+  });
+
+  it('says the file is processed on the device and never uploaded, and kept in this browser until the idle time or Delete my data now', () => {
+    const t = textOf(render(PrivacyPage, makeBrowserHealth({ session_idle_minutes: 30 })));
+    expect(t).toContain('They are processed in your browser on your device (using WebGPU or WebAssembly).');
+    expect(t).toContain('Your file is never uploaded to our servers and never sent to Google or anyone else.');
+    expect(t).toContain("Transcripts, edits and the source file are kept in this browser's storage (IndexedDB) only.");
+    expect(t).toContain('after 30 minutes of inactivity');
+    expect(t).toContain('Delete my data now');
+    expect(t).toContain('Deleted data cannot be recovered.');
+  });
+
+  it('names the downloads the browser makes: models from Hugging Face, program files from jsDelivr, never the media', () => {
+    const t = textOf(render(PrivacyPage, makeBrowserHealth()));
+    expect(t).toContain('your browser downloads the speech model files from Hugging Face (huggingface.co)');
+    expect(t).toContain("the speech engine's program files from jsDelivr (cdn.jsdelivr.net)");
+    expect(t).toContain('never your media or your transcript');
+  });
+
+  it('names Cloudflare as the host and describes the counter: one anonymous +1, only the total stored, not verified', () => {
+    const t = textOf(render(PrivacyPage, makeBrowserHealth()));
+    expect(t).toContain('Cloudflare (Cloudflare Pages) delivers this website.');
+    expect(t).toContain('When a transcription finishes, your browser sends one anonymous "+1" to our counter (a Cloudflare Worker).');
+    expect(t).toContain('It carries no file, transcript or identifier.');
+    expect(t).toContain('we store only the total');
+    expect(t).toContain("reported by visitors' browsers and is not verified");
+  });
+
+  it('makes the AdSense disclosures, with the opt-out and partner-sites links', () => {
+    const f = render(PrivacyPage, makeBrowserHealth());
+    const t = textOf(f);
+    expect(t).toContain('served by Google AdSense');
+    expect(t).toContain('Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites.');
+    expect(t).toContain("Google's use of advertising cookies enables it and its partners to serve ads to you");
+    expect(t).toContain('No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.');
+    expect(t).toContain('We never send your file, your transcript or any personal information to Google.');
+    expect(t).toContain("Google's certified consent message asks for your choice when ads load.");
+    expect(t).toContain('with ads blocked or declined, everything works the same');
+    const el = f.nativeElement as HTMLElement;
+    for (const href of ['https://adssettings.google.com', 'https://www.aboutads.info', 'https://policies.google.com/technologies/partner-sites']) {
+      const a = el.querySelector(`a[href="${href}"]`);
+      expect(a).not.toBeNull();
+      expect(a!.getAttribute('target')).toBe('_blank');
+      expect(a!.getAttribute('rel')).toContain('noopener');
+    }
+  });
+
+  it('says the site sets no cookies of its own, Google sets its own when ads load, and storage stays in the browser', () => {
+    const t = textOf(render(PrivacyPage, makeBrowserHealth()));
+    expect(t).toContain('The site itself sets no cookies.');
+    expect(t).toContain('Google sets its own cookies when ads load');
+    expect(t).toContain('None of this is sent to us.');
+    expect(t).toContain("The Logs page shows this tab's own technical log. It stays in your browser and is never sent anywhere.");
+  });
+
+  it('is not directed to children', () => {
+    expect(textOf(render(PrivacyPage, makeBrowserHealth()))).toContain('is not directed to children under 13 (or under 16 in the EU where applicable)');
+  });
+
+  it("says Delete my data now cannot delete Google's cookies", () => {
+    expect(textOf(render(PrivacyPage, makeBrowserHealth()))).toContain("It deletes the data in this browser only; it cannot delete Google's cookies.");
+  });
+
+  it('mentions "Privacy and cookie settings" only once every AdSense id is configured', () => {
+    expect(textOf(render(PrivacyPage, makeBrowserHealth()))).not.toContain('Privacy and cookie settings');
+    TestBed.resetTestingModule();
+    const t = textOf(render(PrivacyPage, makeBrowserHealth(), adsConfigured));
+    expect(t).toContain(
+      'You can change it at any time with Privacy and cookie settings at the bottom of any page that shows ads (for example the home page).',
+    );
+    expect(t).toContain('use Privacy and cookie settings at the bottom of a page that shows ads,');
+  });
+
+  it('keeps the placeholders, and shows the contact e-mail when there is one', () => {
+    const f = render(PrivacyPage, makeBrowserHealth());
+    expect(placeholders(f)).toEqual(['[Operator / company name and address]', '[Contact e-mail address]']);
+    TestBed.resetTestingModule();
+    const g = render(PrivacyPage, makeBrowserHealth({ brand: { contact_email: 'privacy@transcribevid.com' } }));
+    expect(placeholders(g)).toEqual(['[Operator / company name and address]']);
+    expect((g.nativeElement as HTMLElement).querySelector('a[href="mailto:privacy@transcribevid.com"]')).not.toBeNull();
+  });
+
+  it('still links to the terms, How it works and the FAQ, and ends with one quiet way to start', () => {
+    const el = render(PrivacyPage, makeBrowserHealth()).nativeElement as HTMLElement;
+    expect(el.querySelector('a[href="/terms"]')).not.toBeNull();
+    expect(el.querySelector('a[href="/how-it-works"]')).not.toBeNull();
+    expect(el.querySelector('a[href="/faq"]')).not.toBeNull();
+    expect(el.querySelector('.end a.btn')!.getAttribute('href')).toBe('/');
+  });
+});
+
+describe('TermsPage in the browser edition', () => {
+  it('has the clauses terms of use need, plus third-party downloads and ads, and children', () => {
+    const f = render(TermsPage, makeBrowserHealth());
+    expect((f.nativeElement as HTMLElement).querySelectorAll('h1').length).toBe(1);
+    const h = headings(f).join(' | ');
+    for (const part of [
+      'Acceptable use',
+      'Limits',
+      'Accuracy: no warranty',
+      'Availability',
+      'Third-party downloads and ads',
+      'Liability',
+      'Termination',
+      'Children',
+      'Governing law',
+    ]) {
+      expect(h).toContain(part);
+    }
+  });
+
+  it('says the device does the work, nothing is uploaded, and there is no file-size limit of ours', () => {
+    const t = textOf(render(TermsPage, makeBrowserHealth({ session_idle_minutes: 30 })));
+    expect(t).toContain('the recognition runs on your device, and your files are not uploaded to us');
+    expect(t).toContain('Transcription runs on your device and uses its processor, graphics chip, memory and battery.');
+    expect(t).toContain('We set no file-size or length limit');
+    expect(t).toContain('may take a long time or run out of memory');
+    expect(t).toContain('deleted automatically after 30 minutes of inactivity');
+    expect(t).not.toContain('Up to');
+  });
+
+  it('says the service is funded by ads and names the third-party downloads', () => {
+    const t = textOf(render(TermsPage, makeBrowserHealth()));
+    expect(t).toContain('It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the Privacy policy).');
+    expect(t).toContain(
+      'your browser downloads speech models from Hugging Face and program files from jsDelivr; they are provided under their own licences and terms.',
+    );
+  });
+
+  it('is not directed to children', () => {
+    expect(textOf(render(TermsPage, makeBrowserHealth()))).toContain('is for a general audience and is not directed to children under 13.');
+  });
+
+  it('has no server wording: no uploads, no send-rate limits, no queue, no local-install note', () => {
+    const f = render(TermsPage, makeBrowserHealth());
+    const t = textOf(f);
+    for (const old of [
+      'the files you upload',
+      'only upload content',
+      'how fast and how many files you can send',
+      'how many transcripts can run at the same time',
+      'capacity limits',
+    ]) {
+      expect(t).not.toContain(old);
+    }
+    expect((f.nativeElement as HTMLElement).querySelector('.callout')).toBeNull();
+  });
+
+  it('keeps the warranty, liability and termination clauses and the placeholders', () => {
+    const f = render(TermsPage, makeBrowserHealth());
+    const t = textOf(f);
+    expect(t).toContain('"as is" and "as available", without any warranty');
+    expect(t).toContain('We do not promise that the service will always be available');
+    expect(t).toContain('we are not liable for indirect or consequential loss');
+    expect(t).toContain('We may suspend or end your access at any time');
+    expect(placeholders(f)).toEqual(['[Operator / company name and address]', '[Governing law and jurisdiction]', '[Contact e-mail address]']);
   });
 });

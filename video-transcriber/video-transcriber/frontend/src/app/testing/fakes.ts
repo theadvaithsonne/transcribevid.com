@@ -93,6 +93,23 @@ export function makePublicHealth(over: Partial<Health> = {}): Health {
   });
 }
 
+/** What BrowserTransport.health() makes up: the static website, where everything runs in the visitor's browser. */
+export function makeBrowserHealth(over: Partial<Health> = {}): Health {
+  return makeHealth({
+    version: '',
+    compute_type: 'browser',
+    persistent: true,
+    public: false,
+    session_idle_minutes: 30,
+    brand: null,
+    logs_enabled: true,
+    logs_require_token: false,
+    allowed_models: null,
+    runs_in: 'browser',
+    ...over,
+  });
+}
+
 export function makeSession(over: Partial<SessionInfo> = {}): SessionInfo {
   return { session_id: 'sess-1', created_at: 1000, last_seen: 1000, expires_in_seconds: 1800, job_count: 0, ...over };
 }

@@ -1,0 +1,35 @@
+# TranscribeVid "videos transcribed" counter: one Cloudflare Worker + one D1 row (free plan).
+# docs/in-browser/spike/hosting.md section 1.3 (why D1, not KV) and docs/in-browser/M5.md (deploy steps).
+#
+#   GET  /stats   -> {"transcribed": n, "counting": true}   (browser-cached for 5 minutes)
+#   POST /count   -> {"transcribed": n + 1, "counting": true} (only from https://transcribevid.com, rate-limited per IP)
+# The same paths also answer under /api/ (/api/stats, /api/count) for the route on the site's own domain below.
+#
+# Deploy (from this folder):  npx wrangler login
+#                             npx wrangler d1 create tv-counter          -> paste the database_id below
+#                             npx wrangler d1 execute tv-counter --remote --file schema.sql
+#                             npx wrangler deploy
+name = "tv-counter"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# Same origin as the pages (environment.browser.ts: counterUrl "https://transcribevid.com/api"). Needs the domain's zone in
+# this Cloudflare account; until then comment it out and use the workers.dev address as counterUrl.
+workers_dev = true
+routes = [{ pattern = "transcribevid.com/api/*", zone_name = "transcribevid.com" }]
+
+[vars]
+# Comma-separated list of page origins allowed to POST /count (and to read the answers from another origin).
+ALLOWED_ORIGINS = "https://transcribevid.com"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tv-counter"
+database_id = "REPLACE_WITH_THE_ID_PRINTED_BY_wrangler_d1_create"
+
+# Per-IP limit on POST /count: Cloudflare's Workers Rate Limiting binding (free). If this wrangler version rejects the
+# block, delete it: src/index.ts then falls back to a per-isolate in-memory limit with the same numbers.
+[[ratelimits]]
+name = "COUNT_LIMITER"
+namespace_id = "1001"
+simple = { limit = 10, period = 60 }

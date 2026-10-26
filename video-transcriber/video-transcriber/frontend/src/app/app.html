@@ -57,7 +57,7 @@
   <span class="clabel">{{ stats.count() === 1 ? 'video' : 'videos' }} transcribed</span>
 </ng-template>
 
-<div class="shell">
+<div class="shell" [class.has-rail]="ads.reserved()">
   <header class="topbar">
     <a routerLink="/" class="brand" [attr.aria-label]="site.brand().name + ' home'" (click)="closeAll()">
       <app-logo [size]="40" />
@@ -138,13 +138,29 @@
       <div class="banner warn" role="status">Your session ends in {{ mins }} min. Export what you need.</div>
     }
     <router-outlet />
+    <!-- tablet / phone: the in-flow unit of the home page and the finished transcript, after the page (48 px clear of its buttons) -->
+    @if (ads.endSlot()) {
+      @for (p of [ads.path()]; track p) {
+        <app-ad-slot placement="inline" [upTo]="1000" />
+      }
+    }
   </main>
+
+  <!-- The ad column (right 20% from 1100 px wide; hidden below). A new page view (keyed) gets a new slot. -->
+  @if (ads.reserved()) {
+    @for (view of [ads.viewKey()]; track view) {
+      <app-ad-rail class="ad-rail" />
+    }
+  }
 
   <footer class="foot">
     <span class="foot-meta">© {{ year }} <span class="foot-brand">{{ site.brand().name }}</span>@if (!site.isPublic() && site.version(); as v) { <span class="foot-ver"> · v{{ v }}</span> }</span>
     <nav class="foot-nav" aria-label="Footer">
       <a routerLink="/privacy">Privacy</a>
       <a routerLink="/terms">Terms</a>
+      @if (ads.privacySettingsShown()) {
+        <button type="button" class="foot-consent" (click)="openPrivacySettings()">Privacy and cookie settings</button>
+      }
       @if (site.contactEmail(); as mail) {
         <a class="foot-mail" [href]="'mailto:' + mail">{{ mail }}</a>
       }

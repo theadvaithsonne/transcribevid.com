@@ -9,9 +9,9 @@ import { fmtBytesShort } from '../../core/format';
 import { Health } from '../../core/models';
 import { PUBLIC_DEFAULTS } from '../../core/site.service';
 import { BrandTitleStrategy } from '../../core/title.service';
-import { makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
+import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { TOOL_CONTENT } from './content';
-import { DEFAULT_LIMITS, ToolPage } from './tool-page';
+import { DEFAULT_LIMITS, ToolPage, editionText } from './tool-page';
 import { TOOL_PAGES, toolRoutePath } from './tool-pages.list';
 
 const clean = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
@@ -205,6 +205,88 @@ describe('ToolPage (a keyword landing page)', () => {
     it('a local install uses its own limits too', async () => {
       await open('/video-to-text', makeHealth({ max_upload_mb: 4096 }));
       expect(hint()).toContain('Up to 4 GB per file.');
+    });
+  });
+
+  describe('the in-browser edition (the file never leaves the device)', () => {
+    /** sentences that are true only when files are uploaded to a server with limits and a shared queue */
+    const SERVER_ONLY = ['uploaded to our server', 'queue', 'refused', 'Up to ', '500 MB', 'over the limit', 'no advertising', 'session cookie'];
+
+    it.each(TOOL_PAGES.map((t) => [t.path] as const))('%s: says nothing that is only true for the server', async (path) => {
+      await open(path, makeBrowserHealth());
+      const shown = clean(page.textContent);
+      for (const phrase of SERVER_ONLY) expect(shown).not.toContain(phrase);
+      expect(clean(q('app-tool-drop .hint')!.textContent)).toContain('Your file never leaves your device.');
+      expect(clean(q('app-tool-drop .hint')!.textContent)).toContain('There is no size or length limit set here.');
+      // what a search engine reads in the structured data is the same browser wording
+      const faq = JSON.stringify(ldBlock('page:faq'));
+      const how = JSON.stringify(ldBlock('page:howto'));
+      for (const phrase of SERVER_ONLY) {
+        expect(faq).not.toContain(phrase);
+        expect(how).not.toContain(phrase);
+      }
+    });
+
+    it('mp4-to-text: the steps, tips and questions in the browser wording, also in the structured data', async () => {
+      await open('/mp4-to-text', makeBrowserHealth());
+      const c = TOOL_CONTENT['mp4-to-text'];
+      const b = editionText(c, true);
+      const steps = qa('ol.steps > li');
+      expect(steps.map((x) => clean(x.querySelector('h3')!.textContent))).toEqual(b.steps.map((x) => x.title));
+      expect(steps.map((x) => clean(x.querySelector('p')!.textContent))).toEqual(b.steps.map((x) => x.text));
+      expect(clean(steps[1].querySelector('h3')!.textContent)).toBe('Add it');
+      expect(clean(steps[1].textContent)).toContain('they are transcribed one after another');
+      const questions = qa('details.qa summary').map((x) => clean(x.textContent));
+      expect(questions).toContain('Why did my MP4 not work?');
+      expect(questions).not.toContain('Why was my MP4 refused?');
+      expect(clean(page.textContent)).toContain('There is no size or length limit, but very long videos need enough free memory.');
+      const how = ldBlock('page:howto');
+      expect(how.step.map((x: { name: string; text: string }) => [x.name, x.text])).toEqual(b.steps.map((x) => [x.title, x.text]));
+      const faq = ldBlock('page:faq');
+      expect(faq.mainEntity.map((e: { name: string }) => e.name)).toEqual(b.faqs.map((f) => f.question));
+    });
+
+    it('mp3-to-text: says the MP3 stays in this browser and is not uploaded', async () => {
+      await open('/mp3-to-text', makeBrowserHealth());
+      const shown = clean(page.textContent);
+      expect(shown).toContain('Only in this browser: your MP3 never leaves your device.');
+      expect(shown).toContain('We set no size or length limit, because the MP3 is transcribed in your browser on your own device.');
+      expect(shown).toContain('your browser reads an MP3 quickly');
+      expect(shown).not.toContain('an MP3 uploads quickly');
+    });
+
+    it('video-to-text: free because of ads, no size limit and nobody ahead of you', async () => {
+      await open('/video-to-text', makeBrowserHealth());
+      const shown = clean(page.textContent);
+      expect(shown).toContain('ads keep it free');
+      expect(shown).toContain('there is no size limit and nobody else is ahead of you');
+      expect(shown).toContain('Long videos take longer.');
+      expect(shown).not.toContain('Stay under the limit.');
+    });
+
+    it('the server editions keep their own words (the public site still states its limits and queue)', async () => {
+      await open('/video-to-text', makePublicHealth({ max_upload_mb: 1024, max_duration_min: 30 }));
+      const shown = clean(page.textContent);
+      expect(shown).toContain('If many people are using the service, your file may wait in a queue for a while.');
+      expect(shown).toContain('Stay under the limit.');
+      expect(clean(q('app-tool-drop .hint')!.textContent)).toContain('Nothing is uploaded until you press Transcribe.');
+    });
+  });
+
+  describe('editionText', () => {
+    it('takes each browser variant only in the in-browser edition, and keeps the rest', () => {
+      const c = TOOL_CONTENT['mp4-to-text'];
+      const server = editionText(c, false);
+      expect(server.steps).toEqual(c.steps.map((x) => ({ title: x.title, text: x.text })));
+      expect(server.tips).toEqual(c.tips.map((x) => ({ title: x.title, text: x.text })));
+      expect(server.faqs).toEqual(c.faqs.map((f) => ({ question: f.question, answer: f.answer })));
+      expect(server.why).toEqual(c.why);
+      const browser = editionText(c, true);
+      expect(browser.steps[0].title).toBe(c.steps[0].title); // a variant without its own title keeps the title
+      expect(browser.steps[0].text).toBe(c.steps[0].browser!.text);
+      expect(browser.steps[2]).toEqual({ title: c.steps[2].title, text: c.steps[2].text }); // no variant: unchanged
+      expect(browser.why).toEqual(c.why); // no browserWhy on this page
+      expect(editionText(TOOL_CONTENT['mp3-to-text'], true).why).toEqual(TOOL_CONTENT['mp3-to-text'].browserWhy);
     });
   });
 

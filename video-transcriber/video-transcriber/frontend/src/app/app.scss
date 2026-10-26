@@ -23,6 +23,50 @@
   height: 100dvh;
 }
 
+/* ---------------------------------------------------------------------------------------- ad rail
+   On ad pages (core/ads.service.ts) from 1100 px wide the right 20% of the window is the ad column: header across the top,
+   then the page (which keeps scrolling inside `main`) and the footer on the left, the rail on the right from below the
+   header to the bottom. The column is reserved by the grid whether an ad loads or not (no layout shift); `minmax(0, 1fr)`
+   lets the page column shrink, so nothing scrolls sideways. Below 1100 px there is no rail: pages carry one in-flow unit. */
+.ad-rail {
+  display: none;
+}
+@media (min-width: 1100px) {
+  .shell.has-rail {
+    grid-template-columns: minmax(0, 1fr) 20vw;
+    .topbar {
+      grid-column: 1 / -1;
+    }
+    .main,
+    .foot {
+      grid-column: 1;
+    }
+    .ad-rail {
+      display: block;
+      grid-column: 2;
+      grid-row: 2 / 4;
+      min-width: 0;
+      min-height: 0;
+      /* a window too short for the 600 px unit: the column scrolls on its own instead of cutting the ad off */
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      contain: layout paint;
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+    }
+  }
+}
+@media print {
+  .shell.has-rail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ad-rail {
+    display: none !important;
+  }
+}
+
 /* a clearly visible 3px focus ring on everything you can press */
 a:focus-visible,
 button:focus-visible,
@@ -466,6 +510,30 @@ summary:focus-visible {
   display: flex;
   gap: 0 26px;
 }
+/* "Privacy and cookie settings": a button (it opens Google's consent message) that looks like the footer links */
+.foot-consent {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text-strong);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  white-space: nowrap;
+  cursor: pointer;
+  &:hover {
+    text-decoration-thickness: 3px;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+  }
+}
 /* second footer row: the free tool pages. Only on tall windows, so the landing page keeps fitting without scrolling. */
 .foot-tools {
   order: 3;
@@ -667,6 +735,9 @@ summary:focus-visible {
   }
   .foot-ver {
     display: none;
+  }
+  .foot-consent {
+    padding: 10px 6px;
   }
   .foot-nav {
     gap: 0 10px;

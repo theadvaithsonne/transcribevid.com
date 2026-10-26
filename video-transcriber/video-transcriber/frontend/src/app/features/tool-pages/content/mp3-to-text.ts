@@ -12,6 +12,10 @@ export const CONTENT: ToolPageContent = {
     'MP3 squeezes audio into a small file, which is why podcasts, voice recorders and downloaded lectures use it. That helps here too: an MP3 uploads quickly even on a slow connection, and a one-hour MP3 at 128 kbps is only about 58 MB.',
     'A transcript lets you search a long episode for one phrase, quote an interviewee exactly, write show notes without replaying the show, or keep a written record of a talk or voice message.',
   ],
+  browserWhy: [
+    'MP3 squeezes audio into a small file, which is why podcasts, voice recorders and downloaded lectures use it. That helps here too: your browser reads an MP3 quickly, and a one-hour MP3 at 128 kbps is only about 58 MB.',
+    'A transcript lets you search a long episode for one phrase, quote an interviewee exactly, write show notes without replaying the show, or keep a written record of a talk or voice message.',
+  ],
 
   howTitle: 'How to convert an MP3 to text',
   howToDescription: 'Upload the MP3, choose the spoken language, wait for the transcript and download it as text or subtitles.',
@@ -60,6 +64,9 @@ export const CONTENT: ToolPageContent = {
     {
       title: 'Split long episodes.',
       text: 'A file over the length limit is refused. Cut a two-hour episode into parts in any audio editor first.',
+      browser: {
+        text: 'There is no length limit, but a two-hour episode takes a while on a slower device. Cut it into parts in any audio editor to read the first part sooner.',
+      },
     },
     {
       title: 'Handle intros and music.',
@@ -76,6 +83,10 @@ export const CONTENT: ToolPageContent = {
       question: 'How long can an MP3 be?',
       answer:
         '{limits} A 60-minute MP3 at 128 kbps is about 58 MB, so the length limit matters more than the size limit. There is no daily or monthly quota.',
+      browser: {
+        answer:
+          'We set no size or length limit, because the MP3 is transcribed in your browser on your own device. A 60-minute MP3 at 128 kbps is about 58 MB; longer files simply take longer, and the page warns you on a slower device. There is no daily or monthly quota.',
+      },
     },
     {
       question: 'Does MP3 compression hurt accuracy?',
@@ -96,6 +107,10 @@ export const CONTENT: ToolPageContent = {
       question: 'Is my MP3 kept?',
       answer:
         'Only for your session. It is deleted automatically when the session ends, or when you press Delete my data now. No account is needed.',
+      browser: {
+        answer:
+          'Only in this browser: your MP3 never leaves your device. It is deleted automatically after a period of inactivity, or when you press Delete my data now. No account is needed.',
+      },
     },
   ],
 };

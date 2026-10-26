@@ -92,11 +92,19 @@ export const CONTENT: ToolPageContent = {
       question: 'How long can the audio be?',
       answer:
         '{limits} Longer or larger files are refused before they are processed, so split them first. There is no daily or monthly quota.',
+      browser: {
+        answer:
+          'We set no limit: the audio is transcribed in your browser on your own device, so long recordings simply take longer and need enough free memory. The page warns you on a slower device. There is no daily or monthly quota.',
+      },
     },
     {
       question: 'Is my audio stored?',
       answer:
         'Files are kept only for your session and deleted automatically when it ends, or right away when you press Delete my data now. There is no account.',
+      browser: {
+        answer:
+          'Only in this browser: your audio never leaves your device. It is deleted automatically after a period of inactivity, or right away when you press Delete my data now. There is no account.',
+      },
     },
   ],
 };

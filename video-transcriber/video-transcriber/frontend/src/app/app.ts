@@ -3,6 +3,7 @@ import { Component, ElementRef, HostListener, computed, inject, signal, viewChil
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
+import { AdsService } from './core/ads.service';
 import { ApiService } from './core/api.service';
 import { fmtEta, fmtTime, timeAgo } from './core/format';
 import { errorDetail } from './core/http-error';
@@ -13,12 +14,14 @@ import { SiteService, TAGLINE } from './core/site.service';
 import { StatsService } from './core/stats.service';
 import { ThemeService } from './core/theme.service';
 import { TOOL_PAGES } from './features/tool-pages/tool-pages.list';
+import { AdRail } from './shared/ad-rail';
+import { AdSlot } from './shared/ad-slot';
 import { Logo } from './shared/logo';
 import { Toasts } from './shared/toasts';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts, AdRail, AdSlot],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -28,6 +31,8 @@ export class App {
   site = inject(SiteService);
   session = inject(SessionService);
   stats = inject(StatsService);
+  /** where ads may appear: the right-hand rail on ad pages (wide windows), and the consent link in the footer */
+  ads = inject(AdsService);
   private api = inject(ApiService);
   private router = inject(Router);
 
@@ -198,6 +203,22 @@ export class App {
     const main = document.getElementById('main');
     main?.focus();
     main?.scrollIntoView?.({ block: 'start' });
+  }
+
+  /**
+   * "Privacy and cookie settings" (footer, ad pages, once ads are configured): re-opens Google's consent message so the
+   * visitor can change the choice made there. Google's consent tool comes with the ad script; if it cannot load (an ad
+   * blocker), say so plainly: then no ad and no ad cookie is loaded either.
+   */
+  openPrivacySettings() {
+    void this.ads.openPrivacySettings().then((ok) => {
+      if (!ok)
+        this.store.notify(
+          "Google's consent tool could not be loaded, probably because an ad blocker or the network stopped it. Without it no ads and no ad cookies are loaded.",
+          'info',
+          'Privacy and cookie settings',
+        );
+    });
   }
 
   // ------------------------------------------------------------------ data

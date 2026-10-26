@@ -6,11 +6,12 @@ import { HowToInput, StructuredDataService } from '../../core/structured-data.se
 import { FreeChips } from '../../shared/free-chips';
 import { readSteps, readText, sameJson } from '../../shared/page-text';
 import { RelatedTools } from '../../shared/related-tools';
+import { AdSlot } from '../../shared/ad-slot';
 
 /** "How it works": the steps, what you get, tips and what to know. Limits and where files go come from /api/health. */
 @Component({
   selector: 'app-how-it-works',
-  imports: [RouterLink, FreeChips, RelatedTools],
+  imports: [RouterLink, FreeChips, RelatedTools, AdSlot],
   templateUrl: './how-it-works.html',
   styleUrl: './how-it-works.scss',
 })

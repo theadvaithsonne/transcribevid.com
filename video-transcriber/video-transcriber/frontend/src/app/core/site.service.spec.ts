@@ -1,10 +1,12 @@
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { makeHealth, makePublicHealth, silentLog } from '../testing/fakes';
+import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../testing/fakes';
 import { JobsStore } from './jobs.store';
 import { ASSUME_PUBLIC } from './platform';
 import { PUBLIC_DEFAULTS, SiteService } from './site.service';
+import { ServerTransport } from './transport/server-transport';
+import { TRANSPORT, TRANSPORT_KIND } from './transport/token';
 
 describe('SiteService', () => {
   let site: SiteService;
@@ -230,6 +232,53 @@ describe('SiteService', () => {
       expect(site.mode()).toBe('unknown');
       expect(site.limitsText()).toBe('');
       expect(site.maxUploadMb()).toBeNull();
+    });
+  });
+
+  describe('the static website build (the engine runs in the browser): it knows itself from the first render', () => {
+    function browserBuild(assumePublic: boolean) {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          silentLog,
+          provideHttpClient(),
+          provideHttpClientTesting(),
+          { provide: ASSUME_PUBLIC, useValue: assumePublic },
+          { provide: TRANSPORT_KIND, useValue: 'browser' },
+          // the store's start-up calls stay on plain HTTP (unanswered); only SiteService's view of the build is under test
+          { provide: TRANSPORT, useExisting: ServerTransport },
+        ],
+      });
+      store = TestBed.inject(JobsStore);
+      site = TestBed.inject(SiteService);
+    }
+
+    it.each([true, false])('before any answer (prerendered: %s) it is the browser edition, never the public server', (prerendered) => {
+      browserBuild(prerendered);
+      expect(site.answered()).toBe(false);
+      expect(site.inBrowser()).toBe(true);
+      expect(site.mode()).toBe('local');
+      expect(site.isPublic()).toBe(false);
+      expect(site.limitsText()).toBe(''); // no upload limit: the file never leaves the device
+      expect(site.idleText()).toBe(`${PUBLIC_DEFAULTS.sessionIdleMinutes} minutes`);
+      expect(site.logsEnabled()).toBe(true); // the Logs page shows this tab's own log
+      expect(site.devHint()).toBe(false);
+      expect(site.brand().name).toBe('TranscribeVid');
+    });
+
+    it("the transport's own answer replaces the assumption", () => {
+      browserBuild(true);
+      store.health.set(makeBrowserHealth({ session_idle_minutes: 45 }));
+      expect(site.answered()).toBe(true);
+      expect(site.inBrowser()).toBe(true);
+      expect(site.idleText()).toBe('45 minutes');
+    });
+
+    it('a server build is unchanged: inBrowser only from an answer that says so', () => {
+      expect(site.inBrowser()).toBe(false);
+      store.health.set(makeBrowserHealth());
+      expect(site.inBrowser()).toBe(true);
+      expect(site.mode()).toBe('local');
     });
   });
 });

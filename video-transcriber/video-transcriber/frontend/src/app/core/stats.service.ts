@@ -1,4 +1,7 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, InjectionToken, computed, effect, inject, signal } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { ApiService } from './api.service';
 import { JobsStore } from './jobs.store';
 import { JobStatus, JobSummary, SiteStats } from './models';
@@ -10,6 +13,16 @@ const AFTER_DONE_MS = 2_000;
 /** After this many failures in a row the pill is hidden, and the poll slows down so a missing endpoint is not hammered. */
 const MAX_FAILURES = 3;
 const SLOW_POLL_MS = 5 * 60_000;
+
+/**
+ * The counter Worker of the static website (workers/counter, environment.counterUrl), without a trailing slash:
+ * `GET <url>/stats` reads the total, `POST <url>/count` adds one finished transcription. '' = ask this edition's own
+ * server (`/api/stats`, which counts by itself). A token so a spec can switch it.
+ */
+export const COUNTER_URL = new InjectionToken<string>('COUNTER_URL', {
+  providedIn: 'root',
+  factory: () => (environment.counterUrl || '').replace(/\/+$/, ''),
+});
 
 /** Only a well-formed answer counts; anything else is treated as "unknown". */
 function parse(raw: unknown): SiteStats | null {
@@ -26,12 +39,19 @@ function parse(raw: unknown): SiteStats | null {
  *
  * Fetched once on start, then every 60 seconds while the tab is visible, and once more shortly after one of the
  * visitor's own transcriptions finishes.
+ *
+ * The static website has no server of its own: it reads the total from the counter Worker (COUNTER_URL), and when one
+ * of this tab's transcriptions finishes it reports it there (one anonymous POST, nothing else is sent). That number is
+ * reported by visitors' browsers, so the tooltip says so and never calls it verified; any error hides the pill.
  */
 @Injectable({ providedIn: 'root' })
 export class StatsService {
   private api = inject(ApiService);
+  private http = inject(HttpClient);
   private store = inject(JobsStore);
   private browser = inject(IS_BROWSER);
+  /** '' = this edition's own server counts; otherwise the counter Worker's address */
+  private counter = inject(COUNTER_URL);
 
   /** null = unknown (not answered yet, or the server could not tell): the pill is hidden. */
   readonly stats = signal<SiteStats | null>(null);
@@ -53,7 +73,11 @@ export class StatsService {
   /** "12,345 videos transcribed" (used as the accessible name and for the full label) */
   readonly label = computed(() => `${this.formatted()} ${this.count() === 1 ? 'video' : 'videos'} transcribed`);
   /** The tooltip: the full label, or why the number is 0 on a copy that does not count. */
-  readonly title = computed(() => (this.counting() ? this.label() : 'This local copy does not count transcriptions'));
+  readonly title = computed(() => {
+    if (!this.counting()) return 'This local copy does not count transcriptions';
+    // the Worker's number comes from visitors' browsers: say so, and never call it verified
+    return this.counter ? `${this.label()}, as reported by visitors' browsers` : this.label();
+  });
   readonly ariaLabel = computed(() => (this.counting() ? this.label() : `${this.label()}. ${this.title()}.`));
 
   private timer?: ReturnType<typeof setTimeout>;
@@ -94,7 +118,7 @@ export class StatsService {
     this.again = false;
     this.stale = false;
     clearTimeout(this.timer);
-    this.api.stats(fresh).subscribe({
+    this.read(fresh).subscribe({
       next: (raw) => {
         this.pending = false;
         const s = parse(raw);
@@ -114,6 +138,29 @@ export class StatsService {
         if (this.again) this.load(true);
       },
     });
+  }
+
+  /** The total: from the counter Worker on the static website, else from this edition's own server. */
+  private read(fresh: boolean): Observable<unknown> {
+    return this.counter ? this.http.get<unknown>(`${this.counter}/stats`) : this.api.stats(fresh);
+  }
+
+  /**
+   * Tells the counter Worker that `n` of this tab's transcriptions finished: one POST each, no body, no identifier. The
+   * answer is the new total. A failure is silent (the next poll shows whatever the Worker has).
+   */
+  private report(n: number) {
+    for (let i = 0; i < n; i++) {
+      this.http.post<unknown>(`${this.counter}/count`, null).subscribe({
+        next: (raw) => {
+          const s = parse(raw);
+          if (!s) return;
+          this.failures = 0;
+          this.stats.set(s);
+        },
+        error: () => undefined,
+      });
+    }
   }
 
   /** Never throws or toasts. A shown number survives a hiccup or two; after that the pill hides. */
@@ -136,9 +183,16 @@ export class StatsService {
     if (!loaded) return;
     const finished =
       this.primed && rows.some((j) => j.status === 'done' && (this.seen.has(j.id) ? this.seen.get(j.id) !== 'done' : true));
+    // reported to the Worker: only what this tab itself saw being worked on (not a list loaded after a reload, not a
+    // transcript another tab finished)
+    const mine = this.primed
+      ? rows.filter((j) => j.status === 'done' && (this.seen.get(j.id) === 'running' || this.seen.get(j.id) === 'queued')).length
+      : 0;
     this.seen = new Map(rows.map((j) => [j.id, j.status]));
     this.primed = true;
-    if (finished) this.soon();
+    if (this.counter) {
+      if (mine) this.report(mine);
+    } else if (finished) this.soon();
   }
 
   private soon() {

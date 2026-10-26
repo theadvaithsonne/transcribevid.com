@@ -57,7 +57,7 @@ Baseline measured on this machine before any change:
 | M2 | `ARCHITECTURE.md`, `PARITY.md` | done | `6be67da` |
 | M3 | Engine modules (audio, VAD, Whisper + models, post + exports, device + session) + IndicXlit fixes | done (not yet tested) | `0121728` .. this commit |
 | M4 | Integration, one agent: job runner, worker, browser transport, upload / job pages on the engine | done (not yet tested) | this commit |
-| M5 | Site, one agent: 20% ad rail + responsive layout, inert ads, privacy / FAQ / terms text, Cloudflare `_headers` / `_redirects` / post-build, counter Worker | running | |
+| M5 | Site, one agent: 20% ad rail + responsive layout, inert ads, privacy / FAQ / terms text, Cloudflare `_headers` / `_redirects` / post-build, counter Worker | done (not yet tested) | this commit |
 | M6 | Final check, one agent: full test suites, one real-Chrome end-to-end run, accuracy on the fixtures, fix what fails | todo | |
 
 Rules for spending: no more research or multi-agent reviews; one agent per milestone; reuse the spike harnesses.

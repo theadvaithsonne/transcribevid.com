@@ -7,7 +7,7 @@
   /* layout */
   --header-h: 76px;
   --sidebar-w: 340px;
-  --gutter: clamp(20px, 3.4vw, 64px);
+  --gutter: clamp(16px, 3.4vw, 64px); /* 16 px on phones: a 300 px ad unit fits from 332 px wide */
   --container: 1560px;
   --container-doc: 1320px;
 
@@ -604,4 +604,13 @@ label,
 summary,
 [role='button'] {
   touch-action: manipulation;
+}
+
+/* Ads never reach paper or a PDF (shared/ad-slot.ts and shared/ad-rail.ts repeat this in their own styles). */
+@media print {
+  app-ad-slot,
+  app-ad-rail,
+  ins.adsbygoogle {
+    display: none !important;
+  }
 }

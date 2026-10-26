@@ -6,4 +6,14 @@
 export const environment = {
   /** 'server' = HTTP + SSE to the self-hosted API; 'browser' = everything runs in the visitor's browser */
   transport: 'server' as 'server' | 'browser',
+  /**
+   * The edition shows Google AdSense units (the static website only). Even then nothing loads until every ad unit id is
+   * set in core/ads.config.ts. A local or self-hosted install never shows ads.
+   */
+  ads: false,
+  /**
+   * The "videos transcribed" counter Worker (workers/counter), without a trailing slash: GET <url>/stats, POST <url>/count.
+   * '' = this edition asks its own server (/api/stats) instead.
+   */
+  counterUrl: '',
 };

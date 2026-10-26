@@ -1,18 +1,30 @@
-/** The text of one keyword landing page. Plain strings only: the same text is shown on the page and put in the FAQ / HowTo data. */
+/**
+ * The text of one keyword landing page. Plain strings only: the same text is shown on the page and put in the FAQ / HowTo data.
+ *
+ * Two editions read the same text: the server (public website or local install) and the in-browser edition (the file never
+ * leaves the device: no upload, no size limit, no queue of other visitors). Where a sentence is only true for the server, the
+ * item carries a `browser` variant that replaces those fields in the in-browser edition (SiteService.inBrowser()).
+ */
 export interface ToolStep {
   title: string;
   text: string;
+  /** the in-browser edition's wording, where the server's is not true there */
+  browser?: { title?: string; text: string };
 }
 
 export interface ToolTip {
   title: string;
   text: string;
+  /** the in-browser edition's wording, where the server's is not true there */
+  browser?: { title?: string; text: string };
 }
 
 export interface ToolFaq {
   question: string;
   /** may contain {limits}, replaced with the announced size / length limits */
   answer: string;
+  /** the in-browser edition's question and answer, where the server's are not true there (no placeholders: there are no limits) */
+  browser?: { question?: string; answer: string };
 }
 
 export interface ToolDownload {
@@ -41,6 +53,8 @@ export interface ToolPageContent {
   whyTitle: string;
   /** paragraphs: why / when to use it */
   why: string[];
+  /** the in-browser edition's paragraphs, when one of `why` is only true for the server */
+  browserWhy?: string[];
   howTitle: string;
   /** one sentence for the HowTo data */
   howToDescription: string;

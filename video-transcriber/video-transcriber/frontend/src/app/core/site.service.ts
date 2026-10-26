@@ -3,6 +3,7 @@ import { fmtBytesShort } from './format';
 import { JobsStore } from './jobs.store';
 import { Brand, Health } from './models';
 import { ASSUME_PUBLIC } from './platform';
+import { TRANSPORT_KIND } from './transport/token';
 
 export const DEFAULT_BRAND: Brand = {
   name: 'TranscribeVid',
@@ -33,6 +34,25 @@ const ASSUMED_PUBLIC: Health = {
 };
 
 /**
+ * The static website (the in-browser edition) as a health answer, the same one BrowserTransport makes up: there is no server
+ * to ask, so the build already knows it. Used in the prerendered HTML (what crawlers and the AdSense review read) and until
+ * the transport's own answer arrives, so the browser edition never shows the public server's or the local install's words.
+ */
+const ASSUMED_BROWSER: Health = {
+  status: 'ok',
+  version: '',
+  device: 'cpu',
+  compute_type: 'browser',
+  persistent: true,
+  public: false,
+  session_idle_minutes: PUBLIC_DEFAULTS.sessionIdleMinutes,
+  logs_enabled: true,
+  logs_require_token: false,
+  allowed_models: null,
+  runs_in: 'browser',
+};
+
+/**
  * `public`: the shared website, files are uploaded to a server. `local`: a private install on the user's own
  * computer. `unknown`: the server has not answered (yet), so no claim about where files go may be made.
  */
@@ -48,11 +68,18 @@ const text = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : nul
 export class SiteService {
   private store = inject(JobsStore);
   private assumePublic = inject(ASSUME_PUBLIC);
+  /** 'browser' = this build is the static website (the engine runs in the visitor's browser); known at build time. */
+  private readonly kind = inject(TRANSPORT_KIND);
+  /** The answer assumed until a real one arrives: the browser edition always knows itself; a server build only on prerendered pages. */
+  private readonly assumed: Health | null = this.kind === 'browser' ? ASSUMED_BROWSER : this.assumePublic ? ASSUMED_PUBLIC : null;
 
   /** True once the server has really answered (the assumed public defaults below are not an answer). */
   readonly answered = computed(() => !!this.store.health());
-  /** The server's answer, or (on a prerendered page, until it answers) the public website's defaults. */
-  private readonly h = computed<Health | null>(() => this.store.health() ?? (this.assumePublic ? ASSUMED_PUBLIC : null));
+  /**
+   * The server's answer, or until it answers: the browser edition's own description (always), or the public website's
+   * defaults (a server build, on a prerendered page).
+   */
+  private readonly h = computed<Health | null>(() => this.store.health() ?? this.assumed);
 
   readonly mode = computed<SiteMode>(() => {
     const h = this.h();
@@ -61,9 +88,11 @@ export class SiteService {
   readonly isPublic = computed(() => this.mode() === 'public');
   /**
    * The in-browser edition (no server: the file never leaves this device, jobs live in this browser for the session).
-   * Its wording is the local install's (mode 'local'), plus the few places that say 'this browser'.
+   * Its mode is 'local' (no shared server), and every page that describes where data goes has its own browser wording
+   * (privacy, terms, FAQ, how it works, tool pages, the session note). True from the first render in the browser build,
+   * including the prerendered HTML.
    */
-  readonly inBrowser = computed(() => this.store.health()?.runs_in === 'browser');
+  readonly inBrowser = computed(() => this.h()?.runs_in === 'browser');
   readonly isLocal = computed(() => this.mode() === 'local');
 
   readonly brand = computed<Brand>(() => {

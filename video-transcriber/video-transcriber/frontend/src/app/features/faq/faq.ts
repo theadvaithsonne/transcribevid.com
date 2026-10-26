@@ -6,11 +6,12 @@ import { FaqItem, StructuredDataService } from '../../core/structured-data.servi
 import { FreeChips } from '../../shared/free-chips';
 import { readFaq, sameJson } from '../../shared/page-text';
 import { RelatedTools } from '../../shared/related-tools';
+import { AdSlot } from '../../shared/ad-slot';
 
 /** The frequently asked questions. Anything about limits or about where files go comes from the server's /api/health. */
 @Component({
   selector: 'app-faq',
-  imports: [RouterLink, FreeChips, RelatedTools],
+  imports: [RouterLink, FreeChips, RelatedTools, AdSlot],
   templateUrl: './faq.html',
   styleUrl: './faq.scss',
 })

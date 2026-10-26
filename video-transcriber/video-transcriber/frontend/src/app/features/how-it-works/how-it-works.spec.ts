@@ -6,7 +6,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { JobsStore } from '../../core/jobs.store';
 import { Health } from '../../core/models';
 import { TOOL_PAGES } from '../tool-pages/tool-pages.list';
-import { makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
+import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { HowItWorksPage } from './how-it-works';
 
 describe('HowItWorksPage', () => {
@@ -190,6 +190,63 @@ describe('HowItWorksPage', () => {
       expect(goodToKnow()).not.toContain('Nothing is saved for later');
       expect(text()).not.toContain('nothing leaves');
       expect(text()).not.toContain('uploaded to our server');
+    });
+  });
+
+  describe('the in-browser edition (the file never leaves the device)', () => {
+    const privateCard = () => clean(qa('ul.features > li').find((li) => li.querySelector('h3')?.textContent === 'Private')!.textContent);
+    const goodToKnow = () => clean(q('section.know')?.textContent);
+    /** true only for the server editions: an upload, a shared queue, server limits, the session cookie, "no ads" */
+    const SERVER_ONLY = [
+      'uploaded to our server',
+      'queue',
+      '500 MB',
+      'refused',
+      'no advertising',
+      'No account and no tracking',
+      'session cookie',
+      'how busy the service is',
+      'kept only for your session',
+      'runs on your own computer',
+      'describes the hosted website',
+    ];
+
+    it('says nothing that is only true for the server', () => {
+      setup(makeBrowserHealth());
+      for (const phrase of SERVER_ONLY) expect(text()).not.toContain(phrase);
+    });
+
+    it('keeps the same six things you get (the six download formats are still true)', () => {
+      setup(makeBrowserHealth());
+      expect(qa('ul.features > li').map((f) => clean(f.querySelector('h3')?.textContent))).toEqual([
+        'Accurate text',
+        'Timestamps',
+        'More than 50 languages',
+        'Edit it right here',
+        'Six ways to download',
+        'Private',
+      ]);
+    });
+
+    it('private: the file never leaves the device and the transcripts stay in this browser', () => {
+      setup(makeBrowserHealth());
+      expect(privateCard()).toContain('Your file never leaves your device.');
+      expect(privateCard()).toContain('It is transcribed right in your browser');
+      expect(privateCard()).toContain('your transcripts stay in this browser');
+    });
+
+    it('good to know: no limit of ours, the device sets the speed, the one-time downloads, local storage and the ads', () => {
+      setup(makeBrowserHealth({ session_idle_minutes: 30 }));
+      const k = goodToKnow();
+      expect(k).toContain('File limits. None set by us.');
+      expect(k).toContain('Speed. It depends on your device, the quality you pick and the length of the file.');
+      expect(k).toContain("your browser fetches the model files from Hugging Face and the engine's program files from jsDelivr");
+      expect(k).toContain('Keep the tab open while it works.');
+      expect(k).toContain('Transcripts and the file stay in this browser only and are deleted automatically after 30 minutes of inactivity');
+      expect(k).toContain('Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.');
+      expect(k).toContain('No ad is shown while a file is being transcribed.');
+      expect(q('section.know a[href="/privacy"]')).not.toBeNull();
+      expect(k).toContain('Mistakes happen.');
     });
   });
 

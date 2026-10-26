@@ -21,7 +21,7 @@ import { SiteService } from '../core/site.service';
     </ul>
     @if (line()) {
       <p class="line">
-        @if (site.isLocal()) {
+        @if (site.isLocal() && !site.inBrowser()) {
           Nothing to sign up for and nothing to pay. Just add your file.
         } @else {
           No sign-up, no payment, no daily limit. Just add your file.

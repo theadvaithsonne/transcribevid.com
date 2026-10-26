@@ -87,6 +87,10 @@ export const CONTENT: ToolPageContent = {
       question: 'How long can a recording be?',
       answer:
         '{limits} Longer files are refused before they are processed, so split them first. There is no daily or monthly quota.',
+      browser: {
+        answer:
+          'We set no limit: the recording is transcribed in your browser on your own device, so a long one simply takes longer. The page warns you on a slower device. There is no daily or monthly quota.',
+      },
     },
     {
       question: 'Does it tell speakers apart?',
@@ -97,6 +101,10 @@ export const CONTENT: ToolPageContent = {
       question: 'Is my voice recording stored?',
       answer:
         'Only for your session. It is deleted when the session ends, after a period of inactivity, or when you press Delete my data now. There is no account.',
+      browser: {
+        answer:
+          'Only in this browser: your recording never leaves your device. It is deleted after a period of inactivity, or when you press Delete my data now. There is no account.',
+      },
     },
   ],
 };

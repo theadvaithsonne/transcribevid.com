@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { JobsStore } from '../../core/jobs.store';
 import { Health } from '../../core/models';
-import { makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
+import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { TOOL_PAGES } from '../tool-pages/tool-pages.list';
 import { FaqPage } from './faq';
 
@@ -279,6 +279,80 @@ describe('FaqPage', () => {
       expect(privacy()).toContain('depends on how TranscribeVid is run');
       expect(privacy()).not.toContain('nothing leaves');
       expect(privacy()).not.toContain('uploaded to our server');
+    });
+  });
+
+  describe('the in-browser edition (the file never leaves the device)', () => {
+    const answer = (i: number) => answerOf(QUESTIONS[i]);
+    /** true only for the server editions: an upload, a shared queue, server limits, the session cookie, "no ads" */
+    const SERVER_ONLY = ['uploaded to our server', 'queue', '500 MB', 'refused', 'no advertising', 'session cookie', 'runs on your own computer', 'how busy the service is'];
+
+    it('asks the same questions, in the same order', () => {
+      setup(makeBrowserHealth());
+      expect(items().map(question)).toEqual(QUESTIONS);
+    });
+
+    it('says nothing that is only true for the server', () => {
+      setup(makeBrowserHealth());
+      for (const phrase of SERVER_ONLY) expect(text()).not.toContain(phrase);
+    });
+
+    it('free and unlimited: no quota, ads keep it free, and no size or length limit set by us', () => {
+      setup(makeBrowserHealth());
+      expect(answer(0)).toContain('Yes. It is free, and there is no account or login, ever.');
+      expect(answer(0)).toContain('ads keep the website free');
+      expect(answer(0)).toContain('Your file is transcribed in your browser on your own device, so we set no size or length limit.');
+      expect(answer(0)).not.toContain('To keep it fast for everyone');
+      expect(answer(0)).not.toContain('Unusually heavy bursts');
+    });
+
+    it('files and limits: the same file types, no limit of ours, and nobody else ahead of you', () => {
+      setup(makeBrowserHealth());
+      expect(answer(4)).toContain('MP4');
+      expect(answer(4)).toContain('record straight from your microphone');
+      expect(answer(4)).toContain('We set no size or length limit: your file is processed on your device');
+      expect(answer(4)).toContain("Nobody else's files are ahead of yours.");
+      expect(answer(4)).toContain('keep the tab open until they are done');
+    });
+
+    it('speed: the device, WebGPU or WebAssembly, and the one-time model download', () => {
+      setup(makeBrowserHealth());
+      expect(answer(5)).toContain('It depends on your device, the quality you pick and the length of the file.');
+      expect(answer(5)).toContain('WebGPU');
+      expect(answer(5)).toContain('WebAssembly');
+      expect(answer(5)).toContain('Fastest is quick; Best accuracy takes longest');
+      expect(answer(5)).toContain('your browser downloads its speech model once and keeps it for next time');
+    });
+
+    it('privacy: never leaves the device, kept in this browser, the downloads, the counter and the ads', () => {
+      setup(makeBrowserHealth({ session_idle_minutes: 30 }));
+      const p = answer(6);
+      expect(p).toContain('Your file never leaves your device.');
+      expect(p).toContain('is never uploaded to us or to anyone else');
+      expect(p).toContain("kept in this browser's storage only and deleted automatically after 30 minutes of inactivity");
+      expect(p).toContain('Delete my data now');
+      expect(p).toContain("the speech model from Hugging Face and the engine's program files from jsDelivr");
+      expect(p).toContain('adds one to the anonymous counter in the page header');
+      expect(p).toContain('Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.');
+      expect(p).toContain('No ad is shown while a file is being transcribed');
+      expect(p).not.toContain('This copy of TranscribeVid runs on your own computer.');
+      expect(p).not.toContain('depends on how TranscribeVid is run');
+      expect(q('a[href="/privacy"]')).not.toBeNull();
+    });
+
+    it('privacy: without an idle time it still says the data is deleted after inactivity', () => {
+      setup(makeBrowserHealth({ session_idle_minutes: undefined }));
+      expect(answer(6)).toContain('deleted automatically after a period of inactivity');
+    });
+
+    it('the FAQPage data carries the browser wording, exactly as shown', () => {
+      setup(makeBrowserHealth());
+      TestBed.tick();
+      const data = JSON.parse(document.head.querySelector('script[data-vt="page:faq"]')!.textContent!);
+      const shown = items().map((d) => [question(d), answerText(d)]);
+      expect(data.mainEntity.map((e: { name: string; acceptedAnswer: { text: string } }) => [e.name, e.acceptedAnswer.text])).toEqual(shown);
+      expect(JSON.stringify(data)).toContain('Your file never leaves your device.');
+      for (const phrase of SERVER_ONLY) expect(JSON.stringify(data)).not.toContain(phrase);
     });
   });
 

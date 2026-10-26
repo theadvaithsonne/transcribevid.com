@@ -19,10 +19,15 @@ export const CONTENT: ToolPageContent = {
     {
       title: 'Find the MP4',
       text: 'Locate the .mp4 file on your phone or computer. You do not need to compress or trim it unless it is over the limit.',
+      browser: { text: 'Locate the .mp4 file on your phone or computer. You do not need to compress or trim it first.' },
     },
     {
       title: 'Upload it',
       text: 'Drop the MP4 in the box at the top of this page, or press Choose a file. In the uploader, several MP4 files can be queued at once.',
+      browser: {
+        title: 'Add it',
+        text: 'Drop the MP4 in the box at the top of this page, or press Choose a file. In the uploader you can add several MP4 files; they are transcribed one after another.',
+      },
     },
     {
       title: 'Pick language and quality',
@@ -60,6 +65,9 @@ export const CONTENT: ToolPageContent = {
     {
       title: 'Shrink big files by exporting the audio.',
       text: 'If an MP4 is over the limit, export just the audio (M4A or MP3) from your editor. It is far smaller and works the same.',
+      browser: {
+        text: 'A very long MP4 needs a lot of memory on a phone. Export just the audio (M4A or MP3) from your editor: it is far smaller and works the same.',
+      },
     },
     {
       title: 'Keep the SRT next to the video.',
@@ -80,6 +88,11 @@ export const CONTENT: ToolPageContent = {
       question: 'Why was my MP4 refused?',
       answer:
         'Files over the size or length limit are refused before processing. {limits} Cut the video into parts, or export only its audio, then upload again.',
+      browser: {
+        question: 'Why did my MP4 not work?',
+        answer:
+          'Your browser could not read its sound: the file may be damaged, have no sound track, or use a rare audio format. Export the audio as M4A or MP3 from your editor and add that file instead. There is no size or length limit, but very long videos need enough free memory.',
+      },
     },
     {
       question: 'Can I add subtitles to my MP4 with this?',
