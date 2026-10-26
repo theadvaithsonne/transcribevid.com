@@ -39,13 +39,13 @@
  },
  "kernels": {
   "source": "kernels/indicxlit-kernels.as.ts",
-  "source_sha256": "340b27480bd6afea7b2adb93d29c226fc439b32d05aab45f53011c18ddd5fba2",
+  "source_sha256": "d4654db4bcd2366bd1e321ec31934894b4834888815fa4ec16df404356636d43",
   "compiler": "AssemblyScript 0.28.2 --optimize --noAssert --runtime stub --importMemory --initialMemory 1 [--enable simd]",
   "embedded_in": "frontend/src/app/engine/hinglish/indicxlit-kernels.wasm.ts",
   "build": ".venv/Scripts/python.exe -m tools.export_indicxlit_kernels",
   "wasm_bytes": {
-   "simd": 5221,
-   "portable": 3751
+   "simd": 5337,
+   "portable": 3867
   }
  }
 }

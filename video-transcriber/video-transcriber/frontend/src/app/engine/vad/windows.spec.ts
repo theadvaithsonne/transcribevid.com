@@ -443,7 +443,7 @@ describe('planWindows properties', () => {
         }
       },
     );
-  });
+  }, 120_000); // the oracle and its ~10^5 expect() calls take ~16 s; planWindows itself ~0.1 s for 1500 calls
 
   it('incremental use: every window but the last is final when more segments arrive (400 cases)', () => {
     forAll(
@@ -457,7 +457,7 @@ describe('planWindows properties', () => {
         }
       },
     );
-  });
+  }, 60_000); // heavy: ~1.3 s under the full parallel suite (M6)
 
   it('time map: window audio, local -> absolute time, monotonicity (120 cases)', () => {
     forAll(
@@ -489,7 +489,7 @@ describe('planWindows properties', () => {
         }
       },
     );
-  });
+  }, 60_000); // heavy: ~2.3 s under the full parallel suite (M6)
 
   it('the presets keep their documented values', () => {
     expect(WHISPER_PLAN).toEqual({ maxWindow: 30, mergeGap: 0, splice: true });

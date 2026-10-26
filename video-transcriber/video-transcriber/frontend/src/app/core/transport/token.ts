@@ -1,14 +1,10 @@
 import { InjectionToken, inject } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { BrowserTransport } from './browser-transport';
+import { TRANSPORT_KIND } from './kind';
 import { ServerTransport } from './server-transport';
 import type { Transport } from './transport';
 
-/** Which transport this build uses (angular.json: `production` = browser; `development` / `self-hosted` = server). */
-export const TRANSPORT_KIND = new InjectionToken<'server' | 'browser'>('TRANSPORT_KIND', {
-  providedIn: 'root',
-  factory: () => environment.transport,
-});
+export { TRANSPORT_KIND } from './kind';
 
 /**
  * The transport behind ApiService, chosen by the build configuration. A spec can provide `TRANSPORT_KIND`, or

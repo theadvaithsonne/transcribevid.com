@@ -30,6 +30,27 @@ import type {
   SourceInfo,
 } from './types';
 
+const YIELD_EVERY_MS = 16;
+
+/**
+ * One task turn, so pending events such as an abort can run. In a window a timer turn: Chrome runs MessageChannel
+ * tasks ahead of timers, so only this lets a timer, input or a repaint in. In a worker a MessageChannel turn (no 4 ms
+ * timer clamping): the cancel arrives there as a message, which it lets in.
+ */
+function yieldTask(): Promise<void> {
+  if (typeof document !== 'undefined' || typeof MessageChannel === 'undefined') {
+    return new Promise((resolve) => setTimeout(resolve, 0));
+  }
+  return new Promise((resolve) => {
+    const channel = new MessageChannel();
+    channel.port1.onmessage = () => {
+      channel.port1.close();
+      resolve();
+    };
+    channel.port2.postMessage(null);
+  });
+}
+
 const ISOBMFF_NAMES = new Set(['MP4', 'QuickTime File Format']);
 /** Codecs an optional mediabunny WASM extension could decode (@mediabunny/ac3, @mediabunny/dts; not in v1). */
 const EXTENSION_CODECS: Record<string, 'ac3' | 'dts'> = { ac3: 'ac3', eac3: 'ac3', dts: 'dts' };
@@ -226,6 +247,12 @@ export async function decodeWithWebCodecs(
     const gapless: Mp3Gapless | null =
       container === 'MP3' ? await readMp3Gapless(file).catch(() => null) : null;
     let skipRemaining = gapless ? gapless.startSkip : 0;
+    // ffmpeg's mp3 demuxer also drops the encoder padding at the end (first_discard_sample .. last_discard_sample):
+    // decoded samples [frames * spf - endTrim, frames * spf). Without it the normaliser's last frames differ.
+    const spfTotal = gapless?.frames ? gapless.frames * gapless.samplesPerFrame : 0;
+    const endDiscardFrom = spfTotal ? spfTotal - gapless!.endTrim : Infinity;
+    const endDiscardTo = spfTotal || Infinity;
+    let decodedPos = 0; // decoder samples seen so far, skipped ones included
 
     // ---- the pipeline is created from the first decoded block (its real rate / channel count win over the header)
     const pipelineOpts: PipelineOptions = {
@@ -288,6 +315,7 @@ export async function decodeWithWebCodecs(
     };
 
     let iterator = track.blocks();
+    let lastYield = -Infinity; // once before the first block (events queued while probing), then every 16 ms
     let resumes = 0;
     let justResumed = false;
     let skippedAny = false;
@@ -333,6 +361,12 @@ export async function decodeWithWebCodecs(
         break;
       }
       demuxMs += performance.now() - t0;
+      // In-memory reads resolve as microtasks, so without this a fast file never lets the event loop run: the abort
+      // timer (or the UI, on the main thread) waits for the whole decode. Yield a task at most every 16 ms (one frame) of work.
+      if (performance.now() - lastYield > YIELD_EVERY_MS) {
+        await yieldTask();
+        lastYield = performance.now();
+      }
       if (signal?.aborted) {
         await iterator.return(undefined).catch(() => undefined);
         throw new DecodeError({ code: 'CANCELLED' });
@@ -386,9 +420,18 @@ export async function decodeWithWebCodecs(
           planes = Array.from({ length: chs }, () => new Float32Array(size));
         }
         for (let c = 0; c < chs; c++) block.copyChannel(c, planes[c]);
-        const n = frames - skip;
-        if (n > 0) {
-          pipe.push(skip ? planes.map((p) => p.subarray(skip, frames)) : planes, n);
+        const blockStart = decodedPos;
+        decodedPos += frames;
+        // the part of [skip, frames) outside the end-padding window
+        const cutFrom = Math.max(skip, Math.min(frames, endDiscardFrom - blockStart));
+        const cutTo = Math.max(cutFrom, Math.min(frames, endDiscardTo - blockStart));
+        for (const [from, to] of [
+          [skip, cutFrom],
+          [cutTo, frames],
+        ]) {
+          const n = to - from;
+          if (n <= 0) continue;
+          pipe.push(from || to !== frames ? planes.map((p) => p.subarray(from, to)) : planes, n);
           samplesIn += n;
         }
         processedSeconds = Math.max(0, nextTs);

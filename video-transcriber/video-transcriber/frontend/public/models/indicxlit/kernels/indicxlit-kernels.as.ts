@@ -436,33 +436,49 @@ export function attendHead(q: usize, K: usize, V: usize, stride: i32, keys: i32,
     store<f32>(scores + ((<usize>j) << 2), dot64(q, K + <usize>j * rowBytes, j < qkTailStart ? qkMain : qkTail) * <f32>0.125);
   }
   softmaxRow(scores, keys);
+  // pvMode bits 0-1: the accumulation order; bit 2: p.v runs through oneDNN's nocopy sgemm driver, which cuts the keys
+  // into blocks of 256 (the last 1-2 blocks halved), sums each block from zero and adds it to C (gemv: one block)
+  const mode = pvMode & 3;
+  const blocked = (pvMode & 4) != 0;
   for (let d = 0; d < 64; d++) {
     const col = V + ((<usize>d) << 2);
-    let acc: f32 = 0;
-    if (pvMode == 0) {
-      for (let j = 0; j < keys; j++) {
-        acc = fma32(load<f32>(scores + ((<usize>j) << 2)), load<f32>(col + <usize>j * rowBytes), acc);
+    let total: f32 = 0;
+    let from = 0;
+    while (from < keys) {
+      let size = keys - from;
+      if (blocked) {
+        if (size >= 512) size = 256;
+        else if (size > 256) size = (size + 1) >> 1;
       }
-    } else {
-      // two interleaved accumulators over an even prefix; an odd last key is added after the lanes are summed
-      let e: f32 = 0, o: f32 = 0;
-      const pairs = keys & ~1;
-      for (let j = 0; j < pairs; j++) {
-        const p = load<f32>(scores + ((<usize>j) << 2));
-        const v = load<f32>(col + <usize>j * rowBytes);
-        if ((j & 1) == 0) {
-          e = pvMode == 1 ? e + p * v : fma32(p, v, e);
-        } else {
-          o = pvMode == 1 ? o + p * v : fma32(p, v, o);
+      const to = from + size;
+      let acc: f32 = 0;
+      if (mode == 0) {
+        for (let j = from; j < to; j++) {
+          acc = fma32(load<f32>(scores + ((<usize>j) << 2)), load<f32>(col + <usize>j * rowBytes), acc);
+        }
+      } else {
+        // two interleaved accumulators over an even prefix; an odd last key is added after the lanes are summed
+        let e: f32 = 0, o: f32 = 0;
+        const pairs = from + ((to - from) & ~1);
+        for (let j = from; j < pairs; j++) {
+          const p = load<f32>(scores + ((<usize>j) << 2));
+          const v = load<f32>(col + <usize>j * rowBytes);
+          if (((j - from) & 1) == 0) {
+            e = mode == 1 ? e + p * v : fma32(p, v, e);
+          } else {
+            o = mode == 1 ? o + p * v : fma32(p, v, o);
+          }
+        }
+        acc = e + o;
+        if (pairs != to) {
+          const p = load<f32>(scores + ((<usize>pairs) << 2));
+          const v = load<f32>(col + <usize>pairs * rowBytes);
+          acc = mode == 1 ? acc + p * v : fma32(p, v, acc);
         }
       }
-      acc = e + o;
-      if (pairs != keys) {
-        const p = load<f32>(scores + ((<usize>pairs) << 2));
-        const v = load<f32>(col + <usize>pairs * rowBytes);
-        acc = pvMode == 1 ? acc + p * v : fma32(p, v, acc);
-      }
+      total = from == 0 ? acc : total + acc;
+      from = to;
     }
-    store<f32>(out + ((<usize>d) << 2), acc);
+    store<f32>(out + ((<usize>d) << 2), total);
   }
 }

@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { ADS_CONFIG, ADS_EDITION } from '../../core/ads.service';
 import { JobsStore } from '../../core/jobs.store';
 import { Health } from '../../core/models';
+import { FFMPEG_NOTICE, QWEN_NOTICE, THIRD_PARTY_NOTICES } from '../../engine/models/licences';
 import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { LEGAL_UPDATED } from './legal-info';
 import { PrivacyPage } from './privacy';
@@ -315,6 +316,29 @@ describe('PrivacyPage in the browser edition', () => {
 
   it('is not directed to children', () => {
     expect(textOf(render(PrivacyPage, makeBrowserHealth()))).toContain('is not directed to children under 13 (or under 16 in the EU where applicable)');
+  });
+
+  it('lists the open-source components the browser may download, with their licence notices and source links', () => {
+    const f = render(PrivacyPage, makeBrowserHealth());
+    const el = f.nativeElement as HTMLElement;
+    expect(headings(f)).toContain('12. Open-source components');
+    expect(headings(f).at(-1)).toBe('13. Changes to this policy');
+    const items = Array.from(el.querySelectorAll('ul.notices li'));
+    expect(items.length).toBe(THIRD_PARTY_NOTICES.length);
+    const t = textOf(f);
+    for (const n of [FFMPEG_NOTICE, QWEN_NOTICE]) {
+      expect(t).toContain(`${n.name} (${n.licence}).`);
+      expect(t).toContain(n.notice);
+      expect(el.querySelector(`ul.notices a[href="${n.sourceCode}"]`)).not.toBeNull();
+      expect(el.querySelector(`ul.notices a[href="${n.licenceUrl}"]`)).not.toBeNull();
+    }
+    expect(t).toContain('https://github.com/ffmpegwasm/ffmpeg.wasm/tree/v0.12.10');
+  });
+
+  it('has no open-source components section in the server editions (nothing is downloaded into the browser there)', () => {
+    const f = render(PrivacyPage, makePublicHealth());
+    expect(headings(f).join(' | ')).not.toContain('Open-source components');
+    expect((f.nativeElement as HTMLElement).querySelector('ul.notices')).toBeNull();
   });
 
   it("says Delete my data now cannot delete Google's cookies", () => {

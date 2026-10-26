@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AdsService } from '../../core/ads.service';
 import { SiteService } from '../../core/site.service';
+import { THIRD_PARTY_NOTICES } from '../../engine/models/licences';
 import { LEGAL_UPDATED } from './legal-info';
 
 /**
@@ -22,4 +23,6 @@ export class PrivacyPage {
   /** `configured`: every AdSense id is set, so the "Privacy and cookie settings" control exists on the pages with ads */
   ads = inject(AdsService);
   readonly updated = LEGAL_UPDATED;
+  /** browser edition: the components downloaded at run time and the notices their licences ask for (ffmpeg.wasm, Qwen) */
+  readonly notices = THIRD_PARTY_NOTICES;
 }

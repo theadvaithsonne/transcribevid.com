@@ -161,7 +161,7 @@ describe('StreamResampler', () => {
         expect(maxd, `${rate}/${chunk}`).toBe(0);
       }
     }
-  });
+  }, 60_000); // heavy: ~1.7 s under the full parallel suite (M6)
 
   it('keeps DC at gain 1, passes an in-band tone and rejects an out-of-band one', () => {
     const rate = 48000;

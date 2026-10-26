@@ -4,7 +4,7 @@
  * no-speech window skip, the word anomaly scores and the hallucination-silence guard. Line numbers refer to
  * backend/.venv/Lib/site-packages/faster_whisper/transcribe.py (1.2.1).
  */
-import { pyRound } from './py';
+import { pyRound, pySum } from './py';
 
 /** engine.py:473 `temperature=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]` */
 export const TEMPERATURES: readonly number[] = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0];
@@ -216,8 +216,7 @@ export function isSegmentAnomaly(
 ): boolean {
   if (!segment || !segment.words || segment.words.length === 0) return false;
   const words = segment.words.filter((w) => !PUNCTUATION.includes(w.word)).slice(0, 8);
-  let score = 0;
-  for (const w of words) score += wordAnomalyScore(w);
+  const score = pySum(words.map(wordAnomalyScore)); // Python's compensated sum()
   return score >= 3 || score + 0.01 >= words.length;
 }
 

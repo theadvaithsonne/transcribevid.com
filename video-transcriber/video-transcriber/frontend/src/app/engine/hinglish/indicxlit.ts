@@ -370,23 +370,49 @@ interface Scratch {
 
 /**
  * Float32 accumulation orders of the sgemm behind q.k and p.v, as established by probing CTranslate2 itself
- * (docs/in-browser/spike/indicxlit.md). oneDNN's AVX2 sgemm splits the query rows into blocks of 6; the last
+ * (docs/in-browser/spike/indicxlit.md). oneDNN's AVX2 nocopy sgemm splits the query rows into blocks of 6; the last
  * 1-2 rows (non-fused, two accumulators) and 3 rows (fused, two accumulators) have their own micro-kernels, a lone
  * row uses the gemv kernel (8 fused accumulators). Key columns come in blocks of 16 (one fused chain); a remainder
  * of 1-8 keys uses the 8-wide kernel (two fused accumulators).
+ *
+ * The 6-row remainders are per block of the driver (sgemm_nocopy_driver): it cuts the query rows into blocks of
+ * BN = 96 for q.k (A transposed) and BN = 48 for p.v, halving the last 1.5-2 blocks, and cuts p.v's keys into
+ * blocks of BK = 256 the same way (`PV_KEY_BLOCKS`, applied by the kernel). Without the blocks, words of more than
+ * ~140 symbols were not bit-exact (M6).
  *
  * Returns [qkMain, qkTail, qkTailStart, pvMode] for query `row` of `rows` over `keys` keys.
  */
 function attentionModes(rows: number, row: number, keys: number): [number, number, number, number] {
   if (rows === 1) return [1, 1, keys, 0];
-  const rem = rows % 6;
-  if (rem !== 0 && row >= rows - rem) {
-    if (rem <= 2) return [2, 2, keys, 1];
-    if (rem === 3) return [3, 3, keys, 2];
-  }
+  const qkRem = remainderRows(rows, row, 96);
+  const pvRem = remainderRows(rows, row, 48);
+  const pv = (pvRem === 0 ? 0 : pvRem <= 2 ? 1 : pvRem === 3 ? 2 : 0) | PV_KEY_BLOCKS;
+  if (qkRem !== 0 && qkRem <= 2) return [2, 2, keys, pv];
+  if (qkRem === 3) return [3, 3, keys, pv];
   const tailStart = keys - (keys % 16);
   const rest = keys - tailStart;
-  return rest > 0 && rest <= 8 ? [0, 3, tailStart, 0] : [0, 0, keys, 0];
+  return rest > 0 && rest <= 8 ? [0, 3, tailStart, pv] : [0, 0, keys, pv];
+}
+
+/** pvMode flag: the p.v product runs through the sgemm driver, whose key blocks (BK = 256) are summed into C. */
+const PV_KEY_BLOCKS = 4;
+
+/**
+ * Size of the 6-row remainder that `row` falls in (0 when it is in a full 6-row group), within the driver's block
+ * of `bn` rows: blocks of bn while 2 * bn or more rows are left, then two halves when more than 1.5 * bn are left.
+ */
+function remainderRows(rows: number, row: number, bn: number): number {
+  let start = 0;
+  for (;;) {
+    let size = rows - start;
+    if (size >= 2 * bn) size = bn;
+    else if (size > bn + (bn >> 1)) size = (size + 1) >> 1;
+    if (row < start + size) {
+      const rem = size % 6;
+      return row >= start + size - rem ? rem : 0;
+    }
+    start += size;
+  }
 }
 
 export class IndicXlitModel {

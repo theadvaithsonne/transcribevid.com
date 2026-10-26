@@ -4,6 +4,7 @@ import { tap } from 'rxjs';
 import { getLogsToken, logsAuthHeaders } from './logs-token';
 import { LogBatch, LogEntry } from './models';
 import { IS_BROWSER } from './platform';
+import { TRANSPORT_KIND } from './transport/kind';
 
 type Level = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR';
 
@@ -80,6 +81,11 @@ export class LogService {
   /** the token (or '') the server refused for client logs; null while nothing was refused */
   private refused: string | null = null;
   private serverLogs = { enabled: true, needsToken: false };
+  /**
+   * The browser edition has no server: nothing is ever sent (also not before the synthesised health arrives, when the
+   * default above would), so no log line, which can name the visitor's file, leaves the device.
+   */
+  private readonly noServer = inject(TRANSPORT_KIND) === 'browser';
 
   /**
    * What /api/health says about the server's logs. When they are off (or need a token this browser does not have,
@@ -116,7 +122,7 @@ export class LogService {
   }
 
   private send(level: Level, message: string, context: unknown) {
-    if (!this.browser || !this.serverLogs.enabled || (this.serverLogs.needsToken && !getLogsToken())) return;
+    if (!this.browser || this.noServer || !this.serverLogs.enabled || (this.serverLogs.needsToken && !getLogsToken())) return;
     const now = Date.now();
     const key = `${level}|${message}`;
     if (key === this.last && now - this.lastAt < 5000) return; // identical repeat

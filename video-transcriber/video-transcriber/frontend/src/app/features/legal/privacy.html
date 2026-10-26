@@ -149,7 +149,22 @@
       }
     </p>
 
-    <h2>12. Changes to this policy</h2>
+    <h2>12. Open-source components</h2>
+    <p>
+      Some features download open-source components into your browser when you use them. They run on your device like the rest of the
+      engine. Their licences ask us to show these notices:
+    </p>
+    <ul class="notices">
+      @for (n of notices; track n.id) {
+        <li>
+          <b>{{ n.name }}</b> ({{ n.licence }}). {{ n.what }} {{ n.notice }}
+          <a [href]="n.sourceCode" target="_blank" rel="noopener">Source code</a> ·
+          <a [href]="n.licenceUrl" target="_blank" rel="noopener">Licence text</a>
+        </li>
+      }
+    </ul>
+
+    <h2>13. Changes to this policy</h2>
     <p>If we change this policy, the new version appears on this page with a new "Last updated" date.</p>
   } @else {
     @if (site.isLocal()) {

@@ -1,7 +1,8 @@
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { GlobalErrorHandler, LogService, errorLogInterceptor } from './log.service';
+import { GlobalErrorHandler, LogRing, LogService, errorLogInterceptor } from './log.service';
+import { TRANSPORT_KIND } from './transport/token';
 
 describe('LogService', () => {
   let fetchMock: ReturnType<typeof vi.fn>;
@@ -115,6 +116,20 @@ describe('LogService', () => {
     it('is the old behaviour by default (older servers say nothing about logs)', () => {
       log.warn('a');
       expect(fetchMock).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('in the browser edition (no server)', () => {
+    it('never sends a log line, not even before the health arrives or when it says logs are on; the in-page log keeps it', () => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({ providers: [{ provide: TRANSPORT_KIND, useValue: 'browser' }] });
+      const own = TestBed.inject(LogService);
+      own.error('Upload of my-holiday.mp4 failed');
+      own.configure({ enabled: true, needsToken: false });
+      own.warn('again');
+      expect(console.error).toHaveBeenCalledWith('[ERROR] Upload of my-holiday.mp4 failed');
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(TestBed.inject(LogRing).batch(0).entries.map((e) => e.message)).toEqual(['Upload of my-holiday.mp4 failed', 'again']);
     });
   });
 

@@ -78,3 +78,9 @@
     width: 100%;
   }
 }
+
+/* the licence notices carry long URLs (no spaces): let them wrap instead of widening the page on phones */
+.notices li {
+  overflow-wrap: anywhere;
+  margin-bottom: 8px;
+}

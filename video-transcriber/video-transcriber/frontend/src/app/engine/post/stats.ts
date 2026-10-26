@@ -3,7 +3,7 @@
  * after every edit, restyle and delete; the UI shows words, pace, confidence and the keywords as search shortcuts.
  */
 import type { Keyword, Stats } from '../../core/models';
-import { pyLen, pyRound } from './py';
+import { pyLen, pyRound, pySum } from './py';
 
 /** formats.py:221 `c < 0.6`: segments below this confidence are counted as low-confidence */
 export const LOW_CONFIDENCE = 0.6;
@@ -44,8 +44,7 @@ export interface StatsSegment {
 export function computeStats(segments: readonly StatsSegment[], _duration?: number | null): Stats {
   const text = segments.map((s) => s.text).join(' ');
   const words = text.toLowerCase().match(WORD_RE) ?? [];
-  let speech = 0;
-  for (const s of segments) speech += Math.max(0.0, s.end - s.start);
+  const speech = pySum(segments.map((s) => Math.max(0.0, s.end - s.start))); // Python's compensated sum()
   const confs = segments
     .filter((s) => s.confidence !== null && s.confidence !== undefined)
     .map((s) => s.confidence as number);
@@ -60,8 +59,7 @@ export function computeStats(segments: readonly StatsSegment[], _duration?: numb
     .filter(([w]) => pyLen(w) >= KEYWORD_MIN_LENGTH && !STOP_WORDS.has(w))
     .slice(0, KEYWORD_COUNT)
     .map(([word, count]) => ({ word, count }));
-  let confSum = 0;
-  for (const c of confs) confSum += c;
+  const confSum = pySum(confs);
   return {
     word_count: words.length,
     segment_count: segments.length,

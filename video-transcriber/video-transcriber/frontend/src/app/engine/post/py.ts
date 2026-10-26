@@ -64,6 +64,23 @@ export function pyRound(x: number, ndigits?: number): number {
   return neg ? -value : value;
 }
 
+/**
+ * sum() of floats as CPython 3.12+ computes it (Neumaier compensated summation, the compensation added once at the
+ * end when finite). A plain `+=` loop differs in the last bit, which flips round(x, 3) on ties such as 5.769 / 6.
+ */
+export function pySum(values: Iterable<number>): number {
+  let f = 0.0;
+  let c = 0.0;
+  for (const x of values) {
+    const t = f + x;
+    if (Math.abs(f) >= Math.abs(x)) c += f - t + x;
+    else c += x - t + f;
+    f = t;
+  }
+  if (c !== 0 && Number.isFinite(c)) f += c;
+  return f;
+}
+
 /** repr(float): shortest round-trip digits, fixed notation for 1e-4 <= |x| < 1e16, always with a '.0' or exponent. */
 export function pyFloatRepr(x: number): string {
   if (Number.isNaN(x)) return 'NaN';

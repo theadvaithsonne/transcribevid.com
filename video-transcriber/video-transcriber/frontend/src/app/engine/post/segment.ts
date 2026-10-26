@@ -5,7 +5,7 @@
  */
 import type { JobOptions, Segment, Word } from '../../core/models';
 import { LOG_PROB_THRESHOLD, NO_SPEECH_THRESHOLD } from './guards';
-import { pyRound, pyStrip } from './py';
+import { pyRound, pyStrip, pySum } from './py';
 import { fixNumberText, mergeNumberPieces, norm } from './text';
 
 // The app's own no-speech filter (engine.py:500) reuses the decoder thresholds of engine.py:477-478 (guards.ts).
@@ -53,9 +53,7 @@ export function segmentDict(idx: number, s: RawSegment): Segment {
   const text = fixNumberText(pyStrip(s.text));
   let conf: number;
   if (words.length) {
-    let sum = 0;
-    for (const w of words) sum += w.probability;
-    conf = sum / words.length;
+    conf = pySum(words.map((w) => w.probability)) / words.length; // Python's compensated sum()
   } else {
     conf = Math.exp(Math.max(Math.min(s.avg_logprob, 0.0), LOGPROB_FLOOR));
   }

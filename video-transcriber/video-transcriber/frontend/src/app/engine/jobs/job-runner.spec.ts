@@ -124,7 +124,9 @@ describe('JobRunner (the in-browser job queue)', () => {
     await settle();
     const done = (await store.get(a.id))!;
     expect(done).toMatchObject({ status: 'cancelled', cancel_requested: false });
-    expect(done.segments.map((s) => s.text)).toEqual(['kept']);
+    // default output_script 'hinglish' + language 'en': converted as it was recognised (engine.py:513), so the kept
+    // text is the converted one (the fake romaniser appends " (roman)")
+    expect(done.segments.map((s) => s.text)).toEqual(['kept (roman)']);
     expect(engine.runs).toHaveLength(1); // b never ran
   });
 

@@ -196,7 +196,7 @@ describe('StreamingVad memory, cancellation and call order', () => {
     segs += (await vad.flush()).length;
     expect(segs).toBeGreaterThan(110); // ~ 3600 / 29.2
     expect(maxRetained / 16000).toBeLessThan(60);
-  });
+  }, 60_000); // heavy: ~2.3 s under the full parallel suite (M6)
 
   it('without a max-speech cap the open segment is held until it ends (why the browser uses 30 s)', async () => {
     const vad = new StreamingVad(new FakeModel(), WHISPER_VAD);

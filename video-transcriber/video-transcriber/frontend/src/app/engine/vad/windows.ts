@@ -14,6 +14,7 @@
  * All offsets are absolute sample indices of the 16 kHz stream, so a caller can transcribe a window, then add
  * the offset back (contiguous) or map through the pieces (spliced). planWindows is a pure function.
  */
+import { pyRound as exactPyRound } from '../post/py';
 import { FRAME, SAMPLE_RATE, SpeechSegment } from './types';
 
 export interface PlanOptions {
@@ -236,13 +237,12 @@ export function windowAudio(samples: Float32Array, w: Window): Float32Array {
   return out;
 }
 
-/** Python's round(x, p): correctly rounded decimal expansion, exact ties to even. */
+/**
+ * Python's round(x, p): half to even on the EXACT binary value (round(2.675, 2) == 2.67). One implementation for the
+ * whole engine (post/py.ts); the old local version tested ties after a rounded division and got 2.675 wrong.
+ */
 export function pyRound(v: number, p: number): number {
-  const f = 10 ** p;
-  const x = v * f;
-  const fl = Math.floor(x);
-  if (x - fl === 0.5 && (fl + 0.5) / f === v) return (fl % 2 === 0 ? fl : fl + 1) / f;
-  return Number(v.toFixed(p));
+  return exactPyRound(v, p);
 }
 
 export interface TimeMap {

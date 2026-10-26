@@ -162,28 +162,47 @@ export class JsKernels implements Kernels {
     }
     softmaxRow(sc, 0, keys);
     const vi = V >> 2;
-    for (let d = 0; d < 64; d++) {
-      let acc: number;
-      if (pvMode === 0) {
-        acc = 0;
-        for (let j = 0; j < keys; j++) acc = f(acc + sc[j] * F[vi + j * stride + d]);
-      } else {
-        // two interleaved accumulators over an even prefix; an odd last key is added after the lanes are summed
-        let e = 0;
-        let o = 0;
-        const pairs = keys & ~1;
-        for (let j = 0; j < pairs; j++) {
-          const prod = sc[j] * F[vi + j * stride + d];
-          if ((j & 1) === 0) e = pvMode === 1 ? f(e + f(prod)) : f(e + prod);
-          else o = pvMode === 1 ? f(o + f(prod)) : f(o + prod);
-        }
-        acc = f(e + o);
-        if (pairs !== keys) {
-          const prod = sc[pairs] * F[vi + pairs * stride + d];
-          acc = pvMode === 1 ? f(acc + f(prod)) : f(acc + prod);
-        }
+    const mode = pvMode & 3;
+    // p.v through the sgemm driver (flag 4): keys in blocks of 256 (the last 1-2 blocks halved), each block summed
+    // from zero and added to C; without the flag (gemv) one block
+    const blocks: number[] = [];
+    for (let b = 0; b < keys; ) {
+      let size = keys - b;
+      if ((pvMode & 4) !== 0) {
+        if (size >= 512) size = 256;
+        else if (size > 256) size = (size + 1) >> 1;
       }
-      F[(out >> 2) + d] = acc;
+      blocks.push(b, b + size);
+      b += size;
+    }
+    for (let d = 0; d < 64; d++) {
+      let total = 0;
+      for (let bi = 0; bi < blocks.length; bi += 2) {
+        const from = blocks[bi];
+        const to = blocks[bi + 1];
+        let acc: number;
+        if (mode === 0) {
+          acc = 0;
+          for (let j = from; j < to; j++) acc = f(acc + sc[j] * F[vi + j * stride + d]);
+        } else {
+          // two interleaved accumulators over an even prefix; an odd last key is added after the lanes are summed
+          let e = 0;
+          let o = 0;
+          const pairs = from + ((to - from) & ~1);
+          for (let j = from; j < pairs; j++) {
+            const prod = sc[j] * F[vi + j * stride + d];
+            if (((j - from) & 1) === 0) e = mode === 1 ? f(e + f(prod)) : f(e + prod);
+            else o = mode === 1 ? f(o + f(prod)) : f(o + prod);
+          }
+          acc = f(e + o);
+          if (pairs !== to) {
+            const prod = sc[pairs] * F[vi + pairs * stride + d];
+            acc = mode === 1 ? f(acc + f(prod)) : f(acc + prod);
+          }
+        }
+        total = bi === 0 ? acc : f(total + acc);
+      }
+      F[(out >> 2) + d] = total;
     }
     void scores;
   }

@@ -109,7 +109,7 @@ describe('SpeechSegmenter (incremental) == speechTimestampsFromProbs (oracle) on
         expect(got).toEqual(expected);
       },
     );
-  });
+  }, 60_000); // ~0.7 s alone, several times that under the full parallel suite
 
   it('output invariants: ordered, inside the audio, never empty, bounded by max speech (3000 cases)', () => {
     forAll(
@@ -140,7 +140,7 @@ describe('SpeechSegmenter (incremental) == speechTimestampsFromProbs (oracle) on
         }
       },
     );
-  });
+  }, 60_000); // ~1.3 s alone; timed out at 5 s under the full parallel suite (M6)
 });
 
 describe('segmenter rules that the defaults depend on', () => {
