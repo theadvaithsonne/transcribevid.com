@@ -137,7 +137,9 @@ describe('App shell in another language', () => {
   });
 
   it('the language menu is there, and says its name in the language', () => {
-    expect(q('app-language-switcher details summary')!.getAttribute('aria-label')).toBe('Idioma');
+    const summary = q('app-language-switcher details summary')!;
+    expect(summary.getAttribute('title')).toBe('Idioma');
+    expect(summary.textContent!.replace(/\s+/g, ' ').trim()).toBe('ES Idioma'); // the visible code is part of the accessible name
   });
 
   it('the counter reads in the language', () => {

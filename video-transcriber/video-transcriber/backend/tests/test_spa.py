@@ -20,6 +20,11 @@ JOB = "a" * 32
 PROJECT = config.PROJECT_DIR
 PUBLIC_FILES = PROJECT / "frontend" / "public"
 TOOL_PAGES_TS = PROJECT / "frontend" / "src" / "app" / "features" / "tool-pages" / "tool-pages.list.ts"
+LOCALES_TS = PROJECT / "frontend" / "src" / "app" / "i18n" / "locales.ts"
+# The translated pages (/es, /de/..., one set per language) exist only in the static website edition (environment.languages);
+# this backend serves the self-hosted edition, which stays English, so its own build never contains them.
+TRANSLATED = (set(re.findall(r"^\s+\w+: \{ code: '([a-z]{2})'", LOCALES_TS.read_text(encoding="utf-8"), re.M)) - {"en"}
+              if LOCALES_TS.is_file() else set())
 GUIDES_TS = PROJECT / "frontend" / "src" / "app" / "features" / "guides" / "guides.list.ts"
 CORE_TOOLS = ["video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator", "voice-recording-to-text"]
 # every keyword page, read from the frontend list so the test cannot drift from it (the six core ones must stay)
@@ -221,6 +226,8 @@ def test_every_route_a_build_prerendered_is_a_known_page():
         pytest.skip("no frontend build")
     routes = json.loads(manifest.read_text(encoding="utf-8")).get("routes", {})
     for route in routes:
+        if route.strip("/").split("/")[0] in TRANSLATED:
+            continue  # the static website's build (npm run build:pages) also prerenders the translated pages
         assert is_app_page(route.strip("/")), f"{route} was prerendered but the backend would answer 404"
 
 
