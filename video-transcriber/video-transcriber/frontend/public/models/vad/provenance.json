@@ -1,0 +1,20 @@
+{
+ "model": "Silero VAD v6.0, the ONNX file faster-whisper 1.2.1 ships as assets/silero_vad_v6.onnx and the Python engine runs today (backend/app/engine.py vad_filter)",
+ "source": "https://github.com/SYSTRAN/faster-whisper/blob/v1.2.1/faster_whisper/assets/silero_vad_v6.onnx (copied byte for byte from backend/.venv/Lib/site-packages/faster_whisper/assets/silero_vad_v6.onnx)",
+ "upstream": "https://github.com/snakers4/silero-vad (release v6.0; the weights are identical to the official v6.0 export, max probability difference 0.0000, see docs/in-browser/spike/vad.md section 4.2)",
+ "license": "MIT",
+ "license_notice": "Silero VAD: Copyright (c) 2020-present Silero Team, MIT License. faster-whisper: Copyright (c) 2023 SYSTRAN, MIT License. Both notices are kept in LICENSE next to this file.",
+ "files": {
+  "silero_vad_v6.onnx": {
+   "bytes": 1245151,
+   "sha256": "4cbf549b8326f60f80f2536d9eefeb450a9abe83365a098031c89719f1be17d2"
+  }
+ },
+ "contract": {
+  "inputs": "input [seq, 576] float32 (64 samples of context + 512 samples per row, 16 kHz), h [1, 1, 128], c [1, 1, 128]",
+  "outputs": "speech_probs [seq], hn [1, 1, 128], cn [1, 1, 128]",
+  "execution_provider": "wasm only: the WebGPU provider of onnxruntime-web 1.31.0-dev.20260914 returns wrong probabilities for this model (vad.md section 4.4); SileroVad.selfTest() checks this at load time"
+ },
+ "runtime": "onnxruntime-web 1.31.0-dev.20260914-8d85527a0 (the build Transformers.js 4.3.1 pins), frontend/src/app/engine/vad/silero.ts",
+ "verification": "frontend/src/app/engine/vad/README.md: specs (segments identical to Python on 52 clip variants) and the headless Chrome check"
+}
