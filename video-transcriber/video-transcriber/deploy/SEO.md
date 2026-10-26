@@ -3,7 +3,9 @@
 Plain-English steps for you, the owner. The website side is done: every page has its own title, description and address,
 there is a sitemap and a robots.txt, every page is delivered as ready-made HTML that search engines can read without
 running JavaScript, and there are 24 pages written for what people search for plus 5 guides (details in "What is on the
-site" below). The site runs on Cloudflare Pages (static, in-browser transcription); the Docker / backend setup that
+site" below). The whole site also exists in 15 more languages (Spanish, Portuguese, French, German, Italian, Indonesian,
+Japanese, Korean, Thai, Vietnamese, Turkish, Hindi, Bengali, Arabic, Urdu), so a visitor in Spain, Brazil or Japan reads it in
+their own language and Google lists each country's pages in that language ("Languages and countries" below). The site runs on Cloudflare Pages (static, in-browser transcription); the Docker / backend setup that
 earlier versions of this file described is not what is online.
 
 **Be realistic.** Nobody can promise "number 1 on Google". Google ranks pages that (1) it can open and read, (2) really
@@ -30,7 +32,9 @@ minutes or need an upload).
 | Guides | `/guides/srt-vs-vtt`, `/guides/how-to-add-subtitles-to-a-video`, `/guides/transcribe-video-without-uploading`, `/guides/accurate-transcripts`, `/guides/what-is-whisper` |
 | Information | `/how-it-works`, `/faq`, `/about`, `/contact`, `/privacy`, `/terms` |
 
-38 addresses in all, all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
+38 English addresses, and the same pages in 15 languages (32 each: the home page, the six information pages, the two lists, 18 tool
+pages and the 5 guides; the six "by language" pages have no translation, a Spanish page about Spanish would only repeat the generic page): 518
+addresses in all, all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
 chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
 
 ---
@@ -48,12 +52,13 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    "backend setting" methods do not exist on the static site; the DNS record is the one to use.)
 
 3. **Submit the sitemap.** In Search Console open *Sitemaps*, type `sitemap.xml`, press *Submit*. Within a day or two it
-   should say *Success* with 38 pages discovered.
+   should say *Success* with 518 pages discovered (38 English + 480 translated).
 
 4. **Ask Google to look now.** *URL inspection* (search bar at the top) > *Request indexing*, about 10 a day are allowed.
    Day 1: `/`, `/video-to-text`, `/audio-to-text`, `/mp4-to-text`, `/mp3-to-text`, `/srt-subtitle-generator`,
    `/voice-recording-to-text`, `/guides`, `/tools`, `/guides/srt-vs-vtt`. Day 2 and after: the other guides, then the
-   file-type, use and language pages, 10 a day. *Test live URL* then *View tested page* shows the page the way Google
+   file-type, use and language pages, 10 a day. The translated pages do not need this: Google finds them from the sitemap and
+   from the language menu on every page; inspect only the translated home pages (`/es`, `/pt`, `/de`, ...) if you are curious. *Test live URL* then *View tested page* shows the page the way Google
    sees it: the text and headings should all be there.
 
 5. **Bing and the others (10 minutes).** At https://www.bing.com/webmasters sign in and choose *Import from Google Search
@@ -79,7 +84,8 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    WebApplication, FAQ). There are no star ratings anywhere, on purpose: never add made-up ones.
 
 8. **Wait, then check monthly (15 minutes).** In Search Console:
-   - **Pages** (page indexing): the 38 pages should move to *Indexed* over 1 to 6 weeks. Normal and nothing to fix: *Page with
+   - **Pages** (page indexing): the 38 English pages should move to *Indexed* over 1 to 6 weeks, the translated ones over 2 to 10
+     (a large batch of new pages on a new site is crawled slowly; that is normal). Normal and nothing to fix: *Page with
      redirect* (http and www addresses), *Not found (404)* (mistyped addresses), *Excluded by 'noindex' tag* and *Blocked by
      robots.txt* (private transcript pages `/jobs/...`, `/logs`, `/api/...`). Worth attention: *Crawled - currently not
      indexed* or *Discovered - currently not indexed* for a page you care about. On a new site this usually clears by itself
@@ -88,6 +94,30 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    - **Core Web Vitals**: says *Not enough usage data* until enough Chrome users have visited (often months). Normal.
    - **Performance**: which searches show the site and which pages get clicks. Write the numbers down each month.
    - Search Google for `TranscribeVid` and `site:transcribevid.com`: the home page first, the main pages listed.
+
+9. **Languages and countries (nothing to switch on; this is what to know and the two things to check).**
+   - Every language is a set of pages under its own address (`/es`, `/de`, `/ja`, ...), not a different domain, and each page
+     names its twins in the other languages (`hreflang`, in the page and in the sitemap), so Google shows the Spanish page to
+     Spanish speakers, the German page to German speakers, and the English page to everyone else. Search Console's old
+     *International targeting* report is gone and not needed; there is nothing to set per country. Check *Pages* and
+     *Performance* with the filter *Country* once a month to see which markets grow.
+   - The browser's language decides what a visitor sees, not their location: a visitor whose browser is Spanish and who opens
+     `transcribevid.com` is taken to `/es`; an English browser in Spain stays on English (the language menu is on every page,
+     and a choice made there is remembered). Googlebot, which states no language preference, is never redirected, so the English
+     page stays the one found at `/`.
+   - **Ads work in every country** and need no per-country setup: the same ad units, in every language. In **Spain, Germany,
+     France, Italy and the rest of the EU / EEA, the UK and Switzerland** Google requires a consent message before it serves
+     personalised ads. In AdSense open *Privacy & messaging* and turn on the **European regulations** message (Google's own
+     certified consent tool, shown in the visitor's language); until it is on, Google serves only limited ads (or none) to those
+     visitors and the earnings there are lower. The footer's "Privacy choices" button reopens it. (This was already in the earlier ad checklist; the
+     translated pages use the same ad units and the same footer.)
+   - **Where ads are not paid for**: Iran, Cuba, North Korea and Crimea (sanctions), and Google paused ads for visitors in
+     Russia in 2022. The pages still work there; the ad slot just stays empty. China is left out on purpose (Google is not used
+     there). None of this needs any action.
+   - Translations were written and checked against the English pages by an AI translator, one language at a time, with a
+     glossary per language (`docs/in-browser/glossary/`); legal pages carry "this is a translation for convenience, the English
+     version applies". **A native speaker's read of the home page and the main tool page of each language is worth doing
+     for the largest markets** (Spanish, Portuguese, German, Japanese first); send corrections to the developer.
 
 ---
 
@@ -180,6 +210,22 @@ visible date, the Article `dateModified` and the sitemap `<lastmod>`), never oth
   a guide's printed "updated" date, otherwise the date of the last git commit of the page's own text files (today if they
   have uncommitted changes), and none where git cannot say.
 - Lighthouse for every page, mobile and desktop: `node scripts/lighthouse.mjs` (instructions at the top of the file).
+
+**Languages (developer).** Design, contracts, wrapping rules and the translation rules are in `docs/in-browser/I18N.md`.
+Short version: English text is the key (`'text' | t`, `i18n.t()`, `_t()` markers); a language is `i18n/dict/<code>.ts` (the
+interface, 704 strings, plus the page titles and descriptions), 18 tool pages in `features/tool-pages/content/i18n/<code>/`, 5
+guides in `features/guides/content/i18n/<code>/` and the address words in `i18n/slugs/<code>.ts`; `scripts/gen-i18n.mjs` turns
+what exists into `i18n/generated.ts` (which pages a language has), and the routes, the prerender list, the sitemap
+alternates and the language menu all follow from it. After changing any English text or adding a string run
+`node scripts/extract-i18n.mjs` (it writes the list translators work from; `--check` fails when it is stale). The self-hosted
+edition (`environment.languages = false`) stays English only.
+Checks that stop a half-finished language from going live: `i18n/registry.spec.ts` (every published language is complete:
+home, information pages, same tools and guides, titles within search-result limits, unique, not the English text),
+`node --test scripts/i18n-dicts.test.mjs` (placeholders and markup of every dictionary and content file, the slug tables) and the
+audit, which for every translated page also checks `<html lang dir>`, `og:locale`, that `hreflang` equals the sitemap and lists
+every page back, that links stay inside the language, that no English text is left in the page and that the `Content-Language`
+header rule exists. `pages-postbuild.mjs` writes `Content-Language` for `/<code>` and `/<code>/*` (a signal Bing uses more than
+`hreflang`).
 
 **Measured, not enabled**: Angular client hydration. Built both ways and compared on the same Pages emulator (5 runs each):
 performance 92 vs 91, LCP 2.42 s vs 2.45 s, no layout shift either way. The gain is inside the noise, it adds about 12 kB to

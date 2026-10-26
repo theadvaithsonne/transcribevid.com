@@ -20,12 +20,13 @@ import { TPipe } from './t.pipe';
     @if (items().length > 1) {
       @if (variant() === 'menu') {
         <details class="lang" #menu>
-          <summary [attr.aria-label]="'Language' | t" [attr.title]="'Language' | t">
+          <summary [attr.title]="'Language' | t">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
               <circle cx="12" cy="12" r="9" />
               <path d="M3 12h18M12 3c2.6 2.7 3.9 5.7 3.9 9s-1.3 6.3-3.9 9c-2.6-2.7-3.9-5.7-3.9-9S9.4 5.7 12 3z" />
             </svg>
             <span class="cur">{{ current().code.toUpperCase() }}</span>
+            <span class="visually-hidden">&ngsp;{{ 'Language' | t }}</span>
           </summary>
           <ul class="lang-pop">
             @for (l of items(); track l.code) {

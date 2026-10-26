@@ -125,7 +125,9 @@ describe('LanguageSwitcher', () => {
   it('menu: a button with the current language code and the same links', async () => {
     const { el } = await render('menu', '/faq');
     expect(text(el.querySelector('summary .cur'))).toBe('EN');
-    expect(el.querySelector('summary')!.getAttribute('aria-label')).toBe('Language');
+    // named from its content, so the visible "EN" is part of the accessible name
+    expect(el.querySelector('summary')!.hasAttribute('aria-label')).toBe(false);
+    expect(text(el.querySelector('summary'))).toBe('EN Language');
     expect(Array.from(el.querySelectorAll('ul.lang-pop a')).map((a) => a.getAttribute('href'))).toEqual(['/faq', '/es/faq', '/de/faq']);
   });
 

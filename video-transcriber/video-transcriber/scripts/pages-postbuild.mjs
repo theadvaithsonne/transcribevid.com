@@ -129,9 +129,11 @@ const REDIRECTS_BASE = `# TranscribeVid on Cloudflare Pages. Written by scripts/
 `;
 
 // the same rules for the transcript pages of each translated language (/es/jobs/<id> ...)
+// and a Content-Language header on every translated page (Bing leans on it more than on hreflang; Google reads hreflang and <html lang>)
 const HEADERS =
   HEADERS_BASE +
-  I18N.languages.map((l) => `\n# A visitor's own transcript page in ${l}: never indexed, always revalidated.\n/${l}/jobs/*\n  X-Robots-Tag: noindex, nofollow\n  Cache-Control: no-cache\n`).join('');
+  I18N.languages.map((l) => `\n# A visitor's own transcript page in ${l}: never indexed, always revalidated.\n/${l}/jobs/*\n  X-Robots-Tag: noindex, nofollow\n  Cache-Control: no-cache\n`).join('') +
+  I18N.languages.map((l) => `\n# Every ${l} page names its language (the home page is /${l}, the others are below it).\n/${l}\n  Content-Language: ${l}\n/${l}/*\n  Content-Language: ${l}\n`).join('');
 const REDIRECTS =
   REDIRECTS_BASE + I18N.languages.map((l) => `\n# A visitor's own transcript page in ${l}.\n/${l}/jobs/:id /index.csr 200\n`).join('');
 

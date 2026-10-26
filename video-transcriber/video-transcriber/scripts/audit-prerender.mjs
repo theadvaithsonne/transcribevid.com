@@ -250,6 +250,16 @@ for (const [label, map] of [['title', titles], ['description', descriptions], ['
   for (const [value, urls] of map) if (urls.length > 1) fail(urls.join(' and '), `share the same ${label}: "${value.slice(value.indexOf('|') + 1, value.indexOf('|') + 71)}"`);
 }
 
+// every translated language also names itself in a Content-Language header (_headers, written by pages-postbuild.mjs)
+const headersFile = path.join(root, '_headers');
+const headersText = fs.existsSync(headersFile) ? fs.readFileSync(headersFile, 'utf8') : null;
+if (headersText !== null) {
+  for (const l of new Set([...pages.keys()].map(localeOf))) {
+    if (l === 'en') continue;
+    for (const pattern of [`/${l}`, `/${l}/*`]) if (!headersText.includes(`\n${pattern}\n  Content-Language: ${l}\n`)) fail(pattern, `_headers has no "Content-Language: ${l}" rule`);
+  }
+}
+
 if (problems.length) {
   console.error(`audit-prerender: ${problems.length} problem(s) in ${pages.size} pages:\n  - ${problems.slice(0, 120).join('\n  - ')}${problems.length > 120 ? `\n  ... and ${problems.length - 120} more` : ''}`);
   process.exit(1);

@@ -81,7 +81,7 @@ const dict: Record<string, string> = {
   '{n}% done': 'اكتمل {n}%',
   '{n}% model confidence': 'ثقة النموذج {n}%',
   '{n}s left': 'متبقي {n} ث',
-  '{name} home': 'الصفحة الرئيسية لـ{name}',
+  '{name} home': '{name}: الصفحة الرئيسية',
   '{size} download': 'تنزيل بحجم {size}',
   '{title}: {blurb}': '{title}: {blurb}',
   '{title}: {blurb} {note}.': '{title}: {blurb} {note}.',
