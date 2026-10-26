@@ -131,7 +131,7 @@ import { TOOL_GROUPS, TOOL_PAGES } from './tool-pages.list';
       }
       a {
         display: inline-block;
-        margin-right: 8px;
+        margin-inline-end: 8px;
         font-weight: 700;
       }
     }

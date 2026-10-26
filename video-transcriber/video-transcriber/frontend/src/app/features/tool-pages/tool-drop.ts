@@ -131,7 +131,7 @@ const AUDIO_EXT = /\.(mp3|wav|m4a|aac|flac|ogg|opus|3gp)$/i;
       display: inline-flex;
       align-items: center;
       min-height: 44px;
-      margin-left: 6px;
+      margin-inline-start: 6px;
       color: var(--accent);
       text-decoration: underline;
       text-underline-offset: 3px;

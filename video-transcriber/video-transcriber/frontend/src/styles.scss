@@ -474,7 +474,7 @@ textarea {
   }
   ul,
   ol {
-    padding-left: 28px;
+    padding-inline-start: 28px;
   }
   li {
     margin-bottom: 8px;
@@ -525,15 +525,14 @@ textarea {
     border-radius: var(--r-md);
   }
   details > :not(summary) {
-    margin-left: 24px;
-    margin-right: 24px;
+    margin-inline: 24px;
   }
   details > :last-child {
     margin-bottom: 22px;
   }
   .langs {
     columns: 4 180px;
-    padding-left: 24px;
+    padding-inline-start: 24px;
     font-size: var(--fs-base);
     color: var(--muted);
   }
@@ -543,7 +542,7 @@ textarea {
 .skip-link {
   position: absolute;
   top: 8px;
-  left: 8px;
+  inset-inline-start: 8px;
   z-index: 100;
   padding: 10px 18px;
   border-radius: var(--r-sm);
@@ -613,4 +612,107 @@ summary,
   ins.adsbygoogle {
     display: none !important;
   }
+}
+
+/* ---------------------------------------------------------------------------------------- right to left (Arabic, Urdu)
+   The layout itself follows <html dir>: flex and grid flip, and the component styles use logical properties
+   (inline-start / inline-end) instead of left and right. What is left here are the few things that must not flip,
+   or must flip by hand. */
+pre,
+code,
+kbd,
+samp,
+.mono {
+  /* timecodes, subtitle samples and commands read left to right even inside a right-to-left page */
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+pre {
+  text-align: left;
+}
+html[dir='rtl'] {
+  /* the "list" icon draws its short line on the left; mirror it so it sits on the end of the row */
+  .tico {
+    transform: scaleX(-1);
+  }
+  .bar.indeterminate > i {
+    animation-name: slide-rtl;
+  }
+}
+@keyframes slide-rtl {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-300%);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------- typography per script
+   Only fonts that are already on the device (nothing to download). Tall scripts (Thai, Devanagari, Bengali, Arabic,
+   Urdu) need more line height for their marks; joined or syllabic scripts must not be letter-spaced (a negative
+   or positive tracking breaks the joins in Arabic and the conjuncts in Indic scripts).
+   Every rule here is written on `html:lang(x) <descendant>`, never on `html:lang(x)` alone: the build inlines the critical CSS
+   into each page and defers the rest, and it drops a rule whose selector is only the root element. A font stack or a line
+   height that arrived with the deferred file reflowed the whole page about 250 ms after the first paint (layout shift 0.3-0.5
+   on the long Japanese and Thai pages). `--font` is read by `body` only, so it is declared on `body`. */
+@mixin script($lang, $font, $body, $head) {
+  html:lang(#{$lang}) {
+    body {
+      @if $font {
+        --font: #{$font}, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      }
+      line-height: $body;
+    }
+    h1,
+    h2,
+    h3,
+    h4 {
+      line-height: $head !important;
+    }
+    * {
+      letter-spacing: 0 !important;
+    }
+  }
+}
+@include script('ar', "'Segoe UI', 'Geeza Pro', 'Noto Naskh Arabic', Tahoma", 1.85, 1.5);
+@include script('ur', "'Segoe UI', 'Geeza Pro', 'Noto Naskh Arabic', Tahoma", 2, 1.75);
+@include script('hi', "'Nirmala UI', 'Kohinoor Devanagari', 'Noto Sans Devanagari'", 1.8, 1.45);
+@include script('bn', "'Nirmala UI', 'Kohinoor Bangla', 'Noto Sans Bengali'", 1.85, 1.5);
+@include script('th', "'Leelawadee UI', 'Thonburi', 'Noto Sans Thai'", 1.85, 1.5);
+@include script(
+  'ja',
+  "'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Yu Gothic', Meiryo, 'Noto Sans JP'",
+  1.85,
+  1.45
+);
+@include script('ko', "'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR'", 1.75, 1.4);
+
+/* Line breaking. Japanese: no small kana or punctuation at the start of a line. Korean: break at spaces, not inside
+   words, and fall back to breaking anywhere when a word is wider than its box. */
+html:lang(ja) body {
+  line-break: strict;
+  overflow-wrap: anywhere;
+}
+html:lang(ko) body {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+html:lang(th) body {
+  overflow-wrap: anywhere;
+}
+/* German compounds are long: hyphenate (needs <html lang="de">, which every German page has). */
+html:lang(de) :is(h1, h2, h3, h4, p, li, dd, summary, .page-lead, .lead, .hint) {
+  hyphens: auto;
+}
+
+/* A heading word wider than its box breaks instead of pushing the page sideways (a long compound on a phone). break-word does not
+   change how wide a box wants to be, so nothing moves while every word fits. Running text is left alone on purpose: an e-mail
+   address that is a few pixels too wide should stay whole, and German body text is hyphenated above. */
+h1,
+h2,
+h3,
+h4,
+summary {
+  overflow-wrap: break-word;
 }

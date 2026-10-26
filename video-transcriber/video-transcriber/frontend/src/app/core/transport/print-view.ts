@@ -47,7 +47,7 @@ body { margin: 0; font: 11pt/1.55 system-ui, "Noto Sans", "Segoe UI", Arial, san
 h1 { font-size: 18pt; line-height: 1.25; margin: 0 0 4pt; }
 .meta { color: #555; font-size: 9.5pt; margin: 0 0 14pt; }
 p { margin: 0 0 9pt; orphans: 2; widows: 2; }
-.t { color: #666; font-size: 8.5pt; margin-right: 6pt; font-variant-numeric: tabular-nums; }
+.t { color: #666; font-size: 8.5pt; margin-inline-end: 6pt; font-variant-numeric: tabular-nums; }
 </style></head>
 <body><h1 dir="auto">${esc(job.title)}</h1>${meta.length ? `<p class="meta">${meta.join(' · ')}</p>` : ''}
 ${body || `<p>${esc(t('No speech was transcribed.'))}</p>`}

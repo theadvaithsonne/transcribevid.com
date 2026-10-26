@@ -54,7 +54,7 @@ import { TPipe } from '../i18n/t.pipe';
   styles: `
     :host {
       position: fixed;
-      left: 24px;
+      inset-inline-start: 24px;
       bottom: 24px;
       z-index: 70;
       width: min(420px, calc(100vw - 32px));
@@ -72,10 +72,11 @@ import { TPipe } from '../i18n/t.pipe';
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: start;
       gap: 12px;
-      padding: 12px 6px 12px 14px;
+      padding-block: 12px;
+      padding-inline: 14px 6px;
       background: var(--surface);
       border: 1px solid var(--line-strong);
-      border-left: 6px solid var(--k);
+      border-inline-start: 6px solid var(--k);
       border-radius: var(--r-lg);
       color: var(--text);
       animation: toast-in 0.18s ease-out;
@@ -166,8 +167,10 @@ import { TPipe } from '../i18n/t.pipe';
       }
       .toast {
         gap: 10px;
-        padding: 8px 4px 8px 10px;
-        border-width: 1px 1px 1px 6px;
+        padding-block: 8px;
+        padding-inline: 10px 4px;
+        border-width: 1px;
+        border-inline-start-width: 6px;
       }
       .toast:not(:last-child) {
         display: none;

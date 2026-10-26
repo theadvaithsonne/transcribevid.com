@@ -49,7 +49,8 @@
     align-items: center;
     gap: 8px;
     min-height: 36px;
-    padding: 3px 16px 3px 5px;
+    padding-block: 3px;
+    padding-inline: 5px 16px;
     border-radius: 999px;
     font-size: 17px;
     font-weight: 750;
@@ -247,12 +248,13 @@
     flex: none;
     align-items: center;
     gap: 12px;
-    padding: 8px 6px 8px 12px;
+    padding-block: 8px;
+    padding-inline: 12px 6px;
     border: 1px solid var(--line-strong);
     border-radius: var(--r-lg);
     background: var(--surface);
     font-size: 18px;
-    text-align: left;
+    text-align: start;
   }
   .ficon {
     display: grid;
@@ -579,7 +581,7 @@ input[type='range'] {
   color: var(--text-strong);
   font-variant-numeric: tabular-nums;
   small {
-    margin-left: 2px;
+    margin-inline-start: 2px;
     font-size: 18px;
     color: var(--muted);
   }
@@ -592,6 +594,9 @@ input[type='range'] {
     background: var(--primary-bright);
     transform-origin: left center;
     transition: transform 0.3s var(--ease);
+    :host-context([dir='rtl']) & {
+      transform-origin: right center;
+    }
   }
 }
 .up-meta {
@@ -817,7 +822,7 @@ input[type='range'] {
   .home-steps,
   .home-uses {
     margin: 0;
-    padding-left: 1.4em;
+    padding-inline-start: 1.4em;
     max-width: 75ch;
     li + li {
       margin-top: 8px;

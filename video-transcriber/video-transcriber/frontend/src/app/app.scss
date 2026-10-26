@@ -54,7 +54,7 @@
       scrollbar-width: thin;
       contain: layout paint;
       background: var(--surface);
-      border-left: 1px solid var(--line);
+      border-inline-start: 1px solid var(--line);
     }
   }
 }
@@ -94,8 +94,9 @@ summary:focus-visible {
   flex: none;
   align-items: center;
   gap: 12px;
-  padding: 4px 8px 4px 4px;
-  margin-left: -4px;
+  padding-block: 4px;
+  padding-inline: 4px 8px;
+  margin-inline-start: -4px;
   color: var(--text-strong);
   text-decoration: none;
   border-radius: var(--r-md);
@@ -129,7 +130,7 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: 4px;
-  margin-right: 6px;
+  margin-inline-end: 6px;
 }
 /* the open tab is obvious without colour: a filled box, bold text and a 3px yellow underline */
 .navlink {
@@ -214,7 +215,8 @@ summary:focus-visible {
   }
 }
 .theme-btn {
-  padding: 10px 20px 10px 16px;
+  padding-block: 10px;
+  padding-inline: 16px 20px;
   gap: 10px;
   .ico {
     flex: none;
@@ -236,7 +238,8 @@ summary:focus-visible {
 }
 .tbtn {
   position: relative;
-  padding: 10px 14px 10px 16px;
+  padding-block: 10px;
+  padding-inline: 16px 14px;
   gap: 10px;
   .badge {
     min-width: 30px;
@@ -260,7 +263,7 @@ summary:focus-visible {
   .pulse {
     position: absolute;
     top: 2px;
-    right: 2px;
+    inset-inline-end: 2px;
     width: 13px;
     height: 13px;
     border-radius: 50%;
@@ -271,7 +274,7 @@ summary:focus-visible {
 .pop {
   position: absolute;
   top: calc(100% + 12px);
-  right: 0;
+  inset-inline-end: 0;
   z-index: 40;
   width: min(440px, 92vw);
   max-height: 60vh;
@@ -303,7 +306,7 @@ summary:focus-visible {
   display: flex;
   align-items: center;
   gap: 2px;
-  padding-right: 6px;
+  padding-inline-end: 6px;
   border-radius: var(--r-md);
   &:hover {
     background: var(--surface-2);
@@ -326,7 +329,8 @@ summary:focus-visible {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 12px 6px 12px 14px;
+  padding-block: 12px;
+  padding-inline: 14px 6px;
   border-radius: var(--r-md);
   text-decoration: none;
   color: var(--text);
@@ -420,7 +424,8 @@ summary:focus-visible {
   color: var(--muted);
 }
 .wipe {
-  margin: 4px 0 0 -4px;
+  margin-block: 4px 0;
+  margin-inline: -4px 0;
   padding: 8px 4px;
   min-height: 44px;
   border: 0;
@@ -608,7 +613,8 @@ summary:focus-visible {
     display: none;
   }
   .counter {
-    padding: 0 16px 0 13px;
+    padding-block: 0;
+    padding-inline: 13px 16px;
   }
   .navlink {
     padding-inline: 12px;
@@ -640,7 +646,7 @@ summary:focus-visible {
   }
   .brand {
     gap: 10px;
-    padding-right: 2px;
+    padding-inline-end: 2px;
   }
 
   .scrim {
@@ -676,7 +682,7 @@ summary:focus-visible {
     align-items: center;
     min-height: 56px;
     padding: 0 16px;
-    border-left: 4px solid transparent;
+    border-inline-start: 4px solid transparent;
     border-radius: var(--r-sm);
     font-size: 20px;
     font-weight: 600;
@@ -687,7 +693,7 @@ summary:focus-visible {
     }
     &.active {
       background: var(--surface-3);
-      border-left-color: var(--primary-bg);
+      border-inline-start-color: var(--primary-bg);
       font-weight: 800;
       color: var(--text-strong);
     }
@@ -752,7 +758,7 @@ summary:focus-visible {
   }
   .foot-nav {
     gap: 0 10px;
-    margin-right: -6px;
+    margin-inline-end: -6px;
     flex-wrap: wrap;
   }
   .offline,

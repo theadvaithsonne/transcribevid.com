@@ -134,14 +134,14 @@
   }
   ul {
     margin: 0;
-    padding-left: 26px;
+    padding-inline-start: 26px;
     font-size: var(--fs-base);
     line-height: 1.65;
     color: var(--text);
   }
   li {
     margin-bottom: 12px;
-    padding-left: 4px;
+    padding-inline-start: 4px;
     &:last-child {
       margin-bottom: 0;
     }
