@@ -15,7 +15,7 @@
 
     <h2>1. Who runs this website</h2>
     <p>
-      {{ site.brand().name }} ({{ site.brand().domain }}) is operated by <mark class="placeholder">[Operator / company name and address]</mark>
+      {{ site.brand().name }} ({{ site.brand().domain }}) is operated by <b>{{ op.name }}</b>, {{ op.address }}
       ("we", "us"). We decide how and why your data is processed, as described here.
     </p>
 
@@ -145,7 +145,7 @@
       @if (site.contactEmail(); as mail) {
         <a [href]="'mailto:' + mail">{{ mail }}</a>.
       } @else {
-        <mark class="placeholder">[Contact e-mail address]</mark>.
+        <a [href]="'mailto:' + op.email">{{ op.email }}</a>.
       }
     </p>
 
@@ -181,7 +181,7 @@
 
     <h2>1. Who runs this website</h2>
     <p>
-      {{ site.brand().name }} ({{ site.brand().domain }}) is operated by <mark class="placeholder">[Operator / company name and address]</mark>
+      {{ site.brand().name }} ({{ site.brand().domain }}) is operated by <b>{{ op.name }}</b>, {{ op.address }}
       ("we", "us"). We decide how and why your data is processed, as described here.
     </p>
 
@@ -258,7 +258,7 @@
       @if (site.contactEmail(); as mail) {
         <a [href]="'mailto:' + mail">{{ mail }}</a>.
       } @else {
-        <mark class="placeholder">[Contact e-mail address]</mark>.
+        <a [href]="'mailto:' + op.email">{{ op.email }}</a>.
       }
     </p>
 

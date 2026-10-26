@@ -55,14 +55,14 @@ _HASHED_ASSET = re.compile(r"^[\w.-]+-[A-Z0-9]{8}\.(js|css)$")  # Angular's cont
 # (frontend/src/app/app.routes.ts) MUST be added here too - tests/test_spa.py compares this list with the frontend's
 # tool pages and with sitemap.xml.
 APP_PAGES = (
-    "how-it-works", "faq", "privacy", "terms", "logs",
+    "how-it-works", "faq", "about", "contact", "privacy", "terms", "logs",
     # keyword landing pages (frontend/src/app/features/tool-pages/tool-pages.list.ts)
     "video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator",
     "voice-recording-to-text",
 )
 # Old addresses of pages that moved: one permanent redirect (301) to the new address, so links and search engines move
-# along at once (the app's own redirect in app.routes.ts only happens after it has loaded).
-MOVED = {"about": "how-it-works"}
+# along at once. Empty since /about became a page of its own again (it used to point at /how-it-works).
+MOVED: dict[str, str] = {}
 _JOB_PAGE = re.compile(r"^jobs/[0-9a-f]{32}$")
 # Never indexed: the JSON API, the operator log viewer and a visitor's private transcript pages.
 _NOINDEX = re.compile(r"^/(api(/|$)|logs(/|$)|jobs/)")
@@ -760,7 +760,7 @@ def spa(request: Request, path: str):
 
     page = path.rstrip("/")
     if page in MOVED:
-        return permanent(MOVED[page])  # /about, /about/ -> /how-it-works
+        return permanent(MOVED[page])  # e.g. /old, /old/ -> /new
     if path and path.endswith("/") and is_app_page(page):
         return permanent(page)  # /faq/ -> /faq ("//" -> "/")
     if path == "index.html" or (path.endswith("/index.html") and is_app_page(path[:-len("/index.html")])):

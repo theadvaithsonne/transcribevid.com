@@ -2,15 +2,12 @@ import { Injectable, computed, inject } from '@angular/core';
 import { fmtBytesShort } from './format';
 import { JobsStore } from './jobs.store';
 import { Brand, Health } from './models';
+import { SITE_BRAND } from './operator';
 import { ASSUME_PUBLIC } from './platform';
 import { TRANSPORT_KIND } from './transport/token';
 
-export const DEFAULT_BRAND: Brand = {
-  name: 'TranscribeVid',
-  domain: 'transcribevid.com',
-  url: 'https://transcribevid.com',
-  contact_email: null,
-};
+/** A server build's brand until its server says otherwise: the public website's name, without a contact address (the server announces its own). */
+export const DEFAULT_BRAND: Brand = { ...SITE_BRAND, contact_email: null };
 export const TAGLINE = 'Video to text, accurately.';
 
 /**
@@ -50,6 +47,7 @@ const ASSUMED_BROWSER: Health = {
   logs_require_token: false,
   allowed_models: null,
   runs_in: 'browser',
+  brand: SITE_BRAND,
 };
 
 /**

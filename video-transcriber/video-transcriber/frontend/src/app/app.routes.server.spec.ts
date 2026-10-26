@@ -9,7 +9,7 @@ const sitemapPaths = () => Array.from(sitemapXml.matchAll(/<loc>\s*([^<]+?)\s*<\
 
 describe('server routes (what is prerendered at build time)', () => {
   it('prerenders the public pages that are in the sitemap (besides the home page, which has its own decision)', () => {
-    for (const path of ['how-it-works', 'faq', 'privacy', 'terms']) {
+    for (const path of ['how-it-works', 'faq', 'about', 'contact', 'privacy', 'terms']) {
       expect(modeOf(path), path).toBe(RenderMode.Prerender);
     }
   });
@@ -25,8 +25,8 @@ describe('server routes (what is prerendered at build time)', () => {
     }
   });
 
-  it('never prerenders a private or dynamic page: a visitor\'s transcript, the operator logs, the old /about address', () => {
-    for (const path of ['jobs/:id', 'logs', 'about']) expect(modeOf(path), path).toBe(RenderMode.Client);
+  it('never prerenders a private or dynamic page: a visitor\'s transcript, the operator logs', () => {
+    for (const path of ['jobs/:id', 'logs']) expect(modeOf(path), path).toBe(RenderMode.Client);
   });
 
   it('never prerenders a page that is marked noindex', () => {

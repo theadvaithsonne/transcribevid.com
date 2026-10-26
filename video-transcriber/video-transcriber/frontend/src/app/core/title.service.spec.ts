@@ -162,11 +162,14 @@ describe('BrandTitleStrategy with the real routes', () => {
     expect(meta('meta[name="description"]')).toBe(DEFAULT_DESCRIPTION);
   });
 
-  it('the old /about address ends up on How it works, with that page\'s title and canonical address', async () => {
+  it('/about and /contact are pages of their own, with their own title and canonical address', async () => {
     await router.navigateByUrl('/about');
-    expect(router.url).toBe('/how-it-works');
-    expect(document.title).toBe('How it works - TranscribeVid');
-    expect(canonical()).toBe('https://transcribevid.com/how-it-works');
+    expect(router.url).toBe('/about');
+    expect(document.title).toBe('About TranscribeVid - TranscribeVid');
+    expect(canonical()).toBe('https://transcribevid.com/about');
+    await router.navigateByUrl('/contact');
+    expect(document.title).toBe('Contact - TranscribeVid');
+    expect(canonical()).toBe('https://transcribevid.com/contact');
   });
 
   it.each([
@@ -279,7 +282,7 @@ describe('BrandTitleStrategy with the real routes', () => {
     const indexable = routes.filter((r) => typeof r.title === 'string' && r.path !== '**' && !(r.data as { noindex?: boolean })?.noindex);
 
     it('every public page: a full title of at most 60 characters and a description of 120 to 160, none shared', () => {
-      expect(indexable.length).toBe(5 + TOOL_PAGES.length); // home, how it works, faq, privacy, terms + the keyword pages
+      expect(indexable.length).toBe(7 + TOOL_PAGES.length); // home, how it works, faq, about, contact, privacy, terms + the keyword pages
       const titles = new Set<string>();
       const descriptions = new Set<string>();
       for (const r of indexable) {

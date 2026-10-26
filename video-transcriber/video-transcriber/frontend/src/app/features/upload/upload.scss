@@ -1,6 +1,6 @@
 :host {
-  display: block;
-  height: 100%;
+  /* no box of its own: .upload then fills the main area (height: 100%), and .home-info follows it when the page is scrolled */
+  display: contents;
 }
 
 /* The landing page, kept deliberately simple: a title with three chips, one place for the file, and one card with the
@@ -781,5 +781,52 @@ input[type='range'] {
 @media (max-width: 359px) {
   .presets {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------------ below the tool: what the page does, in words */
+.home-info {
+  max-width: 980px;
+  padding: 40px var(--gutter) 48px;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-base);
+  line-height: 1.7;
+  color: var(--text);
+  .section-title {
+    margin: 40px 0 12px;
+    font-size: var(--fs-h3);
+    line-height: 1.25;
+    &:first-child {
+      margin-top: 0;
+      font-size: var(--fs-h2);
+    }
+  }
+  p {
+    margin: 0 0 12px;
+    max-width: 75ch;
+  }
+  b {
+    color: var(--text-strong);
+  }
+  a:not(.btn) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+  }
+  .home-steps,
+  .home-uses {
+    margin: 0;
+    padding-left: 1.4em;
+    max-width: 75ch;
+    li + li {
+      margin-top: 8px;
+    }
+  }
+  .home-more {
+    margin-top: 32px;
+  }
+  app-related-tools {
+    margin-top: 40px;
   }
 }

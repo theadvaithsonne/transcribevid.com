@@ -237,3 +237,58 @@
     </div>
   }
 </div>
+
+<!-- Below the tool (the tool itself still fills the first screen on a computer): what the page does, in plain words, for
+     visitors who scroll and for search engines. The phone / tablet ad unit follows this section (app shell), far from the buttons. -->
+<section class="home-info" aria-labelledby="home-info-title">
+  <h2 class="section-title" id="home-info-title">Free video and audio to text{{ site.inBrowser() ? ', right in your browser' : '' }}</h2>
+  <p>
+    {{ site.brand().name }} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no
+    limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.
+  </p>
+  @if (site.inBrowser()) {
+    <p>
+      The transcription runs on your own device with open speech recognition models such as OpenAI Whisper. Your browser downloads a model once and
+      keeps it, so the next file starts faster, and your video or audio is never uploaded anywhere.
+    </p>
+  } @else {
+    <p>Your file is transcribed with open speech recognition models such as OpenAI Whisper and is deleted automatically afterwards.</p>
+  }
+
+  <h2 class="section-title">How to transcribe a video to text</h2>
+  <ol class="home-steps">
+    <li>
+      <b>Choose your file.</b> Drop a video or audio file above, pick one from your device, or record your voice with the microphone. MP4, MOV,
+      MKV, WebM, AVI, MP3, WAV, M4A, FLAC, OGG and most other common formats work.
+    </li>
+    <li>
+      <b>Pick the quality and the language.</b> A faster model gives a quick draft; a more accurate one is better for interviews, lectures and
+      subtitles. The spoken language can be detected for you, and more than 50 languages are supported.
+    </li>
+    <li>
+      <b>Read, correct and download.</b> The transcript appears with timestamps, and words the model was unsure of are marked so you can check
+      them. Download it as plain text, SRT or VTT subtitles, Markdown or JSON.
+    </li>
+  </ol>
+
+  <h2 class="section-title">What people use it for</h2>
+  <ul class="home-uses">
+    <li><b>Subtitles and captions</b> for your own videos, reels and online courses, from an SRT or VTT file.</li>
+    <li><b>Meeting and interview notes</b> that you can search, quote and share.</li>
+    <li><b>Lectures and podcasts</b> turned into readable text for studying or show notes.</li>
+    <li><b>Voice memos</b> written out, so you do not have to listen to them again.</li>
+  </ul>
+
+  <h2 class="section-title">Tips for the best transcript</h2>
+  <p>
+    Clear speech close to the microphone gives the best result. Under More options, <b>Enhance audio</b> and <b>Skip silence &amp; music</b> are on by
+    default: they filter rumble and hiss and stop the model from inventing text during music or long pauses, so keep them on for noisy recordings.
+    For subtitles, keep <b>Word-level timing</b> on too, so each line starts and ends exactly with the words.
+  </p>
+  <p class="home-more">
+    Still have a question? Read the <a routerLink="/faq">frequently asked questions</a>, see <a routerLink="/how-it-works">how it works</a>, or
+    <a routerLink="/contact">contact us</a>.
+  </p>
+
+  <app-related-tools />
+</section>

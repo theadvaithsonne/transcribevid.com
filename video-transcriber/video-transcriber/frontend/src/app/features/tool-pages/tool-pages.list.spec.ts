@@ -165,9 +165,9 @@ describe('TOOL_PAGES (the keyword landing pages)', () => {
 
     it('lists the home page and the other public pages, and nothing private', () => {
       const paths = sitemapPaths();
-      for (const p of ['/', '/how-it-works', '/faq', '/privacy', '/terms']) expect(paths).toContain(p);
+      for (const p of ['/', '/how-it-works', '/faq', '/about', '/contact', '/privacy', '/terms']) expect(paths).toContain(p);
       for (const p of paths) {
-        expect(p).not.toMatch(/^\/(jobs|logs|api|about)(\/|$)/);
+        expect(p).not.toMatch(/^\/(jobs|logs|api)(\/|$)/);
       }
       expect(new Set(paths).size).toBe(paths.length);
     });

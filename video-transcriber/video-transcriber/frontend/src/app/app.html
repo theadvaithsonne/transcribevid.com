@@ -156,6 +156,8 @@
   <footer class="foot">
     <span class="foot-meta">© {{ year }} <span class="foot-brand">{{ site.brand().name }}</span>@if (!site.isPublic() && site.version(); as v) { <span class="foot-ver"> · v{{ v }}</span> }</span>
     <nav class="foot-nav" aria-label="Footer">
+      <a routerLink="/about">About</a>
+      <a routerLink="/contact">Contact</a>
       <a routerLink="/privacy">Privacy</a>
       <a routerLink="/terms">Terms</a>
       @if (ads.privacySettingsShown()) {

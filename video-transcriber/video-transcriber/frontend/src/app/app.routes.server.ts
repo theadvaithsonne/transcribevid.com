@@ -18,6 +18,8 @@ export const serverRoutes: ServerRoute[] = [
   // prerendered
   { path: 'how-it-works', renderMode: RenderMode.Prerender },
   { path: 'faq', renderMode: RenderMode.Prerender },
+  { path: 'about', renderMode: RenderMode.Prerender },
+  { path: 'contact', renderMode: RenderMode.Prerender },
   { path: 'privacy', renderMode: RenderMode.Prerender },
   { path: 'terms', renderMode: RenderMode.Prerender },
   // keyword landing pages: /video-to-text, /audio-to-text, /mp4-to-text, ... (one list: tool-pages.list.ts)
@@ -26,6 +28,5 @@ export const serverRoutes: ServerRoute[] = [
   // private or dynamic: never prerendered
   { path: 'jobs/:id', renderMode: RenderMode.Client }, // a visitor's own transcript, noindex
   { path: 'logs', renderMode: RenderMode.Client }, // operator page, noindex
-  { path: 'about', renderMode: RenderMode.Client }, // redirects to /how-it-works in the app
   { path: '**', renderMode: RenderMode.Client }, // the "Page not found" page and anything unknown
 ];

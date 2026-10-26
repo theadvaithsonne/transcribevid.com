@@ -11,6 +11,7 @@ import { DEFAULT_OPTIONS, JobOptions } from '../../core/models';
 import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
+import { RelatedTools } from '../../shared/related-tools';
 import { ConverterConsent } from '../../core/transport/converter-consent';
 import { DeviceAdvice, EngineDevice } from '../../core/transport/engine-device';
 
@@ -41,7 +42,7 @@ const fileKey = (f: File) => `${f.name}|${f.size}|${f.lastModified}`;
 
 @Component({
   selector: 'app-upload',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, RelatedTools],
   templateUrl: './upload.html',
   styleUrl: './upload.scss',
 })

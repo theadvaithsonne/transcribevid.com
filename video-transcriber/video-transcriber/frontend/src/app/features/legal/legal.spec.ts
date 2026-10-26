@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { ADS_CONFIG, ADS_EDITION } from '../../core/ads.service';
 import { JobsStore } from '../../core/jobs.store';
 import { Health } from '../../core/models';
+import { OPERATOR } from '../../core/operator';
 import { FFMPEG_NOTICE, QWEN_NOTICE, THIRD_PARTY_NOTICES } from '../../engine/models/licences';
 import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
 import { LEGAL_UPDATED } from './legal-info';
@@ -95,18 +96,18 @@ describe('PrivacyPage', () => {
     expect(t).toContain('We do not sell your data and we do not share your files or transcripts with third parties.');
   });
 
-  it('leaves clearly marked placeholders for what the owner must fill in', () => {
+  it('names the operator, their address and contact e-mail (core/operator.ts), with no placeholder left', () => {
     const f = render(PrivacyPage, makePublicHealth());
-    expect(placeholders(f)).toContain('[Operator / company name and address]');
-    expect(placeholders(f)).toContain('[Contact e-mail address]');
+    expect(placeholders(f)).toEqual([]);
+    expect(textOf(f)).toContain(`is operated by ${OPERATOR.name}, ${OPERATOR.address}`);
+    expect((f.nativeElement as HTMLElement).querySelector(`a[href="mailto:${OPERATOR.email}"]`)).not.toBeNull();
   });
 
-  it('shows the contact e-mail from the server instead of the placeholder', () => {
+  it('shows the contact e-mail from the server when it announces one', () => {
     const f = render(PrivacyPage, makePublicHealth({ brand: { contact_email: 'privacy@transcribevid.com' } }));
-    expect(placeholders(f)).not.toContain('[Contact e-mail address]');
     const mail = (f.nativeElement as HTMLElement).querySelector('a[href^="mailto:"]')!;
     expect(mail.getAttribute('href')).toBe('mailto:privacy@transcribevid.com');
-    expect(placeholders(f)).toContain('[Operator / company name and address]'); // still the owner's job
+    expect(placeholders(f)).toEqual([]);
   });
 
   it('copes without an idle time from the server', () => {
@@ -192,14 +193,18 @@ describe('TermsPage', () => {
     expect(t).toContain('Delete my data now');
   });
 
-  it('leaves placeholders for the operator and the governing law', () => {
+  it('names the operator and the governing law (India, courts of Bengaluru), with no placeholder left', () => {
     const f = render(TermsPage, makePublicHealth());
-    expect(placeholders(f)).toEqual(['[Operator / company name and address]', '[Governing law and jurisdiction]', '[Contact e-mail address]']);
+    expect(placeholders(f)).toEqual([]);
+    expect(textOf(f)).toContain(`operated by ${OPERATOR.name}, ${OPERATOR.address}`);
+    expect(textOf(f)).toContain('governed by the laws of India. The courts of Bengaluru, Karnataka, India have exclusive jurisdiction');
+    expect(textOf(f)).toContain('mandatory consumer laws of the country where you live');
+    expect((f.nativeElement as HTMLElement).querySelector(`a[href="mailto:${OPERATOR.email}"]`)).not.toBeNull();
   });
 
   it('shows the contact e-mail when the server has one', () => {
     const f = render(TermsPage, makePublicHealth({ brand: { contact_email: 'legal@transcribevid.com' } }));
-    expect(placeholders(f)).not.toContain('[Contact e-mail address]');
+    expect(placeholders(f)).toEqual([]);
     expect((f.nativeElement as HTMLElement).querySelector('a[href="mailto:legal@transcribevid.com"]')).not.toBeNull();
   });
 
@@ -355,12 +360,13 @@ describe('PrivacyPage in the browser edition', () => {
     expect(t).toContain('use Privacy and cookie settings at the bottom of a page that shows ads,');
   });
 
-  it('keeps the placeholders, and shows the contact e-mail when there is one', () => {
+  it('names the operator and their address, and shows the contact e-mail, with no placeholder left', () => {
     const f = render(PrivacyPage, makeBrowserHealth());
-    expect(placeholders(f)).toEqual(['[Operator / company name and address]', '[Contact e-mail address]']);
+    expect(placeholders(f)).toEqual([]);
+    expect(textOf(f)).toContain(`is operated by ${OPERATOR.name}, ${OPERATOR.address}`);
+    expect((f.nativeElement as HTMLElement).querySelector(`a[href="mailto:${OPERATOR.email}"]`)).not.toBeNull();
     TestBed.resetTestingModule();
     const g = render(PrivacyPage, makeBrowserHealth({ brand: { contact_email: 'privacy@transcribevid.com' } }));
-    expect(placeholders(g)).toEqual(['[Operator / company name and address]']);
     expect((g.nativeElement as HTMLElement).querySelector('a[href="mailto:privacy@transcribevid.com"]')).not.toBeNull();
   });
 
@@ -430,13 +436,15 @@ describe('TermsPage in the browser edition', () => {
     expect((f.nativeElement as HTMLElement).querySelector('.callout')).toBeNull();
   });
 
-  it('keeps the warranty, liability and termination clauses and the placeholders', () => {
+  it('keeps the warranty, liability and termination clauses, and names the operator and the governing law', () => {
     const f = render(TermsPage, makeBrowserHealth());
     const t = textOf(f);
     expect(t).toContain('"as is" and "as available", without any warranty');
     expect(t).toContain('We do not promise that the service will always be available');
     expect(t).toContain('we are not liable for indirect or consequential loss');
     expect(t).toContain('We may suspend or end your access at any time');
-    expect(placeholders(f)).toEqual(['[Operator / company name and address]', '[Governing law and jurisdiction]', '[Contact e-mail address]']);
+    expect(placeholders(f)).toEqual([]);
+    expect(t).toContain(`operated by ${OPERATOR.name}, ${OPERATOR.address}`);
+    expect(t).toContain('governed by the laws of India');
   });
 });

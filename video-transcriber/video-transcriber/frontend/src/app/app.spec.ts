@@ -233,10 +233,12 @@ describe('App shell', () => {
       expect(q('.topbar .chip')).toBeNull();
     });
 
-    it('has a short footer: the year and brand, Privacy and Terms (the pages in the header are not repeated)', () => {
+    it('has a short footer: the year and brand, About, Contact, Privacy and Terms (the pages in the header are not repeated)', () => {
       show(makePublicHealth({ version: '3.1.4' }));
       const foot = q('footer')!;
       expect(links('footer nav[aria-label="Footer"] a')).toEqual([
+        ['About', '/about'],
+        ['Contact', '/contact'],
         ['Privacy', '/privacy'],
         ['Terms', '/terms'],
       ]);

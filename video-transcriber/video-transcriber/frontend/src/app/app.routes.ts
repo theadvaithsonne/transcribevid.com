@@ -55,8 +55,23 @@ export const routes: Routes = [
     },
     loadComponent: () => import('./features/faq/faq').then((m) => m.FaqPage),
   },
-  // the old address of the "How it works" page keeps working
-  { path: 'about', pathMatch: 'full', redirectTo: 'how-it-works' },
+  {
+    path: 'about',
+    title: 'About TranscribeVid',
+    data: {
+      description:
+        'Who builds TranscribeVid and why: a free video and audio to text tool with no sign-up, no sign-in and a clean interface, funded by ads.',
+    },
+    loadComponent: () => import('./features/about/about').then((m) => m.AboutPage),
+  },
+  {
+    path: 'contact',
+    title: 'Contact',
+    data: {
+      description: 'How to reach TranscribeVid: e-mail for questions, bug reports, feature ideas and privacy requests, and who runs the website.',
+    },
+    loadComponent: () => import('./features/contact/contact').then((m) => m.ContactPage),
+  },
   // keyword landing pages: /video-to-text, /audio-to-text, /mp4-to-text, /mp3-to-text, /srt-subtitle-generator, /voice-recording-to-text
   ...TOOL_PAGES.map(toolRoute),
   {

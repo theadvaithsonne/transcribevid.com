@@ -10,7 +10,7 @@
     <h2>1. Agreement</h2>
     <p>
       By using {{ site.brand().name }} ({{ site.brand().domain }}) you agree to these terms. If you do not agree, please do not use the service. The
-      service is operated by <mark class="placeholder">[Operator / company name and address]</mark>.
+      service is operated by <b>{{ op.name }}</b>, {{ op.address }}.
     </p>
 
     <h2>2. The service</h2>
@@ -90,7 +90,10 @@
     <p>We may update these terms. The new version appears on this page with a new "Last updated" date, and applies from then on.</p>
 
     <h2>13. Governing law</h2>
-    <p>These terms are governed by <mark class="placeholder">[Governing law and jurisdiction]</mark>.</p>
+    <p>
+      These terms are governed by {{ op.law }}. This does not take away any protection you have under the mandatory consumer laws of the country
+      where you live.
+    </p>
 
     <h2>14. Contact</h2>
     <p>
@@ -98,7 +101,7 @@
       @if (site.contactEmail(); as mail) {
         <a [href]="'mailto:' + mail">{{ mail }}</a>.
       } @else {
-        <mark class="placeholder">[Contact e-mail address]</mark>.
+        <a [href]="'mailto:' + op.email">{{ op.email }}</a>.
       }
     </p>
   } @else {
@@ -111,7 +114,7 @@
     <h2>1. Agreement</h2>
     <p>
       By using {{ site.brand().name }} ({{ site.brand().domain }}) you agree to these terms. If you do not agree, please do not use the service. The
-      service is operated by <mark class="placeholder">[Operator / company name and address]</mark>.
+      service is operated by <b>{{ op.name }}</b>, {{ op.address }}.
     </p>
 
     <h2>2. The service</h2>
@@ -179,7 +182,10 @@
     <p>We may update these terms. The new version appears on this page with a new "Last updated" date, and applies from then on.</p>
 
     <h2>11. Governing law</h2>
-    <p>These terms are governed by <mark class="placeholder">[Governing law and jurisdiction]</mark>.</p>
+    <p>
+      These terms are governed by {{ op.law }}. This does not take away any protection you have under the mandatory consumer laws of the country
+      where you live.
+    </p>
 
     <h2>12. Contact</h2>
     <p>
@@ -187,7 +193,7 @@
       @if (site.contactEmail(); as mail) {
         <a [href]="'mailto:' + mail">{{ mail }}</a>.
       } @else {
-        <mark class="placeholder">[Contact e-mail address]</mark>.
+        <a [href]="'mailto:' + op.email">{{ op.email }}</a>.
       }
     </p>
   }

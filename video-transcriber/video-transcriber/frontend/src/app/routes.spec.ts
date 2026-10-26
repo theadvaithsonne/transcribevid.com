@@ -5,6 +5,7 @@ import { Router, TitleStrategy, provideRouter, withComponentInputBinding } from 
 import { RouterTestingHarness } from '@angular/router/testing';
 import { routes } from './app.routes';
 import { adFreeDocument } from './core/ads.service';
+import { OPERATOR } from './core/operator';
 import { BrandTitleStrategy } from './core/title.service';
 import { TOOL_PAGES } from './features/tool-pages/tool-pages.list';
 import { silentLog } from './testing/fakes';
@@ -62,11 +63,16 @@ describe('routes', () => {
       expect(page().querySelector('h1')?.textContent).toContain(heading);
     });
 
-    it('the old /about address leads to How it works (and the address bar shows the new one)', async () => {
+    it('/about and /contact are pages of their own, naming who runs the site and how to reach them', async () => {
       await harness.navigateByUrl('/about');
-      expect(TestBed.inject(Router).url).toBe('/how-it-works');
-      expect(page().querySelector('h1')?.textContent).toBe('How TranscribeVid works');
-      expect(document.title).toBe('How it works - TranscribeVid');
+      expect(TestBed.inject(Router).url).toBe('/about');
+      expect(page().querySelector('h1')?.textContent).toBe('About TranscribeVid');
+      expect(page().textContent).toContain(OPERATOR.name);
+      expect(document.title).toBe('About TranscribeVid - TranscribeVid');
+      await harness.navigateByUrl('/contact');
+      expect(page().querySelector('h1')?.textContent).toBe('Contact');
+      expect(page().querySelector(`a[href="mailto:${OPERATOR.email}"]`)).not.toBeNull();
+      expect(document.title).toBe('Contact - TranscribeVid');
     });
 
     it.each(TOOL_PAGES.map((t) => [t.path, t.title] as const))('the keyword page %s shows its own h1 and is titled "%s"', async (path, title) => {
@@ -103,6 +109,7 @@ describe('routes', () => {
         'how-it-works',
         'faq',
         'about',
+        'contact',
         ...TOOL_PAGES.map((t) => t.path.slice(1)),
         'privacy',
         'terms',
@@ -115,16 +122,18 @@ describe('routes', () => {
       expect(paths().filter((p) => /folder/i.test(p ?? ''))).toEqual([]);
     });
 
-    it('the old /about is a redirect to how-it-works (not a page of its own)', () => {
-      const about = routes.find((r) => r.path === 'about')!;
-      expect(about.redirectTo).toBe('how-it-works');
-      expect(about.pathMatch).toBe('full');
-      expect(about.loadComponent).toBeUndefined();
+    it('/about and /contact are pages of their own (no longer a redirect), without ads', () => {
+      for (const path of ['about', 'contact']) {
+        const r = routes.find((x) => x.path === path)!;
+        expect(r.redirectTo, path).toBeUndefined();
+        expect(r.loadComponent, path).toBeDefined();
+        expect((r.data as { ads?: unknown }).ads, path).toBeUndefined();
+      }
     });
 
     it('every page that can be found by a search engine has a title and a description of its own', () => {
       const indexable = routes.filter((r) => !r.redirectTo && !(r.data as { noindex?: boolean } | undefined)?.noindex);
-      expect(indexable.length).toBe(3 + TOOL_PAGES.length + 2); // home, how it works, faq, the keyword pages, privacy, terms
+      expect(indexable.length).toBe(5 + TOOL_PAGES.length + 2); // home, how it works, faq, about, contact, the keyword pages, privacy, terms
       for (const r of indexable) {
         expect(typeof r.title, r.path).toBe('string');
         expect((r.data as { description?: string }).description!.length, r.path).toBeGreaterThan(40);

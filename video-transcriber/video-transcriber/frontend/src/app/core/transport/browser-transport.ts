@@ -9,6 +9,7 @@ import { qwenReason } from '../../engine/qwen/qwen-capability';
 import { exportFilename, render } from '../../engine/export/formats';
 import type { StoredJob } from '../../engine/session/session-store';
 import { LogRing, LogService } from '../log.service';
+import { SITE_BRAND } from '../operator';
 import {
   ExportFormat,
   Health,
@@ -119,7 +120,7 @@ export class BrowserTransport implements Transport {
         persistent: true,
         session_idle_minutes: 30,
         public: false,
-        brand: null, // SiteService fills in the default brand
+        brand: SITE_BRAND, // the public website, with the operator's contact address (there is no server to announce one)
         logs_enabled: true,
         logs_require_token: false,
         allowed_models: null,

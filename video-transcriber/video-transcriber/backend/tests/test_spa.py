@@ -21,7 +21,7 @@ PROJECT = config.PROJECT_DIR
 PUBLIC_FILES = PROJECT / "frontend" / "public"
 TOOL_PAGES_TS = PROJECT / "frontend" / "src" / "app" / "features" / "tool-pages" / "tool-pages.list.ts"
 TOOLS = ["video-to-text", "audio-to-text", "mp4-to-text", "mp3-to-text", "srt-subtitle-generator", "voice-recording-to-text"]
-INFO_PAGES = ["how-it-works", "faq", "privacy", "terms", "logs"]
+INFO_PAGES = ["how-it-works", "faq", "about", "contact", "privacy", "terms", "logs"]
 SHELL = '<!doctype html><html><body><app-root>CSR-SHELL</app-root></body></html>'
 SECRET = "TOP-SECRET-DO-NOT-SERVE"
 
@@ -222,14 +222,12 @@ def test_a_trailing_slash_redirects_permanently_to_the_slashless_url(dist, clien
     assert client.head(f"/{page}/").status_code == 301
 
 
-def test_a_moved_page_redirects_permanently_to_its_new_address(dist, client):
-    for path in ("/about", "/about/", "/about//"):
-        r = client.get(path)
-        assert r.status_code == 301 and r.headers["location"] == "/how-it-works", path
-        assert client.head(path).status_code == 301
-    assert client.get("/about?ref=x").headers["location"] == "/how-it-works?ref=x"
+def test_about_and_contact_are_pages_of_their_own(dist, client):
+    for page in ("about", "contact"):
+        assert is_app_page(page)
+        assert client.get(f"/{page}").status_code == 200
+        assert client.get(f"/{page}/").headers["location"] == f"/{page}"
     assert client.get("/About").status_code == 404 and client.get("/about/x").status_code == 404
-    assert not is_app_page("about")  # not a page of its own any more
 
 
 def test_the_redirect_keeps_the_query_string(dist, client):

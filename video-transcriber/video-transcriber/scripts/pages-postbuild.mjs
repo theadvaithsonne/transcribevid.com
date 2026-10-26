@@ -116,9 +116,6 @@ const REDIRECTS = `# TranscribeVid on Cloudflare Pages. Written by scripts/pages
 # a target ending in .html answers a 308 instead of rewriting, and /x/index.html targets are rejected by wrangler.
 /logs /index.csr 200
 
-# Old URLs
-/about /how-it-works 301
-
 # A visitor's own transcript page: exactly one segment, e.g. /jobs/abc123 (deeper paths and /jobs stay 404).
 /jobs/:id /index.csr 200
 `;
