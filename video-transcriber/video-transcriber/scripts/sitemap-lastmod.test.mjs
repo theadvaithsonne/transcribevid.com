@@ -6,7 +6,8 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { addLastmod, gitDate, guideUpdated, sourcesFor } from './sitemap-lastmod.mjs';
+import { readI18n } from './i18n-data.mjs';
+import { addLastmod, gitDate, guideUpdated, sourcesFor, translatedSourcesFor } from './sitemap-lastmod.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const frontendDir = path.resolve(here, '..', 'frontend');
@@ -17,9 +18,11 @@ test('every address of the real sitemap knows where its text lives (nothing fall
   const xml = fs.readFileSync(path.join(frontendDir, 'public', 'sitemap.xml'), 'utf8');
   const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
   assert.ok(locs.length >= 30);
+  const i18n = readI18n(frontendDir);
   for (const p of locs) {
-    if (p.startsWith('/guides/')) continue; // guides take their date from guides.list.ts
-    const sources = sourcesFor(p);
+    const translated = translatedSourcesFor(p, i18n); // a translated address maps to its language's content module or dictionary
+    if (!translated && p.startsWith('/guides/')) continue; // English guides take their date from guides.list.ts
+    const sources = translated ?? sourcesFor(p);
     assert.ok(sources && sources.length, `no sources for ${p}`);
     for (const s of sources) assert.ok(fs.existsSync(path.join(frontendDir, 'src', 'app', s)), `${p}: ${s} does not exist`);
   }

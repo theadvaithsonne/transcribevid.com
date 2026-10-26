@@ -7,7 +7,7 @@
   <p class="lede">{{ '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.' | t: { brand: site.brand().name } }}</p>
 
   <h2>{{ 'Who builds it' | t }}</h2>
-  <p><app-rich [text]="'{brand} is built and run by **{name}**, {role} based in {city}. I built it to give people the best possible transcription experience: seamless from the first click, with no account to create, and a clean interface that stays out of the way.' | t: { brand: site.brand().name, name: op.name, role: op.role, city: op.city }" /></p>
+  <p><app-rich [text]="'{brand} is built and run by **{name}**, {role} based in {city}. I built it to give people the best possible transcription experience: seamless from the first click, with no account to create, and a clean interface that stays out of the way.' | t: { brand: site.brand().name, name: op.name, role: tr(op.role), city: tr(op.city) }" /></p>
 
   <h2>{{ 'Why it exists' | t }}</h2>
   <p>{{ 'Most transcription websites ask you to create an account, limit the free minutes, add watermarks or push a subscription before you see a single line of text. {brand} does the opposite. Everything it offers is available to everyone, and the page asks for nothing but your file.' | t: { brand: site.brand().name } }}</p>

@@ -16,7 +16,7 @@ import { TOOL_PAGES, toolRoutePath } from './features/tool-pages/tool-pages.list
  * A new public page: add its route to app.routes.ts and a `Prerender` entry here (the keyword pages come from
  * TOOL_PAGES, so adding a tool page there is enough), then add it to backend APP_PAGES and public/sitemap.xml.
  */
-export const serverRoutes: ServerRoute[] = [
+export const makeServerRoutes = (languages: boolean): ServerRoute[] => [
   // Home: prerendered too, so crawlers and first-time visitors get the real heading, chips and quality choices as HTML
   // (the uploader itself starts after the app takes over). index.csr.html stays the client-only shell for /jobs/<id>.
   { path: '', renderMode: RenderMode.Prerender },
@@ -36,7 +36,7 @@ export const serverRoutes: ServerRoute[] = [
   ...GUIDES.map((g): ServerRoute => ({ path: guideRoutePath(g), renderMode: RenderMode.Prerender })),
 
   // the translated pages (/es, /es/video-a-texto, ...): prerendered like the English ones; their transcript pages and 404 are client-only
-  ...(environment.languages
+  ...(languages
     ? [
         ...localizedPaths(appPages, { available: AVAILABLE }).map((path): ServerRoute => ({ path, renderMode: RenderMode.Prerender })),
         ...OTHER_LOCALES.filter((l) => (AVAILABLE[l] ?? []).length).flatMap(
@@ -53,3 +53,6 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'logs', renderMode: RenderMode.Client }, // operator page, noindex
   { path: '**', renderMode: RenderMode.Client }, // the "Page not found" page and anything unknown
 ];
+
+/** What this build prerenders: the translated pages too, in the edition that has languages (the static website). */
+export const serverRoutes: ServerRoute[] = makeServerRoutes(environment.languages === true);

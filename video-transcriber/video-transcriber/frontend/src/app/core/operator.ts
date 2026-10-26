@@ -1,3 +1,4 @@
+import { _t } from '../i18n/mark';
 import { Brand } from './models';
 
 /**
@@ -6,9 +7,10 @@ import { Brand } from './models';
  */
 export const OPERATOR = {
   name: 'Advaith Bibhishan Sonne',
-  role: 'an independent software developer',
+  /** shown inside translated sentences: marked with _t so each language can say it in its own words */
+  role: _t('an independent software developer'),
   address: 'Chinnapanahalli Main Road, Bengaluru, Karnataka 560037, India',
-  city: 'Bengaluru, India',
+  city: _t('Bengaluru, India'),
   email: 'theadvaithsonne@gmail.com',
   /** completes "These terms are governed by …" */
   law: 'the laws of India. The courts of Bengaluru, Karnataka, India have exclusive jurisdiction over any dispute arising from them',
