@@ -163,8 +163,10 @@ def sitemap_locs():
 
 @pytest.mark.skipif(not (PUBLIC_FILES / "sitemap.xml").is_file(), reason="frontend/public/sitemap.xml is missing")
 def test_every_sitemap_url_is_a_known_app_page_that_answers_200(dist, client):
-    locs = sitemap_locs()
-    assert locs and len(locs) == len(set(locs))
+    all_locs = sitemap_locs()
+    assert all_locs and len(all_locs) == len(set(all_locs))
+    # translated pages (/es/..., /de/...) belong to the static website; the self-hosted edition is English only
+    locs = [loc for loc in all_locs if not re.match(r"^/(es|pt|fr|de|it|id|ja|ko|th|vi|tr|hi|bn|ar|ur)(/|$)", urlsplit(loc).path)]
     for loc in locs:
         u = urlsplit(loc)
         assert u.scheme == "https" and u.hostname == config.BRAND_DOMAIN and not u.query and not u.fragment, loc

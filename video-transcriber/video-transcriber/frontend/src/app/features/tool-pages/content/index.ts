@@ -1,3 +1,5 @@
+import { TOOL_LOADERS } from '../../../i18n/generated';
+import { DEFAULT_LOCALE, Locale } from '../../../i18n/locales';
 import { ToolPageContent } from '../tool-page.model';
 
 type Loader = () => Promise<{ CONTENT: ToolPageContent }>;
@@ -34,8 +36,14 @@ export const TOOL_CONTENT_LOADERS: Readonly<Record<string, Loader>> = {
   'german-audio-to-text': () => import('./german-audio-to-text'),
 };
 
-/** The text of one page; an unknown address gets the video page's text (the route table only names listed pages). */
-export async function loadToolContent(slug: string): Promise<ToolPageContent> {
+/**
+ * The text of one page in a language (English by default). A language that has no text for the page gets the English text:
+ * the router never offers such a page under a translated address (i18n/availability), this is only a safety net. An unknown
+ * address gets the video page's text (the route table only names listed pages).
+ */
+export async function loadToolContent(slug: string, locale: Locale = DEFAULT_LOCALE): Promise<ToolPageContent> {
+  const translated = locale === DEFAULT_LOCALE ? undefined : TOOL_LOADERS[locale]?.[slug];
+  if (translated) return (await translated()).CONTENT;
   const load = TOOL_CONTENT_LOADERS[slug] ?? TOOL_CONTENT_LOADERS['video-to-text'];
   return (await load()).CONTENT;
 }

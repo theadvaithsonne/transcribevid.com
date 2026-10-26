@@ -2,6 +2,8 @@ import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
+import { I18nService, pageKeyOf } from '../i18n/i18n.service';
+import { LOCALES } from '../i18n/locales';
 import { SiteService } from './site.service';
 import { StructuredDataService } from './structured-data.service';
 
@@ -27,6 +29,8 @@ export interface PageMeta {
   imageAlt?: string;
   /** Open Graph type; "website" unless a page is an article */
   type?: string;
+  /** the English path of the page ("/video-to-text"): which translations it has (hreflang); defaults to the language service's page */
+  pageKey?: string;
 }
 
 /** Sets the document title and the description / Open Graph / Twitter / canonical / robots tags. */
@@ -36,6 +40,7 @@ export class TitleService {
   private meta = inject(Meta);
   private doc = inject(DOCUMENT);
   private site = inject(SiteService);
+  private i18n = inject(I18nService);
 
   /** The full title for a page name: "How it works - TranscribeVid" (just the brand for the home page without a name). */
   full(title: string): string {
@@ -53,6 +58,7 @@ export class TitleService {
     this.tag('property', 'og:description', description);
     this.tag('property', 'og:site_name', brand.name);
     this.tag('property', 'og:type', page.type || 'website');
+    this.tag('property', 'og:locale', LOCALES[this.i18n.locale()].og);
     this.tag('name', 'twitter:card', 'summary_large_image');
     this.tag('name', 'twitter:title', full);
     this.tag('name', 'twitter:description', description);
@@ -74,6 +80,19 @@ export class TitleService {
 
     // a page that must not be indexed has no canonical address
     this.canonical(page.noindex ? null : url);
+    // the same page in the other languages (and x-default = English): only for pages that may be found
+    this.alternates(page.noindex ? [] : this.i18n.alternates(page.pageKey ?? this.i18n.page(), brand.url));
+  }
+
+  private alternates(list: { hreflang: string; href: string }[]) {
+    for (const old of Array.from(this.doc.head.querySelectorAll('link[rel="alternate"][hreflang]'))) old.remove();
+    for (const a of list) {
+      const link = this.doc.createElement('link');
+      link.rel = 'alternate';
+      link.hreflang = a.hreflang;
+      link.href = a.href;
+      this.doc.head.appendChild(link);
+    }
   }
 
   private absolute(base: string, src: string): string {
@@ -119,6 +138,7 @@ interface RouteData {
 export class BrandTitleStrategy extends TitleStrategy {
   private pages = inject(TitleService);
   private schema = inject(StructuredDataService);
+  private i18n = inject(I18nService);
 
   override updateTitle(snapshot: RouterStateSnapshot) {
     let leaf = snapshot.root;
@@ -127,7 +147,8 @@ export class BrandTitleStrategy extends TitleStrategy {
     const path = snapshot.url.split(/[?#]/)[0] || '/';
     const title = this.buildTitle(snapshot) ?? '';
     const noindex = data.noindex === true;
-    this.pages.set({ title, description: data.description, noindex, path });
+    const pageKey = pageKeyOf(leaf);
+    this.pages.set({ title, description: data.description, noindex, path, pageKey });
     this.schema.forRoute({
       path: path.replace(/(.)\/+$/, '$1'),
       name: title,
@@ -135,7 +156,8 @@ export class BrandTitleStrategy extends TitleStrategy {
       description: data.description || DEFAULT_DESCRIPTION,
       indexable: !noindex,
       app: data.app === true,
-      parents: data.parent ? [{ name: data.parent.label, path: data.parent.path }] : undefined,
+      home: pageKey === '/',
+      parents: data.parent ? [{ name: this.i18n.t(data.parent.label), path: this.i18n.path(data.parent.path) }] : undefined,
     });
   }
 }

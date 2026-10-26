@@ -1,3 +1,5 @@
+import { GUIDE_LOADERS } from '../../../i18n/generated';
+import { DEFAULT_LOCALE, Locale } from '../../../i18n/locales';
 import { GuideContent } from '../guide.model';
 
 type Loader = () => Promise<{ CONTENT: GuideContent }>;
@@ -15,7 +17,10 @@ export const GUIDE_CONTENT_LOADERS: Readonly<Record<string, Loader>> = {
   'what-is-whisper': () => import('./what-is-whisper'),
 };
 
-export async function loadGuideContent(slug: string): Promise<GuideContent> {
+/** The text of one guide in a language (English by default; English text is the safety net for a missing translation). */
+export async function loadGuideContent(slug: string, locale: Locale = DEFAULT_LOCALE): Promise<GuideContent> {
+  const translated = locale === DEFAULT_LOCALE ? undefined : GUIDE_LOADERS[locale]?.[slug];
+  if (translated) return (await translated()).CONTENT;
   const load = GUIDE_CONTENT_LOADERS[slug] ?? GUIDE_CONTENT_LOADERS['srt-vs-vtt'];
   return (await load()).CONTENT;
 }

@@ -11,6 +11,26 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { LOCALES, readI18n } from './i18n-data.mjs';
+
+/**
+ * The files that hold the text of a translated page (/es/video-a-texto): its content module, or for the home page and the
+ * information pages the language's dictionary. `i18n` is readI18n(); null when the address is not a page of that language.
+ */
+export function translatedSourcesFor(pathname, i18n) {
+  const m = pathname.match(/^\/([a-z]{2})(\/.*)?$/);
+  if (!m || !LOCALES.includes(m[1]) || !i18n.available[m[1]]) return null;
+  const [, locale, rest = ''] = m;
+  const enPath = i18n.available[locale].find((p) => i18n.path(locale, p) === (rest ? `/${locale}${rest}` : `/${locale}`));
+  if (!enPath) return null;
+  const dict = path.join('i18n', 'dict', `${locale}.ts`);
+  const guide = enPath.match(/^\/guides\/([a-z0-9-]+)$/);
+  if (guide) return [path.join('features', 'guides', 'content', 'i18n', locale, `${guide[1]}.ts`)];
+  const tool = enPath.match(/^\/([a-z0-9]+(?:-[a-z0-9]+)*)$/);
+  const info = ['/tools', '/guides', '/how-it-works', '/faq', '/about', '/contact', '/privacy', '/terms'];
+  if (tool && !info.includes(enPath)) return [path.join('features', 'tool-pages', 'content', 'i18n', locale, `${tool[1]}.ts`)];
+  return [dict];
+}
 
 /** The files (relative to frontend/src/app) that hold the text of a public page, or null when the address is unknown. */
 export function sourcesFor(pathname) {
@@ -60,11 +80,15 @@ export function gitDate(files, cwd, today = new Date().toLocaleDateString('en-CA
 export function addLastmod(xml, { frontendDir, dateOf = (files) => gitDate(files, frontendDir) }) {
   const app = path.join(frontendDir, 'src', 'app');
   const guidesList = fs.readFileSync(path.join(app, 'features', 'guides', 'guides.list.ts'), 'utf8');
-  return xml.replace(/<url>\s*<loc>\s*([^<\s]+)\s*<\/loc>\s*<\/url>/g, (whole, loc) => {
+  const i18n = readI18n(frontendDir);
+  // an entry may carry <xhtml:link> alternates after <loc>: keep them, and put <lastmod> right after <loc>
+  return xml.replace(/<url>\s*<loc>\s*([^<\s]+)\s*<\/loc>([\s\S]*?)<\/url>/g, (whole, loc, rest) => {
+    if (/<lastmod>/.test(rest)) return whole;
     const pathname = new URL(loc).pathname.replace(/\/+$/, '') || '/';
-    const guide = pathname.match(/^\/guides\/([a-z0-9-]+)$/);
-    const sources = guide ? null : sourcesFor(pathname);
+    const translated = translatedSourcesFor(pathname, i18n);
+    const guide = translated ? null : pathname.match(/^\/guides\/([a-z0-9-]+)$/);
+    const sources = translated ?? (guide ? null : sourcesFor(pathname));
     const date = guide ? guideUpdated(guidesList, guide[1]) : sources ? dateOf(sources.map((s) => path.join(app, s))) : null;
-    return date ? `<url>\n    <loc>${loc}</loc>\n    <lastmod>${date}</lastmod>\n  </url>` : whole;
+    return date ? `<url>\n    <loc>${loc}</loc>\n    <lastmod>${date}</lastmod>${rest.replace(/^\s*\n/, '\n')}</url>` : whole;
   });
 }

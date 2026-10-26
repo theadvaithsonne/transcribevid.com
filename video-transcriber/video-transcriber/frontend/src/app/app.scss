@@ -554,8 +554,19 @@ summary:focus-visible {
   font-weight: 500;
   text-decoration-thickness: 1px;
 }
+/* third footer row: the languages (the header menu is the way to switch on short and narrow windows) */
+.foot-lang {
+  order: 4;
+  flex: 0 0 100%;
+  padding-bottom: 6px;
+  border-top: 1px solid var(--line);
+}
+.sheet-lang {
+  padding: 8px 0 0;
+}
 @media (max-height: 879px), (max-width: 760px) {
-  .foot-tools {
+  .foot-tools,
+  .foot-lang {
     display: none;
   }
 }

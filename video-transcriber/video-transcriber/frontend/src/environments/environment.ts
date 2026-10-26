@@ -16,4 +16,6 @@ export const environment = {
    * '' = this edition asks its own server (/api/stats) instead.
    */
   counterUrl: '',
+  /** Translated pages (/es, /pt, ...). Only the static website has them; a self-hosted install is English only. */
+  languages: false,
 };

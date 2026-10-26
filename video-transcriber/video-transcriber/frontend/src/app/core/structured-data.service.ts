@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { DestroyRef, Injectable, RendererFactory2, Signal, effect, inject, isSignal, untracked } from '@angular/core';
+import { I18nService } from '../i18n/i18n.service';
 import { SiteService } from './site.service';
 
 /** One question and its answer, exactly as the visitor reads them (plain text, no HTML). */
@@ -41,6 +42,8 @@ export interface RouteSchemaInput {
   name: string;
   /** the name to show in the breadcrumb (defaults to `name`) */
   crumb?: string;
+  /** this is the home page (of its language: the path is then "/" or "/es") */
+  home?: boolean;
   /** pages between Home and this one in the breadcrumb (a guide: "Guides") */
   parents?: { name: string; path: string }[];
   description: string;
@@ -83,6 +86,7 @@ export class StructuredDataService {
   private doc = inject(DOCUMENT);
   private renderer = inject(RendererFactory2).createRenderer(null, null);
   private site = inject(SiteService);
+  private i18n = inject(I18nService);
   /** who wrote each "page:" block last, so a page that is being replaced cannot remove its successor's data */
   private owners = new Map<string, symbol>();
 
@@ -152,7 +156,7 @@ export class StructuredDataService {
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
         datePublished: a.published,
         dateModified: a.updated,
-        inLanguage: 'en',
+        inLanguage: this.i18n.locale(),
         image: `${base}/og-image.png`,
         ...(a.wordCount ? { wordCount: a.wordCount } : {}),
         author: this.publisher(base),
@@ -168,14 +172,14 @@ export class StructuredDataService {
     const blocks: Record<string, Json> = {};
     if (page.indexable) {
       const base = this.site.brand().url;
-      if (page.path === '/' || page.path === '') {
+      if (page.home ?? (page.path === '/' || page.path === '')) {
         blocks['organization'] = this.organization(base);
         blocks['website'] = this.website(base);
-        blocks['app'] = this.webApplication(base, '/', page.description);
+        blocks['app'] = this.webApplication(base, page.path || '/', page.description);
       } else {
         const crumb = clean(page.crumb || page.name);
         blocks['breadcrumb'] = this.breadcrumbs(base, [
-          { name: 'Home', path: '/' },
+          { name: this.i18n.t('Home'), path: this.i18n.path('/') },
           ...(page.parents ?? []),
           { name: crumb, path: page.path },
         ]);
@@ -216,7 +220,7 @@ export class StructuredDataService {
       name: brand.name,
       ...(brand.domain && brand.domain !== brand.name ? { alternateName: brand.domain } : {}),
       url: `${base}/`,
-      inLanguage: 'en',
+      inLanguage: this.i18n.locale(),
       publisher: this.publisher(base),
     };
   }
@@ -241,11 +245,11 @@ export class StructuredDataService {
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript and a modern web browser',
-      inLanguage: 'en',
+      inLanguage: this.i18n.locale(),
       isAccessibleForFree: true,
       image: `${base}/og-image.png`,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      featureList: FEATURES,
+      featureList: FEATURES.map((f) => this.i18n.t(f)),
       publisher: this.publisher(base),
     };
   }

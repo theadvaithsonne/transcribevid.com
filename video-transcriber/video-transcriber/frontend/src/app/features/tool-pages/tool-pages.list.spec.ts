@@ -1,7 +1,9 @@
 import { Route } from '@angular/router';
 import robotsTxt from '../../../../public/robots.txt' with { loader: 'text' };
 import sitemapXml from '../../../../public/sitemap.xml' with { loader: 'text' };
-import { routes } from '../../app.routes';
+import { appPages, routes } from '../../app.routes';
+import { AVAILABLE } from '../../i18n/generated';
+import { localizedPaths } from '../../i18n/routes';
 import { DEFAULT_DESCRIPTION } from '../../core/title.service';
 import { serverRoutes } from '../../app.routes.server';
 import { TOOL_CONTENT_LOADERS, loadAllToolContent } from './content';
@@ -242,10 +244,33 @@ describe('TOOL_PAGES (the keyword landing pages)', () => {
       expect(new Set(paths).size).toBe(paths.length);
     });
 
-    it('every address in the sitemap is a real page of the app (it has a route, or is the home page)', () => {
+    it('every address in the sitemap is a real page of the app (it has a route, or is the home page, or is a translated page)', () => {
+      const translated = new Set(localizedPaths(appPages, { available: AVAILABLE }));
       for (const p of sitemapPaths()) {
-        const known = p === '/' || routes.some((r) => r.path === p.slice(1) && !r.redirectTo);
+        const known = p === '/' || routes.some((r) => r.path === p.slice(1) && !r.redirectTo) || translated.has(p.slice(1));
         expect(known, p).toBe(true);
+      }
+      // and every translated page the app has is in the sitemap
+      for (const t of translated) expect(sitemapPaths(), t).toContain('/' + t);
+    });
+
+    it('every page that exists in several languages lists all its versions as hreflang alternates (itself included, x-default = English), and every alternate is a page of the sitemap', () => {
+      const urls = Array.from(sitemapXml.matchAll(/<url>([\s\S]*?)<\/url>/g)).map((m) => m[1]);
+      const locs = urls.map((u) => u.match(/<loc>\s*([^<]+?)\s*<\/loc>/)![1]);
+      for (const [i, u] of urls.entries()) {
+        const alternates = Array.from(u.matchAll(/hreflang="([^"]+)" href="([^"]+)"/g)).map((m) => [m[1], m[2]] as const);
+        if (!alternates.length) continue;
+        expect(alternates.map((a) => a[1]), locs[i]).toContain(locs[i]); // itself
+        const xDefault = alternates.find((a) => a[0] === 'x-default');
+        expect(xDefault, locs[i]).toBeDefined();
+        expect(xDefault![1]).toBe(alternates.find((a) => a[0] === 'en')![1]);
+        for (const [, href] of alternates) expect(locs, `${locs[i]} -> ${href}`).toContain(href);
+        // reciprocal: each alternate lists this page back
+        for (const [, href] of alternates) {
+          const other = urls[locs.indexOf(href)];
+          expect(other, `${href} must list ${locs[i]}`).toContain(`href="${locs[i]}"`);
+        }
+        expect(new Set(alternates.map((a) => a[0])).size).toBe(alternates.length);
       }
     });
 

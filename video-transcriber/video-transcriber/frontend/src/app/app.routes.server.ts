@@ -1,4 +1,9 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
+import { environment } from '../environments/environment';
+import { appPages } from './app.routes';
+import { AVAILABLE } from './i18n/generated';
+import { OTHER_LOCALES } from './i18n/locales';
+import { localizedPaths } from './i18n/routes';
 import { GUIDES, guideRoutePath } from './features/guides/guides.list';
 import { TOOL_PAGES, toolRoutePath } from './features/tool-pages/tool-pages.list';
 
@@ -29,6 +34,19 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'tools', renderMode: RenderMode.Prerender },
   { path: 'guides', renderMode: RenderMode.Prerender },
   ...GUIDES.map((g): ServerRoute => ({ path: guideRoutePath(g), renderMode: RenderMode.Prerender })),
+
+  // the translated pages (/es, /es/video-a-texto, ...): prerendered like the English ones; their transcript pages and 404 are client-only
+  ...(environment.languages
+    ? [
+        ...localizedPaths(appPages, { available: AVAILABLE }).map((path): ServerRoute => ({ path, renderMode: RenderMode.Prerender })),
+        ...OTHER_LOCALES.filter((l) => (AVAILABLE[l] ?? []).length).flatMap(
+          (l): ServerRoute[] => [
+            { path: `${l}/jobs/:id`, renderMode: RenderMode.Client },
+            { path: `${l}/**`, renderMode: RenderMode.Client },
+          ],
+        ),
+      ]
+    : []),
 
   // private or dynamic: never prerendered
   { path: 'jobs/:id', renderMode: RenderMode.Client }, // a visitor's own transcript, noindex

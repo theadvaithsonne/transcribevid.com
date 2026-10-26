@@ -25,7 +25,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readI18n } from './i18n-data.mjs';
 import { addLastmod } from './sitemap-lastmod.mjs';
+
+/** The languages that have translated pages: their transcript pages (/es/jobs/<id>) are client-only too. */
+const I18N = readI18n(path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'frontend'));
 
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
 const MAX_FILES = 20_000;
@@ -33,9 +37,9 @@ const MAX_HEADER_RULES = 100;
 const MAX_LINE = 2_000;
 
 /** Client-only routes (RenderMode.Client in app.routes.server.ts) that must answer 200 with the client shell. */
-const CLIENT_ROUTES = ['/logs', '/jobs/:id'];
+const CLIENT_ROUTES = ['/logs', '/jobs/:id', ...I18N.languages.map((l) => `/${l}/jobs/:id`)];
 
-const HEADERS = `# TranscribeVid on Cloudflare Pages: security, caching and indexing headers. Written by scripts/pages-postbuild.mjs.
+const HEADERS_BASE = `# TranscribeVid on Cloudflare Pages: security, caching and indexing headers. Written by scripts/pages-postbuild.mjs.
 # Rules of this file (verified, docs/in-browser/spike/hosting.md section 2.1):
 #  * ONE block per URL pattern: a repeated pattern silently replaces the earlier block.
 #  * Different patterns matching one URL are merged; a header set by two of them is joined with ", ". So never set the
@@ -112,7 +116,7 @@ https://:project.pages.dev/*
   X-Robots-Tag: noindex
 `;
 
-const REDIRECTS = `# TranscribeVid on Cloudflare Pages. Written by scripts/pages-postbuild.mjs.
+const REDIRECTS_BASE = `# TranscribeVid on Cloudflare Pages. Written by scripts/pages-postbuild.mjs.
 # Order: static rules first, then rules with placeholders. Pages itself redirects /faq/ -> /faq, /faq.html -> /faq and
 # /index.html -> / (308) because the pages are flat files. www -> apex is a dashboard Bulk Redirect (no host rules here).
 
@@ -123,6 +127,13 @@ const REDIRECTS = `# TranscribeVid on Cloudflare Pages. Written by scripts/pages
 # A visitor's own transcript page: exactly one segment, e.g. /jobs/abc123 (deeper paths and /jobs stay 404).
 /jobs/:id /index.csr 200
 `;
+
+// the same rules for the transcript pages of each translated language (/es/jobs/<id> ...)
+const HEADERS =
+  HEADERS_BASE +
+  I18N.languages.map((l) => `\n# A visitor's own transcript page in ${l}: never indexed, always revalidated.\n/${l}/jobs/*\n  X-Robots-Tag: noindex, nofollow\n  Cache-Control: no-cache\n`).join('');
+const REDIRECTS =
+  REDIRECTS_BASE + I18N.languages.map((l) => `\n# A visitor's own transcript page in ${l}.\n/${l}/jobs/:id /index.csr 200\n`).join('');
 
 const root = path.resolve(process.argv[2] ?? 'frontend/dist/frontend/browser');
 const problems = [];

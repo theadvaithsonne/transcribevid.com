@@ -1,9 +1,12 @@
 import { Route, Routes } from '@angular/router';
+import { environment } from '../environments/environment';
 import { adFreeDocument } from './core/ads.service';
 import { DEFAULT_DESCRIPTION } from './core/title.service';
 import { GUIDES, GUIDES_PATH, GuideLink, guideRoutePath } from './features/guides/guides.list';
 import { guideContentResolver } from './features/guides/guide-content.resolver';
 import { toolContentResolver } from './features/tool-pages/tool-content.resolver';
+import { AVAILABLE } from './i18n/generated';
+import { localizedRoutes } from './i18n/routes';
 import { TOOL_PAGES, ToolPageLink, toolRoutePath } from './features/tool-pages/tool-pages.list';
 
 /** A keyword landing page: its title, description and label come from TOOL_PAGES, its text from features/tool-pages/content. */
@@ -34,7 +37,7 @@ const guideRoute = (g: GuideLink): Route => ({
  * shell draws that page's in-flow unit (tablet / phone) after the page instead of the page's own template. `adFreeDocument` opens privacy,
  * terms and logs with a full page load once Google's script is in the tab, so those documents never carry it.
  */
-export const routes: Routes = [
+export const appPages: Routes = [
   {
     path: '',
     pathMatch: 'full',
@@ -134,10 +137,22 @@ export const routes: Routes = [
     canActivate: [adFreeDocument],
     loadComponent: () => import('./features/logs/logs').then((m) => m.LogsPage),
   },
-  {
-    path: '**',
-    title: 'Page not found',
-    data: { noindex: true },
-    loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFoundPage),
-  },
+];
+
+/** The "Page not found" page: the last route, and the catch-all inside every language group. */
+export const notFoundRoute: Route = {
+  path: '**',
+  title: 'Page not found',
+  data: { noindex: true },
+  loadComponent: () => import('./features/not-found/not-found').then((m) => m.NotFoundPage),
+};
+
+/**
+ * Every route: the English pages (no prefix), then one group per language that has translated pages (/es/..., built by
+ * i18n/routes.ts, only in the edition that has languages), then the catch-all.
+ */
+export const routes: Routes = [
+  ...appPages,
+  ...(environment.languages ? localizedRoutes(appPages, { available: AVAILABLE, notFound: notFoundRoute }) : []),
+  notFoundRoute,
 ];

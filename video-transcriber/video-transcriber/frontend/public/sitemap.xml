@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Every public page, at its one canonical address (no trailing slash). The backend's APP_PAGES must know each of them
-     (backend/tests/test_spa.py checks it). No <lastmod> in this source file on purpose: a date is only useful to Google when
-     it is always accurate, so scripts/pages-postbuild.mjs adds one to the built copy, taken from the last real change of each
-     page's own text (git for the tool pages and information pages, the "updated" date printed on a guide) and left out where
-     it cannot know. To ask Google to recrawl a changed page, use Search Console (deploy/SEO.md). Written by
-     scripts/gen-sitemap.mjs from the page lists: edit the lists, then run it, not this file. -->
+<!-- Every public page, at its one canonical address (no trailing slash). The backend's APP_PAGES must know each English one
+     (backend/tests/test_spa.py checks it). A page that exists in several languages is listed once per language with its
+     <xhtml:link rel="alternate" hreflang> set, itself included, and x-default = English. No <lastmod> in this source file on
+     purpose: a date is only useful to Google when it is always accurate, so scripts/pages-postbuild.mjs adds one to the built
+     copy, taken from the last real change of each page's own text (git for the tool pages and information pages, the "updated"
+     date printed on a guide) and left out where it cannot know. To ask Google to recrawl a changed page, use Search Console
+     (deploy/SEO.md). Written by scripts/gen-sitemap.mjs from the page lists and the translations: edit those, then run it, not
+     this file. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://transcribevid.com/</loc>

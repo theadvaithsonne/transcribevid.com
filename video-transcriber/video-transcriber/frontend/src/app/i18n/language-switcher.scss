@@ -1,0 +1,109 @@
+:host {
+  display: contents;
+}
+
+/* header / sheet: a button that opens a short list */
+.lang {
+  position: relative;
+  > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 14px;
+    list-style: none;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    color: var(--text-strong);
+    font-weight: 650;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &:hover {
+      background: var(--surface-2);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+  }
+  &[open] > summary {
+    border-color: var(--line-strong);
+  }
+}
+.lang-pop {
+  position: absolute;
+  inset-inline-end: 0;
+  z-index: 40;
+  min-width: 220px;
+  max-height: min(70vh, 480px);
+  overflow-y: auto;
+  margin: 6px 0 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+  a {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    padding: 0 14px;
+    border-radius: 8px;
+    color: var(--text-strong);
+    text-decoration: none;
+    font-weight: 600;
+    &:hover {
+      background: var(--surface-2);
+    }
+    &[aria-current='true'] {
+      color: var(--accent);
+    }
+    &:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: -2px;
+    }
+  }
+}
+
+/* footer: the same links in a row */
+.lang-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 22px;
+  .lang-label {
+    font-weight: 700;
+    color: var(--muted);
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--muted);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    &[aria-current='true'] {
+      color: var(--text-strong);
+      font-weight: 700;
+    }
+    &:hover {
+      text-decoration-thickness: 3px;
+    }
+    &:focus-visible {
+      outline: 2px solid var(--focus-ring);
+      outline-offset: 3px;
+    }
+  }
+}
+
+@media (max-width: 1100px) {
+  .lang > summary .cur {
+    display: none;
+  }
+}

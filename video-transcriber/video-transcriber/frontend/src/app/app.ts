@@ -15,13 +15,15 @@ import { StatsService } from './core/stats.service';
 import { ThemeService } from './core/theme.service';
 import { CORE_TOOLS } from './features/tool-pages/tool-pages.list';
 import { AdRail } from './shared/ad-rail';
+import { LanguageSwitcher } from './i18n/language-switcher';
+import { LocaleHintBar } from './i18n/locale-hint-bar';
 import { AdSlot } from './shared/ad-slot';
 import { Logo } from './shared/logo';
 import { Toasts } from './shared/toasts';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts, AdRail, AdSlot],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts, AdRail, AdSlot, LanguageSwitcher, LocaleHintBar],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

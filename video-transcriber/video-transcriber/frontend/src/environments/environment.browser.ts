@@ -12,4 +12,6 @@ export const environment = {
    * If the Worker runs on its workers.dev address instead, put that URL here (CORS allows https://transcribevid.com).
    */
   counterUrl: 'https://transcribevid.com/api',
+  /** Translated pages (/es, /pt, ...): the website is available in every language that has pages (src/app/i18n). */
+  languages: true,
 };
