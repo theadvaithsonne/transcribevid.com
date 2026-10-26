@@ -53,7 +53,7 @@
                 <div class="menu" role="menu" aria-label="Choose a format">
                   <!-- on a phone this is a bottom sheet: it gets a title and a Close button (both hidden on a desktop) -->
                   <p class="sheet-title" aria-hidden="true">Choose a format</p>
-                  @for (e of exports; track e.fmt) {
+                  @for (e of exports(); track e.fmt) {
                     <button type="button" role="menuitem" (click)="download(e.fmt)"><b>{{ e.label }}</b><span>{{ e.hint }}</span></button>
                   }
                   <label class="menu-opt">Subtitle line length
@@ -107,8 +107,8 @@
                   </select></div>
                 <div class="field"><label for="rs">Transcript style</label>
                   <select id="rs" [(ngModel)]="rerunOutputScript" [disabled]="j.options.task === 'translate'">
-                    <option value="hinglish">Hinglish (Roman Hindi)</option>
                     <option value="original">Original script</option>
+                    <option value="hinglish">Hinglish (Roman Hindi)</option>
                   </select></div>
                 <div class="rerun-actions">
                   <button type="button" class="btn primary" (click)="rerun()" [disabled]="rerunning()">{{ rerunning() ? 'Starting…' : 'Start' }}</button>
@@ -152,7 +152,13 @@
       <section class="card progress" aria-label="Progress">
         <p class="status" role="status"><b>{{ statusText() }}</b> @if (statusDetail()) { <span>{{ statusDetail() }}</span> }</p>
         <button type="button" class="btn small" (click)="cancel()" [disabled]="cancelling()">{{ cancelling() ? 'Cancelling…' : 'Cancel' }}</button>
-        <div class="bar" [class.indeterminate]="j.status === 'queued' || j.phase !== 'transcribing'"><i [style.transform]="'scaleX(' + j.progress + ')'"></i></div>
+        <div class="bar" [class.indeterminate]="barValue() === null"><i [style.transform]="'scaleX(' + (barValue() ?? 0) + ')'"></i></div>
+        @if (site.inBrowser()) {
+          <p class="keep-open">
+            @if (j.resume_count) { <b>Continued after the page reloaded.</b> }
+            Keep this page open until it is finished. If it reloads or closes, it continues where it stopped when you open the site again.
+          </p>
+        }
       </section>
     }
 

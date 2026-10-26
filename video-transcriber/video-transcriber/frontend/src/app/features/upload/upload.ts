@@ -14,6 +14,7 @@ import { ToastService } from '../../core/toast.service';
 import { RelatedTools } from '../../shared/related-tools';
 import { ConverterConsent } from '../../core/transport/converter-consent';
 import { DeviceAdvice, EngineDevice } from '../../core/transport/engine-device';
+import { ModelPrefetch } from '../../core/transport/model-prefetch';
 
 const KEY = 'vt-options';
 const MEDIA_EXT = /\.(mp4|mkv|mov|avi|webm|mp3|wav|m4a|aac|flac|ogg|opus|wmv|flv|m4v|3gp|ts|mts)$/i;
@@ -54,6 +55,7 @@ export class UploadPage {
   private pendingFile = inject(PendingFileService);
   private toast = inject(ToastService);
   private device = inject(EngineDevice);
+  private prefetch = inject(ModelPrefetch);
   private converter = inject(ConverterConsent);
   /** the converter question is being prepared (the files are probed): a second click must not start twice */
   private converterCheck = false;
@@ -95,15 +97,40 @@ export class UploadPage {
 
   presets: Preset[] = [
     { model: 'base', title: 'Fastest', blurb: 'Quick results. Good for clear speech.', speed: 4, speedLabel: 'Quickest' },
-    { model: 'small', title: 'Standard', blurb: 'Good for most videos. Not sure? Keep this one.', speed: 3, speedLabel: 'Fast', recommended: true },
+    { model: 'small', title: 'Standard', blurb: 'Good for most videos.', speed: 3, speedLabel: 'Fast', recommended: true },
     { model: 'large-v3-turbo', title: 'High accuracy', blurb: 'Fewer mistakes. Takes longer.', speed: 2, speedLabel: 'Slower' },
     { model: 'large-v3', title: 'Best accuracy', blurb: 'Fewest mistakes. Takes the longest.', speed: 1, speedLabel: 'Slowest' },
   ];
 
+  /**
+   * The choice marked "Recommended": in the in-browser edition the one the device plan starts with (Fastest on a
+   * phone, where Standard's bigger model can run out of memory), else Standard.
+   */
+  recommendedModel = computed<string | null>(() => {
+    const fallback = this.presets.find((p) => p.recommended)?.model ?? null;
+    if (!this.site.inBrowser()) return fallback;
+    const models = this.store.models();
+    const suggested = models.find((m) => m.default && !m.reason)?.id;
+    if (!suggested) return fallback;
+    if (this.presets.some((p) => p.model === suggested)) return suggested;
+    // the plan starts with a model that has no preset (tiny on a weak phone): the lightest choice that can run here
+    const runs = (id: string) => models.some((m) => m.id === id && !m.reason);
+    return this.presets.find((p) => runs(p.model))?.model ?? fallback;
+  });
+
+  isRecommended(p: Preset): boolean {
+    return p.model === this.recommendedModel();
+  }
+
+  /** what a choice is for (the recommended one adds "Not sure? Keep this one.") */
+  blurbOf(p: Preset): string {
+    return this.isRecommended(p) ? `${p.blurb} Not sure? Keep this one.` : p.blurb;
+  }
+
   /** the hover text of a choice (with the reason when this device cannot run it) */
   tip(p: Preset) {
     const why = this.unavailableReason(p.model);
-    return why ? `${p.title}. ${p.blurb} Not available on this device: ${why}.` : `${p.title}. ${p.blurb}`;
+    return why ? `${p.title}. ${this.blurbOf(p)} Not available on this device: ${why}.` : `${p.title}. ${this.blurbOf(p)}`;
   }
 
   /** the one line of help under the choices: what the picked one means (plus a first-time download, if any) */
@@ -112,7 +139,7 @@ export class UploadPage {
     if (!p) return '';
     const note = this.downloadNote(p.model);
     const timing = this.modelInfo(p.model)?.word_timing_note;
-    const base = note ? `${p.title}: ${p.blurb} ${note}.` : `${p.title}: ${p.blurb}`;
+    const base = note ? `${p.title}: ${this.blurbOf(p)} ${note}.` : `${p.title}: ${this.blurbOf(p)}`;
     return timing ? `${base} Word timing: ${timing}.` : base;
   }
 
@@ -139,6 +166,11 @@ export class UploadPage {
   /** Recomputes the estimate (files or model changed). Only the in-browser edition has one. */
   refreshAdvice() {
     if (!this.site.inBrowser()) return;
+    this.chosenModel.set(this.opts.model);
+    // the chosen model starts downloading in the background (a chosen file: at once, whatever the connection)
+    if (this.opts.engine === 'whisper' && this.available(this.opts.model) && !this.modelInfo(this.opts.model)?.downloaded) {
+      this.prefetch.request(this.opts.model, this.files().length ? 'user' : 'auto');
+    }
     const seq = ++this.adviceSeq;
     const files = this.files();
     if (!files.length) {
@@ -250,9 +282,23 @@ export class UploadPage {
   }
   /** a sentence for a normal person: only for a model that still has to be downloaded */
   downloadNote(id: string) {
+    const bg = this.prefetch.state();
+    if (bg?.model === id && bg.done) return 'Downloaded: ready to start';
     const size = this.downloadSize(id);
-    return size ? `First time only: downloads ${size} (needs internet)` : '';
+    if (!size) return '';
+    if (bg?.model === id) return `First time only: downloads ${size}, now downloading in the background`;
+    return `First time only: downloads ${size} (needs internet)`;
   }
+
+  /** the background download's progress under the help line (not read out on every step: no aria-live) */
+  prefetchLine = computed(() => {
+    const bg = this.prefetch.state();
+    if (!bg || bg.done || bg.model !== this.chosenModel() || !bg.total) return '';
+    const mb = (n: number) => (n >= 1e9 ? `${(n / 1e9).toFixed(2)} GB` : `${Math.round(n / 1e6)} MB`);
+    return `Getting the model ready: ${mb(bg.loaded)} of ${mb(bg.total)}${bg.note ? ` · ${bg.note}` : ''}`;
+  });
+  /** opts is a plain object; the preset choice and the model select update this copy for prefetchLine */
+  private readonly chosenModel = signal('');
   /** the short form for a select option: "3.1 GB download" */
   downloadShort(id: string) {
     const size = this.downloadSize(id);
@@ -598,7 +644,7 @@ export class UploadPage {
       // `prompt` is never persisted; ignore one left behind by an older version too
       const saved = JSON.parse(sessionStorage.getItem(KEY) ?? '{}');
       this.savedModel = typeof saved?.model === 'string' ? saved.model : '';
-      return { ...DEFAULT_OPTIONS, ...saved, output_script: saved?.output_script === 'original' ? 'original' : 'hinglish', prompt: '' };
+      return { ...DEFAULT_OPTIONS, ...saved, output_script: saved?.output_script === 'hinglish' ? 'hinglish' : 'original', prompt: '' };
     } catch {
       return { ...DEFAULT_OPTIONS };
     }

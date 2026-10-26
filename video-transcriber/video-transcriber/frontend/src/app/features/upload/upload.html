@@ -104,12 +104,15 @@
                   <span class="dot" aria-hidden="true"></span>
                   <span class="words">
                     <b>{{ p.title }}</b>
-                    <span class="sub">{{ p.recommended ? 'Recommended' : p.speedLabel }}</span>
+                    <span class="sub">{{ isRecommended(p) ? 'Recommended' : p.speedLabel }}</span>
                   </span>
                 </label>
               }
             </div>
             <p class="quality-help" aria-live="polite">{{ selectedHelp() }}</p>
+            @if (prefetchLine(); as line) {
+              <p class="quality-help prefetch-note">{{ line }}</p>
+            }
             @for (n of planNotes(); track n) {
               <p class="quality-help device-note">{{ n }}</p>
             }
@@ -136,10 +139,10 @@
         <div class="field">
           <label for="output-script">Transcript style</label>
           <select id="output-script" [(ngModel)]="opts.output_script" [disabled]="opts.task === 'translate'" aria-describedby="output-script-hint">
-            <option value="hinglish">Hinglish (Roman Hindi)</option>
             <option value="original">Original script</option>
+            <option value="hinglish">Hinglish (Roman Hindi)</option>
           </select>
-          <span id="output-script-hint" class="hint">{{ opts.task === 'translate' ? 'English translation is selected in More options.' : 'Hindi in English letters, with English words preserved. Other languages keep their original script. Review unfamiliar words and names.' }}</span>
+          <span id="output-script-hint" class="hint">{{ opts.task === 'translate' ? 'English translation is selected in More options.' : opts.output_script === 'hinglish' ? 'Hindi in English letters, with English words preserved. Other languages keep their original script. Review unfamiliar words and names.' : 'Every language in its own script: English in English letters, Hindi in Devanagari. Choose Hinglish to write Hindi in English letters.' }}</span>
         </div>
         @if (showAdvanced()) {
           <div class="more-body" id="more-options">

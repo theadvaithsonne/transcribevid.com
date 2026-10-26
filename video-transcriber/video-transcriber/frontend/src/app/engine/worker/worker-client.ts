@@ -19,7 +19,8 @@ export interface EngineWorkerLike {
   onerror: ((event: { message?: string }) => void) | null;
 }
 
-export type RunInput = Omit<RunRequest, 'op' | 'resume'>;
+/** One run; `resume` continues a job from a stored checkpoint (the page was reloaded, or the worker crashed). */
+export type RunInput = Omit<RunRequest, 'op'>;
 
 /** What JobRunner needs from the engine (WorkerClient, or a fake in specs). */
 export interface EngineRunner {

@@ -3,6 +3,10 @@ import { MemoryBackend } from './backend';
 import {
   INTERRUPTED_ERROR,
   LockManagerLike,
+  MAX_STUCK_RESUMES,
+  MAX_STUCK_RESUMES_LOADING,
+  STUCK_ERROR,
+  STUCK_LOADING_ERROR,
   MODEL_CACHE_NAME,
   SUMMARY_FIELDS,
   SessionEnded,
@@ -443,5 +447,142 @@ describe('SessionStore: info() as GET /api/session', () => {
       expires_in_seconds: 20 * 60,
       job_count: 1,
     });
+  });
+});
+
+describe('SessionStore: resumeInterrupted (a reload continues the job instead of failing it)', () => {
+  const media = () => new Blob(['abc'], { type: 'audio/mpeg' });
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+
+  /** A page puts the job, then goes away (its locks are released); the next page opens the store. */
+  async function interrupted(over: Partial<Job>, withMedia = true, opts: SessionStoreOptions = {}) {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: first } = await openStore(backend, clock, { locks });
+    await first.put(job('a', { status: 'running', phase: 'transcribing', progress: 0.4, ...over }), withMedia ? media() : undefined);
+    first.close();
+    await tick();
+    const { store: second } = await openStore(backend, clock, { locks, resumeInterrupted: true, ...opts });
+    return { backend, clock, locks, second };
+  }
+
+  it('queues a running job again for this page, keeps its lines, and holds its lock', async () => {
+    const { second, locks } = await interrupted({});
+    expect(await second.get('a')).toMatchObject({
+      status: 'queued',
+      error: null,
+      phase: null,
+      progress: 0.4,
+      segment_count: 2,
+      resume_count: 1,
+      stuck_count: 0,
+      resume_mark: 2,
+      low_memory: false,
+    });
+    expect((await second.get('a'))!.segments).toHaveLength(2);
+    expect(second.takeRecovered()).toEqual(['a']);
+    expect(second.takeRecovered()).toEqual([]); // taken once
+    expect(locks.held.has('tv-job-a')).toBe(true); // another tab's check leaves it alone now
+    expect(second.ended).toBeNull();
+  });
+
+  it('a queued job that never started is queued again without counting as a resume', async () => {
+    const { second } = await interrupted({ status: 'queued', phase: null, progress: 0, segments: [] });
+    expect(await second.get('a')).toMatchObject({ status: 'queued', resume_count: 0, stuck_count: 0 });
+  });
+
+  it('ends a job being cancelled as cancelled, and one without its file with the old message', async () => {
+    expect((await (await interrupted({ cancel_requested: true })).second.get('a'))!.status).toBe('cancelled');
+    const { second } = await interrupted({}, false);
+    expect(await second.get('a')).toMatchObject({ status: 'error', error: INTERRUPTED_ERROR });
+    expect(second.takeRecovered()).toEqual([]);
+  });
+
+  it('without the option a job still ends with INTERRUPTED_ERROR', async () => {
+    const { second } = await interrupted({}, true, { resumeInterrupted: false });
+    expect(await second.get('a')).toMatchObject({ status: 'error', error: INTERRUPTED_ERROR, checkpoint: null });
+  });
+
+  it('a reload loop without new lines ends the job (memory), switching to low-memory mode on the way', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: first } = await openStore(backend, clock, { locks });
+    await first.put(job('a', { status: 'running', phase: 'transcribing' }), media());
+    first.close();
+    let rec: Awaited<ReturnType<SessionStore['get']>> = null;
+    let opens = 0;
+    for (;;) {
+      await tick();
+      const { store } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+      opens++;
+      rec = await store.get('a');
+      if (rec!.status !== 'queued') break;
+      expect(rec).toMatchObject({ stuck_count: opens - 1, low_memory: opens > 1 });
+      await store.patch('a', { status: 'running', phase: 'transcribing' }); // the runner starts it again; no new line
+      store.close();
+    }
+    expect(opens).toBe(MAX_STUCK_RESUMES + 1);
+    expect(rec).toMatchObject({ status: 'error', error: STUCK_ERROR });
+  });
+
+  it('new lines between interruptions are progress: the count starts again', async () => {
+    const { second, backend, clock, locks } = await interrupted({});
+    await second.patch('a', { status: 'running', phase: 'transcribing' });
+    second.close();
+    await tick();
+    let { store } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+    expect(await store.get('a')).toMatchObject({ status: 'queued', stuck_count: 1 });
+    await store.patch('a', {
+      status: 'running',
+      phase: 'transcribing',
+      segments: [seg(0, 0, 2, 'a'), seg(1, 2, 4, 'b'), seg(2, 4, 6, 'c')],
+    });
+    store.close();
+    await tick();
+    ({ store } = await openStore(backend, clock, { locks, resumeInterrupted: true }));
+    expect(await store.get('a')).toMatchObject({ status: 'queued', stuck_count: 0, resume_mark: 3 });
+  });
+
+  it('allows more reloads while the model loads (a slow download continues), then says so', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: first } = await openStore(backend, clock, { locks });
+    await first.put(job('a', { status: 'running', phase: 'loading_model', segments: [] }), media());
+    first.close();
+    let rec: Awaited<ReturnType<SessionStore['get']>> = null;
+    let opens = 0;
+    for (;;) {
+      await tick();
+      const { store } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+      opens++;
+      rec = await store.get('a');
+      if (rec!.status !== 'queued') break;
+      expect(rec!.low_memory).toBe(false); // a download is not a memory problem
+      await store.patch('a', { status: 'running', phase: 'loading_model' });
+      store.close();
+    }
+    expect(opens).toBe(MAX_STUCK_RESUMES_LOADING + 1);
+    expect(rec).toMatchObject({ status: 'error', error: STUCK_LOADING_ERROR });
+  });
+
+  it('tells the runner when a background check took over a job of a tab that went away', async () => {
+    const backend = new MemoryBackend();
+    const clock = new Clock();
+    const locks = new FakeLocks();
+    const { store: other } = await openStore(backend, clock, { locks, resumeInterrupted: true });
+    const heard = vi.fn();
+    other.onRecovered(heard);
+    const { store: tab } = await openStore(backend, clock, { locks });
+    await tab.put(job('b', { status: 'running', phase: 'transcribing' }), media());
+    await other.checkExpiry();
+    expect(heard).not.toHaveBeenCalled(); // the tab still holds it
+    tab.close();
+    await tick();
+    await other.checkExpiry();
+    expect(heard).toHaveBeenCalledTimes(1);
+    expect(other.takeRecovered()).toEqual(['b']);
   });
 });

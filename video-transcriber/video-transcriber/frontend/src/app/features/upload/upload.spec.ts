@@ -5,7 +5,7 @@ import { Router, provideRouter } from '@angular/router';
 import { JobsStore } from '../../core/jobs.store';
 import { ModelInfo } from '../../core/models';
 import { PendingFileService } from '../../core/pending-file.service';
-import { httpError, makeHealth, makePublicHealth, makeSummary, silentLog } from '../../testing/fakes';
+import { httpError, makeBrowserHealth, makeHealth, makePublicHealth, makeSummary, silentLog } from '../../testing/fakes';
 import { UploadPage } from './upload';
 import { ToastService } from '../../core/toast.service';
 
@@ -785,6 +785,33 @@ describe('UploadPage', () => {
       expect(qa('.preset .sub').map((t) => clean(t))).toEqual(['Quickest', 'Recommended', 'Slower', 'Slowest']);
     });
 
+    it('in the browser, recommends what the device starts with (Fastest on a phone), not always Standard', () => {
+      setup();
+      store.health.set(makeBrowserHealth());
+      const m = (id: string, extra: Partial<ModelInfo> = {}): ModelInfo => ({
+        id,
+        label: id,
+        size_mb: 100,
+        speed: 1,
+        accuracy: 1,
+        note: '',
+        downloaded: false,
+        ...extra,
+      });
+      store.models.set([
+        m('tiny'),
+        m('base', { default: true }),
+        m('small'),
+        m('large-v3-turbo', { reason: 'use a computer for this size' }),
+        m('large-v3', { reason: 'use a computer for this size' }),
+      ]);
+      fixture.detectChanges();
+      expect(page.opts.model).toBe('base');
+      expect(qa('.preset .sub').map((t) => clean(t))).toEqual(['Recommended', 'Fast', 'Slower', 'Slowest']);
+      expect(clean(q('.quality-help'))).toContain('Fastest: Quick results. Good for clear speech. Not sure? Keep this one.');
+      expect(page.tip(page.presets[1])).toBe('Standard. Good for most videos.');
+    });
+
     it('the help line follows the picked choice', () => {
       setup();
       fixture.detectChanges();
@@ -856,14 +883,21 @@ describe('UploadPage', () => {
     const clean = (el: Element | null) => (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
     const toggle = () => q('button.more-toggle') as HTMLButtonElement;
 
-    it('defaults to visible Hinglish and sends it with a new upload', async () => {
+    it('defaults to the original script (English stays English) and sends it with a new upload', async () => {
       setup();
       fixture.detectChanges();
       await fixture.whenStable();
-      expect((q('#output-script') as HTMLSelectElement).value).toBe('hinglish');
+      expect((q('#output-script') as HTMLSelectElement).value).toBe('original');
+      expect(clean(q('#output-script-hint'))).toContain('English in English letters, Hindi in Devanagari');
       page.addFiles([media('a.mp4')]);
       page.start();
-      expect(JSON.parse(uploadReq().request.params.get('options')!).output_script).toBe('hinglish');
+      expect(JSON.parse(uploadReq().request.params.get('options')!).output_script).toBe('original');
+    });
+
+    it('still offers Hinglish, and remembers it when chosen', () => {
+      sessionStorage.setItem('vt-options', JSON.stringify({ model: 'small', output_script: 'hinglish' }));
+      setup();
+      expect(page.opts.output_script).toBe('hinglish');
     });
 
     it('switches the engine and model together and prevents Qwen translation', () => {
@@ -900,10 +934,10 @@ describe('UploadPage', () => {
       expect(page.opts.output_script).toBe('original');
     });
 
-    it('gives old saved options the new Hinglish default', () => {
+    it('gives old saved options without a style the original-script default', () => {
       sessionStorage.setItem('vt-options', JSON.stringify({ model: 'small' }));
       setup();
-      expect(page.opts.output_script).toBe('hinglish');
+      expect(page.opts.output_script).toBe('original');
     });
 
     it('disables script selection for English translation', async () => {

@@ -71,7 +71,7 @@
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="navlink nav-home" (click)="closeAll()">Transcribe</a>
       <a routerLink="/how-it-works" routerLinkActive="active" class="navlink" (click)="closeAll()">How it works</a>
       <a routerLink="/faq" routerLinkActive="active" class="navlink" (click)="closeAll()">FAQ</a>
-      @if (site.logsEnabled()) {
+      @if (site.logsEnabled() && !site.inBrowser()) {
         <a routerLink="/logs" routerLinkActive="active" class="navlink logs-link" title="Live server and client logs" (click)="closeAll()"><span class="prompt" aria-hidden="true">&gt;_</span> Logs</a>
       }
     </nav>
@@ -182,7 +182,7 @@
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="sheet-link" (click)="closeAll()">Transcribe</a>
         <a routerLink="/how-it-works" routerLinkActive="active" class="sheet-link" (click)="closeAll()">How it works</a>
         <a routerLink="/faq" routerLinkActive="active" class="sheet-link" (click)="closeAll()">FAQ</a>
-        @if (site.logsEnabled()) {
+        @if (site.logsEnabled() && !site.inBrowser()) {
           <a routerLink="/logs" routerLinkActive="active" class="sheet-link" (click)="closeAll()">Logs</a>
         }
       </nav>

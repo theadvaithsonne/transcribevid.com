@@ -14,13 +14,18 @@ import { SiteService } from '../../core/site.service';
 import { TitleService } from '../../core/title.service';
 import { ToastService } from '../../core/toast.service';
 import { printTranscript } from '../../core/transport/print-view';
+import { canWriteJobPdf } from '../../engine/export/pdf';
 import { TRANSPORT } from '../../core/transport/token';
 import type { Transport } from '../../core/transport/transport';
 import { TranscriptView, findActiveId } from './transcript';
 
-/** The download formats, most wanted first. The hint says in plain words what each one is for. */
-export const EXPORTS: { fmt: ExportFormat; label: string; hint: string; ext: string }[] = [
+/**
+ * The download formats, most wanted first. The hint says in plain words what each one is for. `inBrowserOnly`: the
+ * server has no such export (the Word file is written by engine/export/docx.ts in the visitor's browser).
+ */
+export const EXPORTS: { fmt: ExportFormat; label: string; hint: string; ext: string; inBrowserOnly?: boolean }[] = [
   { fmt: 'pdf', label: 'PDF document (.pdf)', hint: 'Ready to print or share', ext: 'pdf' },
+  { fmt: 'docx', label: 'Word document (.docx)', hint: 'Opens in Word and Google Docs', ext: 'docx', inBrowserOnly: true },
   { fmt: 'plain', label: 'Plain text (.txt)', hint: 'Just the words, in paragraphs', ext: 'txt' },
   { fmt: 'txt', label: 'Text with times (.txt)', hint: 'Each line with its time, like [00:12]', ext: 'txt' },
   { fmt: 'srt', label: 'Subtitles (.srt)', hint: 'For video players and editors', ext: 'srt' },
@@ -135,7 +140,7 @@ export class JobPage {
   titleDraft = '';
   rerunModel = '';
   rerunLanguage: string | null = null;
-  rerunOutputScript: 'hinglish' | 'original' = 'hinglish';
+  rerunOutputScript: 'hinglish' | 'original' = 'original';
   rerunEngine: 'whisper' | 'qwen' = 'whisper';
   rerunRomanizer: 'auto' | 'indicxlit' | 'basic' = 'auto';
   restyling = signal(false);
@@ -146,7 +151,8 @@ export class JobPage {
    */
   justUploaded = signal(this.takeJustUploaded());
 
-  exports = EXPORTS;
+  /** the formats this edition can make (no Word file from the server) */
+  exports = computed(() => EXPORTS.filter((e) => !e.inBrowserOnly || this.site.inBrowser()));
   speeds = SPEEDS;
   fmtTime = fmtTime;
 
@@ -186,6 +192,15 @@ export class JobPage {
   /** The segment under the playhead. The clock ticks several times a second; this only changes when the line does. */
   activeSeg = computed(() => findActiveId(this.job()?.segments ?? [], this.time()));
   active = computed(() => ['queued', 'running'].includes(this.job()?.status ?? ''));
+  /** ticks every second while the job runs, for the "time so far" clock */
+  private readonly clock = signal(Date.now());
+  private readonly running = computed(() => this.job()?.status === 'running');
+  /** seconds since the job started (running), null otherwise */
+  elapsed = computed<number | null>(() => {
+    const j = this.job();
+    if (!j || j.status !== 'running' || !j.started_at) return null;
+    return Math.max(0, this.clock() / 1000 - j.started_at);
+  });
   hasMedia = computed(() => !!this.job()?.media_url);
   /**
    * In-browser edition: the player plays a WAV made from the decoded audio, because the browser cannot play the file
@@ -223,13 +238,24 @@ export class JobPage {
     const out: string[] = [];
     const lang = this.languageName();
     if (lang) out.push(lang + (j.options.task === 'translate' && j.language !== 'en' ? ' → English' : ''));
-    if (j.duration) out.push(fmtTime(j.duration));
+    if (j.duration) out.push(`Length ${fmtTime(j.duration)}`);
+    if (j.status === 'done' && j.started_at && j.finished_at && j.finished_at >= j.started_at && j.finished_at - j.started_at < 86_400 * 7) {
+      out.push(`Transcribed in ${fmtTime(j.finished_at - j.started_at)}`);
+    }
     const st = j.stats;
     if (st?.word_count) {
       out.push(`${st.word_count.toLocaleString('en-US')} ${st.word_count === 1 ? 'word' : 'words'}`);
       if (st.avg_confidence != null) out.push(`${Math.round(st.avg_confidence * 100)}% model confidence`);
     }
     return out;
+  });
+  /** How full the bar is: the transcript so far, or the model download; null = an animated bar (no figure yet). */
+  barValue = computed<number | null>(() => {
+    const j = this.job();
+    if (!j || j.status !== 'running') return null;
+    if (j.phase === 'transcribing') return j.progress;
+    if (j.phase === 'loading_model' && j.download?.total) return Math.min(1, j.download.loaded / j.download.total);
+    return null;
   });
   /** The progress card: what is happening now, and how far it is. */
   statusText = computed(() => {
@@ -247,12 +273,24 @@ export class JobPage {
     if (j.status === 'running' && j.phase === 'loading_model' && j.download?.total) {
       const mb = (n: number) => (n >= 1e9 ? `${(n / 1e9).toFixed(2)} GB` : `${Math.round(n / 1e6)} MB`);
       parts.push(`Downloading the speech model (first time only): ${mb(j.download.loaded)} of ${mb(j.download.total)}`);
+      // waiting for the connection, retrying, continuing a download saved before a reload
+      if (j.download.note) parts.push(j.download.note);
     }
     if (j.eta_seconds) parts.push(fmtEta(j.eta_seconds));
+    const spent = this.elapsed();
+    // a clock from another device (or a start time that makes no sense) is better left out than shown wrong
+    if (spent !== null && spent < 86_400) parts.push(`Time so far ${fmtTime(spent)}`);
     return parts.join(' · ');
   });
 
   constructor() {
+    // the clock only ticks while something is running
+    effect((onCleanup) => {
+      if (!this.running()) return;
+      untracked(() => this.clock.set(Date.now()));
+      const t = setInterval(() => this.clock.set(Date.now()), 1000);
+      onCleanup(() => clearInterval(t));
+    });
     effect(() => {
       const id = this.id();
       untracked(() => {
@@ -363,7 +401,7 @@ export class JobPage {
           this.rerunModel = j.options.model;
           // Preserve Auto: a detected language must not become a forced choice on the next run.
           this.rerunLanguage = j.options.language ?? null;
-          this.rerunOutputScript = j.options.output_script ?? 'hinglish';
+          this.rerunOutputScript = j.options.output_script ?? 'original';
           this.rerunEngine = j.options.engine ?? 'whisper';
           this.rerunRomanizer = j.options.romanizer ?? 'auto';
         }
@@ -714,15 +752,15 @@ export class JobPage {
    */
   download(fmt: ExportFormat) {
     const j = this.job();
-    const e = EXPORTS.find((x) => x.fmt === fmt);
+    const e = this.exports().find((x) => x.fmt === fmt);
     this.menu.set(null);
     if (!j || !e || this.exporting()) return;
     // a double click on the same format downloads it once
     if (this.lastExport.fmt === fmt && Date.now() - this.lastExport.at < 1500) return;
     this.lastExport = { fmt, at: Date.now() };
     const extra: Record<string, number> = fmt === 'srt' || fmt === 'vtt' ? { max_chars: this.subtitleChars } : {};
-    if (fmt === 'pdf' && this.api.kind === 'browser') {
-      // no PDF generator in the browser: the print dialog makes it ("Save as PDF")
+    if (fmt === 'pdf' && this.api.kind === 'browser' && !canWriteJobPdf(j)) {
+      // letters the standard PDF fonts cannot draw (Hindi, Chinese, Arabic, ...): the print dialog makes it ("Save as PDF")
       printTranscript(j);
       this.log.info('Export printed: pdf', { id: j.id });
       this.toast.info('Choose "Save as PDF" in the print dialog.', 'Print to PDF');

@@ -87,12 +87,16 @@ export interface ModelDownload {
   loaded: number;
   total: number;
   file?: string;
+  /** in-browser edition: what the download is doing when it is not simply running ("Waiting for the internet connection…") */
+  note?: string;
 }
 
 export interface Job extends JobSummary {
   segments: Segment[];
   stats: Stats | null;
   language_probability: number | null;
+  /** in-browser edition: how often it continued after its page was reloaded or closed */
+  resume_count?: number;
 }
 
 export interface ModelInfo {
@@ -199,7 +203,8 @@ export interface SegmentEdit {
   deleted?: boolean;
 }
 
-export type ExportFormat = 'txt' | 'plain' | 'srt' | 'vtt' | 'md' | 'json' | 'pdf';
+/** 'docx' exists in the in-browser edition only (engine/export/docx.ts); the server has no Word export. */
+export type ExportFormat = 'txt' | 'plain' | 'srt' | 'vtt' | 'md' | 'json' | 'pdf' | 'docx';
 
 export const DEFAULT_OPTIONS: JobOptions = {
   engine: 'whisper',
@@ -207,7 +212,7 @@ export const DEFAULT_OPTIONS: JobOptions = {
   model: 'small',
   language: null,
   task: 'transcribe',
-  output_script: 'hinglish',
+  output_script: 'original',
   prompt: '',
   beam_size: 5,
   vad: true,

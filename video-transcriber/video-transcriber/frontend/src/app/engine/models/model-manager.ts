@@ -7,6 +7,13 @@
  * Hugging Face URL (`https://huggingface.co/<repo>/resolve/main/<file>`), and the ORT runtime under its
  * jsDelivr URL (spike asr.md Q8). The manager reads that bucket directly, so `isCached`, `delete` and
  * the quota check work on the page without importing the library.
+ *
+ * Its own download only resumes per file, so `ensure` fetches the missing files first with the resumable
+ * downloader (resumable-download.ts: Range requests, 8 MiB parts saved in IndexedDB, retries, offline wait)
+ * and puts each one into that bucket under the key Transformers.js looks up (hub.js buildResourcePaths:
+ * remoteHost + '{model}/resolve/{revision}/' + file), with the content-length it reads for its progress and
+ * file metadata (hub.js loadResourceFile, model_registry/get_file_metadata.js). The library then finds every
+ * file in the cache and does not touch the network.
  */
 import { Device, isCancelled, LoadInfo, LoadOptions, ProgressInfo } from '../asr/types';
 import {
@@ -21,6 +28,17 @@ import {
 } from './catalog';
 import { fetchQwenFiles, FetchLike, missingQwenFiles, QwenCacheLike, QwenFileSet } from './qwen-files';
 import { isQwenModel, QwenCatalogEntry, qwenEntry, qwenFileUrl, QWEN_CATALOG } from './qwen-catalog';
+import {
+  continuingNote,
+  defaultPartStore,
+  discardDownload,
+  discardDownloads,
+  DownloadTuning,
+  downloadResumable,
+  formatDownloadSize,
+  PartStore,
+  savedDownload,
+} from './resumable-download';
 import {
   chooseVariant,
   configureOrtRuntime,
@@ -55,6 +73,8 @@ export interface CacheLike {
   match(request: string): Promise<Response | undefined>;
   keys(): Promise<ReadonlyArray<Request | { url: string }>>;
   delete(request: CacheKey): Promise<boolean>;
+  /** The real Cache has it; without it `ensure` leaves the download to Transformers.js (not resumable). */
+  put?(request: string, response: Response): Promise<void>;
 }
 
 export interface CacheStorageLike {
@@ -80,8 +100,12 @@ export interface ModelManagerOptions {
   runtime?: OrtRuntimeOptions;
   cacheName?: string;
   host?: string;
-  /** Default: globalThis.fetch (the Qwen downloads). */
+  /** Default: globalThis.fetch (the resumable downloads). */
   fetch?: FetchLike;
+  /** Where unfinished downloads keep their parts; default: IndexedDB 'tv-downloads' (memory without IndexedDB). */
+  parts?: PartStore;
+  /** Retry, stall and part-size settings of the resumable downloads (tests). */
+  download?: DownloadTuning;
 }
 
 /** What ensureQwen() loads with: QwenEngine (engine/qwen) or a test double. */
@@ -137,6 +161,10 @@ export interface EnsureOptions {
   onProgress?: (p: ProgressInfo) => void;
   /** Load even when the files will not fit (they stream, but are fetched again next time). */
   ignoreQuota?: boolean;
+  /** The job's cancel: stops the download at once (the saved parts stay for the next run). */
+  signal?: AbortSignal;
+  /** A downloaded file could not be kept in the cache (quota): Transformers.js fetches it itself instead. */
+  onCacheError?: (file: string, e: unknown) => void;
 }
 
 export interface EnsureResult {
@@ -168,12 +196,30 @@ async function defaultEnv(): Promise<TransformersEnvLike> {
 
 const urlOf = (k: CacheKey) => (typeof k === 'string' ? k : k.url);
 
-/** Download size as the UI shows it: decimal MB below 1 GB ('41 MB'), else GB ('1.8 GB'). */
-export function formatDownloadSize(bytes: number): string {
-  const mb = bytes / 1e6;
-  if (mb < 1) return '1 MB';
-  if (mb < 999.5) return `${Math.round(mb)} MB`;
-  return `${(mb / 1000).toFixed(1)} GB`;
+export { formatDownloadSize };
+
+type PuttableCache = CacheLike & Required<Pick<CacheLike, 'put'>>;
+
+/**
+ * The engine's load progress after `ensure` fetched the files itself: the engine then only reads them back from the
+ * cache, so the bar stays full instead of running from 0 again; a file outside `inCache` (one the cache refused, or
+ * one the plan does not list) is a real download by the engine and extends the bar.
+ */
+function afterPrefetch(inCache: string[], bytes: number, onProgress?: (p: ProgressInfo) => void) {
+  if (!onProgress) return undefined;
+  const known = new Set(inCache);
+  const extra = new Map<string, { loaded: number; total: number }>();
+  return (p: ProgressInfo) => {
+    if (p.file && !known.has(p.file)) extra.set(p.file, { loaded: p.fileLoaded ?? 0, total: p.fileTotal ?? 0 });
+    let loaded = bytes;
+    let total = bytes;
+    for (const e of extra.values()) {
+      loaded += e.loaded;
+      total += Math.max(e.total, e.loaded);
+    }
+    if (p.status === 'ready') loaded = total;
+    onProgress({ ...p, loaded, total, progress: total ? (100 * loaded) / total : 100 });
+  };
 }
 
 export class ModelManager {
@@ -182,6 +228,7 @@ export class ModelManager {
   private readonly env: () => Promise<TransformersEnvLike>;
   private readonly cacheName: string;
   private readonly host: string;
+  private readonly parts: PartStore;
   private runtimeConfigured = false;
 
   constructor(private readonly options: ModelManagerOptions = {}) {
@@ -190,6 +237,7 @@ export class ModelManager {
     this.env = options.env ?? defaultEnv;
     this.cacheName = options.cacheName ?? CACHE_NAME;
     this.host = options.host ?? HF_HOST;
+    this.parts = options.parts ?? defaultPartStore();
   }
 
   fileUrl(repo: string, file: string): string {
@@ -252,33 +300,32 @@ export class ModelManager {
     return !!(await cache.match(wasm));
   }
 
-  /** navigator.storage.estimate() against what is still to download. Unknown quota counts as ok. */
+  /** navigator.storage.estimate() against what the missing files still add. Unknown quota counts as ok. */
   async checkQuota(plan: ModelPlan): Promise<QuotaCheck> {
+    const cache = await this.openCache();
     const missing = new Set(await this.missingFiles(plan));
     const [encoderFile, decoderFile] = plan.files.slice(CONFIG_FILES.length);
-    let needed = 0;
-    if (missing.has(encoderFile)) needed += plan.encoderBytes;
-    if (missing.has(decoderFile)) needed += plan.decoderBytes;
+    const onnx = [
+      { file: encoderFile, bytes: plan.encoderBytes },
+      { file: decoderFile, bytes: plan.decoderBytes },
+    ].filter((f) => missing.has(f.file));
+    const resumable = !!cache?.put; // ensure() fetches them itself (else Transformers.js streams them)
+    let needed = await this.storageNeeded(
+      onnx.map((f) => ({ url: this.fileUrl(plan.repo, f.file), bytes: f.bytes })),
+      resumable,
+      resumable,
+    );
     if (CONFIG_FILES.some((f) => missing.has(f))) needed += CONFIG_BYTES_ESTIMATE;
     if (!(await this.runtimeCached())) {
       needed += ORT_WASM_BYTES[this.options.runtime?.build ?? 'asyncify'];
     }
-    let usage: number | null = null;
-    let quota: number | null = null;
-    try {
-      const est = await this.storage?.estimate();
-      usage = est?.usage ?? null;
-      quota = est?.quota ?? null;
-    } catch {
-      // unknown quota
-    }
-    const free = quota === null ? null : Math.max(0, quota - (usage ?? 0));
-    return { usage, quota, free, needed, ok: free === null || needed <= free };
+    return this.quotaFor(needed);
   }
 
   /**
-   * Makes the model ready: configures the ORT runtime (once), checks the quota, then loads through
-   * `loader` (the engine), which downloads what is missing with per-file progress and creates the
+   * Makes the model ready: configures the ORT runtime (once), checks the quota, downloads the missing
+   * files with the resumable downloader into the cache (per-file progress, notes while it waits or
+   * retries), then loads through `loader` (the engine), which reads them from the cache and creates the
    * sessions. Errors: ModelError 'quota' / 'model-download' / 'unsupported'; a cancel passes through.
    */
   async ensure(
@@ -298,9 +345,28 @@ export class ModelManager {
         `needed ${quota.needed} free ${quota.free} quota ${quota.quota} usage ${quota.usage}`,
       );
     }
-    const wasCached = this.caches ? (await this.missingFiles(plan)).length === 0 : false;
+    const missing = await this.missingFiles(plan);
+    const wasCached = this.caches ? missing.length === 0 : false;
+    const cache = await this.openCache();
+    let onLoadProgress = o.onProgress;
+    // files that will not fit are left to Transformers.js, which streams them without keeping them (ignoreQuota)
+    if (cache?.put && missing.length && quota.ok) {
+      try {
+        const got = await this.prefetch(plan, missing, cache as PuttableCache, o);
+        onLoadProgress = afterPrefetch(got.inCache, got.bytes, o.onProgress);
+      } catch (e) {
+        if (isCancelled(e)) throw e;
+        const err = e as Error;
+        throw new ModelError(
+          'model-download',
+          `The ${plan.label} model could not be downloaded. Check the connection and try again; what ` +
+            'was downloaded so far is kept.',
+          `${err?.name}: ${err?.message ?? String(e)}`,
+        );
+      }
+    }
     try {
-      const info = await loader.load(plan.loadOptions, o.onProgress);
+      const info = await loader.load(plan.loadOptions, onLoadProgress);
       return { plan, info, wasCached, quota };
     } catch (e) {
       if (isCancelled(e)) throw e;
@@ -312,6 +378,123 @@ export class ModelManager {
         `${err?.name}: ${err?.message ?? String(e)}`,
       );
     }
+  }
+
+  /**
+   * Downloads a model's files into the cache without loading it: the page's background download, so the first
+   * transcription does not wait for it. Resumable like `ensure` (a job that starts meanwhile continues from the saved
+   * parts). Does nothing when everything is cached, there is no Cache API, or the files would not fit.
+   */
+  async download(id: string, device: Device, o: EnsureOptions = {}): Promise<{ downloaded: boolean; bytes: number }> {
+    const plan = this.plan(id, device, o.gpu);
+    const missing = await this.missingFiles(plan);
+    if (!missing.length) return { downloaded: false, bytes: 0 };
+    const cache = await this.openCache();
+    if (!cache?.put) return { downloaded: false, bytes: 0 };
+    if (!(await this.checkQuota(plan)).ok) return { downloaded: false, bytes: 0 };
+    const got = await this.prefetch(plan, missing, cache as PuttableCache, o);
+    return { downloaded: true, bytes: got.bytes };
+  }
+
+  /**
+   * Downloads the missing files of the plan (resumable, in plan order: configs, encoder, decoder) and puts each into
+   * the cache under the key Transformers.js looks up. Progress is one bar over every file of the plan (cached ones
+   * count as loaded); a size the catalog only rounds is the estimate until the server says. Returns the files now in
+   * the cache and their bytes. A file the cache refuses is skipped (the engine fetches it itself).
+   */
+  private async prefetch(
+    plan: ModelPlan,
+    missing: string[],
+    cache: PuttableCache,
+    o: EnsureOptions,
+  ): Promise<{ inCache: string[]; bytes: number }> {
+    const sizes = new Map<string, number>();
+    const inCache: string[] = [];
+    for (const f of plan.files) {
+      if (missing.includes(f)) {
+        sizes.set(f, this.estimate(plan, f));
+        continue;
+      }
+      const hit = await cache.match(this.fileUrl(plan.repo, f)).catch(() => undefined);
+      sizes.set(f, Number(hit?.headers.get('content-length')) || this.estimate(plan, f));
+      inCache.push(f);
+    }
+    let done = inCache.reduce((n, f) => n + sizes.get(f)!, 0);
+    const emit = (status: ProgressInfo['status'], file: string, fileLoaded: number, note?: string) => {
+      if (!o.onProgress) return;
+      let total = 0;
+      for (const n of sizes.values()) total += n;
+      const loaded = done + fileLoaded;
+      o.onProgress({
+        status,
+        file,
+        loaded,
+        total,
+        progress: total ? (100 * loaded) / total : 0,
+        fileLoaded,
+        fileTotal: sizes.get(file),
+        ...(note ? { note } : {}),
+      });
+    };
+    for (const f of missing) {
+      const url = this.fileUrl(plan.repo, f);
+      emit('download', f, 0);
+      const blob = await downloadResumable(url, {
+        ...this.options.download,
+        estimatedSize: sizes.get(f),
+        signal: o.signal,
+        store: this.parts,
+        fetchImpl: this.options.fetch,
+        onProgress: (d) => {
+          if (d.total) sizes.set(f, d.total);
+          emit('progress', f, d.loaded, d.continuing ? continuingNote(done + d.resumedBytes) : d.note);
+        },
+      });
+      sizes.set(f, blob.size);
+      try {
+        await cache.put(
+          url,
+          new Response(blob, {
+            headers: {
+              'content-type': blob.type || (f.endsWith('.json') ? 'application/json' : 'application/octet-stream'),
+              'content-length': String(blob.size),
+            },
+          }),
+        );
+        inCache.push(f);
+      } catch (e) {
+        o.onCacheError?.(f, e);
+      }
+      // the cache holds the file now (or refused it, and then the space is better freed for the engine's own copy)
+      await discardDownload(url, this.parts);
+      emit('done', f, blob.size);
+      done += blob.size;
+    }
+    return { inCache, bytes: inCache.reduce((n, f) => n + sizes.get(f)!, 0) };
+  }
+
+  /** Bytes of a file until the server says: the catalog's (rounded) ONNX sizes, an even share of the config estimate. */
+  private estimate(plan: ModelPlan, file: string): number {
+    const [encoderFile, decoderFile] = plan.files.slice(CONFIG_FILES.length);
+    if (file === encoderFile) return plan.encoderBytes;
+    if (file === decoderFile) return plan.decoderBytes;
+    return Math.round(CONFIG_BYTES_ESTIMATE / CONFIG_FILES.length);
+  }
+
+  /**
+   * Storage the missing files still add: what is left to download (saved parts already count in the usage), plus,
+   * with `peak`, the largest file once more, since its parts and its Cache API copy exist side by side until the
+   * parts are dropped.
+   */
+  private async storageNeeded(files: { url: string; bytes: number }[], resumable: boolean, peak: boolean): Promise<number> {
+    let needed = 0;
+    let largest = 0;
+    for (const f of files) {
+      const saved = resumable ? (await savedDownload(f.url, this.parts)).savedBytes : 0;
+      needed += Math.max(0, f.bytes - saved);
+      largest = Math.max(largest, f.bytes);
+    }
+    return needed + (peak ? largest : 0);
   }
 
   /**
@@ -331,7 +514,13 @@ export class ModelManager {
     // the real Cache has put(); qwen-files stores the downloads itself (Transformers.js does that for Whisper)
     const cache = (await this.openCache()) as QwenCacheLike | null;
     const missing = await missingQwenFiles(entry, cache, this.host);
-    const quota = await this.quotaFor(missing.reduce((n, f) => n + f.bytes, 0));
+    const quota = await this.quotaFor(
+      await this.storageNeeded(
+        missing.map((f) => ({ url: qwenFileUrl(f, this.host), bytes: f.bytes })),
+        true,
+        !!cache?.put,
+      ),
+    );
     if (!quota.ok && !o.ignoreQuota) {
       throw new ModelError(
         'quota',
@@ -349,14 +538,16 @@ export class ModelManager {
         signal: o.signal,
         onProgress: o.onProgress,
         onCacheError: o.onCacheError,
+        store: this.parts,
+        tuning: this.options.download,
       });
     } catch (e) {
       if (isCancelled(e)) throw e;
       const err = e as Error;
       throw new ModelError(
         'model-download',
-        `The ${entry.label} model could not be downloaded. Check the connection and try again; files ` +
-          'that finished downloading are kept.',
+        `The ${entry.label} model could not be downloaded. Check the connection and try again; what ` +
+          'was downloaded so far is kept.',
         `${err?.name}: ${err?.message ?? String(e)}`,
       );
     }
@@ -379,15 +570,19 @@ export class ModelManager {
     return formatDownloadSize(this.qwen(id).bytes);
   }
 
-  /** Removes every cached file of the model (all of its repos); the ORT runtime stays. */
+  /**
+   * Removes every cached file of the model (all of its repos) and the saved parts of its unfinished downloads (`bytes`
+   * counts both); the ORT runtime stays.
+   */
   async delete(id: string): Promise<DeleteResult> {
     if (isQwenModel(id)) return this.deleteQwen(this.qwen(id));
     const entry = this.entry(id);
-    const cache = await this.openCache();
-    if (!cache) return { entries: 0, bytes: 0 };
     const prefixes = reposOf(entry).map((r) => `${this.host}${r}/resolve/`);
+    const partBytes = await discardDownloads((url) => prefixes.some((p) => url.startsWith(p)), this.parts);
+    const cache = await this.openCache();
+    if (!cache) return { entries: 0, bytes: partBytes };
     let entries = 0;
-    let bytes = 0;
+    let bytes = partBytes;
     for (const key of await cache.keys()) {
       const url = urlOf(key);
       if (!prefixes.some((p) => url.startsWith(p))) continue;
@@ -411,10 +606,12 @@ export class ModelManager {
 
   /** Exact URLs only: the fused-decoder repo is shared by both Qwen sizes. */
   private async deleteQwen(entry: QwenCatalogEntry): Promise<DeleteResult> {
+    const urls = new Set(entry.files.map((f) => qwenFileUrl(f, this.host)));
+    const partBytes = await discardDownloads((url) => urls.has(url), this.parts);
     const cache = await this.openCache();
-    if (!cache) return { entries: 0, bytes: 0 };
+    if (!cache) return { entries: 0, bytes: partBytes };
     let entries = 0;
-    let bytes = 0;
+    let bytes = partBytes;
     for (const f of entry.files) {
       const url = qwenFileUrl(f, this.host);
       if (!(await cache.match(url))) continue;

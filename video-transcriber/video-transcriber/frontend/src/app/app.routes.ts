@@ -25,7 +25,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    title: 'Free Video to Text Transcription, No Login',
+    title: 'Free Video & Audio to Text Transcription',
     data: { description: DEFAULT_DESCRIPTION, ads: true, adSlot: 'end' },
     loadComponent: () => import('./features/upload/upload').then((m) => m.UploadPage),
   },

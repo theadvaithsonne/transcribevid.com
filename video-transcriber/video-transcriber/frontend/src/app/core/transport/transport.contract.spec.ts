@@ -9,7 +9,7 @@ import { TestBed } from '@angular/core/testing';
 import { Observable } from 'rxjs';
 import { planFor } from '../../engine/device/plan';
 import { QWEN_BROWSER_REASON } from '../../engine/jobs/options';
-import { FakeEngine, makeFakeBrowserEngine, mediaFile, playSuccess, settle } from '../../testing/engine-fakes';
+import { FakeEngine, engineSegment, makeFakeBrowserEngine, mediaFile, playSuccess, settle } from '../../testing/engine-fakes';
 import { FakeEventSource, makeJob, makeSegment, makeSession, makeSummary, silentLog } from '../../testing/fakes';
 import { errorDetail } from '../http-error';
 import { DEFAULT_OPTIONS, Job, JobSummary } from '../models';
@@ -333,11 +333,27 @@ describe('BrowserTransport only', () => {
     expect(s).toMatchObject({ progress: 1, loaded: 3, total: 3 });
   });
 
-  it('PDF is not rendered here (the page prints instead): a 422 with the reason', async () => {
+  it('writes the PDF and the Word file here, named like the other exports', async () => {
     engine.engine.autoplay = (run) => playSuccess(run);
     const s = await first(t.createJob(mediaFile(), { ...DEFAULT_OPTIONS }));
     await settle();
+    const title = (await first(t.getJob(s.job!.id))).title;
+    const pdf = await first(t.exportBlob(s.job!.id, 'pdf'));
+    expect(pdf).toMatchObject({ filename: `${title}.pdf` });
+    expect(pdf.blob.type).toBe('application/pdf');
+    expect((await readBlob(pdf.blob)).startsWith('%PDF-1.4')).toBe(true);
+    const docx = await first(t.exportBlob(s.job!.id, 'docx'));
+    expect(docx).toMatchObject({ filename: `${title}.docx` });
+    expect(docx.blob.type).toBe('application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    expect((await readBlob(docx.blob)).startsWith('PK')).toBe(true);
+  });
+
+  it('a PDF of text the standard PDF fonts cannot draw is a 422 (the page prints those instead)', async () => {
+    engine.engine.autoplay = (run) => playSuccess(run, [engineSegment(0, 0, 1.5, '你好，世界')], 'zh');
+    const s = await first(t.createJob(mediaFile(), { ...DEFAULT_OPTIONS }));
+    await settle();
     await expect(first(t.exportBlob(s.job!.id, 'pdf'))).rejects.toMatchObject({ status: 422 });
+    expect((await first(t.exportBlob(s.job!.id, 'docx'))).blob.size).toBeGreaterThan(0); // Word draws any script
   });
 
   it('a running job streams its segments and progress, then ends', async () => {

@@ -443,4 +443,67 @@ describe('runPipeline: low-memory mode (deviceMemory <= 4, ARCHITECTURE section 
     expect(r2.segments[0].id).toBe(1);
     expect(r2.events.some((e) => e.type === 'phase' && e.phase === 'extracting')).toBe(false);
   });
+
+  it('stores a checkpoint after every window (no audio in it) so a reloaded page can continue', async () => {
+    const asr = new FakeAsr([
+      { segments: [{ start: 0, end: 2, text: ' One.' }] },
+      { segments: [{ start: 0, end: 2, text: ' Two.' }] },
+      { segments: [{ start: 0, end: 2, text: ' Three.' }] },
+    ]);
+    const { events } = await run(request({ vad: false }), deps(70, asr));
+    const checkpoints = events.filter((e) => e.type === 'checkpoint') as Extract<EngineEvent, { type: 'checkpoint' }>[];
+    // after windows 1 and 2 (the loop ends after window 3: the job is done, nothing to continue)
+    expect(checkpoints.map((c) => [c.state.windowsDone, c.state.emitted, c.state.seek])).toEqual([
+      [1, 1, 30 * 100],
+      [2, 2, 60 * 100],
+    ]);
+    for (const c of checkpoints) {
+      expect(c.state.pcm.length).toBe(0);
+      expect(c.state.chunks).toBeNull();
+      expect(c.state).toMatchObject({ redecode: true, streaming: false, language: 'en' });
+    }
+    // each checkpoint comes after the lines it covers
+    const order = events.filter((e) => e.type === 'segments' || e.type === 'checkpoint').map((e) => e.type);
+    expect(order).toEqual(['segments', 'checkpoint', 'segments', 'checkpoint', 'segments']);
+  });
+
+  it('continues from a checkpoint: decodes the file again, skips to its seek, no new language detection', async () => {
+    const script = [
+      { segments: [{ start: 0, end: 2, text: ' One.' }] },
+      { segments: [{ start: 0, end: 2, text: ' Two.' }] },
+      { segments: [{ start: 0, end: 2, text: ' Three.' }] },
+    ];
+    const first = await run(request({ vad: false, language: null }), deps(70, new FakeAsr(script)));
+    const cp = (first.events.filter((e) => e.type === 'checkpoint') as Extract<EngineEvent, { type: 'checkpoint' }>[])[0].state;
+    const asr = new FakeAsr(script.slice(1));
+    const d = deps(70, asr);
+    const { out, events, segments } = await run({ ...request({ vad: false, language: null }), resume: cp }, d);
+    expect(asr.detections).toBe(0); // the language is in the checkpoint
+    expect(asr.calls.map((c) => c.o.offsetSeconds)).toEqual([30, 60]);
+    expect(segments.map((s) => [s.id, s.text])).toEqual([
+      [1, 'Two.'],
+      [2, 'Three.'],
+    ]);
+    expect((events.find((e) => e.type === 'segments') as Extract<EngineEvent, { type: 'segments' }>).since).toBe(1);
+    expect(events.filter((e) => e.type === 'phase').map((e) => (e as { phase: string }).phase)).toEqual([
+      'extracting',
+      'loading_model',
+      'transcribing',
+    ]);
+    expect(out).toMatchObject({ kind: 'done', result: { language: 'en', windows: 3, duration: 70 } });
+  });
+
+  it.each([true, false])('a whole-file checkpoint continues in low-memory mode with the same windows and lines (VAD %s)', async (vad) => {
+    const whole = new FakeAsr(script());
+    const ref = await run(request({ vad }), streamingDeps(100, whole, vad ? speech : null).d);
+    const cp = (ref.events.filter((e) => e.type === 'checkpoint') as Extract<EngineEvent, { type: 'checkpoint' }>[])[0].state;
+    expect(cp).toMatchObject({ streaming: false, redecode: true, emitted: 1, windowsDone: 1 });
+    const low = new FakeAsr(script().slice(1));
+    const b = streamingDeps(100, low, vad ? speech : null);
+    const got = await run({ ...request({ vad }), resume: { ...cp, streaming: true } }, b.d);
+    expect(b.collects).toEqual([false]);
+    expect(low.calls.map((c) => [c.length, c.o.offsetSeconds])).toEqual(whole.calls.slice(1).map((c) => [c.length, c.o.offsetSeconds]));
+    expect(got.segments).toEqual(ref.segments.slice(1));
+  });
 });
+

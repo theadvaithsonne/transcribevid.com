@@ -1,21 +1,32 @@
 /**
  * Download and caching of the pinned Qwen3-ASR files (qwen-catalog.ts). Transformers.js has no Qwen3-ASR model class,
- * so these files do not go through its loader: each one is fetched from its pinned URL with byte progress, hashed while
- * it streams (sha256.ts), refused on a size or hash mismatch, and kept in the same Cache API bucket as the Whisper
- * models ('transformers-cache', key = the pinned URL), so "Delete my data now ... and the downloaded models" removes
- * them too. A file that is already cached is read back without a download (it was verified before it was stored).
+ * so these files do not go through its loader: each one is fetched from its pinned URL with the resumable downloader
+ * (resumable-download.ts: Range requests, parts saved in IndexedDB, so a dropped connection or a reload continues where
+ * it stopped), then read back once to check its SHA-256 (sha256.ts) and fill the buffer the engine gets, refused on a
+ * size or hash mismatch, and kept in the same Cache API bucket as the Whisper models ('transformers-cache', key = the
+ * pinned URL), so "Delete my data now ... and the downloaded models" removes them too. A file that is already cached is
+ * read back without a download (it was verified before it was stored).
  */
-import { CancelledError, ProgressInfo } from '../asr/types';
+import { CancelledError, isCancelled, ProgressInfo } from '../asr/types';
 import { QwenCatalogEntry, QwenFile, QwenFileRole, qwenFileUrl } from './qwen-catalog';
+import {
+  blobBytes,
+  continuingNote,
+  discardDownload,
+  DownloadTuning,
+  downloadResumable,
+  FetchLike,
+  PartStore,
+} from './resumable-download';
 import { Sha256 } from './sha256';
+
+export type { FetchLike } from './resumable-download';
 
 export interface QwenCacheLike {
   match(request: string): Promise<Response | undefined>;
   put?(request: string, response: Response): Promise<void>;
   delete(request: string): Promise<boolean>;
 }
-
-export type FetchLike = (url: string, init?: { signal?: AbortSignal }) => Promise<Response>;
 
 export type QwenFileSet = Record<QwenFileRole, Uint8Array>;
 
@@ -37,7 +48,15 @@ export interface QwenFetchOptions {
   onProgress?: (p: ProgressInfo) => void;
   /** a file could not be stored (quota, private mode): it still loads, it is fetched again next time */
   onCacheError?: (file: string, e: unknown) => void;
+  /** Where unfinished downloads keep their parts; default: IndexedDB 'tv-downloads'. */
+  store?: PartStore;
+  /** Retry, stall and part-size settings of the downloads (tests). */
+  tuning?: DownloadTuning;
 }
+
+/** Slice read per step when checking a finished file: the file is never read in one piece. */
+const READ_SLICE = 8 * 1024 * 1024;
+const CHECKING_NOTE = 'Checking the downloaded file…';
 
 /** Files of the entry that are not in the cache yet. */
 export async function missingQwenFiles(entry: QwenCatalogEntry, cache: QwenCacheLike | null, host?: string): Promise<QwenFile[]> {
@@ -49,11 +68,10 @@ export async function missingQwenFiles(entry: QwenCatalogEntry, cache: QwenCache
 
 /** Reads (cache) or downloads (verified, then cached) every file of the entry, in catalog order. */
 export async function fetchQwenFiles(entry: QwenCatalogEntry, o: QwenFetchOptions): Promise<QwenFileSet> {
-  const doFetch: FetchLike = o.fetch ?? ((url, init) => fetch(url, init));
   const total = entry.bytes;
   let before = 0;
   const out: Partial<QwenFileSet> = {};
-  const report = (status: ProgressInfo['status'], f: QwenFile, fileLoaded: number) => {
+  const report = (status: ProgressInfo['status'], f: QwenFile, fileLoaded: number, note?: string) => {
     const loaded = before + fileLoaded;
     o.onProgress?.({
       status,
@@ -63,6 +81,7 @@ export async function fetchQwenFiles(entry: QwenCatalogEntry, o: QwenFetchOption
       progress: total ? (100 * loaded) / total : 0,
       fileLoaded,
       fileTotal: f.bytes,
+      ...(note ? { note } : {}),
     });
   };
   for (const f of entry.files) {
@@ -77,19 +96,28 @@ export async function fetchQwenFiles(entry: QwenCatalogEntry, o: QwenFetchOption
     }
     if (!bytes) {
       report('download', f, 0);
-      bytes = await downloadVerified(f, url, doFetch, o.signal, (n) => report('progress', f, n));
+      const blob = await downloadFile(f, url, o, (n, note) => report('progress', f, n, note), before);
+      report('progress', f, f.bytes, CHECKING_NOTE);
+      try {
+        bytes = await readVerified(blob, f, o.signal);
+      } catch (e) {
+        if (e instanceof QwenDownloadError) await discardDownload(url, o.store); // wrong bytes: never resume from them
+        throw e;
+      }
       if (o.cache?.put) {
         try {
+          // from the Blob (the saved parts on disk), not from `bytes`: no second copy of the file in memory
           await o.cache.put(
             url,
-            new Response(bytes as BlobPart, {
-              headers: { 'content-length': String(bytes.byteLength), 'content-type': 'application/octet-stream' },
+            new Response(blob, {
+              headers: { 'content-length': String(f.bytes), 'content-type': 'application/octet-stream' },
             }),
           );
         } catch (e) {
           o.onCacheError?.(f.name, e);
         }
       }
+      await discardDownload(url, o.store);
     }
     report('done', f, f.bytes);
     before += f.bytes;
@@ -99,59 +127,40 @@ export async function fetchQwenFiles(entry: QwenCatalogEntry, o: QwenFetchOption
   return out as QwenFileSet;
 }
 
-async function downloadVerified(
+/** One pinned file through the resumable downloader; `before` = bytes of the model already in hand (for the note). */
+async function downloadFile(
   f: QwenFile,
   url: string,
-  doFetch: FetchLike,
-  signal: AbortSignal | undefined,
-  onBytes: (n: number) => void,
-): Promise<Uint8Array> {
-  let res: Response;
+  o: QwenFetchOptions,
+  onBytes: (n: number, note?: string) => void,
+  before: number,
+): Promise<Blob> {
   try {
-    res = await doFetch(url, { signal });
+    return await downloadResumable(url, {
+      ...o.tuning,
+      size: f.bytes,
+      signal: o.signal,
+      store: o.store,
+      fetchImpl: o.fetch,
+      onProgress: (d) => onBytes(d.loaded, d.continuing ? continuingNote(before + d.resumedBytes) : d.note),
+    });
   } catch (e) {
-    if (signal?.aborted) throw new CancelledError();
+    if (isCancelled(e)) throw e;
     throw new QwenDownloadError(`${f.name}: ${(e as Error)?.message ?? e}`, f.name);
   }
-  if (!res.ok) throw new QwenDownloadError(`${f.name}: HTTP ${res.status}`, f.name);
+}
+
+/** Reads the finished file once, slice by slice: its SHA-256 and the bytes the engine gets, in one pass. */
+async function readVerified(blob: Blob, f: QwenFile, signal?: AbortSignal): Promise<Uint8Array> {
+  if (blob.size !== f.bytes) throw new QwenDownloadError(`${f.name}: ${blob.size} bytes, expected ${f.bytes}`, f.name);
   const out = new Uint8Array(f.bytes);
   const hash = new Sha256();
-  let n = 0;
-  const reader = res.body?.getReader();
-  if (!reader) {
-    const all = new Uint8Array(await res.arrayBuffer());
-    if (all.byteLength !== f.bytes) throw new QwenDownloadError(`${f.name}: ${all.byteLength} bytes, expected ${f.bytes}`, f.name);
-    out.set(all);
-    hash.update(all);
-    n = all.byteLength;
-    onBytes(n);
-  } else {
-    let lastReport = 0;
-    try {
-      for (;;) {
-        if (signal?.aborted) throw new CancelledError();
-        const { done, value } = await reader.read();
-        if (done) break;
-        if (n + value.byteLength > f.bytes) {
-          throw new QwenDownloadError(`${f.name}: more than the expected ${f.bytes} bytes`, f.name);
-        }
-        out.set(value, n);
-        hash.update(value);
-        n += value.byteLength;
-        if (n - lastReport >= 1 << 20 || n === f.bytes) {
-          lastReport = n;
-          onBytes(n);
-        }
-      }
-    } catch (e) {
-      reader.cancel().catch(() => undefined);
-      if (signal?.aborted) throw new CancelledError();
-      throw e instanceof QwenDownloadError || e instanceof CancelledError
-        ? e
-        : new QwenDownloadError(`${f.name}: ${(e as Error)?.message ?? e}`, f.name);
-    }
+  for (let at = 0; at < f.bytes; at += READ_SLICE) {
+    if (signal?.aborted) throw new CancelledError();
+    const piece = await blobBytes(blob.slice(at, at + READ_SLICE));
+    out.set(piece, at);
+    hash.update(piece);
   }
-  if (n !== f.bytes) throw new QwenDownloadError(`${f.name}: ${n} bytes, expected ${f.bytes}`, f.name);
   const digest = hash.digest();
   if (digest !== f.sha256) {
     throw new QwenDownloadError(`${f.name}: SHA-256 ${digest} does not match the pinned ${f.sha256}`, f.name);

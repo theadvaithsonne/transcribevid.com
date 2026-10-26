@@ -5,6 +5,7 @@
  *   page -> worker   { op: 'run', id, file, options, plan, resume? }      start (or continue after a recycle)
  *                    { op: 'cancel', id }                                cooperative; the page hard-cancels after 2 s
  *   worker -> page   phase | segments | partial | language | progress | warning | log    while it runs
+ *                    checkpoint { state }                                after every window (Whisper): where a reloaded page continues
  *                    recycle { state }                                   "restart me" (every 40 windows on WebGPU)
  *                    result { ok: true, result } | { ok: false, cancelled, error }      exactly one per run
  *                      (+ restart: true when a background model load was left running: the page starts a fresh worker)
@@ -77,6 +78,11 @@ export interface ResumeState {
   wordTimestamps: boolean;
   /** low-memory mode: `pcm` is empty, the resumed worker decodes again and skips to `seek` */
   streaming?: boolean;
+  /**
+   * A checkpoint (stored after every window, so a reloaded page can continue): `pcm` and `chunks` are empty and the
+   * resumed worker decodes the file again the same way (whole file, or streaming) before it skips to `seek`.
+   */
+  redecode?: boolean;
   /** Qwen3-ASR: the chunk plan and where the per-chunk loop continues */
   qwen?: { plan: QwenChunk[]; loop: QwenLoopState };
 }
@@ -132,7 +138,18 @@ export type EngineEvent =
       probability: number;
       candidates: { language: string; probability: number }[];
     }
-  | { type: 'progress'; id: string; kind: 'download' | 'decode'; loaded: number; total: number; file?: string }
+  | {
+      type: 'progress';
+      id: string;
+      kind: 'download' | 'decode';
+      loaded: number;
+      total: number;
+      file?: string;
+      /** a short status for the page while the download is not simply running ("Waiting for the internet connection…") */
+      note?: string;
+    }
+  /** Whisper, after every window: the state a fresh worker continues from (no audio in it), stored with the job */
+  | { type: 'checkpoint'; id: string; state: ResumeState }
   | { type: 'warning'; id: string; code: string; message: string }
   | { type: 'log'; id: string; level: 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR'; message: string };
 

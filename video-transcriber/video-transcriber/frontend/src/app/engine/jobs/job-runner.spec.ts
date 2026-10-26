@@ -1,5 +1,9 @@
 import { DEFAULT_OPTIONS } from '../../core/models';
-import { FakeEngine, engineSegment, makeRunner, mediaFile, playSuccess, settle } from '../../testing/engine-fakes';
+import { FAKE_WORKER_PLAN, FakeEngine, engineSegment, makeRunner, mediaFile, playSuccess, settle } from '../../testing/engine-fakes';
+import { MemoryBackend } from '../session/backend';
+import { SessionStore } from '../session/session-store';
+import type { ResumeState } from '../worker/protocol';
+import { EngineRunError } from '../worker/worker-client';
 import type { RunnerEvent } from './job-runner';
 import { QWEN_BROWSER_REASON, QWEN_LANGUAGE_REFUSED, QWEN_TRANSLATE_REFUSED } from './options';
 
@@ -110,7 +114,7 @@ describe('JobRunner (the in-browser job queue)', () => {
 
   it('cancels a queued job at once; a running one cooperatively, keeping the text found so far', async () => {
     const { runner, engine, store } = await makeRunner();
-    const a = await runner.create(mediaFile('a.mp3'), {});
+    const a = await runner.create(mediaFile('a.mp3'), { output_script: 'hinglish' });
     const b = await runner.create(mediaFile('b.mp3'), {});
     await settle();
     expect((await runner.cancel(b.id)).status).toBe('cancelled');
@@ -214,7 +218,7 @@ describe('JobRunner (the in-browser job queue)', () => {
 
   it('converts Qwen segments by the language detected in their chunk (romanizeLanguage), not only the job language', async () => {
     const { runner, engine, store, hinglish } = await makeRunner();
-    const job = await runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-0.6b' });
+    const job = await runner.create(mediaFile(), { engine: 'qwen', model: 'qwen3-asr-0.6b', output_script: 'hinglish' });
     await settle();
     const run = engine.last;
     const id = run.req.id;
@@ -230,5 +234,156 @@ describe('JobRunner (the in-browser job queue)', () => {
     expect(done.segments.map((s) => s.text)).toEqual(['bonjour', 'namaste (roman)']);
     expect(done.language_probability).toBeNull();
     expect(hinglish.calls.filter((c) => c.kind === 'convert')).toHaveLength(1);
+  });
+});
+
+describe('JobRunner: a job continues after its page went away, or its engine worker crashed', () => {
+  /** A checkpoint as the worker sends it after a window (no audio in it). */
+  function checkpoint(emitted: number, seek: number): ResumeState {
+    return {
+      pcm: new Int16Array(0),
+      scale: 1 / 32768,
+      samples: 0,
+      duration: 90,
+      chunks: null,
+      seek,
+      emitted,
+      filter: { repeats: 0, lastNorm: null, kept: emitted, dropped: { empty: 0, no_speech: 0, repetition: 0 } },
+      language: 'en',
+      languageProbability: 0.9,
+      context: 'one two',
+      lastSpeechTimestamp: 0,
+      windowsDone: emitted,
+      wordTimestamps: true,
+      streaming: false,
+      redecode: true,
+    };
+  }
+  const result = { language: 'en', language_probability: 0.9, duration: 90, dropped: { empty: 0, no_speech: 0, repetition: 0 }, windows: 3 };
+  const crash = () =>
+    new EngineRunError(
+      { code: 'worker-crashed', userMessage: 'The speech engine stopped unexpectedly. Try again; a smaller model needs less memory.', technical: 'oom' },
+      false,
+    );
+
+  it('a reloaded page continues the job from its checkpoint, with the lines it covers, and finishes it', async () => {
+    const backend = new MemoryBackend();
+    let t = 2_000_000_000_000;
+    const now = () => t;
+    const pageA = await SessionStore.open(backend, { checkIntervalMs: 0, locks: null, caches: null, now });
+    const a = await makeRunner({ store: pageA, now });
+    const job = await a.runner.create(mediaFile(), { output_script: 'original' });
+    await settle();
+    const id = job.id;
+    const r1 = a.engine.last;
+    r1.onEvent({ type: 'phase', id, phase: 'transcribing', progress: 0, eta: null });
+    r1.onEvent({ type: 'segments', id, segments: [engineSegment(0, 0, 2, 'one'), engineSegment(1, 2, 4, 'two')], since: 0, progress: 0.3, language: 'en', duration: 90 });
+    r1.onEvent({ type: 'checkpoint', id, state: checkpoint(2, 3000) });
+    // a line after the last checkpoint: it comes again when the job continues
+    r1.onEvent({ type: 'segments', id, segments: [engineSegment(2, 30, 32, 'three')], since: 2, progress: 0.4, language: 'en', duration: 90 });
+    await settle();
+    expect((await pageA.get(id))!.checkpoint).toMatchObject({ emitted: 2, seek: 3000 });
+    const started = (await pageA.get(id))!.started_at;
+
+    pageA.close(); // the phone dropped the tab
+    t += 11 * 60_000; // without Web Locks: its last write is stale now
+    const pageB = await SessionStore.open(backend, { checkIntervalMs: 0, locks: null, caches: null, now, resumeInterrupted: true });
+    const b = await makeRunner({ store: pageB, now });
+    await settle();
+    expect(b.engine.runs).toHaveLength(1);
+    const r2 = b.engine.last;
+    expect(r2.req.id).toBe(id);
+    expect(r2.req.resume).toMatchObject({ emitted: 2, seek: 3000, redecode: true, streaming: false });
+    let stored = (await pageB.get(id))!;
+    expect(stored).toMatchObject({ status: 'running', resume_count: 1, progress: 0.4, started_at: started });
+    expect(stored.segments.map((x) => x.text)).toEqual(['one', 'two']);
+
+    r2.onEvent({ type: 'segments', id, segments: [engineSegment(2, 30, 32, 'three'), engineSegment(3, 60, 62, 'four')], since: 2, progress: 0.8, language: 'en', duration: 90 });
+    r2.resolve(result);
+    await settle();
+    stored = (await pageB.get(id))!;
+    expect(stored).toMatchObject({ status: 'done', checkpoint: null });
+    expect(stored.segments.map((x) => x.text)).toEqual(['one', 'two', 'three', 'four']);
+  });
+
+  it('continues once in low-memory mode when the engine worker crashes, then gives up with its message', async () => {
+    const { runner, engine, store } = await makeRunner();
+    const job = await runner.create(mediaFile(), { output_script: 'original' });
+    await settle();
+    const id = job.id;
+    const r1 = engine.last;
+    r1.onEvent({ type: 'segments', id, segments: [engineSegment(0, 0, 2, 'one')], since: 0, progress: 0.2, language: 'en', duration: 90 });
+    r1.onEvent({ type: 'checkpoint', id, state: checkpoint(1, 3000) });
+    await settle();
+    r1.reject(crash());
+    await settle();
+    expect(engine.runs).toHaveLength(2);
+    const r2 = engine.last;
+    expect(r2.req.plan.lowMemory).toBe(true);
+    expect(r2.req.resume).toMatchObject({ emitted: 1, seek: 3000, streaming: true });
+    expect(FAKE_WORKER_PLAN.lowMemory).toBeFalsy(); // the device plan itself is not changed
+    expect(await store.get(id)).toMatchObject({ status: 'running', low_memory: true, worker_retries: 1 });
+    expect((await store.get(id))!.segments.map((x) => x.text)).toEqual(['one']);
+    r2.reject(crash());
+    await settle();
+    expect(engine.runs).toHaveLength(2);
+    expect(await store.get(id)).toMatchObject({
+      status: 'error',
+      error: 'The speech engine stopped unexpectedly. Try again; a smaller model needs less memory.',
+      checkpoint: null,
+    });
+  });
+
+  it('a crash before any checkpoint starts again from the beginning, in low-memory mode', async () => {
+    const { runner, engine } = await makeRunner();
+    await runner.create(mediaFile(), {});
+    await settle();
+    engine.last.reject(crash());
+    await settle();
+    expect(engine.runs).toHaveLength(2);
+    expect(engine.last.req.resume).toBeUndefined();
+    expect(engine.last.req.plan.lowMemory).toBe(true);
+  });
+
+  it('a re-run starts from the beginning: no checkpoint, no resume counters, no low-memory flag', async () => {
+    const { runner, engine, store } = await makeRunner();
+    const job = await runner.create(mediaFile(), {});
+    await settle();
+    engine.last.reject(new EngineRunError({ code: 'failed', userMessage: 'Bad file.', technical: 'x' }, false));
+    await settle();
+    await store.patch(job.id, { checkpoint: checkpoint(1, 3000), resume_count: 2, low_memory: true, worker_retries: 1, stuck_count: 1 });
+    const again = await runner.rerun(job.id, {});
+    await settle();
+    const stored = (await store.get(again.id))!;
+    for (const k of ['checkpoint', 'resume_count', 'low_memory', 'worker_retries', 'stuck_count', 'resume_mark'] as const) {
+      expect(stored[k], k).toBeUndefined();
+    }
+    expect(engine.last.req.resume).toBeUndefined();
+    expect(engine.last.req.plan.lowMemory).toBeFalsy();
+  });
+
+  it('says when it becomes busy and when the queue has run empty (the page asks before leaving meanwhile)', async () => {
+    const { runner, engine } = await makeRunner();
+    const seen: boolean[] = [];
+    runner.onBusyChange((busy) => seen.push(busy));
+    await runner.create(mediaFile('a.mp3'), {});
+    await runner.create(mediaFile('b.mp3'), {});
+    await settle();
+    expect(seen).toEqual([true]);
+    playSuccess(engine.last);
+    await settle();
+    expect(seen).toEqual([true]);
+    playSuccess(engine.last);
+    await settle();
+    expect(seen).toEqual([true, false]);
+  });
+
+  it('passes the download status note on to the page', async () => {
+    const { runner, engine } = await makeRunner();
+    const job = await runner.create(mediaFile(), {});
+    await settle();
+    engine.last.onEvent({ type: 'progress', id: job.id, kind: 'download', loaded: 10, total: 100, note: 'Waiting for the internet connection…' });
+    await settle();
+    expect(runner.download(job.id)).toEqual({ loaded: 10, total: 100, file: undefined, note: 'Waiting for the internet connection…' });
   });
 });

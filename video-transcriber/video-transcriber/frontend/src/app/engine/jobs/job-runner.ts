@@ -15,8 +15,8 @@ import { DEFAULT_OPTIONS, Job, JobOptions, ModelDownload, Segment, SegmentEdit }
 import { applyEdits, cleanTitle, etaSeconds, storedProgress } from '../post/job-rules';
 import { shouldRomanize } from '../post/segment';
 import { computeStats } from '../post/stats';
-import { SessionStore, SessionStoreError, StoredJob } from '../session/session-store';
-import type { EngineEvent, JobResult, WorkerPlan } from '../worker/protocol';
+import { RESUME_FIELDS, SessionStore, SessionStoreError, StoredJob } from '../session/session-store';
+import type { EngineEvent, JobResult, ResumeState, WorkerPlan } from '../worker/protocol';
 import type { EngineRunner } from '../worker/worker-client';
 import type { HinglishConverter } from './hinglish-converter';
 import { ModelGate, OptionsError, validateOptions } from './options';
@@ -64,7 +64,9 @@ export interface JobRunnerDeps {
 const ACTIVE = new Set(['queued', 'running']);
 
 /** what an engine run rejects with (EngineRunError, or anything else) */
-type RunFailure = { cancelled?: boolean; userMessage?: string; message?: string; technical?: string };
+type RunFailure = { cancelled?: boolean; code?: string; userMessage?: string; message?: string; technical?: string };
+/** The engine worker crashed (out of memory in the worker): continue from the checkpoint in low-memory mode, once. */
+const MAX_WORKER_RETRIES = 1;
 /** a model-download line is re-sent at most this often (the engine reports every chunk) */
 const DOWNLOAD_EMIT_MS = 250;
 
@@ -98,10 +100,40 @@ export class JobRunner {
   private readonly downloads = new Map<string, ModelDownload>();
   private lastDownloadEmit = 0;
 
+  private readonly busyListeners = new Set<(busy: boolean) => void>();
+
   constructor(private readonly deps: JobRunnerDeps) {
     this.store = deps.store;
     this.now = deps.now ?? Date.now;
     this.log = deps.log ?? (() => {});
+    // jobs whose page went away (a reload, a closed tab, a phone that dropped the tab) continue here
+    this.store.onRecovered(() => this.adopt());
+    this.adopt();
+  }
+
+  /** Queues the jobs the store took over for this page, oldest first. */
+  private adopt() {
+    for (const id of this.store.takeRecovered()) {
+      if (this.isActive(id)) continue;
+      this.log('INFO', `job ${id.slice(0, 8)}: the page was reloaded or closed while it ran; continuing it`);
+      this.enqueue(id);
+    }
+  }
+
+  /** Called with true when the first job is queued and false when the queue has run empty (the page's leave warning). */
+  onBusyChange(listener: (busy: boolean) => void): () => void {
+    this.busyListeners.add(listener);
+    return () => this.busyListeners.delete(listener);
+  }
+
+  private busyChanged(busy: boolean) {
+    for (const l of [...this.busyListeners]) {
+      try {
+        l(busy);
+      } catch {
+        /* a listener must never break the queue */
+      }
+    }
   }
 
   // ------------------------------------------------------------------ events
@@ -211,10 +243,12 @@ export class JobRunner {
       segments: [],
       stats: null,
     };
-    const { updated_at: _u, version: _v, media_type: _m, language_candidates: _c, ...fresh } = job as StoredJob;
+    const { updated_at: _u, version: _v, media_type: _m, language_candidates: _c, ...copied } = job as StoredJob;
+    const fresh: Record<string, unknown> = { ...copied };
+    for (const k of RESUME_FIELDS) delete fresh[k]; // a re-run starts from the beginning
     let stored: StoredJob;
     try {
-      stored = await this.store.put(fresh as Job, media);
+      stored = await this.store.put(fresh as unknown as Job, media);
     } catch (e) {
       storeError(e);
     }
@@ -338,8 +372,11 @@ export class JobRunner {
   }
 
   // ------------------------------------------------------------------ the queue
-  private enqueue(id: string) {
-    this.queue.push(id);
+  private enqueue(id: string, first = false) {
+    const wasBusy = this.busy;
+    if (first) this.queue.unshift(id);
+    else this.queue.push(id);
+    if (!wasBusy) this.busyChanged(true);
     void this.pump();
   }
 
@@ -372,6 +409,7 @@ export class JobRunner {
       } catch {
         /* best effort */
       }
+      if (!this.busy) this.busyChanged(false);
     }
   }
 
@@ -383,6 +421,7 @@ export class JobRunner {
       eta_seconds: null,
       cancel_requested: false,
       finished_at: this.seconds(),
+      checkpoint: null,
     };
     if (status === 'done') done.progress = 1.0;
     return this.patch(id, done);
@@ -397,14 +436,24 @@ export class JobRunner {
       await this.finish(id, 'error', { error: 'The file of this transcript is no longer stored in this browser. Choose it again.' });
       return;
     }
+    // a job continued after its page went away keeps the lines it had up to its checkpoint (later ones come again)
+    // low-memory mode streams the audio; it gives the same windows and lines as the whole-file path (timeline.ts)
+    const resume: ResumeState | null = job.checkpoint ? { ...job.checkpoint, ...(job.low_memory ? { streaming: true } : {}) } : null;
+    const kept = resume ? job.segments.slice(0, resume.emitted) : [];
     let current = await this.patch(id, {
       status: 'running',
-      started_at: this.seconds(),
-      progress: 0,
+      started_at: resume ? (job.started_at ?? this.seconds()) : this.seconds(),
+      progress: resume ? job.progress : 0,
       error: null,
-      segments: [],
+      segments: kept,
     });
-    this.log('INFO', `job ${id.slice(0, 8)} started: ${job.filename} (model=${job.options.model})`);
+    this.log(
+      'INFO',
+      resume
+        ? `job ${id.slice(0, 8)} continues: ${job.filename} (model=${job.options.model}) from ${kept.length} line(s)` +
+            `${job.low_memory ? ', low-memory mode' : ''}`
+        : `job ${id.slice(0, 8)} started: ${job.filename} (model=${job.options.model})${job.low_memory ? ' in low-memory mode' : ''}`,
+    );
     try {
       this.deps.wakeLock?.start();
     } catch {
@@ -412,7 +461,7 @@ export class JobRunner {
     }
 
     const options = job.options;
-    const segments: Segment[] = [];
+    const segments: Segment[] = [...kept];
     let transcribingSince: number | null = null;
     let chain: Promise<unknown> = Promise.resolve();
     let failure: unknown = null;
@@ -432,8 +481,8 @@ export class JobRunner {
     let result: JobResult | null = null;
     let runError: RunFailure | null = null;
     try {
-      const plan = await this.deps.plan();
-      result = await this.deps.engine.run({ id, file: media, options, plan }, onEvent);
+      const plan = { ...(await this.deps.plan()), ...(job.low_memory ? { lowMemory: true } : {}) };
+      result = await this.deps.engine.run({ id, file: media, options, plan, ...(resume ? { resume } : {}) }, onEvent);
     } catch (e) {
       runError = e as RunFailure;
     }
@@ -457,6 +506,17 @@ export class JobRunner {
       if (runError.cancelled || stored?.cancel_requested) {
         this.log('INFO', `job ${id.slice(0, 8)} cancelled after ${segments.length} segment(s)`);
         await this.finish(id, 'cancelled');
+      } else if (runError.code === 'worker-crashed' && (stored?.worker_retries ?? 0) < MAX_WORKER_RETRIES) {
+        // the engine worker died (usually out of memory) but the page is fine: continue at once, with less memory
+        this.log('WARNING', `job ${id.slice(0, 8)}: the engine stopped (${runError.technical ?? runError.message}); continuing in low-memory mode`);
+        await this.patch(id, {
+          status: 'queued',
+          phase: null,
+          eta_seconds: null,
+          low_memory: true,
+          worker_retries: (stored?.worker_retries ?? 0) + 1,
+        });
+        this.enqueue(id, true);
       } else {
         this.log('ERROR', `job ${id.slice(0, 8)} failed: ${runError.technical ?? runError.message}`);
         await this.finish(id, 'error', { error: runError.userMessage ?? runError.message ?? 'Transcription failed.' });
@@ -498,7 +558,7 @@ export class JobRunner {
       }
       case 'progress': {
         if (e.kind !== 'download' || !e.total) return null;
-        this.downloads.set(id, { loaded: e.loaded, total: e.total, file: e.file });
+        this.downloads.set(id, { loaded: e.loaded, total: e.total, file: e.file, ...(e.note ? { note: e.note } : {}) });
         const t = this.now();
         if (t - this.lastDownloadEmit < DOWNLOAD_EMIT_MS && e.loaded < e.total) return null;
         this.lastDownloadEmit = t;
@@ -531,6 +591,10 @@ export class JobRunner {
         this.emit({ type: 'job', job });
         return job;
       }
+      case 'checkpoint':
+        // where a reloaded page continues: stored with the job, after the lines it covers (same chain, in order)
+        await this.store.patch(id, { checkpoint: e.state });
+        return null;
       case 'warning':
         this.log('WARNING', `job ${id.slice(0, 8)}: ${e.message}`);
         return null;
