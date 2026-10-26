@@ -5,7 +5,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } fro
 import { filter } from 'rxjs';
 import { AdsService } from './core/ads.service';
 import { ApiService } from './core/api.service';
-import { fmtEta, fmtTime, timeAgo } from './core/format';
+import { Translate, fmtEta, fmtTime, timeAgo } from './core/format';
 import { errorDetail } from './core/http-error';
 import { JobsStore } from './core/jobs.store';
 import { JobSummary } from './core/models';
@@ -15,15 +15,19 @@ import { StatsService } from './core/stats.service';
 import { ThemeService } from './core/theme.service';
 import { CORE_TOOLS } from './features/tool-pages/tool-pages.list';
 import { AdRail } from './shared/ad-rail';
+import { I18nService } from './i18n/i18n.service';
 import { LanguageSwitcher } from './i18n/language-switcher';
 import { LocaleHintBar } from './i18n/locale-hint-bar';
+import { _t } from './i18n/mark';
+import { LocalePathPipe, TPipe } from './i18n/t.pipe';
 import { AdSlot } from './shared/ad-slot';
 import { Logo } from './shared/logo';
+import { ToolLabelPipe } from './shared/tool-label';
 import { Toasts } from './shared/toasts';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts, AdRail, AdSlot, LanguageSwitcher, LocaleHintBar],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts, AdRail, AdSlot, LanguageSwitcher, LocaleHintBar, TPipe, LocalePathPipe, ToolLabelPipe],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -37,6 +41,9 @@ export class App {
   ads = inject(AdsService);
   private api = inject(ApiService);
   private router = inject(Router);
+  private i18n = inject(I18nService);
+  /** the language service's translate, for the helpers that take one (fmtEta, timeAgo, errorDetail) */
+  private readonly tr: Translate = (key, params) => this.i18n.t(key, params);
 
   /** The mobile menu sheet (narrow windows) and the desktop "Transcripts" popover. */
   menuOpen = signal(false);
@@ -45,8 +52,8 @@ export class App {
   readonly tagline = TAGLINE;
   readonly year = new Date().getFullYear();
   /** the keyword landing pages: linked from the footer so every page links to them */
-  /** the main tools, linked from every page's footer (the rest are one click away on "All tools") */
-  readonly tools = CORE_TOOLS;
+  /** the main tools that exist in the page's language, linked from every page's footer (the rest are one click away on "All tools") */
+  readonly tools = computed(() => CORE_TOOLS.filter((t) => this.i18n.isAvailable(this.i18n.locale(), t.path)));
 
   private popWrap = viewChild<ElementRef<HTMLElement>>('popWrap');
   private popBtn = viewChild<ElementRef<HTMLButtonElement>>('popBtn');
@@ -63,29 +70,31 @@ export class App {
   sessionNote = computed(() => {
     const h = this.store.health();
     if (!h) return '';
+    const t = (key: string, params?: Record<string, string | number>) => this.i18n.t(key, params);
+    const idle = this.site.idleText();
     if (this.site.inBrowser()) {
-      const idle = this.site.idleText();
-      const when = idle ? `after ${idle} of inactivity` : 'when the session ends';
-      return `Your files never leave this device. Transcripts are kept in this browser only and deleted automatically ${when}, or when you press "Delete my data now". Export what you need before you leave.`;
+      return idle
+        ? t('Your files never leave this device. Transcripts are kept in this browser only and deleted automatically after {idle} of inactivity, or when you press "Delete my data now". Export what you need before you leave.', { idle })
+        : t('Your files never leave this device. Transcripts are kept in this browser only and deleted automatically when the session ends, or when you press "Delete my data now". Export what you need before you leave.');
     }
     if (this.site.isPublic()) {
-      const idle = this.site.idleText();
-      const when = idle ? `after ${idle} of inactivity` : 'when it ends';
-      return `Your files and transcripts are kept only for this session and deleted automatically ${when}, or when you press "Delete my data now". No account, no tracking, one essential session cookie. Export what you need before you leave.`;
+      return idle
+        ? t('Your files and transcripts are kept only for this session and deleted automatically after {idle} of inactivity, or when you press "Delete my data now". No account, no tracking, one essential session cookie. Export what you need before you leave.', { idle })
+        : t('Your files and transcripts are kept only for this session and deleted automatically when it ends, or when you press "Delete my data now". No account, no tracking, one essential session cookie. Export what you need before you leave.');
     }
-    return h.persistent === false ? 'Session only — nothing is saved. Closing the app erases all transcripts. Export what you need.' : '';
+    return h.persistent === false ? t('Session only — nothing is saved. Closing the app erases all transcripts. Export what you need.') : '';
   });
 
   /** The one quiet line next to "Delete my data now". */
   dataNote = computed(() => {
     if (!this.sessionNote()) return '';
-    if (this.site.inBrowser()) return 'Stored on this device only, never uploaded.';
-    return this.site.isPublic() ? 'Kept only for this session, then deleted automatically.' : 'Session only — nothing is saved.';
+    if (this.site.inBrowser()) return this.i18n.t('Stored on this device only, never uploaded.');
+    return this.site.isPublic() ? this.i18n.t('Kept only for this session, then deleted automatically.') : this.i18n.t('Session only — nothing is saved.');
   });
 
   fmtTime = fmtTime;
-  fmtEta = fmtEta;
-  timeAgo = timeAgo;
+  fmtEta = (sec: number | null | undefined) => fmtEta(sec, this.tr);
+  timeAgo = (epochSeconds: number) => timeAgo(epochSeconds, this.tr);
 
   /** true on a transcript page: it shows its own full-page "session ended" message, so the shell banner stays away */
   readonly onJobPage = signal(false);
@@ -98,7 +107,8 @@ export class App {
         takeUntilDestroyed(),
       )
       .subscribe((e) => {
-        this.onJobPage.set((e as NavigationEnd).urlAfterRedirects.startsWith('/jobs/'));
+        // a transcript page: /jobs/<id>, or /<language>/jobs/<id>
+        this.onJobPage.set(/^\/(?:[a-z]{2}\/)?jobs\//.test((e as NavigationEnd).urlAfterRedirects));
         this.closeAll();
       });
   }
@@ -117,13 +127,13 @@ export class App {
   statusLabel(j: JobSummary) {
     switch (j.status) {
       case 'queued':
-        return 'Queued';
+        return this.i18n.t('Queued');
       case 'running':
-        return j.phase === 'transcribing' ? `Transcribing ${Math.round(j.progress * 100)}%` : 'Starting…';
+        return j.phase === 'transcribing' ? this.i18n.t('Transcribing {n}%', { n: Math.round(j.progress * 100) }) : this.i18n.t('Starting…');
       case 'error':
-        return 'Failed';
+        return this.i18n.t('Failed');
       case 'cancelled':
-        return 'Cancelled';
+        return this.i18n.t('Cancelled');
       default:
         return fmtTime(j.duration);
     }
@@ -217,9 +227,9 @@ export class App {
     void this.ads.openPrivacySettings().then((ok) => {
       if (!ok)
         this.store.notify(
-          "Google's consent tool could not be loaded, probably because an ad blocker or the network stopped it. Without it no ads and no ad cookies are loaded.",
+          this.i18n.t("Google's consent tool could not be loaded, probably because an ad blocker or the network stopped it. Without it no ads and no ad cookies are loaded."),
           'info',
-          'Privacy and cookie settings',
+          this.i18n.t('Privacy and cookie settings'),
         );
     });
   }
@@ -232,12 +242,11 @@ export class App {
   deleteMyData() {
     if (this.deleting()) return;
     const local = this.site.inBrowser();
-    const what = local
-      ? 'Delete all your transcripts and the files kept in this browser now?'
-      : 'Delete all your transcripts and uploaded files now?';
-    if (!confirm(`${what}\n\nThis cannot be undone. Export anything you want to keep first.`)) return;
+    const t = (key: string) => this.i18n.t(key);
+    const what = local ? t('Delete all your transcripts and the files kept in this browser now?') : t('Delete all your transcripts and uploaded files now?');
+    if (!confirm(`${what}\n\n${t('This cannot be undone. Export anything you want to keep first.')}`)) return;
     const deleteModels =
-      local && confirm('Also delete the downloaded speech models?\n\nThey are downloaded again the next time you transcribe.');
+      local && confirm(`${t('Also delete the downloaded speech models?')}\n\n${t('They are downloaded again the next time you transcribe.')}`);
     this.deleting.set(true);
     this.api.deleteSession(local ? { deleteModels } : undefined).subscribe({
       next: () => {
@@ -246,16 +255,16 @@ export class App {
         this.store.clearAll();
         if (deleteModels) this.store.refreshModels();
         this.closeAll();
-        this.router.navigateByUrl('/');
+        this.router.navigateByUrl(this.i18n.path('/'));
         this.store.notify(
-          local ? 'Your transcripts and files were removed from this device.' : 'Your transcripts and files were removed from the server.',
+          local ? t('Your transcripts and files were removed from this device.') : t('Your transcripts and files were removed from the server.'),
           'success',
-          'All your data was deleted',
+          t('All your data was deleted'),
         );
       },
       error: (e) => {
         this.deleting.set(false);
-        this.store.notify(errorDetail(e, 'Could not delete your data.'));
+        this.store.notify(errorDetail(e, _t('Could not delete your data.'), this.tr));
         this.store.refresh();
       },
     });
@@ -265,16 +274,16 @@ export class App {
     ev.preventDefault();
     ev.stopPropagation();
     const run = j.status === 'running';
-    const msg = run ? `Cancel "${j.title}"?` : `Delete "${j.title}" and its transcript?`;
+    const msg = run ? this.i18n.t('Cancel "{title}"?', { title: j.title }) : this.i18n.t('Delete "{title}" and its transcript?', { title: j.title });
     if (!confirm(msg)) return;
     // a deleted transcript is gone, so leave its page; a cancelled one still exists (it shows "Cancelled"), so stay on it
     const done = () => {
       this.store.refresh();
-      if (!run && this.router.url.includes(j.id)) this.router.navigateByUrl('/');
+      if (!run && this.router.url.includes(j.id)) this.router.navigateByUrl(this.i18n.path('/'));
     };
     // e.g. 409 "Cancel the running job first." when the list was stale; resync the list either way
     const fail = (e: unknown) => {
-      this.store.notify(errorDetail(e, run ? 'Could not cancel the transcript.' : 'Could not delete the transcript.'));
+      this.store.notify(errorDetail(e, run ? _t('Could not cancel the transcript.') : _t('Could not delete the transcript.'), this.tr));
       this.store.refresh();
     };
     if (run) this.api.cancel(j.id).subscribe({ next: done, error: fail });

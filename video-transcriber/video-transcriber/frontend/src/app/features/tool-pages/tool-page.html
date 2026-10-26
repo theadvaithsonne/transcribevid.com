@@ -1,8 +1,8 @@
 <div class="page tool">
   <header class="hero">
     <div class="hero-text">
-      <nav class="crumbs" aria-label="Breadcrumb">
-        <a routerLink="/">Home</a>
+      <nav class="crumbs" [attr.aria-label]="'Breadcrumb' | t">
+        <a [routerLink]="'/' | lp">{{ 'Home' | t }}</a>
         <span aria-hidden="true">/</span>
         <span aria-current="page">{{ label() }}</span>
       </nav>
@@ -13,7 +13,7 @@
     <div class="hero-drop">
       <app-tool-drop [kind]="c().dropKind" [noun]="c().dropNoun" [formats]="c().accepts" [limits]="limits()" [preset]="preset()" />
       @if (c().record) {
-        <p class="alt"><a routerLink="/">Record with your microphone</a></p>
+        <p class="alt"><a [routerLink]="'/' | lp">{{ 'Record with your microphone' | t }}</a></p>
       }
     </div>
   </header>
@@ -82,7 +82,7 @@
         </ul>
       </div>
       <div>
-        <h3>Download the transcript as</h3>
+        <h3>{{ 'Download the transcript as' | t }}</h3>
         <ul class="downloads">
           @for (d of c().downloads; track d.name) {
             <li><b>{{ d.name }}</b> {{ d.use }}</li>
@@ -106,11 +106,11 @@
 
   @if (c().links?.length) {
     <section class="links" aria-labelledby="links-title">
-      <h2 class="section-title" id="links-title">Related reading</h2>
+      <h2 class="section-title" id="links-title">{{ 'Related reading' | t }}</h2>
       <ul class="link-list">
         @for (l of c().links; track l.path) {
           <li>
-            <a [routerLink]="l.path">{{ l.label }}</a>
+            <a [routerLink]="l.path | lp">{{ l.label }}</a>
             <span>{{ l.note }}</span>
           </li>
         }
@@ -119,7 +119,7 @@
   }
 
   <section class="faq" aria-labelledby="faq-title">
-    <h2 class="section-title" id="faq-title">{{ label() }}: common questions</h2>
+    <h2 class="section-title" id="faq-title">{{ '{label}: common questions' | t: { label: label() } }}</h2>
     <div class="qas">
       @for (f of faqs(); track $index) {
         <details class="qa">
@@ -131,7 +131,7 @@
   </section>
 
   <div class="end">
-    <a class="btn big ghost" routerLink="/">Transcribe a file</a>
+    <a class="btn big ghost" [routerLink]="'/' | lp">{{ 'Transcribe a file' | t }}</a>
   </div>
 
   <app-related-tools [current]="path()" />

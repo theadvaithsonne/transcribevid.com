@@ -1,4 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
+import { _t } from '../i18n/mark';
+import { I18nService } from '../i18n/i18n.service';
 import { IS_BROWSER } from './platform';
 
 export type ToastKind = 'success' | 'error' | 'warning' | 'info';
@@ -22,7 +24,8 @@ export const TOAST_DURATION: Record<ToastKind, number> = { success: 4000, info: 
 /** At most this many at once: a new one pushes the oldest out. */
 export const TOAST_MAX = 3;
 
-const DEFAULT_TITLE: Record<ToastKind, string> = { success: 'Done', error: 'Something went wrong', warning: 'Please note', info: 'Note' };
+/** English; translated when the toast is made. */
+const DEFAULT_TITLE: Record<ToastKind, string> = { success: _t('Done'), error: _t('Something went wrong'), warning: _t('Please note'), info: _t('Note') };
 
 /**
  * Short pop-up messages (like Bootstrap's toasts): stacked, a coloured icon per kind, a close button, and they hide by
@@ -30,10 +33,14 @@ const DEFAULT_TITLE: Record<ToastKind, string> = { success: 'Done', error: 'Some
  * The same message twice in a row is not stacked: the visible one simply stays longer.
  *
  *   toast.success('Transcript copied');            toast.error('Could not save the change.', 'Not saved');
+ *
+ * The text is shown as given: translate it where the toast is made (`toast.success(this.i18n.t('...'), this.i18n.t('...'))`);
+ * only the default titles are translated here.
  */
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   private browser = inject(IS_BROWSER);
+  private i18n = inject(I18nService);
   readonly toasts = signal<Toast[]>([]);
 
   private nextId = 1;
@@ -57,7 +64,7 @@ export class ToastService {
   show(kind: ToastKind, message: string, title?: string, opts: ToastOptions = {}): number {
     if (!this.browser) return 0;
     const text = (message ?? '').trim();
-    const head = (title ?? DEFAULT_TITLE[kind]).trim();
+    const head = (title ?? this.i18n.t(DEFAULT_TITLE[kind])).trim();
     const duration = opts.duration ?? TOAST_DURATION[kind];
 
     const same = this.toasts().find((t) => t.kind === kind && t.title === head && t.message === text);

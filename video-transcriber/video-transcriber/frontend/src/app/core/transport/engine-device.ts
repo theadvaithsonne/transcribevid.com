@@ -1,5 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import type { DeviceInfo, DevicePlan, TimeEstimate } from '../../engine/device';
+import { msg } from '../../engine/device/message';
+import { _t } from '../../i18n/mark';
 import type { ModelGate } from '../../engine/jobs/options';
 import { qwenReason } from '../../engine/qwen/qwen-capability';
 import type { WorkerPlan } from '../../engine/worker/protocol';
@@ -105,6 +107,6 @@ export class EngineDevice {
       info,
     );
     if (est.seconds === null) return { text: '', warnings: est.warnings.map((w) => w.message) };
-    return { text: `Transcribing takes ${est.text} on this device.`, warnings: est.warnings.map((w) => w.message) };
+    return { text: msg(_t('Transcribing takes {time} on this device.'), { time: est.text }), warnings: est.warnings.map((w) => w.message) };
   }
 }

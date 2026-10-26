@@ -1,64 +1,44 @@
 <div class="page-doc">
 <article class="doc">
   <header class="doc-head">
-    <h1>About {{ site.brand().name }}</h1>
+    <h1>{{ 'About {brand}' | t: { brand: site.brand().name } }}</h1>
   </header>
 
-  <p class="lede">
-    {{ site.brand().name }} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the
-    page, choose a file and read your transcript.
-  </p>
+  <p class="lede">{{ '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.' | t: { brand: site.brand().name } }}</p>
 
-  <h2>Who builds it</h2>
-  <p>
-    {{ site.brand().name }} is built and run by <b>{{ op.name }}</b>, {{ op.role }} based in {{ op.city }}. I built it to give people the best
-    possible transcription experience: seamless from the first click, with no account to create, and a clean interface that stays out of the way.
-  </p>
+  <h2>{{ 'Who builds it' | t }}</h2>
+  <p><app-rich [text]="'{brand} is built and run by **{name}**, {role} based in {city}. I built it to give people the best possible transcription experience: seamless from the first click, with no account to create, and a clean interface that stays out of the way.' | t: { brand: site.brand().name, name: op.name, role: op.role, city: op.city }" /></p>
 
-  <h2>Why it exists</h2>
-  <p>
-    Most transcription websites ask you to create an account, limit the free minutes, add watermarks or push a subscription before you see a single
-    line of text. {{ site.brand().name }} does the opposite. Everything it offers is available to everyone, and the page asks for nothing but your file.
-  </p>
+  <h2>{{ 'Why it exists' | t }}</h2>
+  <p>{{ 'Most transcription websites ask you to create an account, limit the free minutes, add watermarks or push a subscription before you see a single line of text. {brand} does the opposite. Everything it offers is available to everyone, and the page asks for nothing but your file.' | t: { brand: site.brand().name } }}</p>
 
-  <h2>How it works</h2>
+  <h2>{{ 'How it works' | t }}</h2>
   @if (site.inBrowser()) {
-    <p>
-      The speech recognition runs inside your own browser, using open speech recognition models such as OpenAI Whisper. Your browser downloads the
-      model once and keeps it, then does all the work on your device. Your video or audio is never uploaded to us, which is also why there is no file
-      size limit and no queue of other people's files. The <a routerLink="/how-it-works">How it works</a> page explains each step.
-    </p>
+    <p><app-rich [text]="'The speech recognition runs inside your own browser, using open speech recognition models such as OpenAI Whisper. Your browser downloads the model once and keeps it, then does all the work on your device. Your video or audio is never uploaded to us, which is also why there is no file size limit and no queue of other people\'s files. The [How it works](/how-it-works) page explains each step.' | t" /></p>
   } @else {
-    <p>
-      Your file is sent to the server over an encrypted connection, transcribed with open speech recognition models such as OpenAI Whisper, and
-      deleted automatically afterwards. The <a routerLink="/how-it-works">How it works</a> page explains each step.
-    </p>
+    <p><app-rich [text]="'Your file is sent to the server over an encrypted connection, transcribed with open speech recognition models such as OpenAI Whisper, and deleted automatically afterwards. The [How it works](/how-it-works) page explains each step.' | t" /></p>
   }
 
-  <h2>What you can do with it</h2>
+  <h2>{{ 'What you can do with it' | t }}</h2>
   <ul>
-    <li>Transcribe videos, audio files and voice recordings in more than 50 languages, or let the language be detected for you.</li>
-    <li>Record straight from your microphone and turn it into text.</li>
-    <li>Read the transcript with timestamps, see which words the model was unsure of, and correct them in place.</li>
-    <li>Download the result as plain text, SRT or VTT subtitles, Markdown or JSON.</li>
-    <li>Choose between faster and more accurate models, depending on your device and how much time you have.</li>
+    <li>{{ 'Transcribe videos, audio files and voice recordings in more than 50 languages, or let the language be detected for you.' | t }}</li>
+    <li>{{ 'Record straight from your microphone and turn it into text.' | t }}</li>
+    <li>{{ 'Read the transcript with timestamps, see which words the model was unsure of, and correct them in place.' | t }}</li>
+    <li>{{ 'Download the result as plain text, SRT or VTT subtitles, Markdown or JSON.' | t }}</li>
+    <li>{{ 'Choose between faster and more accurate models, depending on your device and how much time you have.' | t }}</li>
   </ul>
 
-  <h2>How it stays free</h2>
+  <h2>{{ 'How it stays free' | t }}</h2>
   @if (site.inBrowser()) {
-    <p>
-      {{ site.brand().name }} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device
-      does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The
-      <a routerLink="/privacy">Privacy policy</a> explains what the ads use and how to choose your settings.
-    </p>
+    <p><app-rich [text]="'{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.' | t: { brand: site.brand().name }" /></p>
   } @else {
-    <p>{{ site.brand().name }} is free to use. The <a routerLink="/privacy">Privacy policy</a> explains what happens to your files.</p>
+    <p><app-rich [text]="'{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.' | t: { brand: site.brand().name }" /></p>
   }
 
-  <h2>Get in touch</h2>
+  <h2>{{ 'Get in touch' | t }}</h2>
   <p>
-    Questions, bug reports and ideas are always welcome. Write to <a [href]="'mailto:' + op.email">{{ op.email }}</a>, or see the
-    <a routerLink="/contact">Contact</a> page for what to include.
+    @let writeTo = ('Questions, bug reports and ideas are always welcome. Write to {email}, or see the [Contact](/contact) page for what to include.' | t).split('{email}');
+    <app-rich [text]="writeTo[0]" /><a [href]="'mailto:' + op.email">{{ op.email }}</a><app-rich [text]="writeTo.slice(1).join('')" />
   </p>
 </article>
 </div>

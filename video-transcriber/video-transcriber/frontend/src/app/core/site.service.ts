@@ -1,4 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
+import { I18nService } from '../i18n/i18n.service';
+import { _t } from '../i18n/mark';
 import { fmtBytesShort } from './format';
 import { JobsStore } from './jobs.store';
 import { Brand, Health } from './models';
@@ -8,7 +10,7 @@ import { TRANSPORT_KIND } from './transport/token';
 
 /** A server build's brand until its server says otherwise: the public website's name, without a contact address (the server announces its own). */
 export const DEFAULT_BRAND: Brand = { ...SITE_BRAND, contact_email: null };
-export const TAGLINE = 'Video to text, accurately.';
+export const TAGLINE = _t('Video to text, accurately.');
 
 /**
  * What the public website announces, used where the server has not answered (and cannot be asked): in the static HTML of
@@ -65,6 +67,7 @@ const text = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : nul
 @Injectable({ providedIn: 'root' })
 export class SiteService {
   private store = inject(JobsStore);
+  private i18n = inject(I18nService);
   private assumePublic = inject(ASSUME_PUBLIC);
   /** 'browser' = this build is the static website (the engine runs in the visitor's browser); known at build time. */
   private readonly kind = inject(TRANSPORT_KIND);
@@ -135,20 +138,29 @@ export class SiteService {
   });
   readonly maxMinutesText = computed(() => {
     const m = this.maxDurationMin();
-    return m ? `${m} ${m === 1 ? 'minute' : 'minutes'}` : null;
+    return m ? this.minutes(m) : null;
   });
 
   /** "Up to 500 MB and 60 minutes per file." (just the limits that exist; '' when there are none) */
   readonly limitsText = computed(() => {
-    const parts = [this.maxSizeText(), this.maxMinutesText()].filter((p): p is string => !!p);
-    return parts.length ? `Up to ${parts.join(' and ')} per file.` : '';
+    const size = this.maxSizeText();
+    const minutes = this.maxMinutesText();
+    if (size && minutes) return this.i18n.t('Up to {size} and {minutes} per file.', { size, minutes });
+    if (size) return this.i18n.t('Up to {size} per file.', { size });
+    if (minutes) return this.i18n.t('Up to {minutes} per file.', { minutes });
+    return '';
   });
 
   /** "after 60 minutes of inactivity" / "after a period of inactivity" */
   readonly idleText = computed(() => {
     const n = this.idleMinutes();
-    return n ? `${n} ${n === 1 ? 'minute' : 'minutes'}` : null;
+    return n ? this.minutes(n) : null;
   });
+
+  /** "1 minute" / "60 minutes" in the page's language (two keys: languages count differently). */
+  private minutes(n: number): string {
+    return n === 1 ? this.i18n.t('1 minute') : this.i18n.t('{n} minutes', { n });
+  }
 
   /** A developer running the UI on this computer: worth telling how to start the backend when it is down. */
   readonly devHint = computed(() => {

@@ -9,7 +9,9 @@ import { Health } from '../../core/models';
 import { OPERATOR } from '../../core/operator';
 import { FFMPEG_NOTICE, QWEN_NOTICE, THIRD_PARTY_NOTICES } from '../../engine/models/licences';
 import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
-import { LEGAL_UPDATED } from './legal-info';
+import { I18N_DATA, I18nService } from '../../i18n/i18n.service';
+import { fakeData } from '../../i18n/testing';
+import { LEGAL_UPDATED, LEGAL_UPDATED_ISO, fmtLegalDate } from './legal-info';
 import { PrivacyPage } from './privacy';
 import { TermsPage } from './terms';
 
@@ -446,5 +448,111 @@ describe('TermsPage in the browser edition', () => {
     expect(placeholders(f)).toEqual([]);
     expect(t).toContain(`operated by ${OPERATOR.name}, ${OPERATOR.address}`);
     expect(t).toContain('governed by the laws of India');
+  });
+});
+
+describe('legal dates', () => {
+  it('LEGAL_UPDATED_ISO is the date LEGAL_UPDATED says, and English is written exactly like LEGAL_UPDATED', () => {
+    expect(fmtLegalDate(LEGAL_UPDATED_ISO, 'en')).toBe(LEGAL_UPDATED);
+  });
+
+  it('writes the date in the language, with the Gregorian calendar and Western digits', () => {
+    expect(fmtLegalDate('2026-10-26', 'es')).toContain('octubre');
+    expect(fmtLegalDate('2026-10-26', 'de')).toBe('26. Oktober 2026');
+    expect(fmtLegalDate('2026-10-26', 'ja')).toBe('2026年10月26日');
+    expect(fmtLegalDate('2026-10-26', 'th')).toContain('2026'); // not the Buddhist year 2569
+    expect(fmtLegalDate('2026-10-26', 'ar')).toContain('2026'); // not Arabic-Indic digits
+    expect(fmtLegalDate('2026-10-26', 'bn')).toContain('2026');
+  });
+});
+
+describe('the governing law of the terms', () => {
+  it("is the operator's `law` (core/operator.ts): the sentence is one translatable key, so change the key and its translations together with the operator", () => {
+    const t = textOf(render(TermsPage, makeBrowserHealth()));
+    expect(t).toContain(`These terms are governed by ${OPERATOR.law}. This does not take away any protection you have under the mandatory consumer laws of the country where you live.`);
+  });
+});
+
+describe('translated legal pages (the in-browser edition in another language)', () => {
+  const PAGES = ['/', '/terms', '/privacy', '/how-it-works', '/faq'];
+  const ES: Record<string, string> = {
+    'Privacy policy': 'Política de privacidad',
+    'Terms of use': 'Términos de uso',
+    'Last updated: {date}': 'Última actualización: {date}',
+    'This is a translation for convenience. If it differs from the English version, the English version applies.':
+      'Esta es una traducción de cortesía. Si difiere de la versión en inglés, prevalece la versión en inglés.',
+    '1. Who runs this website': '1. Quién gestiona este sitio web',
+    '{n} minutes': '{n} minutos',
+    'Transcribe a file': 'Transcribir un archivo',
+    'See also the [Terms of use](/terms), [How it works](/how-it-works) and the [FAQ](/faq).':
+      'Consulta también los [Términos de uso](/terms), [Cómo funciona](/how-it-works) y las [preguntas frecuentes](/faq).',
+    'You can stop using the service at any time and delete the data in this browser with **Delete my data now**. We may suspend or end your access at any time, in particular if you break these terms.':
+      'Puedes dejar de usar el servicio en cualquier momento y borrar los datos de este navegador con **Borrar mis datos ahora**. Podemos suspender o poner fin a tu acceso en cualquier momento, en particular si incumples estos términos.',
+    'By using {brand} ({domain}) you agree to these terms. If you do not agree, please do not use the service. The service is operated by **{name}**, {address}.':
+      'Al usar {brand} ({domain}) aceptas estos términos. Si no estás de acuerdo, no uses el servicio. El servicio lo opera **{name}**, {address}.',
+  };
+
+  async function renderIn<T>(page: Type<T>, dict: Record<string, string>, health: Health = makeBrowserHealth({ session_idle_minutes: 45 })) {
+    const data = fakeData({ available: { es: PAGES }, dicts: { es: async () => ({ default: dict }) } });
+    TestBed.configureTestingModule({
+      providers: [silentLog, provideHttpClient(), provideHttpClientTesting(), provideRouter([]), { provide: I18N_DATA, useValue: data }],
+    });
+    TestBed.inject(JobsStore).health.set(health);
+    const i18n = TestBed.inject(I18nService);
+    i18n.apply('es', await i18n.load('es'));
+    const fixture = TestBed.createComponent(page);
+    fixture.detectChanges();
+    return fixture;
+  }
+
+  it('privacy: the title, the date, the headings, the note and the closing links are in the language, and links stay in it', async () => {
+    const f = await renderIn(PrivacyPage, ES);
+    const el = f.nativeElement as HTMLElement;
+    expect(el.querySelector('h1')!.textContent).toBe('Política de privacidad');
+    expect(el.querySelector('.updated')!.textContent!.trim()).toBe('Última actualización: 26 de octubre de 2026');
+    expect(headings(f)[0]).toBe('1. Quién gestiona este sitio web');
+    expect(el.querySelector('.callout')!.textContent).toContain('Esta es una traducción de cortesía');
+    expect(el.querySelector('a[href="/es/terms"]')!.textContent).toBe('Términos de uso');
+    expect(el.querySelector('a[href="/es/how-it-works"]')).not.toBeNull();
+    expect(el.querySelector('.end a.btn')!.getAttribute('href')).toBe('/es');
+    expect(el.querySelector('.end a.btn')!.textContent!.trim()).toBe('Transcribir un archivo');
+  });
+
+  it('privacy: the idle time goes through the language, and every missing translation is the English text with no placeholder left over', async () => {
+    const t = textOf(await renderIn(PrivacyPage, ES));
+    expect(t).toContain('after 45 minutos of inactivity');
+    expect(t).toContain('Your file never leaves your device.'); // not in the dictionary: English
+    expect(t).not.toMatch(/\{(brand|domain|name|address|idle|n|date)\}/);
+    expect(t).toContain(`is operated by ${OPERATOR.name}, ${OPERATOR.address}`);
+  });
+
+  it('terms: the same, with a rich sentence (bold and a link) translated whole', async () => {
+    const f = await renderIn(TermsPage, ES);
+    const el = f.nativeElement as HTMLElement;
+    expect(el.querySelector('h1')!.textContent).toBe('Términos de uso');
+    expect(el.querySelector('.callout')!.textContent).toContain('traducción de cortesía');
+    const t = textOf(f);
+    expect(t).toContain('Puedes dejar de usar el servicio en cualquier momento');
+    expect(el.querySelector('b')?.textContent).toBeTruthy();
+    expect(t).toContain(`lo opera ${OPERATOR.name}, ${OPERATOR.address}`);
+    expect(el.querySelector(`a[href="mailto:${OPERATOR.email}"]`)).not.toBeNull();
+    expect(el.querySelector('.end a.btn')!.getAttribute('href')).toBe('/es');
+  });
+
+  it('English pages never show the translation note, and the e-mail line keeps its full stop', () => {
+    for (const page of [PrivacyPage, TermsPage]) {
+      TestBed.resetTestingModule();
+      const f = render(page, makeBrowserHealth());
+      expect((f.nativeElement as HTMLElement).querySelector('.callout')).toBeNull();
+      const mail = (f.nativeElement as HTMLElement).querySelector(`a[href="mailto:${OPERATOR.email}"]`)!;
+      expect(mail.nextSibling?.textContent?.trim()).toBe('.');
+    }
+  });
+
+  it('a page in the server edition is never translated (translated pages exist only next to the in-browser engine)', async () => {
+    const f = await renderIn(PrivacyPage, ES, makePublicHealth());
+    const el = f.nativeElement as HTMLElement;
+    expect(el.querySelector('.callout')).toBeNull(); // only the website text carries the note
+    expect(textOf(f)).toContain('there is no account, no tracking and no advertising');
   });
 });

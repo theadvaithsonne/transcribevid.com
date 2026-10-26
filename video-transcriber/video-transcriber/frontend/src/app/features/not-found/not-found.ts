@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 
 @Component({
   selector: 'app-not-found',
-  imports: [RouterLink],
+  imports: [RouterLink, TPipe, LocalePathPipe],
   template: `
     <div class="page-doc">
       <section class="lost">
-        <h1>Page not found</h1>
-        <p class="lede">The page you are looking for does not exist or has moved.</p>
-        <a class="btn primary big" routerLink="/">Go to the home page</a>
+        <h1>{{ 'Page not found' | t }}</h1>
+        <p class="lede">{{ 'The page you are looking for does not exist or has moved.' | t }}</p>
+        <a class="btn primary big" [routerLink]="'/' | lp">{{ 'Go to the home page' | t }}</a>
       </section>
     </div>
   `,

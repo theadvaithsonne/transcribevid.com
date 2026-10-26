@@ -1,39 +1,30 @@
 <div class="page-doc">
 <article class="doc">
   <header class="doc-head">
-    <h1>Contact</h1>
+    <h1>{{ 'Contact' | t }}</h1>
   </header>
 
   <p class="lede">
-    Have a question, found a bug or want to suggest a feature? Write to <a [href]="'mailto:' + op.email">{{ op.email }}</a>. Every message is read
-    by the person who builds {{ site.brand().name }}, and you will usually get an answer within a few working days.
+    @let intro = ('Have a question, found a bug or want to suggest a feature? Write to {email}. Every message is read by the person who builds {brand}, and you will usually get an answer within a few working days.' | t: { brand: site.brand().name }).split('{email}');
+    {{ intro[0] }}<a [href]="'mailto:' + op.email">{{ op.email }}</a>{{ intro.slice(1).join('') }}
   </p>
 
-  <h2>Reporting a problem</h2>
-  <p>These details make a problem much quicker to find and fix:</p>
+  <h2>{{ 'Reporting a problem' | t }}</h2>
+  <p>{{ 'These details make a problem much quicker to find and fix:' | t }}</p>
   <ul>
-    <li>what you were doing, and what happened instead of what you expected;</li>
-    <li>your browser and its version, and your device (computer or phone, and its operating system);</li>
-    <li>the type and length of the file, for example "MP4, 25 minutes";</li>
-    <li>the exact error message, or a screenshot of it.</li>
+    <li>{{ 'what you were doing, and what happened instead of what you expected;' | t }}</li>
+    <li>{{ 'your browser and its version, and your device (computer or phone, and its operating system);' | t }}</li>
+    <li>{{ 'the type and length of the file, for example "MP4, 25 minutes";' | t }}</li>
+    <li>{{ 'the exact error message, or a screenshot of it.' | t }}</li>
   </ul>
   @if (site.inBrowser()) {
-    <p>
-      Please do not send private recordings. {{ site.brand().name }} transcribes your files on your own device and we never receive them, so we do not
-      need them to help you.
-    </p>
+    <p>{{ 'Please do not send private recordings. {brand} transcribes your files on your own device and we never receive them, so we do not need them to help you.' | t: { brand: site.brand().name } }}</p>
   }
 
-  <h2>Privacy requests</h2>
-  <p>
-    The <a routerLink="/privacy">Privacy policy</a> explains what is processed and why. To ask a question about your data or to exercise your rights,
-    write to the same address.
-  </p>
+  <h2>{{ 'Privacy requests' | t }}</h2>
+  <p><app-rich [text]="'The [Privacy policy](/privacy) explains what is processed and why. To ask a question about your data or to exercise your rights, write to the same address.' | t" /></p>
 
-  <h2>Who runs this website</h2>
-  <p>
-    {{ site.brand().name }} ({{ site.brand().domain }}) is run by <b>{{ op.name }}</b>, {{ op.address }}. Read more on the
-    <a routerLink="/about">About</a> page.
-  </p>
+  <h2>{{ 'Who runs this website' | t }}</h2>
+  <p><app-rich [text]="'{brand} ({domain}) is run by **{name}**, {address}. Read more on the [About](/about) page.' | t: { brand: site.brand().name, domain: site.brand().domain, name: op.name, address: op.address }" /></p>
 </article>
 </div>

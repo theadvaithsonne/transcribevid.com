@@ -1,7 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { I18nService } from '../../i18n/i18n.service';
+import { _t } from '../../i18n/mark';
 
 /** The question the page asks once before the ffmpeg.wasm converter may be downloaded (engine/audio ffmpeg.ts). */
-export const CONVERTER_PROMPT = 'This file needs a 9 MB converter that runs in your browser. Load it?';
+export const CONVERTER_PROMPT = _t('This file needs a 9 MB converter that runs in your browser. Load it?');
 
 const KEY = 'tv-converter';
 
@@ -14,6 +16,14 @@ const KEY = 'tv-converter';
 export class ConverterConsent {
   /** this visit's answer (also covers a "yes" that storage refused to keep) */
   private visit: boolean | null = null;
+  /** the question is asked in the visitor's language (absent when the class is made by hand, as the specs do: English) */
+  private i18n = (() => {
+    try {
+      return inject(I18nService);
+    } catch {
+      return null;
+    }
+  })();
 
   /** true = agreed, false = declined in this visit, null = not asked yet */
   answer(): boolean | null {
@@ -43,7 +53,7 @@ export class ConverterConsent {
   ask(confirm: (text: string) => boolean): boolean {
     const have = this.answer();
     if (have !== null) return have;
-    const yes = !!confirm(CONVERTER_PROMPT);
+    const yes = !!confirm(this.i18n ? this.i18n.t(CONVERTER_PROMPT) : CONVERTER_PROMPT);
     this.record(yes);
     return yes;
   }

@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { I18nService } from '../../i18n/i18n.service';
+import { RichText } from '../../i18n/rich-text';
+import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 import { GUIDES, fmtLongDate } from './guides.list';
 
 /**
@@ -8,34 +11,34 @@ import { GUIDES, fmtLongDate } from './guides.list';
  */
 @Component({
   selector: 'app-guides-index',
-  imports: [RouterLink],
+  imports: [RouterLink, TPipe, LocalePathPipe, RichText],
   template: `
     <div class="page-doc">
       <article class="doc">
-        <nav class="crumbs" aria-label="Breadcrumb">
-          <a routerLink="/">Home</a>
+        <nav class="crumbs" [attr.aria-label]="'Breadcrumb' | t">
+          <a [routerLink]="'/' | lp">{{ 'Home' | t }}</a>
           <span aria-hidden="true">/</span>
-          <span aria-current="page">Guides</span>
+          <span aria-current="page">{{ 'Guides' | t }}</span>
         </nav>
-        <h1 class="page-title">Guides: transcripts and subtitles</h1>
+        <h1 class="page-title">{{ 'Guides: transcripts and subtitles' | t }}</h1>
         <p class="lede">
-          Short, practical answers about turning speech into text and subtitles: which subtitle format to pick, how to add subtitles to a video,
-          how to get a more accurate transcript, and how transcription can run in your own browser without uploading your file.
+          {{
+            'Short, practical answers about turning speech into text and subtitles: which subtitle format to pick, how to add subtitles to a video, how to get a more accurate transcript, and how transcription can run in your own browser without uploading your file.'
+              | t
+          }}
         </p>
         <ul class="guides">
-          @for (g of guides; track g.path) {
+          @for (g of guides(); track g.path) {
             <li>
               <h2>
-                <a [routerLink]="g.path">{{ g.label }}</a>
+                <a [routerLink]="g.path | lp">{{ g.label }}</a>
               </h2>
               <p>{{ g.description }}</p>
-              <p class="when">Updated {{ date(g.updated) }}</p>
+              <p class="when">{{ 'Updated {date}' | t: { date: g.date } }}</p>
             </li>
           }
         </ul>
-        <p>
-          Ready to try it? <a routerLink="/tools">See all free tools</a> or <a routerLink="/">transcribe a file now</a>.
-        </p>
+        <p><app-rich [text]="'Ready to try it? [See all free tools](/tools) or [transcribe a file now](/).' | t" /></p>
       </article>
     </div>
   `,
@@ -115,6 +118,21 @@ import { GUIDES, fmtLongDate } from './guides.list';
   `,
 })
 export class GuidesIndexPage {
-  readonly guides = GUIDES;
-  readonly date = fmtLongDate;
+  private i18n = inject(I18nService);
+
+  /** The guides that exist in the page's language, with their name, description and date in that language (English where the dictionary has no entry). */
+  readonly guides = computed(() => {
+    const locale = this.i18n.locale();
+    const meta = (kind: 'label' | 'description', path: string, english: string) => {
+      const key = `${kind}:${path}`;
+      const hit = this.i18n.t(key);
+      return hit === key ? english : hit;
+    };
+    return GUIDES.filter((g) => this.i18n.isAvailable(locale, g.path)).map((g) => ({
+      path: g.path,
+      label: meta('label', g.path, g.label),
+      description: meta('description', g.path, g.description),
+      date: fmtLongDate(g.updated, locale),
+    }));
+  });
 }

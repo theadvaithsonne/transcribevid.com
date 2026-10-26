@@ -16,26 +16,29 @@ import { ToastService } from '../../core/toast.service';
 import { printTranscript } from '../../core/transport/print-view';
 import { TRANSPORT } from '../../core/transport/token';
 import type { Transport } from '../../core/transport/transport';
+import { I18nService } from '../../i18n/i18n.service';
+import { _t } from '../../i18n/mark';
+import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 import { TranscriptView, findActiveId } from './transcript';
 
 /** The download formats, most wanted first. The hint says in plain words what each one is for. */
 export const EXPORTS: { fmt: ExportFormat; label: string; hint: string; ext: string }[] = [
-  { fmt: 'pdf', label: 'PDF document (.pdf)', hint: 'Ready to print or share', ext: 'pdf' },
-  { fmt: 'plain', label: 'Plain text (.txt)', hint: 'Just the words, in paragraphs', ext: 'txt' },
-  { fmt: 'txt', label: 'Text with times (.txt)', hint: 'Each line with its time, like [00:12]', ext: 'txt' },
-  { fmt: 'srt', label: 'Subtitles (.srt)', hint: 'For video players and editors', ext: 'srt' },
-  { fmt: 'vtt', label: 'Web subtitles (.vtt)', hint: 'For YouTube and web video', ext: 'vtt' },
-  { fmt: 'md', label: 'Markdown (.md)', hint: 'For notes apps', ext: 'md' },
-  { fmt: 'json', label: 'JSON (.json)', hint: 'For developers: words, times, confidence', ext: 'json' },
+  { fmt: 'pdf', label: _t('PDF document (.pdf)'), hint: _t('Ready to print or share'), ext: 'pdf' },
+  { fmt: 'plain', label: _t('Plain text (.txt)'), hint: _t('Just the words, in paragraphs'), ext: 'txt' },
+  { fmt: 'txt', label: _t('Text with times (.txt)'), hint: _t('Each line with its time, like [00:12]'), ext: 'txt' },
+  { fmt: 'srt', label: _t('Subtitles (.srt)'), hint: _t('For video players and editors'), ext: 'srt' },
+  { fmt: 'vtt', label: _t('Web subtitles (.vtt)'), hint: _t('For YouTube and web video'), ext: 'vtt' },
+  { fmt: 'md', label: _t('Markdown (.md)'), hint: _t('For notes apps'), ext: 'md' },
+  { fmt: 'json', label: _t('JSON (.json)'), hint: _t('For developers: words, times, confidence'), ext: 'json' },
 ];
 
 export const SPEEDS = [0.75, 1, 1.25, 1.5, 2];
 
 /** What the progress card says for each step, in plain words. */
 const PHASE_TEXT: Record<string, string> = {
-  extracting: 'Preparing the audio…',
-  loading_model: 'Getting the speech engine ready…',
-  transcribing: 'Transcribing…',
+  extracting: _t('Preparing the audio…'),
+  loading_model: _t('Getting the speech engine ready…'),
+  transcribing: _t('Transcribing…'),
 };
 
 /** The file name from a Content-Disposition header (moved to core/transport, kept here for its callers and spec). */
@@ -85,7 +88,7 @@ function copyWithSelection(text: string): boolean {
 
 @Component({
   selector: 'app-job',
-  imports: [FormsModule, RouterLink, TranscriptView],
+  imports: [FormsModule, RouterLink, TranscriptView, TPipe, LocalePathPipe],
   templateUrl: './job.html',
   styleUrl: './job.scss',
   host: {
@@ -106,6 +109,7 @@ export class JobPage {
   private titles = inject(TitleService);
   private session = inject(SessionService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
   store = inject(JobsStore);
   site = inject(SiteService);
 
@@ -177,6 +181,17 @@ export class JobPage {
     const qwen = this.store.models().filter((m) => m.engine === 'qwen' && this.site.modelAllowed(m.id));
     return qwen.length && qwen.every((m) => m.reason) ? (qwen[0].reason as string) : '';
   });
+  /** A language's name in the page's language (the browser knows them all); the English name from the list in English. */
+  languageLabel(code: string, english: string): string {
+    const locale = this.i18n.locale();
+    if (locale === 'en') return english;
+    try {
+      return new Intl.DisplayNames([locale], { type: 'language' }).of(code) ?? english;
+    } catch {
+      return english;
+    }
+  }
+
   changeRerunEngine() {
     const list = this.rerunModels();
     this.rerunModel = (list.find((m) => !m.reason) ?? list[0])?.id ?? 'small';
@@ -198,15 +213,15 @@ export class JobPage {
   qualityConcern = computed(() => {
     const j = this.job();
     if (!j || j.status !== 'done') return '';
-    if (!j.segments.length) return 'No speech was transcribed. Check the recording and the selected language.';
+    if (!j.segments.length) return this.i18n.t('No speech was transcribed. Check the recording and the selected language.');
     if (j.segments.some((s) => !s.edited && s.review_reasons?.length)) {
-      return 'Some passages need a listening check because of repeated text or an uncertain speech boundary.';
+      return this.i18n.t('Some passages need a listening check because of repeated text or an uncertain speech boundary.');
     }
     if (j.stats?.avg_confidence != null && j.stats.avg_confidence < 0.6) {
-      return 'This transcript has low model confidence. Listen to the recording and check the spoken language before using the text.';
+      return this.i18n.t('This transcript has low model confidence. Listen to the recording and check the spoken language before using the text.');
     }
     if (j.options.language == null && j.language_probability != null && j.language_probability < 0.8) {
-      return 'The spoken language could not be identified confidently. Choose the language you hear and try again.';
+      return this.i18n.t('The spoken language could not be identified confidently. Choose the language you hear and try again.');
     }
     return '';
   });
@@ -214,7 +229,7 @@ export class JobPage {
   languageName = computed(() => {
     const code = this.job()?.language;
     if (!code) return '';
-    return this.store.languages().find((l) => l.code === code)?.name ?? code.toUpperCase();
+    return this.languageLabel(code, this.store.languages().find((l) => l.code === code)?.name ?? code.toUpperCase());
   });
   /** The model's confidence is a review signal, not measured accuracy. */
   facts = computed(() => {
@@ -222,12 +237,17 @@ export class JobPage {
     if (!j) return [] as string[];
     const out: string[] = [];
     const lang = this.languageName();
-    if (lang) out.push(lang + (j.options.task === 'translate' && j.language !== 'en' ? ' → English' : ''));
+    if (lang) out.push(j.options.task === 'translate' && j.language !== 'en' ? this.i18n.t('{language} → English', { language: lang }) : lang);
     if (j.duration) out.push(fmtTime(j.duration));
     const st = j.stats;
     if (st?.word_count) {
-      out.push(`${st.word_count.toLocaleString('en-US')} ${st.word_count === 1 ? 'word' : 'words'}`);
-      if (st.avg_confidence != null) out.push(`${Math.round(st.avg_confidence * 100)}% model confidence`);
+      const locale = this.i18n.locale();
+      out.push(
+        st.word_count === 1
+          ? this.i18n.t('1 word')
+          : this.i18n.t('{n} words', { n: st.word_count.toLocaleString(locale === 'en' ? 'en-US' : locale) }),
+      );
+      if (st.avg_confidence != null) out.push(this.i18n.t('{n}% model confidence', { n: Math.round(st.avg_confidence * 100) }));
     }
     return out;
   });
@@ -235,18 +255,18 @@ export class JobPage {
   statusText = computed(() => {
     const j = this.job();
     if (!j) return '';
-    return j.status === 'queued' ? 'Waiting in line…' : (PHASE_TEXT[j.phase ?? 'extracting'] ?? 'Working…');
+    return j.status === 'queued' ? this.i18n.t('Waiting in line…') : this.i18n.t(PHASE_TEXT[j.phase ?? 'extracting'] ?? _t('Working…'));
   });
   statusDetail = computed(() => {
     const j = this.job();
     if (!j) return '';
     const parts: string[] = [];
     // floor, so 99.6% never reads "100%" before it is done (the tiny nudge keeps 0.29 from reading 28%)
-    if (j.status === 'running' && j.phase === 'transcribing') parts.push(`${Math.floor(j.progress * 100 + 1e-6)}% done`);
+    if (j.status === 'running' && j.phase === 'transcribing') parts.push(this.i18n.t('{n}% done', { n: Math.floor(j.progress * 100 + 1e-6) }));
     // in-browser edition: the first use of a model downloads it into this browser
     if (j.status === 'running' && j.phase === 'loading_model' && j.download?.total) {
       const mb = (n: number) => (n >= 1e9 ? `${(n / 1e9).toFixed(2)} GB` : `${Math.round(n / 1e6)} MB`);
-      parts.push(`Downloading the speech model (first time only): ${mb(j.download.loaded)} of ${mb(j.download.total)}`);
+      parts.push(this.i18n.t('Downloading the speech model (first time only): {loaded} of {total}', { loaded: mb(j.download.loaded), total: mb(j.download.total) }));
     }
     if (j.eta_seconds) parts.push(fmtEta(j.eta_seconds));
     return parts.join(' · ');
@@ -375,11 +395,11 @@ export class JobPage {
         if (!this.current(id)) return;
         if (isBusy(e)) {
           // rate limited or full: the transcript is not gone, say why and try again in a moment
-          const why = errorDetail(e, 'The server is busy right now.');
+          const why = errorDetail(e, this.i18n.t('The server is busy right now.'));
           if (!this.job()) this.busy.set(why);
           else if (!this.busyShown) {
             this.busyShown = true;
-            this.toast.warning(why, 'Server busy');
+            this.toast.warning(why, this.i18n.t('Server busy'));
           }
           this.scheduleRetry(id, 5000);
         } else if (isTransient(e)) {
@@ -403,21 +423,21 @@ export class JobPage {
     if (running && j.cancel_requested) this.cancelling.set(true);
     if (!running && this.cancelling()) {
       this.cancelling.set(false);
-      if (j.status === 'cancelled') this.toast.info('The text found so far is kept.', 'Cancelled');
+      if (j.status === 'cancelled') this.toast.info(this.i18n.t('The text found so far is kept.'), this.i18n.t('Cancelled'));
     }
     const files = this.justUploaded();
     if (files && j.id === this.uploadedId) {
       this.justUploaded.set(0);
-      if (j.status === 'done') this.toast.success('Your transcript is ready below.', 'Upload complete');
+      if (j.status === 'done') this.toast.success(this.i18n.t('Your transcript is ready below.'), this.i18n.t('Upload complete'));
       else if (running)
         this.toast.success(
           files > 1
-            ? 'Transcription has started. Your other files are under Transcripts at the top of the page.'
-            : 'Transcription has started. The text appears below as it is recognised.',
-          'Upload complete',
+            ? this.i18n.t('Transcription has started. Your other files are under Transcripts at the top of the page.')
+            : this.i18n.t('Transcription has started. The text appears below as it is recognised.'),
+          this.i18n.t('Upload complete'),
         );
     } else if (this.wasActive && j.status === 'done') {
-      this.toast.success('You can now read, fix and download it.', 'Transcript ready');
+      this.toast.success(this.i18n.t('You can now read, fix and download it.'), this.i18n.t('Transcript ready'));
     }
     this.wasActive = running;
   }
@@ -509,6 +529,13 @@ export class JobPage {
       return s;
     });
     return reused ? { ...j, segments } : j;
+  }
+
+  /** Opens a transcript page in the page's language (English keeps the router's array form). */
+  private goToJob(id: string) {
+    const url = this.i18n.path(`/jobs/${id}`);
+    if (url === `/jobs/${id}`) this.router.navigate(['/jobs', id]);
+    else this.router.navigateByUrl(url);
   }
 
   // ------------------------------------------------------------------ menus
@@ -622,9 +649,9 @@ export class JobPage {
       next: (j) => {
         settle();
         if (this.current(id)) this.job.set(this.withKnownSegments(j));
-        if (single?.deleted) this.toast.success('The line was removed.', 'Line deleted');
-        else if (single) this.toast.success('Your change is saved.', 'Saved');
-        else this.toast.success(`Changed in ${edits.length} lines.`, 'Replaced');
+        if (single?.deleted) this.toast.success(this.i18n.t('The line was removed.'), this.i18n.t('Line deleted'));
+        else if (single) this.toast.success(this.i18n.t('Your change is saved.'), this.i18n.t('Saved'));
+        else this.toast.success(this.i18n.t('Changed in {n} lines.', { n: edits.length }), this.i18n.t('Replaced'));
       },
       error: (e) => {
         settle();
@@ -635,7 +662,10 @@ export class JobPage {
           if (single && !single.deleted) setTimeout(() => this.transcript()?.reopen(single.id, single.text));
         }
         const reopened = single && !single.deleted && this.current(id);
-        this.toast.error(errorDetail(e, reopened ? 'Your change is still in its box: press Save to try again.' : 'Could not save the change.'), 'Not saved');
+        this.toast.error(
+          errorDetail(e, reopened ? this.i18n.t('Your change is still in its box: press Save to try again.') : this.i18n.t('Could not save the change.')),
+          this.i18n.t('Not saved'),
+        );
       },
     });
   }
@@ -680,7 +710,7 @@ export class JobPage {
     const title = this.titleDraft.trim();
     if (title === j.title) return;
     if (!title) {
-      this.toast.warning('A name cannot be empty, so the old name was kept.', 'Name not changed');
+      this.toast.warning(this.i18n.t('A name cannot be empty, so the old name was kept.'), this.i18n.t('Name not changed'));
       return;
     }
     const id = j.id;
@@ -695,14 +725,14 @@ export class JobPage {
           this.titles.set({ title: res.title, noindex: true });
         }
         this.store.refresh();
-        this.toast.success(`It is now called “${res.title}”.`, 'Renamed');
+        this.toast.success(this.i18n.t('It is now called “{title}”.', { title: res.title }), this.i18n.t('Renamed'));
       },
       error: (e) => {
         if (this.current(id) && this.job()?.title === title) {
           this.job.update((cur) => (cur?.id === id ? { ...cur, title: old } : cur));
           this.titles.set({ title: old, noindex: true });
         }
-        this.toast.error(errorDetail(e, 'Could not rename the transcript.'), 'Not renamed');
+        this.toast.error(errorDetail(e, this.i18n.t('Could not rename the transcript.')), this.i18n.t('Not renamed'));
       },
     });
   }
@@ -725,7 +755,7 @@ export class JobPage {
       // no PDF generator in the browser: the print dialog makes it ("Save as PDF")
       printTranscript(j);
       this.log.info('Export printed: pdf', { id: j.id });
-      this.toast.info('Choose "Save as PDF" in the print dialog.', 'Print to PDF');
+      this.toast.info(this.i18n.t('Choose "Save as PDF" in the print dialog.'), this.i18n.t('Print to PDF'));
       return;
     }
     this.exporting.set(fmt);
@@ -735,11 +765,11 @@ export class JobPage {
         const name = file.filename ?? `${j.title}.${e.ext}`;
         saveFile(file.blob, name);
         this.log.info(`Export downloaded: ${fmt}`, { id: j.id });
-        this.toast.success(`${e.label}. Look for it in your downloads.`, 'Download started');
+        this.toast.success(this.i18n.t('{label}. Look for it in your downloads.', { label: this.i18n.t(e.label) }), this.i18n.t('Download started'));
       },
       error: async (err: HttpErrorResponse) => {
         this.exporting.set(null);
-        this.toast.error(await this.blobErrorDetail(err, 'Could not prepare the file. Please try again.'), 'Download failed');
+        this.toast.error(await this.blobErrorDetail(err, this.i18n.t('Could not prepare the file. Please try again.')), this.i18n.t('Download failed'));
       },
     });
   }
@@ -766,10 +796,10 @@ export class JobPage {
     text.catch(() => {}); // handled below; never an "unhandled rejection"
     try {
       const done = await this.writeClipboard(text);
-      if (done) this.toast.success('The text is ready to paste.', 'Copied');
-      else this.toast.error('Your browser blocked copying here. Use Export to save the text instead.', 'Could not copy');
+      if (done) this.toast.success(this.i18n.t('The text is ready to paste.'), this.i18n.t('Copied'));
+      else this.toast.error(this.i18n.t('Your browser blocked copying here. Use Export to save the text instead.'), this.i18n.t('Could not copy'));
     } catch (e) {
-      this.toast.error(errorDetail(e, 'Could not load the text to copy.'), 'Could not copy');
+      this.toast.error(errorDetail(e, this.i18n.t('Could not load the text to copy.')), this.i18n.t('Could not copy'));
     } finally {
       this.copying.set(false);
     }
@@ -807,7 +837,7 @@ export class JobPage {
   cancel() {
     const j = this.job();
     if (!j || this.cancelling()) return;
-    if (!confirm('Stop this transcription? The text found so far is kept.')) return;
+    if (!confirm(this.i18n.t('Stop this transcription? The text found so far is kept.'))) return;
     this.cancelling.set(true);
     this.api.cancel(j.id).subscribe({
       next: (upd) => {
@@ -817,13 +847,13 @@ export class JobPage {
         if (this.current(j.id)) this.job.update((cur) => (cur?.id === j.id ? { ...cur, ...upd, segments: cur.segments } : cur));
         this.wasActive = pending;
         this.store.refresh();
-        if (pending) this.toast.info('Stopping the transcription worker. The text found so far is kept.', 'Cancellation requested');
-        else if (upd.status === 'cancelled') this.toast.info('The text found so far is kept.', 'Cancelled');
-        else this.toast.info('The transcript finished before it could be cancelled.', 'Already finished');
+        if (pending) this.toast.info(this.i18n.t('Stopping the transcription worker. The text found so far is kept.'), this.i18n.t('Cancellation requested'));
+        else if (upd.status === 'cancelled') this.toast.info(this.i18n.t('The text found so far is kept.'), this.i18n.t('Cancelled'));
+        else this.toast.info(this.i18n.t('The transcript finished before it could be cancelled.'), this.i18n.t('Already finished'));
       },
       error: (e) => {
         this.cancelling.set(false);
-        this.toast.error(errorDetail(e, 'Could not cancel the transcript.'), 'Not cancelled');
+        this.toast.error(errorDetail(e, this.i18n.t('Could not cancel the transcript.')), this.i18n.t('Not cancelled'));
         this.store.refresh();
       },
     });
@@ -838,14 +868,14 @@ export class JobPage {
       next: (j) => {
         this.rerunning.set(false);
         this.store.upsert(j);
-        this.toast.success('A new transcript has started. The old one is kept in your list.', 'Started again');
+        this.toast.success(this.i18n.t('A new transcript has started. The old one is kept in your list.'), this.i18n.t('Started again'));
         if (!this.current(id)) return; // the user already went elsewhere: do not pull them back
         this.menu.set(null);
-        this.router.navigate(['/jobs', j.id]);
+        this.goToJob(j.id);
       },
       error: (e) => {
         this.rerunning.set(false);
-        this.toast.error(errorDetail(e, 'Could not start.'), 'Could not start');
+        this.toast.error(errorDetail(e, this.i18n.t('Could not start.')), this.i18n.t('Could not start'));
       },
     });
   }
@@ -860,12 +890,12 @@ export class JobPage {
         this.restyling.set(false);
         this.job.set(updated);
         this.menu.set(null);
-        this.toast.success('Style updated using the saved recognition. Edited lines are kept.', 'Style updated');
+        this.toast.success(this.i18n.t('Style updated using the saved recognition. Edited lines are kept.'), this.i18n.t('Style updated'));
       },
       error: (e) => {
         if (!this.current(j.id)) return;
         this.restyling.set(false);
-        this.toast.error(errorDetail(e, 'Could not change transcript style.'), 'Style unchanged');
+        this.toast.error(errorDetail(e, this.i18n.t('Could not change transcript style.')), this.i18n.t('Style unchanged'));
       },
     });
   }
@@ -874,19 +904,19 @@ export class JobPage {
     const j = this.job();
     this.menu.set(null);
     if (!j || this.deleting()) return;
-    if (!confirm(`Delete "${j.title}"? This cannot be undone.`)) return;
+    if (!confirm(this.i18n.t('Delete "{title}"? This cannot be undone.', { title: j.title }))) return;
     this.deleting.set(true);
     this.api.delete(j.id).subscribe({
       next: () => {
         this.deleting.set(false);
         this.store.remove(j.id);
-        this.toast.success(`“${j.title}” was deleted.`, 'Deleted');
+        this.toast.success(this.i18n.t('“{title}” was deleted.', { title: j.title }), this.i18n.t('Deleted'));
         // replace this page in the history: Back must not lead to a transcript that no longer exists
-        if (this.current(j.id)) this.router.navigateByUrl('/', { replaceUrl: true });
+        if (this.current(j.id)) this.router.navigateByUrl(this.i18n.path('/'), { replaceUrl: true });
       },
       error: (e) => {
         this.deleting.set(false);
-        this.toast.error(errorDetail(e, 'Could not delete the transcript.'), 'Not deleted');
+        this.toast.error(errorDetail(e, this.i18n.t('Could not delete the transcript.')), this.i18n.t('Not deleted'));
         this.store.refresh();
       },
     });

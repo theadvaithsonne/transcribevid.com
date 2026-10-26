@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, InjectionToken, computed, effect, inject, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { I18nService } from '../i18n/i18n.service';
 import { ApiService } from './api.service';
 import { JobsStore } from './jobs.store';
 import { JobStatus, JobSummary, SiteStats } from './models';
@@ -50,6 +51,7 @@ export class StatsService {
   private http = inject(HttpClient);
   private store = inject(JobsStore);
   private browser = inject(IS_BROWSER);
+  private i18n = inject(I18nService);
   /** '' = this edition's own server counts; otherwise the counter Worker's address */
   private counter = inject(COUNTER_URL);
 
@@ -67,18 +69,24 @@ export class StatsService {
   readonly counting = computed(() => this.stats()?.counting === true);
   readonly count = computed(() => this.stats()?.transcribed ?? 0);
 
+  /** the browser's own number style: used on English pages, exactly as before there were languages */
   private readonly nf = new Intl.NumberFormat();
-  /** "12,345" (thousands separators) */
-  readonly formatted = computed(() => this.nf.format(this.count()));
+  /** "12,345" (thousands separators): the browser's style on English pages, the page's own language elsewhere */
+  readonly formatted = computed(() => {
+    const locale = this.i18n.locale();
+    return (locale === 'en' ? this.nf : new Intl.NumberFormat(locale)).format(this.count());
+  });
   /** "12,345 videos transcribed" (used as the accessible name and for the full label) */
-  readonly label = computed(() => `${this.formatted()} ${this.count() === 1 ? 'video' : 'videos'} transcribed`);
+  readonly label = computed(() =>
+    this.count() === 1 ? this.i18n.t('{n} video transcribed', { n: this.formatted() }) : this.i18n.t('{n} videos transcribed', { n: this.formatted() }),
+  );
   /** The tooltip: the full label, or why the number is 0 on a copy that does not count. */
   readonly title = computed(() => {
-    if (!this.counting()) return 'This local copy does not count transcriptions';
+    if (!this.counting()) return this.i18n.t('This local copy does not count transcriptions');
     // the Worker's number comes from visitors' browsers: say so, and never call it verified
-    return this.counter ? `${this.label()}, as reported by visitors' browsers` : this.label();
+    return this.counter ? this.i18n.t("{label}, as reported by visitors' browsers", { label: this.label() }) : this.label();
   });
-  readonly ariaLabel = computed(() => (this.counting() ? this.label() : `${this.label()}. ${this.title()}.`));
+  readonly ariaLabel = computed(() => (this.counting() ? this.label() : this.i18n.t('{label}. {title}.', { label: this.label(), title: this.title() })));
 
   private timer?: ReturnType<typeof setTimeout>;
   private soonTimer?: ReturnType<typeof setTimeout>;

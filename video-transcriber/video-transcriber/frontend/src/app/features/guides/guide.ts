@@ -3,6 +3,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { SiteService } from '../../core/site.service';
 import { StructuredDataService } from '../../core/structured-data.service';
+import { I18nService } from '../../i18n/i18n.service';
+import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 import { AdSlot } from '../../shared/ad-slot';
 import { GuideBlock, GuideContent } from './guide.model';
 import { GUIDES, GUIDES_PATH, fmtLongDate } from './guides.list';
@@ -43,7 +45,7 @@ export function guideWordCount(c: GuideContent, blocks: GuideBlock[] = c.blocks)
  */
 @Component({
   selector: 'app-guide',
-  imports: [RouterLink, AdSlot],
+  imports: [RouterLink, AdSlot, TPipe, LocalePathPipe],
   templateUrl: './guide.html',
   styleUrl: './guide.scss',
 })
@@ -52,13 +54,17 @@ export class GuidePage {
   private data = toSignal(this.route.data, { initialValue: this.route.snapshot.data });
   private site = inject(SiteService);
   private structured = inject(StructuredDataService);
+  private i18n = inject(I18nService);
 
   readonly guidesPath = GUIDES_PATH;
   private slug = computed(() => String(this.data()['guide'] ?? ''));
   readonly c = computed<GuideContent>(() => this.data()['content'] as GuideContent);
   readonly meta = computed(() => GUIDES.find((g) => g.slug === this.slug()) ?? GUIDES[0]);
   readonly blocks = computed(() => editionBlocks(this.c(), this.site.inBrowser()));
-  readonly updatedLabel = computed(() => fmtLongDate(this.meta().updated));
+  /** the guide's short name and description in the page's language (the route resolves them per language; English comes from the list) */
+  readonly label = computed(() => String(this.data()['label'] ?? this.meta().label));
+  private description = computed(() => String(this.data()['description'] ?? this.meta().description));
+  readonly updatedLabel = computed(() => fmtLongDate(this.meta().updated, this.i18n.locale()));
   readonly faqs = computed(() => this.c().faqs);
 
   constructor() {
@@ -66,8 +72,8 @@ export class GuidePage {
     this.structured.article(
       computed(() => ({
         headline: this.c().h1,
-        description: this.meta().description,
-        path: this.meta().path,
+        description: this.description(),
+        path: this.i18n.path(this.meta().path),
         published: this.meta().published,
         updated: this.meta().updated,
         wordCount: guideWordCount(this.c(), this.blocks()),

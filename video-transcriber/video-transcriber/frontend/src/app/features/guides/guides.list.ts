@@ -79,8 +79,20 @@ export const guideRoutePath = (g: GuideLink) => g.path.replace(/^\//, '');
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-/** "2026-10-27" -> "27 October 2026" (fixed English text, so the prerendered page and the browser agree). */
-export function fmtLongDate(iso: string): string {
-  const [y, m, d] = iso.split('-').map(Number);
-  return m >= 1 && m <= 12 ? `${d} ${MONTHS[m - 1]} ${y}` : iso;
+/**
+ * "2026-10-27" -> "27 October 2026" in English; in another language that language's long date ("27 de octubre de 2026").
+ * Always the Gregorian calendar and UTC, so the prerendered page and the browser agree whatever the visitor's settings.
+ * Anything that is not a real date is returned unchanged.
+ */
+export function fmtLongDate(iso: string, locale = 'en'): string {
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return iso;
+  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const date = new Date(Date.UTC(y, mo - 1, d));
+  if (date.getUTCFullYear() !== y || date.getUTCMonth() !== mo - 1 || date.getUTCDate() !== d) return iso;
+  try {
+    return new Intl.DateTimeFormat(`${locale === 'en' ? 'en-GB' : locale}-u-ca-gregory`, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
+  } catch {
+    return `${d} ${MONTHS[mo - 1]} ${y}`;
+  }
 }

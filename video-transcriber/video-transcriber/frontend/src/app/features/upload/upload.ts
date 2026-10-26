@@ -1,13 +1,13 @@
 import { Component, DestroyRef, HostListener, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { concatMap, from, last, tap } from 'rxjs';
 import { ApiService } from '../../core/api.service';
 import { fmtBytes, fmtBytesShort, fmtTime, prefersReducedMotion } from '../../core/format';
 import { errorDetail } from '../../core/http-error';
 import { JobsStore } from '../../core/jobs.store';
 import { LogService } from '../../core/log.service';
-import { DEFAULT_OPTIONS, JobOptions } from '../../core/models';
+import { DEFAULT_OPTIONS, JobOptions, ModelInfo } from '../../core/models';
 import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
@@ -15,8 +15,29 @@ import { RelatedTools } from '../../shared/related-tools';
 import type { ToolPreset } from '../tool-pages/tool-pages.list';
 import { ConverterConsent } from '../../core/transport/converter-consent';
 import { DeviceAdvice, EngineDevice } from '../../core/transport/engine-device';
+import { translateMessage } from '../../engine/device/message';
+import { I18nService } from '../../i18n/i18n.service';
+import { _t } from '../../i18n/mark';
+import { RichText } from '../../i18n/rich-text';
+import { TPipe } from '../../i18n/t.pipe';
 
 const KEY = 'vt-options';
+
+/**
+ * Texts that other code produces and this page shows (core/transport and engine/qwen build them as fixed English strings).
+ * They are translated when shown (`tm()`); listing them here is what lets scripts/extract-i18n.mjs find their keys. A spec
+ * checks they still equal what those modules produce.
+ */
+export const SHOWN_ELSEWHERE = [
+  _t('Qwen3-ASR needs a desktop browser with WebGPU (Chrome or Edge).'),
+  _t('Qwen3-ASR needs a desktop browser with WebGPU (Chrome or Edge) and 8 GB of memory.'),
+  _t('Qwen3-ASR needs a desktop browser with WebGPU (Chrome or Edge) and 16-bit shader support (shader-f16) in the graphics driver.'),
+  _t('not available in this browser'),
+  _t('not available with Qwen (times are per chunk)'),
+  _t('first time only, also downloads the {size} MB word-timing model'),
+];
+/** "first time only, also downloads the 564 MB word-timing model": the one text with a value that core/transport builds itself. */
+const WORD_TIMING_DOWNLOAD = /^first time only, also downloads the (\d+) MB word-timing model$/;
 const MEDIA_EXT = /\.(mp4|mkv|mov|avi|webm|mp3|wav|m4a|aac|flac|ogg|opus|wmv|flv|m4v|3gp|ts|mts)$/i;
 
 interface Preset {
@@ -43,7 +64,7 @@ const fileKey = (f: File) => `${f.name}|${f.size}|${f.lastModified}`;
 
 @Component({
   selector: 'app-upload',
-  imports: [FormsModule, RouterLink, RelatedTools],
+  imports: [FormsModule, RelatedTools, TPipe, RichText],
   templateUrl: './upload.html',
   styleUrl: './upload.scss',
 })
@@ -54,6 +75,7 @@ export class UploadPage {
   private destroyRef = inject(DestroyRef);
   private pendingFile = inject(PendingFileService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
   private device = inject(EngineDevice);
   private converter = inject(ConverterConsent);
   /** the converter question is being prepared (the files are probed): a second click must not start twice */
@@ -94,27 +116,128 @@ export class UploadPage {
   fmtBytes = fmtBytes;
   fmtTime = fmtTime;
 
+  /** The quality choices: English texts that are translation keys, shown with the `t` pipe. */
   presets: Preset[] = [
-    { model: 'base', title: 'Fastest', blurb: 'Quick results. Good for clear speech.', speed: 4, speedLabel: 'Quickest' },
-    { model: 'small', title: 'Standard', blurb: 'Good for most videos. Not sure? Keep this one.', speed: 3, speedLabel: 'Fast', recommended: true },
-    { model: 'large-v3-turbo', title: 'High accuracy', blurb: 'Fewer mistakes. Takes longer.', speed: 2, speedLabel: 'Slower' },
-    { model: 'large-v3', title: 'Best accuracy', blurb: 'Fewest mistakes. Takes the longest.', speed: 1, speedLabel: 'Slowest' },
+    { model: 'base', title: _t('Fastest'), blurb: _t('Quick results. Good for clear speech.'), speed: 4, speedLabel: _t('Quickest') },
+    { model: 'small', title: _t('Standard'), blurb: _t('Good for most videos. Not sure? Keep this one.'), speed: 3, speedLabel: _t('Fast'), recommended: true },
+    { model: 'large-v3-turbo', title: _t('High accuracy'), blurb: _t('Fewer mistakes. Takes longer.'), speed: 2, speedLabel: _t('Slower') },
+    { model: 'large-v3', title: _t('Best accuracy'), blurb: _t('Fewest mistakes. Takes the longest.'), speed: 1, speedLabel: _t('Slowest') },
   ];
+
+  /** The home page text below the tool: the keys (rich texts use **bold** and [links](/path)). */
+  readonly info = {
+    title: _t('Free video and audio to text'),
+    titleBrowser: _t('Free video and audio to text, right in your browser'),
+    intro: _t(
+      '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.',
+    ),
+    browser: _t(
+      'The transcription runs on your own device with open speech recognition models such as OpenAI Whisper. Your browser downloads a model once and keeps it, so the next file starts faster, and your video or audio is never uploaded anywhere.',
+    ),
+    server: _t('Your file is transcribed with open speech recognition models such as OpenAI Whisper and is deleted automatically afterwards.'),
+    stepsTitle: _t('How to transcribe a video to text'),
+    step1: _t(
+      '**Choose your file.** Drop a video or audio file above, pick one from your device, or record your voice with the microphone. MP4, MOV, MKV, WebM, AVI, MP3, WAV, M4A, FLAC, OGG and most other common formats work.',
+    ),
+    step2: _t(
+      '**Pick the quality and the language.** A faster model gives a quick draft; a more accurate one is better for interviews, lectures and subtitles. The spoken language can be detected for you, and more than 50 languages are supported.',
+    ),
+    step3: _t(
+      '**Read, correct and download.** The transcript appears with timestamps, and words the model was unsure of are marked so you can check them. Download it as plain text, SRT or VTT subtitles, Markdown or JSON.',
+    ),
+    usesTitle: _t('What people use it for'),
+    use1: _t('**Subtitles and captions** for your own videos, reels and online courses, from an SRT or VTT file.'),
+    use2: _t('**Meeting and interview notes** that you can search, quote and share.'),
+    use3: _t('**Lectures and podcasts** turned into readable text for studying or show notes.'),
+    use4: _t('**Voice memos** written out, so you do not have to listen to them again.'),
+    tipsTitle: _t('Tips for the best transcript'),
+    tips: _t(
+      'Clear speech close to the microphone gives the best result. Under More options, **Enhance audio** and **Skip silence & music** are on by default: they filter rumble and hiss and stop the model from inventing text during music or long pauses, so keep them on for noisy recordings. For subtitles, keep **Word-level timing** on too, so each line starts and ends exactly with the words.',
+    ),
+    more: _t(
+      'Still have a question? Read the [frequently asked questions](/faq), see [how it works](/how-it-works), or [contact us](/contact).',
+    ),
+  };
+
+  /** The four switches under More options (bold lead-in, then the rest). */
+  readonly checkText = {
+    enhance: _t('**Enhance audio** — filter rumble & hiss, even out quiet speakers'),
+    vad: _t('**Skip silence & music** — prevents made-up text'),
+    words: _t('**Word-level timing** — better subtitles and confidence marks'),
+    context: _t('**Use previous text as context** — can repeat on long files'),
+  };
+
+  /**
+   * A message that other code produced (a device note, a model's reason, the time estimate) in the page's language.
+   * Those modules build fixed English strings: values go through msg() and are translated from there, the Qwen / transport
+   * texts are fixed keys (SHOWN_ELSEWHERE), and anything unknown is shown as it is.
+   */
+  tm(message: string): string {
+    const timing = message.match(WORD_TIMING_DOWNLOAD);
+    if (timing) return this.i18n.t('first time only, also downloads the {size} MB word-timing model', { size: timing[1] });
+    return translateMessage(message, (key, params) => this.i18n.t(key, params));
+  }
+
+  /** The languages for the select, named in the page's language ("Alemán" on the Spanish page) and sorted by that name. English keeps the list as it comes. */
+  readonly languageOptions = computed(() => {
+    const locale = this.i18n.locale();
+    const list = this.store.languages();
+    if (locale === 'en') return list;
+    let names: Intl.DisplayNames | null = null;
+    try {
+      names = new Intl.DisplayNames(locale, { type: 'language', fallback: 'none' });
+    } catch {
+      /* a browser without display names: the English names are shown */
+    }
+    return list.map((l) => ({ code: l.code, name: this.displayName(names, l.code) ?? l.name })).sort((a, b) => a.name.localeCompare(b.name, locale));
+  });
+
+  private displayName(names: Intl.DisplayNames | null, code: string): string | undefined {
+    try {
+      const name = names?.of(code);
+      return name && name.toLowerCase() !== code.toLowerCase() ? name : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** One <option> of the model select: "Small — Good balance (default) (465 MB download)", or the label and why it cannot run here. */
+  modelOption(m: ModelInfo): string {
+    const label = m.label;
+    if (m.reason) return this.i18n.t('{label} — {reason}', { label, reason: this.tm(m.reason) });
+    const note = this.i18n.t(m.note);
+    const download = this.downloadShort(m.id);
+    return download ? this.i18n.t('{label} — {note} ({download})', { label, note, download }) : this.i18n.t('{label} — {note}', { label, note });
+  }
+
+  /** The words on the big button. */
+  submitLabel(): string {
+    if (this.uploading()) return this.site.inBrowser() ? this.i18n.t('Preparing…') : this.i18n.t('Uploading…');
+    const n = this.files().length;
+    if (!n) return this.i18n.t('Choose a file first');
+    return n > 1 ? this.i18n.t('Transcribe {n} files', { n }) : this.i18n.t('Transcribe');
+  }
 
   /** the hover text of a choice (with the reason when this device cannot run it) */
   tip(p: Preset) {
     const why = this.unavailableReason(p.model);
-    return why ? `${p.title}. ${p.blurb} Not available on this device: ${why}.` : `${p.title}. ${p.blurb}`;
+    const title = this.i18n.t(p.title);
+    const blurb = this.i18n.t(p.blurb);
+    return why
+      ? this.i18n.t('{title}. {blurb} Not available on this device: {reason}.', { title, blurb, reason: this.tm(why) })
+      : this.i18n.t('{title}. {blurb}', { title, blurb });
   }
 
   /** the one line of help under the choices: what the picked one means (plus a first-time download, if any) */
   selectedHelp() {
     const p = this.presets.find((x) => x.model === this.opts.model);
     if (!p) return '';
+    const title = this.i18n.t(p.title);
+    const blurb = this.i18n.t(p.blurb);
     const note = this.downloadNote(p.model);
     const timing = this.modelInfo(p.model)?.word_timing_note;
-    const base = note ? `${p.title}: ${p.blurb} ${note}.` : `${p.title}: ${p.blurb}`;
-    return timing ? `${base} Word timing: ${timing}.` : base;
+    const base = note ? this.i18n.t('{title}: {blurb} {note}.', { title, blurb, note }) : this.i18n.t('{title}: {blurb}', { title, blurb });
+    return timing ? this.i18n.t('{base} Word timing: {timing}.', { base, timing: this.tm(timing) }) : base;
   }
 
   /**
@@ -234,9 +357,9 @@ export class UploadPage {
   translateWarning(): string {
     if (this.opts.task !== 'translate') return '';
     if (this.opts.model === 'large-v3-turbo') {
-      return 'High accuracy (Large v3 Turbo) was not trained to translate and may give you the original language. For translation choose Standard or Best accuracy.';
+      return this.i18n.t('High accuracy (Large v3 Turbo) was not trained to translate and may give you the original language. For translation choose Standard or Best accuracy.');
     }
-    if (this.opts.model === 'distil-large-v3') return 'Distil Large v3 understands English speech only. Choose another model to translate.';
+    if (this.opts.model === 'distil-large-v3') return this.i18n.t('Distil Large v3 understands English speech only. Choose another model to translate.');
     return '';
   }
 
@@ -280,12 +403,12 @@ export class UploadPage {
   /** a sentence for a normal person: only for a model that still has to be downloaded */
   downloadNote(id: string) {
     const size = this.downloadSize(id);
-    return size ? `First time only: downloads ${size} (needs internet)` : '';
+    return size ? this.i18n.t('First time only: downloads {size} (needs internet)', { size }) : '';
   }
   /** the short form for a select option: "3.1 GB download" */
   downloadShort(id: string) {
     const size = this.downloadSize(id);
-    return size ? `${size} download` : '';
+    return size ? this.i18n.t('{size} download', { size }) : '';
   }
 
   // ------------------------------------------------------------------ whole-page drop and leaving
@@ -365,7 +488,7 @@ export class UploadPage {
   addFiles(list: File[]) {
     if (this.uploading()) {
       // the list is cleared when the upload finishes, so anything added now would silently vanish
-      this.error.set('An upload is in progress. Wait for it to finish before adding more files.');
+      this.error.set(this.i18n.t('An upload is in progress. Wait for it to finish before adding more files.'));
       return;
     }
     if (!list.length) return;
@@ -373,9 +496,16 @@ export class UploadPage {
     const media = list.filter((f) => f.type.startsWith('video/') || f.type.startsWith('audio/') || MEDIA_EXT.test(f.name));
     const skipped = list.length - media.length;
     if (skipped && !media.length) {
-      problems.push(list.length === 1 ? 'That is not a video or audio file. Please choose a video or audio file.' : 'None of those are video or audio files.');
+      problems.push(
+        list.length === 1
+          ? this.i18n.t('That is not a video or audio file. Please choose a video or audio file.')
+          : this.i18n.t('None of those are video or audio files.'),
+      );
     } else if (skipped) {
-      this.toast.warning(`${skipped} ${skipped === 1 ? 'file was' : 'files were'} skipped: not video or audio.`, 'File skipped');
+      this.toast.warning(
+        skipped === 1 ? this.i18n.t('1 file was skipped: not video or audio.') : this.i18n.t('{n} files were skipped: not video or audio.', { n: skipped }),
+        this.i18n.t('File skipped'),
+      );
     }
     const ok = media.filter((f) => {
       const tooBig = this.oversizeMessage(f);
@@ -394,7 +524,12 @@ export class UploadPage {
       have.add(k);
       return true;
     });
-    if (dup) this.toast.info(dup === 1 ? 'That file is already in the list.' : `${dup} of those files are already in the list.`, 'Already added');
+    if (dup) {
+      this.toast.info(
+        dup === 1 ? this.i18n.t('That file is already in the list.') : this.i18n.t('{n} of those files are already in the list.', { n: dup }),
+        this.i18n.t('Already added'),
+      );
+    }
     this.error.set(problems.join(' '));
     this.files.update((cur) => [...cur, ...fresh]);
     if (fresh.length) this.refreshAdvice();
@@ -411,9 +546,11 @@ export class UploadPage {
     const mb = this.store.health()?.max_upload_mb;
     if (!mb || mb <= 0 || f.size <= mb * 1024 * 1024) return null;
     const limit = fmtBytesShort(mb * 1024 * 1024);
-    const message = `File "${f.name}" is ${fmtBytesShort(f.size)}; the limit is ${limit}`;
+    const values = { name: f.name, size: fmtBytesShort(f.size), limit };
     // only whoever runs their own copy can change the limit
-    return this.site.isPublic() ? `${message}.` : `${message} - set VT_MAX_UPLOAD_MB to raise it`;
+    return this.site.isPublic()
+      ? this.i18n.t('File "{name}" is {size}; the limit is {limit}.', values)
+      : this.i18n.t('File "{name}" is {size}; the limit is {limit} - set VT_MAX_UPLOAD_MB to raise it', values);
   }
 
   // ------------------------------------------------------------------ recording
@@ -425,7 +562,7 @@ export class UploadPage {
     }
     if (this.uploading()) return;
     if (!this.micSupported) {
-      this.error.set('This browser cannot record. Please choose a file instead.');
+      this.error.set(this.i18n.t('This browser cannot record. Please choose a file instead.'));
       return;
     }
     this.micBusy.set(true);
@@ -436,7 +573,7 @@ export class UploadPage {
       this.micBusy.set(false);
       if (!this.destroyed) {
         this.error.set('');
-        this.toast.error('Allow the microphone in your browser, or choose a file instead.', 'No microphone');
+        this.toast.error(this.i18n.t('Allow the microphone in your browser, or choose a file instead.'), this.i18n.t('No microphone'));
       }
       return;
     }
@@ -452,20 +589,20 @@ export class UploadPage {
       const rec = new MediaRecorder(stream);
       this.recorder = rec;
       rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
-      rec.onerror = () => this.error.set('The recording failed. Please try again.');
+      rec.onerror = () => this.error.set(this.i18n.t('The recording failed. Please try again.'));
       rec.onstop = () => {
         this.releaseMic();
         if (this.recorder === rec) this.recorder = undefined;
         if (this.destroyed) return;
         this.recording.set(false);
         if (!chunks.length) {
-          this.error.set('Nothing was recorded.');
+          this.error.set(this.i18n.t('Nothing was recorded.'));
           return;
         }
         const type = rec.mimeType || 'audio/webm';
         const ext = type.includes('ogg') ? 'ogg' : type.includes('mp4') ? 'm4a' : 'webm';
         const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ').replace(':', '-');
-        this.addFiles([new File(chunks, `Recording ${stamp}.${ext}`, { type })]);
+        this.addFiles([new File(chunks, `${this.i18n.t('Recording {stamp}', { stamp })}.${ext}`, { type })]);
       };
       rec.start(1000);
       this.recSeconds.set(0);
@@ -475,7 +612,7 @@ export class UploadPage {
     } catch {
       this.recorder = undefined;
       this.releaseMic();
-      this.error.set('Recording is not supported by this browser.');
+      this.error.set(this.i18n.t('Recording is not supported by this browser.'));
     }
   }
 
@@ -497,7 +634,9 @@ export class UploadPage {
     if (blocked) {
       // never swapped for another model at this point: the visitor decides
       const label = this.modelInfo(this.opts.model)?.label ?? this.opts.model;
-      this.error.set(`The ${label} model cannot run on this device: ${blocked.replace(/\.$/, '')}. Choose another one.`);
+      this.error.set(
+        this.i18n.t('The {label} model cannot run on this device: {reason}. Choose another one.', { label, reason: this.tm(blocked).replace(/[.。]$/, '') }),
+      );
       return;
     }
     // in-browser edition: a file only ffmpeg.wasm can read (AVI, WMA, FLV, AMR ...) needs the visitor's yes to the
@@ -577,7 +716,7 @@ export class UploadPage {
             this.uploading.set(false);
             this.uploadDone.set(false);
             this.files.set([]);
-            this.router.navigate(['/jobs', created[0]], { state: { justUploaded: created.length } });
+            this.router.navigate(this.jobCommands(created[0]), { state: { justUploaded: created.length } });
           }, 1400);
         },
         error: (e) => {
@@ -585,7 +724,7 @@ export class UploadPage {
           this.log.error(`Upload failed: ${msg}`);
           if (created.length) this.store.refresh();
           if (this.destroyed) {
-            this.store.notify(msg, 'error', 'Upload failed');
+            this.store.notify(msg, 'error', this.i18n.t('Upload failed'));
             return;
           }
           this.uploading.set(false);
@@ -593,8 +732,11 @@ export class UploadPage {
             // those files are already queued: drop them from the list so Transcribe does not upload them twice
             this.files.update((cur) => cur.slice(created.length));
             const left = files.length - created.length;
+            const values = { message: msg, done: created.length, total: files.length, left };
             this.error.set(
-              `${msg} ${created.length} of ${files.length} file(s) were already queued; the other ${left} ${left === 1 ? 'is' : 'are'} still in the list, press Transcribe to retry.`,
+              left === 1
+                ? this.i18n.t('{message} {done} of {total} file(s) were already queued; the other {left} is still in the list, press Transcribe to retry.', values)
+                : this.i18n.t('{message} {done} of {total} file(s) were already queued; the other {left} are still in the list, press Transcribe to retry.', values),
             );
           } else {
             this.error.set(msg);
@@ -603,23 +745,29 @@ export class UploadPage {
       });
   }
 
+  /** Where a started job's page is: "/jobs/<id>" in English, "/es/jobs/<id>" in Spanish (the router commands, as navigate() takes them). */
+  private jobCommands(id: string): string[] {
+    const path = this.i18n.path(`/jobs/${id}`);
+    return path === `/jobs/${id}` ? ['/jobs', id] : [path];
+  }
+
   private describe(e: unknown): string {
     const status = (e as { status?: number } | null)?.status ?? 0;
     if (!status) {
       return this.site.devHint()
-        ? 'Cannot reach the server. Make sure it is running (npm run dev) and try again.'
-        : 'Cannot reach the server. Check your connection and try again.';
+        ? this.i18n.t('Cannot reach the server. Make sure it is running (npm run dev) and try again.')
+        : this.i18n.t('Cannot reach the server. Check your connection and try again.');
     }
     const detail = errorDetail(e, '');
     // includes the server's own text for 413 (too large), 429 (busy / too many jobs), 503 (full) and 507 (disk full)
     if (detail) return detail;
-    if (status === 413) return 'The file is larger than the server accepts.';
-    if (status === 429) return 'The service is busy right now. Please wait a moment and try again.';
-    if (status === 503) return 'The service is full right now. Please try again in a little while.';
-    if (status === 507) return 'The server does not have enough free disk space for this file.';
+    if (status === 413) return this.i18n.t('The file is larger than the server accepts.');
+    if (status === 429) return this.i18n.t('The service is busy right now. Please wait a moment and try again.');
+    if (status === 503) return this.i18n.t('The service is full right now. Please try again in a little while.');
+    if (status === 507) return this.i18n.t('The server does not have enough free disk space for this file.');
     return this.site.devHint()
-      ? `Upload failed (server error ${status}). Check the terminal running the server for details.`
-      : `Upload failed (server error ${status}). Please try again in a moment.`;
+      ? this.i18n.t('Upload failed (server error {status}). Check the terminal running the server for details.', { status })
+      : this.i18n.t('Upload failed (server error {status}). Please try again in a moment.', { status });
   }
 
   private restore(): JobOptions {

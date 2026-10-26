@@ -1,18 +1,18 @@
 <div class="page-doc guide">
   <article class="doc">
     <header>
-      <nav class="crumbs" aria-label="Breadcrumb">
-        <a routerLink="/">Home</a>
+      <nav class="crumbs" [attr.aria-label]="'Breadcrumb' | t">
+        <a [routerLink]="'/' | lp">{{ 'Home' | t }}</a>
         <span aria-hidden="true">/</span>
-        <a [routerLink]="guidesPath">Guides</a>
+        <a [routerLink]="guidesPath | lp">{{ 'Guides' | t }}</a>
         <span aria-hidden="true">/</span>
-        <span aria-current="page">{{ meta().label }}</span>
+        <span aria-current="page">{{ label() }}</span>
       </nav>
       <h1 class="page-title">{{ c().h1 }}</h1>
       <p class="meta">
-        <time [attr.datetime]="meta().updated">Updated {{ updatedLabel() }}</time>
+        <time [attr.datetime]="meta().updated">{{ 'Updated {date}' | t: { date: updatedLabel() } }}</time>
         <span aria-hidden="true">·</span>
-        <span>{{ c().readingMinutes }} min read</span>
+        <span>{{ '{n} min read' | t: { n: c().readingMinutes } }}</span>
       </p>
       <p class="lede">{{ c().lead }}</p>
     </header>
@@ -88,7 +88,7 @@
     }
 
     <section class="faq" aria-labelledby="g-faq-title">
-      <h2 id="g-faq-title">Common questions</h2>
+      <h2 id="g-faq-title">{{ 'Common questions' | t }}</h2>
       <div class="qas">
         @for (f of faqs(); track $index) {
           <details class="qa">
@@ -101,11 +101,11 @@
 
     @if (c().links.length) {
       <section class="links" aria-labelledby="g-links-title">
-        <h2 id="g-links-title">Keep reading</h2>
+        <h2 id="g-links-title">{{ 'Keep reading' | t }}</h2>
         <ul class="link-list">
           @for (l of c().links; track l.path) {
             <li>
-              <a [routerLink]="l.path">{{ l.label }}</a>
+              <a [routerLink]="l.path | lp">{{ l.label }}</a>
               <span>{{ l.note }}</span>
             </li>
           }
@@ -114,7 +114,7 @@
     }
 
     <div class="end">
-      <a class="btn big ghost" [routerLink]="c().toolPath">{{ c().toolCta }}</a>
+      <a class="btn big ghost" [routerLink]="c().toolPath | lp">{{ c().toolCta }}</a>
     </div>
   </article>
 </div>

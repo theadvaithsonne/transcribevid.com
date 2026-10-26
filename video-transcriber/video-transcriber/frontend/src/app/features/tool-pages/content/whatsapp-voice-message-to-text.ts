@@ -21,7 +21,7 @@ export const CONTENT: ToolPageContent = {
     {
       title: 'How to save a voice message as a file',
       paragraphs: [
-        'WhatsApp keeps voice messages inside the app, so save the message as a file first. Menus differ between phone models and app versions, so treat these steps as a guide and look for Share, Forward or Save options. WhatsApp is a name of its owner, and this site is not connected to it.',
+        'WhatsApp keeps voice messages inside the app, so save the message as a file first. Menus differ between phone models and app versions, so treat these steps as a guide and look for Share, Forward or Save options. WhatsApp belongs to its own company, and this site is not connected to it.',
         'WhatsApp can also show a transcript inside the chat on some phones, in the languages and versions that offer it. This page is for when you want the text as a file you can edit and export, with timestamps, or when your version or language is not covered.',
       ],
       bullets: [

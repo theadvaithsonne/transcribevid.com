@@ -4,6 +4,8 @@ import { fmtBytesShort } from '../../core/format';
 import { PendingFileService } from '../../core/pending-file.service';
 import { SiteService } from '../../core/site.service';
 import { ToastService } from '../../core/toast.service';
+import { I18nService } from '../../i18n/i18n.service';
+import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 import { DropKind } from './tool-page.model';
 import type { ToolPreset } from './tool-pages.list';
 
@@ -26,7 +28,7 @@ const AUDIO_EXT = /\.(mp3|wav|m4a|aac|flac|ogg|opus|3gp)$/i;
  */
 @Component({
   selector: 'app-tool-drop',
-  imports: [RouterLink],
+  imports: [RouterLink, TPipe, LocalePathPipe],
   template: `
     <div
       class="box"
@@ -42,15 +44,15 @@ const AUDIO_EXT = /\.(mp3|wav|m4a|aac|flac|ogg|opus|3gp)$/i;
           <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 15v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </span>
-      <p class="title" id="tool-drop-title">Drop your {{ noun() }} here, or choose a file</p>
+      <p class="title" id="tool-drop-title">{{ 'Drop your {noun} here, or choose a file' | t: { noun: noun() } }}</p>
       <input #picker type="file" hidden [accept]="accept()" (change)="onPick($event)" />
-      <button type="button" class="btn primary big" (click)="picker.click()">Choose a file</button>
+      <button type="button" class="btn primary big" (click)="picker.click()">{{ 'Choose a file' | t }}</button>
       <p class="hint">{{ hint() }}</p>
       @if (error()) {
         <p class="alert" role="alert">
           {{ error() }}
           @if (wrongKind()) {
-            <a routerLink="/video-to-text">Go to Video to text</a>
+            <a [routerLink]="'/video-to-text' | lp">{{ 'Go to Video to text' | t }}</a>
           }
         </p>
       }
@@ -142,6 +144,7 @@ export class ToolDrop {
   private pending = inject(PendingFileService);
   private site = inject(SiteService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
 
   /** video pages take video and audio, audio pages take audio only */
   readonly kind = input<DropKind>('video');
@@ -165,13 +168,13 @@ export class ToolDrop {
 
   readonly hint = computed(() => {
     const f = this.formats();
-    const named = f.slice(0, 5).join(', ') + (f.length > 5 ? ' and more' : '');
+    const list = f.slice(0, 5).join(', ');
     const parts = [
-      named ? `${named}.` : '',
-      this.kind() === 'video' ? 'Audio works too.' : '',
+      list ? this.i18n.t(f.length > 5 ? '{formats} and more.' : '{formats}.', { formats: list }) : '',
+      this.kind() === 'video' ? this.i18n.t('Audio works too.') : '',
       this.limits(),
       // the in-browser edition never uploads the file; the server edition uploads it once Transcribe is pressed
-      this.site.inBrowser() ? 'Your file never leaves your device.' : 'Nothing is uploaded until you press Transcribe.',
+      this.site.inBrowser() ? this.i18n.t('Your file never leaves your device.') : this.i18n.t('Nothing is uploaded until you press Transcribe.'),
     ];
     // "500 MB" stays on one line
     return parts.filter(Boolean).join(' ').replace(/(\d) (?=[KMGT]B(?![a-z]))/g, '$1\xa0');
@@ -203,7 +206,7 @@ export class ToolDrop {
   private take(files: File[]) {
     if (!files.length) return;
     if (files.length > 1) {
-      this.refuse('Please add one file at a time here. You can add more files on the next page.');
+      this.refuse(this.i18n.t('Please add one file at a time here. You can add more files on the next page.'));
       return;
     }
     const file = files[0];
@@ -217,8 +220,8 @@ export class ToolDrop {
     this.pending.set(file, this.preset());
     this.toast.dismiss(this.refusedToast); // an earlier "File not added" is out of date now
     this.refusedToast = 0;
-    this.toast.success(`"${file.name}" is ready. Press Transcribe to start.`, 'File added');
-    void this.router.navigateByUrl('/');
+    this.toast.success(this.i18n.t('"{name}" is ready. Press Transcribe to start.', { name: file.name }), this.i18n.t('File added'));
+    void this.router.navigateByUrl(this.i18n.path('/'));
   }
 
   /** the reason stays in the box (read out by screen readers) and also pops up as a toast, where the eye is drawn */
@@ -226,7 +229,7 @@ export class ToolDrop {
     this.error.set(text);
     this.wrongKind.set(video);
     this.toast.dismiss(this.refusedToast); // only the latest reason, not a pile of them
-    this.refusedToast = this.toast.warning(text, 'File not added');
+    this.refusedToast = this.toast.warning(text, this.i18n.t('File not added'));
   }
 
   /** why this file cannot be used (the same checks the uploader makes, so it never gets a surprise); null when it can */
@@ -236,16 +239,23 @@ export class ToolDrop {
     const isMedia = isAudio || f.type.startsWith('video/') || MEDIA_EXT.test(f.name);
     if (audioOnly && !isAudio) {
       return isMedia
-        ? { text: 'This box takes audio files such as MP3, WAV or M4A, but that one is a video.', video: true }
-        : { text: 'That is not an audio file. Choose an MP3, WAV, M4A or another audio file.', video: false };
+        ? { text: this.i18n.t('This box takes audio files such as MP3, WAV or M4A, but that one is a video.'), video: true }
+        : { text: this.i18n.t('That is not an audio file. Choose an MP3, WAV, M4A or another audio file.'), video: false };
     }
     if (!isMedia) {
-      return { text: 'That is not a video or audio file. Choose an MP4, MOV, MP3 or another video or audio file.', video: false };
+      return { text: this.i18n.t('That is not a video or audio file. Choose an MP4, MOV, MP3 or another video or audio file.'), video: false };
     }
-    if (f.size === 0) return { text: `"${f.name}" is empty.`, video: false };
+    if (f.size === 0) return { text: this.i18n.t('"{name}" is empty.', { name: f.name }), video: false };
     const mb = this.site.maxUploadMb();
     if (mb && f.size > mb * 1024 * 1024) {
-      return { text: `"${f.name}" is ${fmtBytesShort(f.size)}; the limit is ${fmtBytesShort(mb * 1024 * 1024)}.`, video: false };
+      return {
+        text: this.i18n.t('"{name}" is {size}; the limit is {limit}.', {
+          name: f.name,
+          size: fmtBytesShort(f.size),
+          limit: fmtBytesShort(mb * 1024 * 1024),
+        }),
+        video: false,
+      };
     }
     return null;
   }

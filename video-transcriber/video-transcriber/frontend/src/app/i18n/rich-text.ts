@@ -32,6 +32,16 @@ export function parseRich(text: string): RichPart[] {
 }
 
 /**
+ * The words of a sentence with the markup taken away: `**bold**` -> bold, `[label](/path)` -> label. For plain-text uses of a
+ * translated sentence (structured data, a title attribute) where no markup may appear.
+ */
+export function plainText(text: string): string {
+  return parseRich(text)
+    .map((p) => p.text)
+    .join('');
+}
+
+/**
  * A sentence with bold words and links, e.g. `<app-rich [text]="'Read **How it works** or [ask us](/contact).' | t" />`.
  * Links are real anchors (crawlers and keyboards work) and stay in the page's language.
  */

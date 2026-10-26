@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { I18nService } from '../../i18n/i18n.service';
+import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 import { GUIDES } from '../guides/guides.list';
 import { TOOL_GROUPS, TOOL_PAGES } from './tool-pages.list';
 
@@ -10,46 +12,50 @@ import { TOOL_GROUPS, TOOL_PAGES } from './tool-pages.list';
  */
 @Component({
   selector: 'app-all-tools',
-  imports: [RouterLink],
+  imports: [RouterLink, TPipe, LocalePathPipe],
   template: `
     <div class="page-doc">
       <article class="doc">
-        <nav class="crumbs" aria-label="Breadcrumb">
-          <a routerLink="/">Home</a>
+        <nav class="crumbs" [attr.aria-label]="'Breadcrumb' | t">
+          <a [routerLink]="'/' | lp">{{ 'Home' | t }}</a>
           <span aria-hidden="true">/</span>
-          <span aria-current="page">All free tools</span>
+          <span aria-current="page">{{ 'All free tools' | t }}</span>
         </nav>
-        <h1 class="page-title">All free video and audio to text tools</h1>
+        <h1 class="page-title">{{ 'All free video and audio to text tools' | t }}</h1>
         <p class="lede">
-          Every page does the same job: it turns the speech in a video or audio file into text with a timestamp on each line, in more than 50 languages,
-          with no sign-up. Pick the one that matches the file you have or what you want to make.
+          {{
+            'Every page does the same job: it turns the speech in a video or audio file into text with a timestamp on each line, in more than 50 languages, with no sign-up. Pick the one that matches the file you have or what you want to make.'
+              | t
+          }}
         </p>
-        @for (g of groups; track g.id) {
+        @for (g of groups(); track g.id) {
           <section [attr.aria-labelledby]="'grp-' + g.id">
-            <h2 [id]="'grp-' + g.id">{{ g.title }}</h2>
-            <p class="intro">{{ g.intro }}</p>
+            <h2 [id]="'grp-' + g.id">{{ g.title | t }}</h2>
+            <p class="intro">{{ g.intro | t }}</p>
             <ul class="tools">
               @for (t of g.pages; track t.path) {
                 <li>
-                  <a [routerLink]="t.path">{{ t.label }}</a>
+                  <a [routerLink]="t.path | lp">{{ t.label }}</a>
                   <span>{{ t.description }}</span>
                 </li>
               }
             </ul>
           </section>
         }
-        <section aria-labelledby="grp-guides">
-          <h2 id="grp-guides">Guides</h2>
-          <p class="intro">Longer answers: formats, subtitles, accuracy and privacy.</p>
-          <ul class="tools">
-            @for (g of guides; track g.path) {
-              <li>
-                <a [routerLink]="g.path">{{ g.label }}</a>
-                <span>{{ g.description }}</span>
-              </li>
-            }
-          </ul>
-        </section>
+        @if (guides().length) {
+          <section aria-labelledby="grp-guides">
+            <h2 id="grp-guides">{{ 'Guides' | t }}</h2>
+            <p class="intro">{{ 'Longer answers: formats, subtitles, accuracy and privacy.' | t }}</p>
+            <ul class="tools">
+              @for (g of guides(); track g.path) {
+                <li>
+                  <a [routerLink]="g.path | lp">{{ g.label }}</a>
+                  <span>{{ g.description }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
       </article>
     </div>
   `,
@@ -132,6 +138,34 @@ import { TOOL_GROUPS, TOOL_PAGES } from './tool-pages.list';
   `,
 })
 export class AllToolsPage {
-  readonly guides = GUIDES;
-  readonly groups = TOOL_GROUPS.map((g) => ({ ...g, pages: TOOL_PAGES.filter((t) => t.group === g.id) }));
+  private i18n = inject(I18nService);
+
+  /** A name or description in the page's language: the dictionary's `label:<path>` / `description:<path>`, else the English text. */
+  private meta(kind: 'label' | 'description', path: string, english: string): string {
+    const key = `${kind}:${path}`;
+    const hit = this.i18n.t(key);
+    return hit === key ? english : hit;
+  }
+
+  /** The groups with the pages that exist in the page's language (all of them in English); a group without pages is left out. */
+  readonly groups = computed(() => {
+    const locale = this.i18n.locale();
+    return TOOL_GROUPS.map((g) => ({
+      ...g,
+      pages: TOOL_PAGES.filter((t) => t.group === g.id && this.i18n.isAvailable(locale, t.path)).map((t) => ({
+        path: t.path,
+        label: this.meta('label', t.path, t.label),
+        description: this.meta('description', t.path, t.description),
+      })),
+    })).filter((g) => g.pages.length);
+  });
+
+  readonly guides = computed(() => {
+    const locale = this.i18n.locale();
+    return GUIDES.filter((g) => this.i18n.isAvailable(locale, g.path)).map((g) => ({
+      path: g.path,
+      label: this.meta('label', g.path, g.label),
+      description: this.meta('description', g.path, g.description),
+    }));
+  });
 }

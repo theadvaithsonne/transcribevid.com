@@ -6,7 +6,7 @@ import { LanguageSwitcher } from './language-switcher';
 import { HINT_DISMISSED_KEY, LANG_KEY, LocaleHintService } from './locale-hint.service';
 import { LocaleHintBar } from './locale-hint-bar';
 import { I18N_DATA, I18nService } from './i18n.service';
-import { RichText, parseRich } from './rich-text';
+import { RichText, parseRich, plainText } from './rich-text';
 import { LocalePathPipe, TPipe } from './t.pipe';
 import { ES_DICT, fakeData, setupI18n } from './testing';
 
@@ -34,6 +34,16 @@ describe('parseRich (light markup in a translated sentence)', () => {
     expect(parseRich('')).toEqual([]);
     expect(parseRich('<script>alert(1)</script>')).toEqual([{ kind: 'text', text: '<script>alert(1)</script>' }]);
     expect(parseRich('2 * 3 * 4 and [not a link]')).toEqual([{ kind: 'text', text: '2 * 3 * 4 and [not a link]' }]);
+  });
+});
+
+describe('plainText (a translated sentence without its markup)', () => {
+  it('keeps the words of bold text and of a link, drops the markup, and leaves plain text alone', () => {
+    expect(plainText('See **How it works** or [ask us](/contact) today.')).toBe('See How it works or ask us today.');
+    expect(plainText('[Google](https://example.com/a?b=c) and **more**')).toBe('Google and more');
+    expect(plainText('Just words.')).toBe('Just words.');
+    expect(plainText('')).toBe('');
+    expect(plainText('2 * 3 and [not a link]')).toBe('2 * 3 and [not a link]');
   });
 });
 

@@ -1,5 +1,7 @@
 import { Component, inject, input } from '@angular/core';
 import { SiteService } from '../core/site.service';
+import { _t } from '../i18n/mark';
+import { TPipe } from '../i18n/t.pipe';
 
 /**
  * The three promises: Free, Unlimited, No login. Shown once, at the top of How it works, the FAQ and the keyword pages,
@@ -8,23 +10,24 @@ import { SiteService } from '../core/site.service';
  */
 @Component({
   selector: 'app-free-chips',
+  imports: [TPipe],
   template: `
-    <ul class="chips" aria-label="Free, unlimited, no login">
+    <ul class="chips" [attr.aria-label]="'Free, unlimited, no login' | t">
       @for (c of chips; track c) {
         <li>
           <span class="tick" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
           </span>
-          {{ c }}
+          {{ c | t }}
         </li>
       }
     </ul>
     @if (line()) {
       <p class="line">
         @if (site.isLocal() && !site.inBrowser()) {
-          Nothing to sign up for and nothing to pay. Just add your file.
+          {{ 'Nothing to sign up for and nothing to pay. Just add your file.' | t }}
         } @else {
-          No sign-up, no payment, no daily limit. Just add your file.
+          {{ 'No sign-up, no payment, no daily limit. Just add your file.' | t }}
         }
       </p>
     }
@@ -80,5 +83,6 @@ export class FreeChips {
   /** also show the one-line explanation under the chips (off by default: the chips say it already) */
   line = input(false);
 
-  readonly chips = ['Free', 'Unlimited', 'No login'];
+  /** English; shown with `| t` */
+  readonly chips = [_t('Free'), _t('Unlimited'), _t('No login')];
 }

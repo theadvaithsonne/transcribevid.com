@@ -1,3 +1,5 @@
+import { Translate, english } from './format';
+
 /** The bits of an HttpErrorResponse we look at (kept structural so plain objects work in tests too). */
 interface ErrorLike {
   status?: number;
@@ -7,9 +9,11 @@ interface ErrorLike {
 /**
  * The server's explanation of a failed request (FastAPI `detail`), reduced to one short line so it fits
  * a toast: validation errors can arrive as an array or as a multi-line message, only the first line is kept.
- * Falls back to `fallback` when the server gave no usable text.
+ * Falls back to `fallback` when the server gave no usable text. The result goes through `t` (the language service's, when
+ * given): messages of the in-browser edition and `fallback` are English keys with a translation, a server's own text has
+ * none and stays as it is. Mark a literal fallback with `_t('...')` so the extractor finds it.
  */
-export function errorDetail(e: unknown, fallback: string): string {
+export function errorDetail(e: unknown, fallback: string, t: Translate = english): string {
   const err = e as ErrorLike | null;
   const d = err?.error?.detail;
   let text = '';
@@ -21,8 +25,8 @@ export function errorDetail(e: unknown, fallback: string): string {
       .join('; ');
   }
   const first = text.split(/\r?\n/).map((s) => s.trim()).find(Boolean);
-  if (first) return first;
-  return err?.status === 0 ? 'Cannot reach the server.' : fallback;
+  if (first) return t(first);
+  return err?.status === 0 ? t('Cannot reach the server.') : t(fallback);
 }
 
 /** True for failures that are worth retrying: the server is unreachable (status 0) or broke (5xx). */

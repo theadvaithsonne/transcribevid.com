@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { I18nService } from '../i18n/i18n.service';
 import { AdSlot } from './ad-slot';
 
 /**
@@ -11,7 +12,7 @@ import { AdSlot } from './ad-slot';
   selector: 'app-ad-rail',
   imports: [AdSlot],
   template: `<app-ad-slot placement="rail" />`,
-  host: { role: 'complementary', 'aria-label': 'Advertisement' },
+  host: { role: 'complementary', '[attr.aria-label]': 'label()' },
   styles: `
     :host {
       display: block;
@@ -24,4 +25,8 @@ import { AdSlot } from './ad-slot';
     }
   `,
 })
-export class AdRail {}
+export class AdRail {
+  private i18n = inject(I18nService);
+  /** the column's accessible name, in the page's language */
+  readonly label = computed(() => this.i18n.t('Advertisement'));
+}

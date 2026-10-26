@@ -5,6 +5,8 @@
  * plan (engine/device).
  */
 
+import { _t } from '../../i18n/mark';
+
 export interface ModelUi {
   id: string;
   label: string;
@@ -18,27 +20,27 @@ export interface ModelUi {
 
 /** engine.py MODEL_CATALOG (order matters: shown in this order). */
 export const MODEL_UI: readonly ModelUi[] = [
-  { id: 'tiny', label: 'Tiny', size_mb: 75, speed: 5, accuracy: 1, note: 'Fastest, rough drafts only', engine: 'whisper' },
-  { id: 'base', label: 'Base', size_mb: 145, speed: 4, accuracy: 2, note: 'Fast, clean audio', engine: 'whisper' },
-  { id: 'small', label: 'Small', size_mb: 465, speed: 3, accuracy: 3, note: 'Good balance (default)', engine: 'whisper' },
-  { id: 'medium', label: 'Medium', size_mb: 1500, speed: 2, accuracy: 4, note: 'High accuracy, slower', engine: 'whisper' },
+  { id: 'tiny', label: 'Tiny', size_mb: 75, speed: 5, accuracy: 1, note: _t('Fastest, rough drafts only'), engine: 'whisper' },
+  { id: 'base', label: 'Base', size_mb: 145, speed: 4, accuracy: 2, note: _t('Fast, clean audio'), engine: 'whisper' },
+  { id: 'small', label: 'Small', size_mb: 465, speed: 3, accuracy: 3, note: _t('Good balance (default)'), engine: 'whisper' },
+  { id: 'medium', label: 'Medium', size_mb: 1500, speed: 2, accuracy: 4, note: _t('High accuracy, slower'), engine: 'whisper' },
   {
     id: 'large-v3-turbo',
     label: 'Large v3 Turbo',
     size_mb: 1600,
     speed: 3,
     accuracy: 5,
-    note: 'Near-best accuracy, much faster than Large',
+    note: _t('Near-best accuracy, much faster than Large'),
     engine: 'whisper',
   },
-  { id: 'large-v3', label: 'Large v3', size_mb: 3100, speed: 1, accuracy: 5, note: 'Best accuracy, slowest', engine: 'whisper' },
+  { id: 'large-v3', label: 'Large v3', size_mb: 3100, speed: 1, accuracy: 5, note: _t('Best accuracy, slowest'), engine: 'whisper' },
   {
     id: 'distil-large-v3',
     label: 'Distil Large v3',
     size_mb: 1500,
     speed: 4,
     accuracy: 4,
-    note: 'English only, very fast and accurate',
+    note: _t('English only, very fast and accurate'),
     engine: 'whisper',
   },
   {
@@ -47,7 +49,7 @@ export const MODEL_UI: readonly ModelUi[] = [
     size_mb: 1300,
     speed: 2,
     accuracy: 0,
-    note: 'Experimental: compare on your audio; chunk timestamps',
+    note: _t('Experimental: compare on your audio; chunk timestamps'),
     engine: 'qwen',
   },
   {
@@ -56,7 +58,7 @@ export const MODEL_UI: readonly ModelUi[] = [
     size_mb: 3500,
     speed: 1,
     accuracy: 0,
-    note: 'Experimental: larger model; chunk timestamps',
+    note: _t('Experimental: larger model; chunk timestamps'),
     engine: 'qwen',
   },
 ];

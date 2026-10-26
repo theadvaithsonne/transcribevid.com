@@ -4,6 +4,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { fmtBytesShort } from '../../core/format';
 import { PUBLIC_DEFAULTS, SiteService } from '../../core/site.service';
 import { StructuredDataService } from '../../core/structured-data.service';
+import { I18nService } from '../../i18n/i18n.service';
+import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 import { FreeChips } from '../../shared/free-chips';
 import { RelatedTools } from '../../shared/related-tools';
 import { ToolDrop } from './tool-drop';
@@ -43,7 +45,7 @@ export const DEFAULT_LIMITS = `Up to ${fmtBytesShort(PUBLIC_DEFAULTS.maxUploadMb
  */
 @Component({
   selector: 'app-tool-page',
-  imports: [RouterLink, FreeChips, RelatedTools, ToolDrop, AdSlot],
+  imports: [RouterLink, FreeChips, RelatedTools, ToolDrop, AdSlot, TPipe, LocalePathPipe],
   templateUrl: './tool-page.html',
   styleUrl: './tool-page.scss',
 })
@@ -52,6 +54,7 @@ export class ToolPage {
   private data = toSignal(this.route.data, { initialValue: this.route.snapshot.data });
   private site = inject(SiteService);
   private structured = inject(StructuredDataService);
+  private i18n = inject(I18nService);
 
   private slug = computed(() => String(this.data()['tool'] ?? ''));
   /** the page's text, loaded by the route's resolver before the page is shown */
@@ -67,7 +70,12 @@ export class ToolPage {
   readonly limits = computed(() => {
     const announced = this.site.limitsText();
     if (announced) return announced;
-    return this.site.mode() === 'unknown' ? DEFAULT_LIMITS : 'There is no size or length limit set here.';
+    if (this.site.mode() !== 'unknown') return this.i18n.t('There is no size or length limit set here.');
+    // what the public site announces until the server answers (the same words as DEFAULT_LIMITS, in the page's language)
+    return this.i18n.t('Up to {size} and {minutes} minutes per file.', {
+      size: fmtBytesShort(PUBLIC_DEFAULTS.maxUploadMb * 1024 * 1024),
+      minutes: PUBLIC_DEFAULTS.maxDurationMin,
+    });
   });
 
   /** the questions as the visitor reads them ({limits} filled in) */

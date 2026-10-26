@@ -1,3 +1,5 @@
+import { _t } from '../../i18n/mark';
+
 /**
  * The keyword landing pages ("tool pages"). Kept in its own tiny file (no page text in here) so the app shell can import
  * it for the footer "Free tools" links, the routes can use it for titles and descriptions, and the related-links
@@ -244,9 +246,9 @@ export const CORE_TOOLS: readonly ToolPageLink[] = TOOL_PAGES.filter((t) => t.gr
 
 /** Headings of the groups on the "All free tools" page, in the order they are shown. */
 export const TOOL_GROUPS: readonly { id: ToolGroup; title: string; intro: string }[] = [
-  { id: 'core', title: 'Video and audio to text', intro: 'The main tools: turn any video or audio file into a timestamped transcript.' },
-  { id: 'format', title: 'By file type', intro: 'Pages for the file you already have: WAV, M4A, WebM and MOV.' },
-  { id: 'use-case', title: 'By use', intro: 'Voice notes, meetings, lectures, podcasts and interviews.' },
-  { id: 'subtitles', title: 'Subtitle files', intro: 'Make a subtitle file (SRT or VTT) from your video.' },
-  { id: 'language', title: 'By language', intro: 'Transcribe or translate speech in the language you need.' },
+  { id: 'core', title: _t('Video and audio to text'), intro: _t('The main tools: turn any video or audio file into a timestamped transcript.') },
+  { id: 'format', title: _t('By file type'), intro: _t('Pages for the file you already have: WAV, M4A, WebM and MOV.') },
+  { id: 'use-case', title: _t('By use'), intro: _t('Voice notes, meetings, lectures, podcasts and interviews.') },
+  { id: 'subtitles', title: _t('Subtitle files'), intro: _t('Make a subtitle file (SRT or VTT) from your video.') },
+  { id: 'language', title: _t('By language'), intro: _t('Transcribe or translate speech in the language you need.') },
 ];

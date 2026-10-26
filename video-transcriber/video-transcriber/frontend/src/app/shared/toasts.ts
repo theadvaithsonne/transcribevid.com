@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ToastService } from '../core/toast.service';
+import { TPipe } from '../i18n/t.pipe';
 
 /**
  * Where the toasts appear: bottom left on a computer (the main buttons are at the top right of the transcript page and
@@ -8,6 +9,7 @@ import { ToastService } from '../core/toast.service';
  */
 @Component({
   selector: 'app-toasts',
+  imports: [TPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="stack" aria-live="polite" aria-relevant="additions">
@@ -42,7 +44,7 @@ import { ToastService } from '../core/toast.service';
               <span>{{ t.message }}</span>
             }
           </div>
-          <button type="button" class="close" (click)="toast.dismiss(t.id)" [attr.aria-label]="'Close: ' + t.title">
+          <button type="button" class="close" (click)="toast.dismiss(t.id)" [attr.aria-label]="'Close: {title}' | t: { title: t.title }">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" /></svg>
           </button>
         </div>

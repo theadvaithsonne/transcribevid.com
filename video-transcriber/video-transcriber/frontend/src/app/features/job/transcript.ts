@@ -19,6 +19,8 @@ import {
 import { FormsModule } from '@angular/forms';
 import { fmtTime, prefersReducedMotion } from '../../core/format';
 import { Segment, SegmentEdit } from '../../core/models';
+import { I18nService } from '../../i18n/i18n.service';
+import { TPipe } from '../../i18n/t.pipe';
 
 interface Part {
   text: string;
@@ -79,7 +81,7 @@ export function findActiveId(segs: Segment[], t: number): number | null {
  */
 @Component({
   selector: 'app-transcript',
-  imports: [FormsModule],
+  imports: [FormsModule, TPipe],
   templateUrl: './transcript.html',
   styleUrl: './transcript.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -109,6 +111,7 @@ export class TranscriptView implements AfterViewChecked, AfterViewInit {
   fmtTime = fmtTime;
   private injector = inject(Injector);
   private destroyRef = inject(DestroyRef);
+  private i18n = inject(I18nService);
   private list = viewChild<ElementRef<HTMLElement>>('list');
   private lastScrolled: number | string | null = null;
   private lastLen = 0;
@@ -384,7 +387,12 @@ export class TranscriptView implements AfterViewChecked, AfterViewInit {
     }
     if (!edits.length) return;
     const n = edits.length;
-    if (confirm(`Replace "${this.query()}" with "${repl}" in ${n} ${n === 1 ? 'line' : 'lines'}?`)) {
+    const ask = { query: this.query(), replacement: repl, n };
+    const question =
+      n === 1
+        ? this.i18n.t('Replace "{query}" with "{replacement}" in 1 line?', ask)
+        : this.i18n.t('Replace "{query}" with "{replacement}" in {n} lines?', ask);
+    if (confirm(question)) {
       this.save.emit(edits);
       this.query.set('');
       this.replacement.set('');
@@ -417,7 +425,7 @@ export class TranscriptView implements AfterViewChecked, AfterViewInit {
 
   /** Deletes the line being edited, after one question (there is no undo). */
   remove(seg: Segment) {
-    if (!confirm('Delete this line from the transcript?')) return;
+    if (!confirm(this.i18n.t('Delete this line from the transcript?'))) return;
     this.editingId.set(null);
     this.save.emit([{ id: seg.id, text: seg.text, deleted: true }]);
   }

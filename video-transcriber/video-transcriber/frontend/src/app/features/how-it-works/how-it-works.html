@@ -1,30 +1,30 @@
 <div class="page how">
   <header class="hero">
-    <h1 class="page-title">How {{ site.brand().name }} works</h1>
+    <h1 class="page-title">{{ 'How {brand} works' | t: { brand: site.brand().name } }}</h1>
     <p class="page-lead">
-      {{ site.brand().name }} turns the speech in a video or audio file into text with timestamps, in three simple steps.
+      {{ '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.' | t: { brand: site.brand().name } }}
     </p>
     <app-free-chips />
-    <a class="btn primary big" routerLink="/">Transcribe a file</a>
+    <a class="btn primary big" [routerLink]="'/' | lp">{{ 'Transcribe a file' | t }}</a>
   </header>
 
   <section aria-labelledby="steps-title">
-    <h2 class="section-title" id="steps-title">3 simple steps</h2>
+    <h2 class="section-title" id="steps-title">{{ '3 simple steps' | t }}</h2>
     <ol class="steps">
       <li>
         <span class="num" aria-hidden="true">1</span>
-        <h3>Add your file</h3>
-        <p>Drop a video or audio file on the <a routerLink="/">home page</a>, or record from your microphone.</p>
+        <h3>{{ 'Add your file' | t }}</h3>
+        <p><app-rich [text]="'Drop a video or audio file on the [home page](/), or record from your microphone.' | t" /></p>
       </li>
       <li>
         <span class="num" aria-hidden="true">2</span>
-        <h3>Pick quality</h3>
-        <p>Choose Fastest, Standard, High accuracy or Best accuracy: Fastest is quickest, Best accuracy makes the fewest mistakes.</p>
+        <h3>{{ 'Pick quality' | t }}</h3>
+        <p>{{ 'Choose Fastest, Standard, High accuracy or Best accuracy: Fastest is quickest, Best accuracy makes the fewest mistakes.' | t }}</p>
       </li>
       <li>
         <span class="num" aria-hidden="true">3</span>
-        <h3>Read, edit, download</h3>
-        <p>Watch the text appear live, fix any mistakes, then download it as SRT, VTT, TXT, Markdown, JSON or PDF.</p>
+        <h3>{{ 'Read, edit, download' | t }}</h3>
+        <p>{{ 'Watch the text appear live, fix any mistakes, then download it as SRT, VTT, TXT, Markdown, JSON or PDF.' | t }}</p>
       </li>
     </ol>
   </section>
@@ -33,60 +33,60 @@
   <app-ad-slot placement="inline" />
 
   <section aria-labelledby="get-title">
-    <h2 class="section-title" id="get-title">What you get</h2>
+    <h2 class="section-title" id="get-title">{{ 'What you get' | t }}</h2>
     <ul class="features">
       <li>
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.5" /></svg>
         </span>
-        <h3>Accurate text</h3>
-        <p>Usually very accurate on clear speech. Lines it is unsure about are marked, so you can check them first.</p>
+        <h3>{{ 'Accurate text' | t }}</h3>
+        <p>{{ 'Usually very accurate on clear speech. Lines it is unsure about are marked, so you can check them first.' | t }}</p>
       </li>
       <li>
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>
         </span>
-        <h3>Timestamps</h3>
-        <p>Every line has a time. Play the media from any line to hear what was said.</p>
+        <h3>{{ 'Timestamps' | t }}</h3>
+        <p>{{ 'Every line has a time. Play the media from any line to hear what was said.' | t }}</p>
       </li>
       <li>
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18" /></svg>
         </span>
-        <h3>More than 50 languages</h3>
-        <p>Choose the spoken language or leave it on auto-detect. You can also translate speech into English.</p>
+        <h3>{{ 'More than 50 languages' | t }}</h3>
+        <p>{{ 'Choose the spoken language or leave it on auto-detect. You can also translate speech into English.' | t }}</p>
       </li>
       <li>
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4 20l1-4L16.5 4.5a2 2 0 013 3L8 19l-4 1z" /></svg>
         </span>
-        <h3>Edit it right here</h3>
-        <p>Change or delete a line, or search and replace. Your edits are in every download.</p>
+        <h3>{{ 'Edit it right here' | t }}</h3>
+        <p>{{ 'Change or delete a line, or search and replace. Your edits are in every download.' | t }}</p>
       </li>
       <li>
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" /></svg>
         </span>
-        <h3>Six ways to download</h3>
-        <p>SRT and VTT for subtitles, TXT and Markdown for reading, JSON for programs, or a PDF to print.</p>
+        <h3>{{ 'Six ways to download' | t }}</h3>
+        <p>{{ 'SRT and VTT for subtitles, TXT and Markdown for reading, JSON for programs, or a PDF to print.' | t }}</p>
       </li>
       <li>
         <span class="ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>
         </span>
-        <h3>Private</h3>
+        <h3>{{ 'Private' | t }}</h3>
         @if (site.inBrowser()) {
-          <p>Your file never leaves your device. It is transcribed right in your browser, with no account, and your transcripts stay in this browser.</p>
+          <p>{{ 'Your file never leaves your device. It is transcribed right in your browser, with no account, and your transcripts stay in this browser.' | t }}</p>
         } @else {
           @switch (site.mode()) {
             @case ('public') {
-              <p>No account and no tracking. Your files are kept only for your session and deleted automatically.</p>
+              <p>{{ 'No account and no tracking. Your files are kept only for your session and deleted automatically.' | t }}</p>
             }
             @case ('local') {
-              <p>This copy runs on your own computer. Your files are processed on this machine and nothing leaves it.</p>
+              <p>{{ 'This copy runs on your own computer. Your files are processed on this machine and nothing leaves it.' | t }}</p>
             }
             @default {
-              <p>Where your files are processed depends on how {{ site.brand().name }} is run.</p>
+              <p>{{ 'Where your files are processed depends on how {brand} is run.' | t: { brand: site.brand().name } }}</p>
             }
           }
         }
@@ -96,75 +96,52 @@
 
   <div class="two">
     <section class="tips" aria-labelledby="tips-title">
-      <h2 id="tips-title">Tips for the best results</h2>
+      <h2 id="tips-title">{{ 'Tips for the best results' | t }}</h2>
       <ul>
-        <li><b>Choose the spoken language</b> instead of auto-detect.</li>
-        <li><b>Add a vocabulary hint</b>: names, brands and jargon, spelled the way you want them.</li>
-        <li><b>Pick High accuracy or Best accuracy</b> for difficult audio.</li>
-        <li><b>Re-transcribe</b> with another quality or language; your current transcript is kept.</li>
-        <li><b>Start from good audio</b>: little background noise, a close microphone, one person at a time. Keep "Enhance audio" on.</li>
-        <li><b>Check the marked lines</b> and fix them in the transcript editor.</li>
+        <li><app-rich [text]="'**Choose the spoken language** instead of auto-detect.' | t" /></li>
+        <li><app-rich [text]="'**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.' | t" /></li>
+        <li><app-rich [text]="'**Pick High accuracy or Best accuracy** for difficult audio.' | t" /></li>
+        <li><app-rich [text]="'**Re-transcribe** with another quality or language; your current transcript is kept.' | t" /></li>
+        <li><app-rich [text]="texts.goodAudio | t" /></li>
+        <li><app-rich [text]="'**Check the marked lines** and fix them in the transcript editor.' | t" /></li>
       </ul>
     </section>
 
     <section class="know" aria-labelledby="know-title">
-      <h2 id="know-title">Good to know</h2>
+      <h2 id="know-title">{{ 'Good to know' | t }}</h2>
       <ul>
         @if (site.inBrowser()) {
-          <li>
-            <b>File limits.</b> None set by us. Your file is processed on your device, so very large or long files take longer and need
-            enough free memory; the page warns you on a slower device.
-          </li>
-          <li>
-            <b>Speed.</b> It depends on your device, the quality you pick and the length of the file. The first use of a quality level
-            downloads its model once: your browser fetches the model files from Hugging Face and the engine's program files from jsDelivr,
-            then keeps them cached. Keep the tab open while it works.
-          </li>
-          <li>
-            <b>Nothing is saved for later.</b> Transcripts and the file stay in this browser only and are deleted automatically after
-            @if (site.idleText()) { {{ site.idleText() }} } @else { a period }
-            of inactivity, or when you press <b>Delete my data now</b>. Export what you need before you leave. Details are in the
-            <a routerLink="/privacy">Privacy policy</a>.
-          </li>
-          <li>
-            <b>Ads.</b> Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.
-            No ad is shown while a file is being transcribed.
-          </li>
+          <li><app-rich [text]="'**File limits.** None set by us. Your file is processed on your device, so very large or long files take longer and need enough free memory; the page warns you on a slower device.' | t" /></li>
+          <li><app-rich [text]="'**Speed.** It depends on your device, the quality you pick and the length of the file. The first use of a quality level downloads its model once: your browser fetches the model files from Hugging Face and the engine\'s program files from jsDelivr, then keeps them cached. Keep the tab open while it works.' | t" /></li>
+          <li><app-rich [text]="'**Nothing is saved for later.** Transcripts and the file stay in this browser only and are deleted automatically after {idle} of inactivity, or when you press **Delete my data now**. Export what you need before you leave. Details are in the [Privacy policy](/privacy).' | t: { idle: idleOrPeriod() }" /></li>
+          <li><app-rich [text]="'**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.' | t" /></li>
         } @else {
           <li>
-            <b>File limits.</b>
+            <b>{{ 'File limits.' | t }}</b>
             @if (site.limitsText()) {
-              {{ site.limitsText() }} Larger or longer files are refused before they are processed, so split them first.
+              {{ site.limitsText() }} {{ 'Larger or longer files are refused before they are processed, so split them first.' | t }}
             } @else {
-              No size or length limit is announced by the server right now. Very large files simply take longer.
+              {{ 'No size or length limit is announced by the server right now. Very large files simply take longer.' | t }}
             }
           </li>
-          <li><b>Speed.</b> It depends on the quality you pick, the length of the file and how busy the service is.</li>
+          <li><app-rich [text]="'**Speed.** It depends on the quality you pick, the length of the file and how busy the service is.' | t" /></li>
         }
         @switch (site.inBrowser() ? 'browser' : site.mode()) {
           @case ('public') {
-            <li>
-              <b>Nothing is saved for later.</b> Files and transcripts exist only for your session. Export what you need before you leave.
-              Details are in the <a routerLink="/privacy">Privacy policy</a>.
-            </li>
+            <li><app-rich [text]="'**Nothing is saved for later.** Files and transcripts exist only for your session. Export what you need before you leave. Details are in the [Privacy policy](/privacy).' | t" /></li>
           }
           @case ('local') {
-            <li>
-              <b>Nothing is saved for later.</b> Transcripts exist only for this session, so export what you need. The
-              <a routerLink="/privacy">Privacy policy</a> describes the hosted website.
-            </li>
+            <li><app-rich [text]="'**Nothing is saved for later.** Transcripts exist only for this session, so export what you need. The [Privacy policy](/privacy) describes the hosted website.' | t" /></li>
           }
         }
-        <li>
-          <b>Mistakes happen.</b> No speech recognition is perfect. Always verify a transcript before relying on it for anything important.
-        </li>
+        <li><app-rich [text]="'**Mistakes happen.** No speech recognition is perfect. Always verify a transcript before relying on it for anything important.' | t" /></li>
       </ul>
-      <p class="more">More answers: <a routerLink="/faq">Frequently asked questions</a></p>
+      <p class="more"><app-rich [text]="'More answers: [Frequently asked questions](/faq)' | t" /></p>
     </section>
   </div>
 
   <div class="end">
-    <a class="btn big ghost" routerLink="/">Transcribe a file</a>
+    <a class="btn big ghost" [routerLink]="'/' | lp">{{ 'Transcribe a file' | t }}</a>
   </div>
 
   <app-related-tools />

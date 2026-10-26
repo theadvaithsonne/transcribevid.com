@@ -4,6 +4,8 @@
  * and anything not measured is marked arithmetic. A long file on a weak device gets a warning, never a refusal
  * (ARCHITECTURE.md section 5).
  */
+import { _t } from '../../i18n/mark';
+import { msg } from './message';
 import { Backend, MOBILE_SLOWDOWN, ModelCatalog, MODEL_DATA, findModel } from './model-data';
 import { DeviceFacts } from './plan';
 
@@ -37,17 +39,28 @@ export const LONG_WAIT_SECONDS = 20 * 60;
 export const LOW_MEMORY_FILE_SECONDS = 60 * 60;
 export const LOW_MEMORY_GB = 4;
 
+/** "about 7 min", "about 2 h 5 min", "under a minute". Built with msg(), so the page can translate it. */
 export function formatDuration(seconds: number): string {
-  if (seconds < 60) return 'under a minute';
+  if (seconds < 60) return msg(_t('under a minute'));
   const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `about ${minutes} min`;
+  if (minutes < 60) return msg(_t('about {n} min'), { n: minutes });
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return m === 0 ? `about ${h} h` : `about ${h} h ${m} min`;
+  return m === 0 ? msg(_t('about {h} h'), { h }) : msg(_t('about {h} h {m} min'), { h, m });
+}
+
+/** The same without "about": "7 min", "2 h 5 min" ("under a minute" stays), for a sentence like "... of audio". */
+export function formatDurationBare(seconds: number): string {
+  if (seconds < 60) return msg(_t('under a minute'));
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return msg(_t('{n} min'), { n: minutes });
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return m === 0 ? msg(_t('{h} h'), { h }) : msg(_t('{h} h {m} min'), { h, m });
 }
 
 export function formatEstimate(seconds: number | null): string {
-  return seconds === null ? 'no estimate for this model here' : `${formatDuration(seconds)} (estimate)`;
+  return seconds === null ? msg(_t('no estimate for this model here')) : msg(_t('{duration} (estimate)'), { duration: formatDuration(seconds) });
 }
 
 export function estimateTime(
@@ -82,14 +95,16 @@ export function estimateTime(
   if (rtf >= 1) {
     warnings.push({
       code: 'slower-than-real-time',
-      message:
-        `${model.label} runs slower than real time on this device: ${formatDuration(seconds)} for ` +
-        `${formatDuration(duration).replace(/^about /, '')} of audio (estimate). Tiny or base finish sooner.`,
+      message: msg(_t('{model} runs slower than real time on this device: {wait} for {audio} of audio (estimate). Tiny or base finish sooner.'), {
+        model: model.label,
+        wait: formatDuration(seconds),
+        audio: formatDurationBare(duration),
+      }),
     });
   } else if (seconds > LONG_WAIT_SECONDS) {
     warnings.push({
       code: 'long-wait',
-      message: `This will take ${formatDuration(seconds)} on this device (estimate). Keep the tab open until it finishes.`,
+      message: msg(_t('This will take {wait} on this device (estimate). Keep the tab open until it finishes.'), { wait: formatDuration(seconds) }),
     });
   }
   warnings.push(...lowMemoryWarning(duration, info));
@@ -101,9 +116,7 @@ function lowMemoryWarning(durationSeconds: number, info: DeviceFacts): LongFileW
     return [
       {
         code: 'low-memory',
-        message:
-          'This device has little memory for a file this long. It is processed in small pieces, which is slower; ' +
-          'a shorter cut or a smaller model is safer.',
+        message: _t('This device has little memory for a file this long. It is processed in small pieces, which is slower; a shorter cut or a smaller model is safer.'),
       },
     ];
   }

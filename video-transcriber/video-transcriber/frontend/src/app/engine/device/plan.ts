@@ -14,6 +14,8 @@ import {
   MODEL_DATA,
   sizeText,
 } from './model-data';
+import { _t } from '../../i18n/mark';
+import { msg } from './message';
 import { DeviceInfo, PlatformClass } from './probe';
 
 export type DeviceClassId =
@@ -53,16 +55,17 @@ export interface ResolvedFacts extends DeviceFacts {
   memoryAssumed: boolean;
 }
 
+/** Why a model is hidden on this device. Fixed English texts, each its own translation key (the page translates them when it shows them). */
 export const REASON = {
-  needs8GB: 'needs 8 GB',
-  needs4GB: 'needs 4 GB',
-  needsGraphics: 'needs a graphics-capable browser (Chrome, Edge)',
-  needsWebGpu: 'needs WebGPU',
-  needsShaderF16: 'needs 16-bit shader support (shader-f16) in the graphics driver',
-  useComputer: 'use a computer for this size',
-} as const;
+  needs8GB: _t('needs 8 GB'),
+  needs4GB: _t('needs 4 GB'),
+  needsGraphics: _t('needs a graphics-capable browser (Chrome, Edge)'),
+  needsWebGpu: _t('needs WebGPU'),
+  needsShaderF16: _t('needs 16-bit shader support (shader-f16) in the graphics driver'),
+  useComputer: _t('use a computer for this size'),
+};
 
-export const WORD_TIMESTAMPS_NOTE = 'not available for this size';
+export const WORD_TIMESTAMPS_NOTE = _t('not available for this size');
 
 const WHISPER_SMALL_SET = ['tiny', 'base', 'small'] as const;
 const ALL = [
@@ -227,16 +230,18 @@ export function planFor(info: DeviceInfo | DeviceFacts, catalog: ModelCatalog = 
   const notes: string[] = [];
   if (facts.memoryAssumed) {
     notes.push(
-      `This browser does not report memory; ${facts.memoryGB} GB assumed. Pick a smaller model if the page gets slow.`,
+      msg(_t('This browser does not report memory; {gb} GB assumed. Pick a smaller model if the page gets slow.'), {
+        gb: facts.memoryGB,
+      }),
     );
   }
   if (facts.mobile) {
-    notes.push('Speeds on phones and tablets are estimated, not measured; tiny and base are the safe sizes.');
+    notes.push(_t('Speeds on phones and tablets are estimated, not measured; tiny and base are the safe sizes.'));
   }
   if (backend === 'wasm') {
-    notes.push('No WebGPU here: models run on one CPU thread, so larger sizes are slower than real time.');
+    notes.push(_t('No WebGPU here: models run on one CPU thread, so larger sizes are slower than real time.'));
   } else if (!facts.shaderF16) {
-    notes.push('The graphics driver has no 16-bit shaders: downloads are larger and memory use higher.');
+    notes.push(_t('The graphics driver has no 16-bit shaders: downloads are larger and memory use higher.'));
   }
 
   for (const id of row.offered) {
@@ -246,9 +251,9 @@ export function planFor(info: DeviceInfo | DeviceFacts, catalog: ModelCatalog = 
     if (!picked) throw new Error(`device policy: ${row.id} offers ${id} but it has no ${backend} mix`);
     const rtf = model.rtf[backend] ?? null;
     const modelNotes: string[] = [];
-    if (rtf && rtf.value >= 1) modelNotes.push('slower than real time on the measured laptop');
+    if (rtf && rtf.value >= 1) modelNotes.push(_t('slower than real time on the measured laptop'));
     if (model.minRamGB[backend] && facts.memoryGB < model.minRamGB[backend]!) {
-      modelNotes.push(`${model.minRamGB[backend]} GB of memory recommended`);
+      modelNotes.push(msg(_t('{gb} GB of memory recommended'), { gb: model.minRamGB[backend]! }));
     }
     offered.push({
       id: model.id,

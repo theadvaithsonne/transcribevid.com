@@ -16,6 +16,9 @@ import { AdSenseConfig } from '../core/ads.config';
 import { AdsService } from '../core/ads.service';
 import { LogService } from '../core/log.service';
 import { IS_BROWSER } from '../core/platform';
+import { I18nService } from '../i18n/i18n.service';
+import { _t } from '../i18n/mark';
+import { TPipe } from '../i18n/t.pipe';
 
 /** `rail`: the desktop column on the right (>= 1100 px). `inline`: one in-flow unit on tablet and phone. */
 export type AdPlacement = 'rail' | 'inline';
@@ -50,7 +53,7 @@ export function adSizeFor(placement: AdPlacement, viewportWidth: number, upTo: n
 export type AdSlotState = 'reserved' | 'pending' | 'filled' | 'unfilled' | 'failed';
 
 /** The neutral line inside an empty box. Not clickable, not dressed as an ad, no pressure to switch an ad blocker off. */
-export const HOUSE_NOTE = 'Ads keep TranscribeVid free. Everything works without them.';
+export const HOUSE_NOTE = _t('Ads keep TranscribeVid free. Everything works without them.');
 
 /**
  * One manual AdSense unit in a box of fixed size, reserved before anything loads (no layout shift, also in the prerendered
@@ -62,12 +65,13 @@ export const HOUSE_NOTE = 'Ads keep TranscribeVid free. Everything works without
  */
 @Component({
   selector: 'app-ad-slot',
+  imports: [TPipe],
   template: `
-    <span class="ad-label" [class.on]="state() === 'filled'" aria-hidden="true">Advertisement</span>
+    <span class="ad-label" [class.on]="state() === 'filled'" aria-hidden="true">{{ 'Advertisement' | t }}</span>
     <div class="ad-box" [class.has-ins]="state() === 'pending' || state() === 'filled'">
       <div class="ad-ins" #insHost></div>
       @if (noteShown()) {
-        <p class="ad-note">{{ note }}</p>
+        <p class="ad-note">{{ note | t }}</p>
       }
     </div>
   `,
@@ -169,7 +173,7 @@ export const HOUSE_NOTE = 'Ads keep TranscribeVid free. Everything works without
   host: {
     '[class]': 'hostClass()',
     '[attr.role]': "on() && placement() === 'inline' ? 'complementary' : null",
-    '[attr.aria-label]': "on() && placement() === 'inline' ? 'Advertisement' : null",
+    '[attr.aria-label]': "on() && placement() === 'inline' ? adLabel() : null",
     '[attr.aria-hidden]': "on() ? null : 'true'",
     '[attr.data-ad-state]': 'state()',
   },
@@ -186,7 +190,10 @@ export class AdSlot {
   private browser = inject(IS_BROWSER);
   private insHost = viewChild.required<ElementRef<HTMLElement>>('insHost');
 
+  private i18n = inject(I18nService);
   readonly note = HOUSE_NOTE;
+  /** the unit's accessible name, in the page's language */
+  readonly adLabel = computed(() => this.i18n.t('Advertisement'));
   readonly state = signal<AdSlotState>('reserved');
   /** the box is (nearly) in view, or for the rail the browser had an idle moment */
   private readonly near = signal(false);

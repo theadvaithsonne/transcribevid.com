@@ -8,6 +8,7 @@ import { qwenEntry } from '../../engine/models/qwen-catalog';
 import { qwenReason } from '../../engine/qwen/qwen-capability';
 import { exportFilename, render } from '../../engine/export/formats';
 import type { StoredJob } from '../../engine/session/session-store';
+import { _t } from '../../i18n/mark';
 import { LogRing, LogService } from '../log.service';
 import { SITE_BRAND } from '../operator';
 import {
@@ -51,7 +52,7 @@ export const BROWSER_ENGINE = new InjectionToken<() => Promise<BrowserEngine>>('
 
 const FINAL = new Set(['done', 'error', 'cancelled']);
 /** Qwen3-ASR returns chunk times only (the server's `words: null`). */
-const QWEN_WORD_TIMING_NOTE = 'not available with Qwen (times are per chunk)';
+const QWEN_WORD_TIMING_NOTE = _t('not available with Qwen (times are per chunk)');
 const BOOKKEEPING = ['updated_at', 'version', 'media_type', 'language_candidates'] as const;
 
 /** Store / runner errors as HTTP-shaped errors (status + detail), so every page's error handling stays as it is. */
@@ -62,7 +63,7 @@ function asTransportError(e: unknown): unknown {
   if (err?.name === 'SessionStoreError') {
     return new TransportError(err.code === 'not-found' ? 404 : 409, String(err.message ?? ''));
   }
-  return new TransportError(500, 'Something went wrong in this browser. Please try again.', String(err?.message ?? e));
+  return new TransportError(500, _t('Something went wrong in this browser. Please try again.'), String(err?.message ?? e));
 }
 
 /** A promise as an Observable whose errors are HTTP-shaped. */
@@ -224,7 +225,7 @@ export class BrowserTransport implements Transport {
       const engine = await this.get();
       await engine.store.touch();
       const job = await engine.store.get(id);
-      if (!job) throw new TransportError(404, 'Job not found');
+      if (!job) throw new TransportError(404, _t('Job not found'));
       return this.publicJob(engine, job);
     });
   }
@@ -281,7 +282,7 @@ export class BrowserTransport implements Transport {
       if (have) return have;
       const engine = await this.get();
       const job = await engine.store.get(id);
-      if (!job) throw new TransportError(404, 'Job not found');
+      if (!job) throw new TransportError(404, _t('Job not found'));
       if (job.status !== 'done' || typeof URL.createObjectURL !== 'function') return null;
       if (playableByName(job.filename) || (job.media_type && this.canPlay(job.media_type, job.media_kind))) {
         const url = await this.mediaUrl(engine, job);
@@ -357,11 +358,11 @@ export class BrowserTransport implements Transport {
   private rendered(id: string, format: ExportFormat, extra: Record<string, number>) {
     return call(async () => {
       if (format === 'pdf') {
-        throw new TransportError(422, 'PDF is made by your browser: choose "Save as PDF" in the print dialog.');
+        throw new TransportError(422, _t('PDF is made by your browser: choose "Save as PDF" in the print dialog.'));
       }
       const { store } = await this.get();
       const job = await store.get(id);
-      if (!job) throw new TransportError(404, 'Job not found');
+      if (!job) throw new TransportError(404, _t('Job not found'));
       const maxChars = Math.min(80, Math.max(20, Math.round(extra['max_chars'] ?? 42)));
       const maxLines = Math.min(3, Math.max(1, Math.round(extra['max_lines'] ?? 2)));
       const r = render(job, format, { maxChars, maxLines });
