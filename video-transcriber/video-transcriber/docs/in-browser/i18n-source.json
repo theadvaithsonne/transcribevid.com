@@ -100,6 +100,7 @@
     "**Subtitles and captions** for your own videos, reels and online courses, from an SRT or VTT file.",
     "**Text made on your device.** The transcript, its timestamps and your edits, the title you choose, and the settings you pick (quality, language, vocabulary hint). They are made and kept in this browser; we never receive them.",
     "**Use previous text as context** — can repeat on long files",
+    "**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.",
     "**Voice memos** written out, so you do not have to listen to them again.",
     "**Why can results differ between runs, quality settings or other tools?** Speech recognition is probabilistic: it chooses the most likely words, and in noisy or ambiguous passages several answers are close. A different quality setting, language setting, vocabulary hint or audio clean-up can change the text, and so can another tool that uses a different system. Speaker names or labels are not added.",
     "**Word-level timing** — better subtitles and confidence marks",

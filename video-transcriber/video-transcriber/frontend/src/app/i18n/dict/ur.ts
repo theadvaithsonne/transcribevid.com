@@ -1131,6 +1131,8 @@ const dict: Record<string, string> = {
     'مکمل ٹرانسکرپٹ: میڈیا پلیئر کے برابر میں مختصر سطروں میں متن، ہر سطر کے ساتھ ٹائم اسٹیمپ۔',
   'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
     'مکمل ٹرانسکرپٹ۔ ہر سطر پر ٹائم اسٹیمپ ہے، اور ایکسپورٹ اسے SRT، VTT، TXT، PDF اور دیگر شکلوں میں محفوظ کرتا ہے۔',
+  '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
+    '**وزٹ کے اعداد و شمار۔** Cloudflare Web Analytics ہمارے صفحات پر ہونے والے وزٹ گنتا ہے: کون سا صفحہ کھلا، آپ کس سائٹ سے آئے، آپ کا ملک، آپ کا براؤزر اور ڈیوائس کی قسم، اور صفحہ کتنی تیزی سے لوڈ ہوا۔ Cloudflare کے مطابق وہ کوئی کوکیز سیٹ نہیں کرتا، آپ کی ڈیوائس پر کوئی شناخت نہیں رکھتا اور ڈیٹا کو آپ کو ایک ویب سائٹ سے دوسری تک ٹریک کرنے کے لیے استعمال نہیں کرتا۔',
 };
 
 export default dict;

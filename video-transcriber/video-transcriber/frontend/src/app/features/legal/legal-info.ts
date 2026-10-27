@@ -1,8 +1,8 @@
 /** Shown as "Last updated" on both legal pages: change it whenever their text changes. */
-export const LEGAL_UPDATED = '26 October 2026';
+export const LEGAL_UPDATED = '27 October 2026';
 
 /** The same date as ISO (YYYY-MM-DD), so each language can write it its own way: keep it equal to LEGAL_UPDATED (a spec checks). */
-export const LEGAL_UPDATED_ISO = '2026-10-26';
+export const LEGAL_UPDATED_ISO = '2026-10-27';
 
 /**
  * A date written out in a language: "26 October 2026", "26 de octubre de 2026", "2026年10月26日". English is written the

@@ -79,6 +79,8 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
      crawlers see "[email protected]". Switch it **off**: a visible contact address is a trust signal for Google and for the
      AdSense review. (Checked on the live site on 2026-10-27: it is still on, `/contact` shows "[email protected]" to crawlers.)
    - Leave *Always Use HTTPS* on, and the www > apex redirect as it is.
+   - **Web Analytics** (Analytics & logs): the owner chose to keep it on (2026-10-27). Cloudflare injects its small cookieless script into every page; the privacy policy discloses it in section 2 ("Visit statistics"), in all 16 languages. If it is ever switched off, remove that bullet.
+   - Done on 2026-10-27 (checked live): Managed robots.txt off, Email Address Obfuscation off, Crawler Hints on, Search Console Domain property verified with the sitemap read (525 pages).
 
 7. **Test the speed once.** At https://pagespeed.web.dev test `https://transcribevid.com/` and a guide on mobile. Aim for
    green. The three numbers Google cares about: loading (LCP) under 2.5 s, reaction to taps (INP) under 200 ms, layout

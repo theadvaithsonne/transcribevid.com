@@ -285,6 +285,12 @@ describe('PrivacyPage in the browser edition', () => {
     expect(t).toContain('never your media or your transcript');
   });
 
+  it('discloses the Cloudflare visit statistics: what is counted, and that Cloudflare says it uses no cookies and no identifier on the device', () => {
+    const t = textOf(render(PrivacyPage, makeBrowserHealth()));
+    expect(t).toContain('Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded.');
+    expect(t).toContain('Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.');
+  });
+
   it('names Cloudflare as the host and describes the counter: one anonymous +1, only the total stored, not verified', () => {
     const t = textOf(render(PrivacyPage, makeBrowserHealth()));
     expect(t).toContain('Cloudflare (Cloudflare Pages) delivers this website.');
@@ -509,7 +515,7 @@ describe('translated legal pages (the in-browser edition in another language)', 
     const f = await renderIn(PrivacyPage, ES);
     const el = f.nativeElement as HTMLElement;
     expect(el.querySelector('h1')!.textContent).toBe('Política de privacidad');
-    expect(el.querySelector('.updated')!.textContent!.trim()).toBe('Última actualización: 26 de octubre de 2026');
+    expect(el.querySelector('.updated')!.textContent!.trim()).toBe('Última actualización: 27 de octubre de 2026');
     expect(headings(f)[0]).toBe('1. Quién gestiona este sitio web');
     expect(el.querySelector('.callout')!.textContent).toContain('Esta es una traducción de cortesía');
     expect(el.querySelector('a[href="/es/terms"]')!.textContent).toBe('Términos de uso');
