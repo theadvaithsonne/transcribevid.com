@@ -825,6 +825,9 @@ const dict: Record<string, string> = {
   'Transcribing takes {time} on this device.':
     'Su questo dispositivo la trascrizione richiede {time}.',
   'Transcribing…': 'Trascrizione in corso…',
+  'Transcribed in {time}': 'Trascritto in {time}',
+  '{n} s': '{n} s',
+  '{m} min {s} s': '{m} min {s} s',
   Transcript: 'Trascrizione',
   'Transcript name': 'Nome della trascrizione',
   'Transcript not found': 'Trascrizione non trovata',

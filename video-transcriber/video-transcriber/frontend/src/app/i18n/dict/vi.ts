@@ -821,6 +821,9 @@ const dict: Record<string, string> = {
   'Transcribing takes {time} on this device.':
     'Việc chuyển thành văn bản mất {time} trên thiết bị này.',
   'Transcribing…': 'Đang chuyển thành văn bản…',
+  'Transcribed in {time}': 'Chuyển thành văn bản trong {time}',
+  '{n} s': '{n} giây',
+  '{m} min {s} s': '{m} phút {s} giây',
   Transcript: 'Bản gỡ băng',
   'Transcript name': 'Tên bản gỡ băng',
   'Transcript not found': 'Không tìm thấy bản gỡ băng',

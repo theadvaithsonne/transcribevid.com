@@ -35,6 +35,8 @@ const ES: Record<string, string> = {
   '{n} words': '{n} palabras',
   '1 word': '1 palabra',
   '{n}% model confidence': '{n}% de confianza del modelo',
+  'Transcribed in {time}': 'Transcrito en {time}',
+  '{m} min {s} s': '{m} min {s} s',
   '{language} → English': '{language} → inglés',
   '{n}% done': '{n}% completado',
   'Transcribing…': 'Transcribiendo…',
@@ -176,6 +178,7 @@ describe('the transcript pages in another language', () => {
       expect(facts[0]).toBe('alemán → inglés');
       expect(facts).toContain('12.345 palabras');
       expect(facts).toContain('91% de confianza del modelo');
+      expect(facts).toContain('Transcrito en 1 min 40 s');
 
       page.menu.set('export');
       fixture.detectChanges();

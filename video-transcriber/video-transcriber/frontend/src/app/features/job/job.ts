@@ -249,8 +249,22 @@ export class JobPage {
       );
       if (st.avg_confidence != null) out.push(this.i18n.t('{n}% model confidence', { n: Math.round(st.avg_confidence * 100) }));
     }
+    // how long the visitor waited: from the start of this run to its end (a job resumed after a reload counts from the resume)
+    if (j.status === 'done' && j.started_at != null && j.finished_at != null && j.finished_at > j.started_at) {
+      out.push(this.i18n.t('Transcribed in {time}', { time: this.took(j.finished_at - j.started_at) }));
+    }
     return out;
   });
+  /** "48 s", "2 min 59 s", "1 h 5 min": the whole wait, to the second below an hour. */
+  private took(seconds: number): string {
+    const total = Math.max(1, Math.round(seconds));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    if (h) return m ? this.i18n.t('{h} h {m} min', { h, m }) : this.i18n.t('{h} h', { h });
+    if (m) return s ? this.i18n.t('{m} min {s} s', { m, s }) : this.i18n.t('{n} min', { n: m });
+    return this.i18n.t('{n} s', { n: s });
+  }
   /** The progress card: what is happening now, and how far it is. */
   statusText = computed(() => {
     const j = this.job();

@@ -820,37 +820,65 @@ describe('JobPage', () => {
 
       it('language, length, words and how sure: one quiet line of text (no pills, no tiles)', () => {
         show({ language: 'en', duration: 125, stats: stats() }, [{ code: 'en', name: 'English' }]);
-        expect(facts()).toEqual(['English', '02:05', '321 words', '90% model confidence']);
+        expect(facts()).toEqual(['English', '02:05', '321 words', '90% model confidence', 'Transcribed in 1 min 40 s']);
         expect(qa('p.facts [class*="tint-"]')).toEqual([]);
         expect(q('.stats')).toBeNull();
         expect(q('dl')).toBeNull();
       });
 
       it('rounds the confidence and counts words in the singular too', () => {
-        show({ language: null, duration: null, stats: stats({ word_count: 1, avg_confidence: 0.876 }) });
+        show({ started_at: null, finished_at: null, language: null, duration: null, stats: stats({ word_count: 1, avg_confidence: 0.876 }) });
         expect(facts()).toEqual(['1 word', '88% model confidence']);
       });
 
       it('names the language by its code when the server has no name for it', () => {
-        show({ language: 'xx', duration: null }, [{ code: 'en', name: 'English' }]);
+        show({ started_at: null, finished_at: null, language: 'xx', duration: null }, [{ code: 'en', name: 'English' }]);
         expect(facts()).toEqual(['XX']);
       });
 
       it('leaves out what is not known, and the whole line when nothing is', () => {
-        show({ language: null, duration: null, stats: stats({ avg_confidence: null }) });
+        show({ started_at: null, finished_at: null, language: null, duration: null, stats: stats({ avg_confidence: null }) });
         expect(facts()).toEqual(['321 words']);
         TestBed.resetTestingModule();
-        show({ language: null, duration: null, stats: null });
+        show({ started_at: null, finished_at: null, language: null, duration: null, stats: null });
         expect(q('p.facts')).toBeNull();
       });
 
+      it('says how long the transcription took: seconds under a minute, then minutes and seconds, then hours', () => {
+        const cases: [number, string][] = [
+          [48, 'Transcribed in 48 s'],
+          [179, 'Transcribed in 2 min 59 s'],
+          [120, 'Transcribed in 2 min'],
+          [3600, 'Transcribed in 1 h'],
+          [3900, 'Transcribed in 1 h 5 min'],
+          [0.4, 'Transcribed in 1 s'],
+        ];
+        for (const [took, text] of cases) {
+          TestBed.resetTestingModule();
+          show({ language: null, duration: null, stats: null, started_at: 1000, finished_at: 1000 + took });
+          expect(facts()).toEqual([text]);
+        }
+      });
+
+      it('has no time while the transcript is still being made, or when the start or the end is not known', () => {
+        const timed = (o: object) => {
+          TestBed.resetTestingModule();
+          show({ language: null, duration: null, stats: null, ...o });
+          return facts();
+        };
+        expect(timed({ status: 'running', started_at: 1000, finished_at: null })).toEqual([]);
+        expect(timed({ status: 'done', started_at: null, finished_at: 1100 })).toEqual([]);
+        expect(timed({ status: 'done', started_at: 1000, finished_at: null })).toEqual([]);
+        expect(timed({ status: 'done', started_at: 1100, finished_at: 1100 })).toEqual([]); // nothing measured
+      });
+
       it('says "→ English" when the transcript was translated', () => {
-        show({ language: 'de', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'de', name: 'German' }]);
+        show({ started_at: null, finished_at: null, language: 'de', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'de', name: 'German' }]);
         expect(facts()).toEqual(['German → English']);
       });
 
       it('never shows "English → English" (translating English into English is just English)', () => {
-        show({ language: 'en', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'en', name: 'English' }]);
+        show({ started_at: null, finished_at: null, language: 'en', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'en', name: 'English' }]);
         expect(facts()).toEqual(['English']);
       });
 
@@ -1405,7 +1433,7 @@ describe('JobPage', () => {
         show({ status: 'done', segments: [], stats: null });
         expect(clean(q('.list .empty'))).toBe('No speech was found in this file.If it does have speech, try More › Re-transcribe with the right language.');
         expect(q('input[type="search"]')).toBeNull(); // nothing to search
-        expect(qa('p.facts > span').map((s) => clean(s))).toEqual(['EN', '01:00']); // no "0 words"
+        expect(qa('p.facts > span').map((s) => clean(s))).toEqual(['EN', '01:00', 'Transcribed in 1 min 40 s']); // no "0 words"
       });
 
       it('a very long name wraps instead of widening the page (it is plain text, no fixed width)', () => {
