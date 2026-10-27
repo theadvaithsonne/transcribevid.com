@@ -93,7 +93,7 @@
       @if (site.inBrowser()) {
         <p><app-rich [text]="'Your file never leaves your device. It is transcribed in your browser on this device and is never uploaded to us or to anyone else. Transcripts, your edits and the file are kept in this browser\'s storage only and deleted automatically after {idle} of inactivity, or right away when you press **Delete my data now** in the Transcripts menu. There is no account. Export what you need before you leave.' | t: { idle: idleOrPeriod() }" /></p>
         <p>{{ 'The first time you use a quality level, your browser downloads the speech model from Hugging Face and the engine\'s program files from jsDelivr, and keeps them for next time; nothing of your file is sent with them. When a transcription finishes, your browser adds one to the anonymous counter in the page header, and nothing else.' | t }}</p>
-        <p><app-rich [text]="'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).' | t" /></p>
+        <p><app-rich [text]="'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).' | t" /></p>
       } @else {
         @switch (site.mode()) {
           @case ('public') {

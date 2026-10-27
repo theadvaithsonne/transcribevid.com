@@ -31,22 +31,22 @@ const dict: Record<string, string> = {
     '{brand} dibuat dan dijalankan oleh **{name}**, {role} yang berbasis di {city}. Saya membuatnya untuk memberi orang pengalaman transkripsi terbaik: mulus sejak klik pertama, tanpa perlu membuat akun, dengan antarmuka bersih yang tidak mengganggu.',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand} ditujukan untuk khalayak umum dan tidak ditujukan bagi anak di bawah 13 tahun.',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand} gratis karena menampilkan iklan yang disajikan oleh Google AdSense. Iklan hanya muncul di halaman informasi (beranda, Cara kerja, FAQ, dan halaman alat) serta di samping transkrip yang sudah selesai. Tidak ada iklan yang ditampilkan saat file sedang ditranskripsikan, dan tidak pernah di halaman privasi, ketentuan, atau log.',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand} gratis karena menampilkan iklan yang disajikan oleh Google AdSense. Iklan hanya muncul di halaman informasi (beranda, Cara kerja, FAQ, dan halaman alat). Tidak ada iklan yang ditampilkan saat file sedang ditranskripsikan maupun di samping transkrip Anda, dan tidak pernah di halaman privasi, ketentuan, atau log.',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand} gratis digunakan. [Kebijakan privasi](/privacy) menjelaskan apa yang terjadi pada file Anda.',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand} didanai oleh iklan yang ditampilkan di halaman informasinya dan di samping transkrip yang sudah selesai (Google AdSense). Karena perangkat Anda sendiri yang melakukan transkripsi, tidak ada biaya server untuk setiap file, dan itulah yang membuat layanan ini tetap gratis dan tanpa batas. [Kebijakan privasi](/privacy) menjelaskan apa yang digunakan iklan dan cara memilih pengaturan Anda.',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand} didanai oleh iklan yang ditampilkan di halaman informasinya (Google AdSense). Karena perangkat Anda sendiri yang melakukan transkripsi, tidak ada biaya server untuk setiap file, dan itulah yang membuat layanan ini tetap gratis dan tanpa batas. [Kebijakan privasi](/privacy) menjelaskan apa yang digunakan iklan dan cara memilih pengaturan Anda.',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand} mengubah ucapan dalam file video atau audio menjadi teks dengan penanda waktu, dalam tiga langkah mudah.',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand} mengubah ucapan dalam video, file audio, dan rekaman suara menjadi teks akurat berpenanda waktu. Gratis, tidak ada batas jumlah file yang Anda transkripsikan, dan Anda tidak memerlukan akun: pilih file di atas, tekan Transkripsikan, lalu baca hasilnya.',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand} mengubah file video dan audio menjadi teks langsung di browser Anda: pengenalan berjalan di perangkat Anda, dan file Anda tidak diunggah ke kami. Gratis digunakan dan tidak memerlukan akun. Layanan ini didanai oleh iklan di halaman informasi dan di samping transkrip yang sudah selesai (Google AdSense; lihat [Kebijakan privasi](/privacy)). Kami dapat mengubah, membatasi, atau menghentikan fitur kapan saja.',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand} mengubah file video dan audio menjadi teks langsung di browser Anda: pengenalan berjalan di perangkat Anda, dan file Anda tidak diunggah ke kami. Gratis digunakan dan tidak memerlukan akun. Layanan ini didanai oleh iklan di halaman informasi (Google AdSense; lihat [Kebijakan privasi](/privacy)). Kami dapat mengubah, membatasi, atau menghentikan fitur kapan saja.',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand} mengubah video dan audio menjadi teks berpenanda waktu secara gratis. Tanpa pendaftaran, tanpa masuk, dan tanpa watermark: buka halaman, pilih file, lalu baca transkrip Anda.',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand} mengubah video dan audio menjadi teks langsung di browser Anda. Halaman ini menjelaskan apa artinya itu bagi data Anda, dengan kata-kata sederhana. Singkatnya: file Anda tidak pernah meninggalkan perangkat Anda. Transkrip Anda hanya disimpan di browser ini, tidak ada akun, dan situs ini tidak memasang cookie sendiri. Iklan hanya muncul di halaman informasi dan di samping transkrip yang sudah selesai, dan disajikan oleh Google, yang menggunakan cookie.',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand} mengubah video dan audio menjadi teks langsung di browser Anda. Halaman ini menjelaskan apa artinya itu bagi data Anda, dengan kata-kata sederhana. Singkatnya: file Anda tidak pernah meninggalkan perangkat Anda. Transkrip Anda hanya disimpan di browser ini, tidak ada akun, dan situs ini tidak memasang cookie sendiri. Iklan hanya muncul di halaman informasi, dan disajikan oleh Google, yang menggunakan cookie.',
   '{done} of {total}': '{done} dari {total}',
   '{duration} (estimate)': '{duration} (perkiraan)',
   '{gb} GB of memory recommended': 'Disarankan memori {gb} GB',
@@ -97,8 +97,8 @@ const dict: Record<string, string> = {
     '**Tambahkan petunjuk kosakata**: nama, merek, dan istilah khusus yang muncul dalam audio, dieja sesuai keinginan Anda.',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**Tambahkan petunjuk kosakata**: nama, merek, dan istilah khusus, dieja sesuai keinginan Anda.',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**Iklan.** Iklan hanya muncul di halaman informasi dan di samping transkrip yang sudah selesai, dan disajikan oleh Google, yang menggunakan cookie. Tidak ada iklan yang ditampilkan saat file sedang ditranskripsikan.',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**Iklan.** Iklan hanya muncul di halaman informasi, dan disajikan oleh Google, yang menggunakan cookie. Tidak ada iklan yang ditampilkan saat file sedang ditranskripsikan maupun di samping transkrip Anda.',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**Periksa baris yang ditandai** dan perbaiki di editor transkrip.',
   '**Choose the spoken language** instead of auto-detect.':
@@ -219,8 +219,8 @@ const dict: Record<string, string> = {
   'Accurate text': 'Teks akurat',
   'Add another file': 'Tambah file lain',
   'Add your file': 'Tambahkan file Anda',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    'Iklan hanya muncul di halaman informasi dan di samping transkrip yang sudah selesai, dan disajikan oleh Google, yang menggunakan cookie. Tidak ada iklan yang ditampilkan saat file sedang ditranskripsikan, dan situs web ini tidak memasang cookie sendiri. Rinciannya ada di [Kebijakan privasi](/privacy).',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    'Iklan hanya muncul di halaman informasi, dan disajikan oleh Google, yang menggunakan cookie. Tidak ada iklan yang ditampilkan saat file sedang ditranskripsikan maupun di samping transkrip Anda, dan situs web ini tidak memasang cookie sendiri. Rinciannya ada di [Kebijakan privasi](/privacy).',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'Iklan tidak diperlukan untuk fitur apa pun: dengan iklan diblokir atau ditolak, semuanya tetap berfungsi sama.',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1136,6 +1136,8 @@ const dict: Record<string, string> = {
   'label:/youtube-subtitle-generator': 'Pembuat subtitle YouTube',
   'an independent software developer': 'pengembang perangkat lunak independen',
   'Bengaluru, India': 'Bengaluru, India',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'Halaman ini diterjemahkan dengan AI. [Menemukan kesalahan? Beri tahu kami.](/contact)',
 };
 
 export default dict;

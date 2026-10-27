@@ -333,8 +333,8 @@ describe('FaqPage', () => {
       expect(p).toContain('Delete my data now');
       expect(p).toContain("the speech model from Hugging Face and the engine's program files from jsDelivr");
       expect(p).toContain('adds one to the anonymous counter in the page header');
-      expect(p).toContain('Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.');
-      expect(p).toContain('No ad is shown while a file is being transcribed');
+      expect(p).toContain('Ads appear only on information pages, and are served by Google, which uses cookies.');
+      expect(p).toContain('No ad is shown while a file is being transcribed or beside your transcript');
       expect(p).not.toContain('This copy of TranscribeVid runs on your own computer.');
       expect(p).not.toContain('depends on how TranscribeVid is run');
       expect(q('a[href="/privacy"]')).not.toBeNull();

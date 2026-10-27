@@ -8,7 +8,7 @@ import { IS_BROWSER } from './platform';
 
 /**
  * Route data `ads`: `true` = an information page that may show ads (home, how it works, FAQ, the tool pages);
- * `'job-done'` = the transcript page, which shows ads only once its transcript is finished. Any other route: no ads.
+ * `'job-done'` = the transcript page once its transcript is finished: supported here, but no route uses it (a transcript is the visitor's own machine-made text on a page Google cannot read: adsense.md section 5). Any other route: no ads.
  */
 export type AdsRouteFlag = true | 'job-done';
 
@@ -85,7 +85,7 @@ export class AdsService {
   readonly reserved = computed(() => this.isAdPage(this.route()));
   /**
    * The page's in-flow unit is drawn by the app shell, after the page (route data `adSlot: 'end'`): the home page and the
-   * finished transcript, whose own templates have no content break below their buttons.
+   * finished transcript (for a route that uses 'job-done'), whose own templates have no content break below their buttons.
    */
   readonly endSlot = computed(() => this.reserved() && leaf(this.route())?.data?.['adSlot'] === 'end');
   /** the address shown (no query): the shell's end-of-page unit is keyed on it, so every page gets its own `ins` */

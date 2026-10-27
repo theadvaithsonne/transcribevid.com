@@ -30,22 +30,22 @@ const dict: Record<string, string> = {
     '{brand} को **{name}** ने बनाया है और वही इसे चलाते हैं ({role}, {city} में स्थित)। मैंने इसे इसलिए बनाया कि लोगों को ट्रांसक्रिप्शन का सबसे अच्छा अनुभव मिले: पहले क्लिक से ही आसान, बिना अकाउंट बनाए, और एक साफ़-सुथरे इंटरफ़ेस के साथ जो रास्ते में न आए।',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand} आम लोगों के लिए है और 13 साल से कम उम्र के बच्चों के लिए नहीं है।',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand} मुफ़्त है क्योंकि इसमें विज्ञापन दिखते हैं, जो Google AdSense से आते हैं। विज्ञापन सिर्फ़ जानकारी वाले पेजों (होम, यह कैसे काम करता है, अक्सर पूछे जाने वाले सवाल और टूल पेज) पर और तैयार ट्रांसक्रिप्ट के बगल में दिखते हैं। फ़ाइल ट्रांसक्राइब होते समय कोई विज्ञापन नहीं दिखता, और प्राइवेसी, शर्तों या लॉग पेज पर कभी नहीं।',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand} मुफ़्त है क्योंकि इसमें विज्ञापन दिखते हैं, जो Google AdSense से आते हैं। विज्ञापन सिर्फ़ जानकारी वाले पेजों (होम, यह कैसे काम करता है, अक्सर पूछे जाने वाले सवाल और टूल पेज) पर दिखते हैं। फ़ाइल ट्रांसक्राइब होते समय या आपकी ट्रांसक्रिप्ट के बगल में कोई विज्ञापन नहीं दिखता, और प्राइवेसी, शर्तों या लॉग पेज पर कभी नहीं।',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand} इस्तेमाल करने के लिए मुफ़्त है। आपकी फ़ाइलों का क्या होता है, यह [प्राइवेसी पॉलिसी](/privacy) में बताया गया है।',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand} का खर्च जानकारी वाले पेजों पर और तैयार ट्रांसक्रिप्ट के बगल में दिखने वाले विज्ञापनों (Google AdSense) से चलता है। ट्रांसक्रिप्शन आपका अपना डिवाइस करता है, इसलिए हर फ़ाइल के लिए सर्वर का कोई खर्च नहीं आता, और यही सेवा को मुफ़्त और असीमित रखता है। विज्ञापन क्या इस्तेमाल करते हैं और आप अपनी सेटिंग कैसे चुन सकते हैं, यह [प्राइवेसी पॉलिसी](/privacy) में बताया गया है।',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand} का खर्च जानकारी वाले पेजों पर दिखने वाले विज्ञापनों (Google AdSense) से चलता है। ट्रांसक्रिप्शन आपका अपना डिवाइस करता है, इसलिए हर फ़ाइल के लिए सर्वर का कोई खर्च नहीं आता, और यही सेवा को मुफ़्त और असीमित रखता है। विज्ञापन क्या इस्तेमाल करते हैं और आप अपनी सेटिंग कैसे चुन सकते हैं, यह [प्राइवेसी पॉलिसी](/privacy) में बताया गया है।',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand} तीन आसान चरणों में किसी वीडियो या ऑडियो फ़ाइल की बोली को टाइमस्टैम्प वाले टेक्स्ट में बदलता है।',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand} वीडियो, ऑडियो फ़ाइलों और वॉइस रिकॉर्डिंग की बोली को सटीक, टाइमस्टैम्प वाले टेक्स्ट में बदलता है। यह मुफ़्त है, कितनी भी फ़ाइलें ट्रांसक्राइब करने की कोई सीमा नहीं है, और अकाउंट की ज़रूरत नहीं: ऊपर फ़ाइल चुनें, ट्रांसक्राइब करें दबाएँ और नतीजा पढ़ें।',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand} वीडियो और ऑडियो फ़ाइलों को सीधे आपके ब्राउज़र में टेक्स्ट में बदलता है: पहचान का काम आपके डिवाइस पर होता है, और आपकी फ़ाइलें हमें अपलोड नहीं होतीं। इसका इस्तेमाल मुफ़्त है और अकाउंट की ज़रूरत नहीं। इसका खर्च जानकारी वाले पेजों पर और तैयार ट्रांसक्रिप्ट के बगल में दिखने वाले विज्ञापनों (Google AdSense; [प्राइवेसी पॉलिसी](/privacy) देखें) से चलता है। हम किसी भी समय सुविधाएँ बदल, सीमित या बंद कर सकते हैं।',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand} वीडियो और ऑडियो फ़ाइलों को सीधे आपके ब्राउज़र में टेक्स्ट में बदलता है: पहचान का काम आपके डिवाइस पर होता है, और आपकी फ़ाइलें हमें अपलोड नहीं होतीं। इसका इस्तेमाल मुफ़्त है और अकाउंट की ज़रूरत नहीं। इसका खर्च जानकारी वाले पेजों पर दिखने वाले विज्ञापनों (Google AdSense; [प्राइवेसी पॉलिसी](/privacy) देखें) से चलता है। हम किसी भी समय सुविधाएँ बदल, सीमित या बंद कर सकते हैं।',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand} वीडियो और ऑडियो को मुफ़्त में सटीक, टाइमस्टैम्प वाले टेक्स्ट में बदलता है। न साइन-अप, न साइन-इन और न कोई वॉटरमार्क: पेज खोलें, फ़ाइल चुनें और अपनी ट्रांसक्रिप्ट पढ़ें।',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand} वीडियो और ऑडियो को सीधे आपके ब्राउज़र में टेक्स्ट में बदलता है। यह पेज आम भाषा में बताता है कि इसमें आपके डेटा का क्या होता है। संक्षेप में: आपकी फ़ाइल आपके डिवाइस से बाहर नहीं जाती। आपकी ट्रांसक्रिप्ट सिर्फ़ इसी ब्राउज़र में रहती हैं, कोई अकाउंट नहीं है, और साइट अपनी कोई कुकी नहीं लगाती। विज्ञापन सिर्फ़ जानकारी वाले पेजों पर और तैयार ट्रांसक्रिप्ट के बगल में दिखते हैं, और Google उन्हें दिखाता है, जो कुकी का इस्तेमाल करता है।',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand} वीडियो और ऑडियो को सीधे आपके ब्राउज़र में टेक्स्ट में बदलता है। यह पेज आम भाषा में बताता है कि इसमें आपके डेटा का क्या होता है। संक्षेप में: आपकी फ़ाइल आपके डिवाइस से बाहर नहीं जाती। आपकी ट्रांसक्रिप्ट सिर्फ़ इसी ब्राउज़र में रहती हैं, कोई अकाउंट नहीं है, और साइट अपनी कोई कुकी नहीं लगाती। विज्ञापन सिर्फ़ जानकारी वाले पेजों पर दिखते हैं, और Google उन्हें दिखाता है, जो कुकी का इस्तेमाल करता है।',
   '{done} of {total}': '{total} में से {done}',
   '{duration} (estimate)': '{duration} (अनुमान)',
   '{gb} GB of memory recommended': '{gb} GB मेमोरी सुझाई जाती है',
@@ -98,8 +98,8 @@ const dict: Record<string, string> = {
     '**शब्दावली संकेत जोड़ें**: ऑडियो में आने वाले नाम, ब्रांड और खास शब्द, उसी वर्तनी में जैसी आप चाहते हैं।',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**शब्दावली संकेत जोड़ें**: नाम, ब्रांड और खास शब्द, उसी वर्तनी में जैसी आप चाहते हैं।',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**विज्ञापन।** विज्ञापन सिर्फ़ जानकारी वाले पेजों पर और तैयार ट्रांसक्रिप्ट के बगल में दिखते हैं, और Google उन्हें दिखाता है, जो कुकी का इस्तेमाल करता है। फ़ाइल ट्रांसक्राइब होते समय कोई विज्ञापन नहीं दिखता।',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**विज्ञापन।** विज्ञापन सिर्फ़ जानकारी वाले पेजों पर दिखते हैं, और Google उन्हें दिखाता है, जो कुकी का इस्तेमाल करता है। फ़ाइल ट्रांसक्राइब होते समय या आपकी ट्रांसक्रिप्ट के बगल में कोई विज्ञापन नहीं दिखता।',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**निशान लगी लाइनें जाँचें** और उन्हें ट्रांसक्रिप्ट एडिटर में ठीक करें।',
   '**Choose the spoken language** instead of auto-detect.':
@@ -220,8 +220,8 @@ const dict: Record<string, string> = {
   'Accurate text': 'सटीक टेक्स्ट',
   'Add another file': 'एक और फ़ाइल जोड़ें',
   'Add your file': 'अपनी फ़ाइल जोड़ें',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    'विज्ञापन सिर्फ़ जानकारी वाले पेजों पर और तैयार ट्रांसक्रिप्ट के बगल में दिखते हैं, और Google उन्हें दिखाता है, जो कुकी का इस्तेमाल करता है। फ़ाइल ट्रांसक्राइब होते समय कोई विज्ञापन नहीं दिखता, और यह वेबसाइट अपनी कोई कुकी नहीं लगाती। ब्योरा [प्राइवेसी पॉलिसी](/privacy) में है।',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    'विज्ञापन सिर्फ़ जानकारी वाले पेजों पर दिखते हैं, और Google उन्हें दिखाता है, जो कुकी का इस्तेमाल करता है। फ़ाइल ट्रांसक्राइब होते समय या आपकी ट्रांसक्रिप्ट के बगल में कोई विज्ञापन नहीं दिखता, और यह वेबसाइट अपनी कोई कुकी नहीं लगाती। ब्योरा [प्राइवेसी पॉलिसी](/privacy) में है।',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'किसी भी सुविधा के लिए विज्ञापनों की ज़रूरत नहीं है: विज्ञापन ब्लॉक या अस्वीकार करने पर भी सब कुछ पहले जैसा ही चलता है।',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1126,5 +1126,7 @@ const dict: Record<string, string> = {
   'description:/youtube-subtitle-generator':
     'अपने YouTube वीडियो के लिए मुफ़्त में, बिना लॉगिन किए SRT सबटाइटल फ़ाइल बनाएँ। बोली के हिसाब से समय, 50+ भाषाएँ। उसे YouTube Studio में अपलोड करें।',
   'label:/youtube-subtitle-generator': 'YouTube सबटाइटल जनरेटर',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'यह पेज AI से अनुवादित है। [कोई गलती मिली? हमें बताएँ।](/contact)',
 };
 export default dict;

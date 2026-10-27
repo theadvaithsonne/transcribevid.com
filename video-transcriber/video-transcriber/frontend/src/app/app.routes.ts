@@ -32,8 +32,8 @@ const guideRoute = (g: GuideLink): Route => ({
  * meta description and `data.noindex` keeps private / admin pages out of search results.
  *
  * `data.ads` marks the pages that may show ads in the edition that has them (core/ads.service.ts): `true` for the
- * information pages (home, how it works, FAQ, the tool pages), `'job-done'` for a transcript once it is finished. Every
- * other page (privacy, terms, logs, 404, a transcript still being made) never shows one. `data.adSlot: 'end'`: the app
+ * information pages (home, how it works, FAQ, the tool pages, the guides). Every
+ * other page (privacy, terms, logs, 404 and every transcript page: see adsense.md section 5) never shows one. `data.adSlot: 'end'`: the app
  * shell draws that page's in-flow unit (tablet / phone) after the page instead of the page's own template. `adFreeDocument` opens privacy,
  * terms and logs with a full page load once Google's script is in the tab, so those documents never carry it.
  */
@@ -48,7 +48,7 @@ export const appPages: Routes = [
   {
     path: 'jobs/:id',
     title: 'Transcript',
-    data: { noindex: true, ads: 'job-done', adSlot: 'end' },
+    data: { noindex: true },
     loadComponent: () => import('./features/job/job').then((m) => m.JobPage),
   },
   {

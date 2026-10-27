@@ -150,6 +150,10 @@ describe('App shell', () => {
       expect(fixture.nativeElement.textContent).not.toContain('Video Transcriber');
     });
 
+    it('has no "translated with AI" note on an English page', () => {
+      expect(q('.ai-note')).toBeNull();
+    });
+
     it('has the page landmarks: banner, labelled navigations, main and a footer', () => {
       expect(q('header.topbar')).not.toBeNull();
       expect(q('header nav[aria-label="Main"]')).not.toBeNull();

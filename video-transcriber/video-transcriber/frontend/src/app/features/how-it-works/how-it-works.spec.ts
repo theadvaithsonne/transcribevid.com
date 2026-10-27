@@ -243,8 +243,8 @@ describe('HowItWorksPage', () => {
       expect(k).toContain("your browser fetches the model files from Hugging Face and the engine's program files from jsDelivr");
       expect(k).toContain('Keep the tab open while it works.');
       expect(k).toContain('Transcripts and the file stay in this browser only and are deleted automatically after 30 minutes of inactivity');
-      expect(k).toContain('Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.');
-      expect(k).toContain('No ad is shown while a file is being transcribed.');
+      expect(k).toContain('Ads appear only on information pages, and are served by Google, which uses cookies.');
+      expect(k).toContain('No ad is shown while a file is being transcribed or beside your transcript.');
       expect(q('section.know a[href="/privacy"]')).not.toBeNull();
       expect(k).toContain('Mistakes happen.');
     });

@@ -112,7 +112,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'La pubblicità.',
-          text: 'Il sito è gratuito perché mostra annunci pubblicati da Google AdSense, nelle pagine informative e accanto a una trascrizione finita, mai mentre un file viene trascritto. Google usa i cookie per gli annunci e, dove la legge lo richiede, chiede prima il tuo consenso. Gli script pubblicitari di Google fanno richieste proprie a Google, ma il tuo file e la tua trascrizione non vengono mai inviati a Google.',
+          text: 'Il sito è gratuito perché mostra annunci pubblicati da Google AdSense, nelle pagine informative, mai mentre un file viene trascritto né accanto alla tua trascrizione. Google usa i cookie per gli annunci e, dove la legge lo richiede, chiede prima il tuo consenso. Gli script pubblicitari di Google fanno richieste proprie a Google, ma il tuo file e la tua trascrizione non vengono mai inviati a Google.',
         },
       ],
       after: [

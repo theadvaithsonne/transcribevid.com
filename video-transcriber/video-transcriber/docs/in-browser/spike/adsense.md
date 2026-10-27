@@ -147,6 +147,13 @@ Cloudflare Pages specifics:
 | `**` not found | Client | **No** | "Dead end ... Error pages" (S6). Also give it a real HTTP 404: add `404.html` (Pages then serves it with status 404 instead of SPA fallback `200`, S22). A soft-404 with an ad slot is the worst case. |
 | Any in-app error / empty state / toast / modal | n/a | No | "alerts, navigation or other behavioral purposes" (S6). |
 
+**Decision 2026-10-27 (owner instruction: always follow the AdSense rules, it is the main income):** the v1 rule above is final. The
+route `jobs/:id` has no `ads` flag, so a transcript, finished or not, never shows an ad (it is user content that the publisher neither created
+nor manages, machine-made, unreadable for Google's crawler, and sits beside the Download and Export buttons). `routes.spec.ts` pins it. To
+reverse it later, give the route `ads: 'job-done'` and `adSlot: 'end'` again (the service and its specs still support it), and change the
+six sentences of the privacy, terms, about, FAQ, how-it-works and guide texts back; do it only after Google has approved the site and
+confirmed in Policy center that such pages are fine.
+
 Implementation note [inference]: put an explicit allow-list in `app.routes.ts` (`data: { ads: 'full' }` on the nine ad pages) rather than a deny-list; anything not listed (including future routes) is ad-free by default.
 
 ---

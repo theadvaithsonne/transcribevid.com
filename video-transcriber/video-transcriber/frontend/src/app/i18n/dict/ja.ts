@@ -30,22 +30,22 @@ const dict: Record<string, string> = {
     '{brand}は、{city}を拠点とする**{name}**（{role}）が作り、運営しています。誰もが最高の文字起こし体験を得られるように作りました。最初のクリックからスムーズで、アカウントの作成は不要、じゃまにならないすっきりした画面です。',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand}は一般のお客様向けで、13歳未満のお子様を対象としていません。',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand}は、Google AdSenseで配信される広告によって無料で提供されています。広告は、情報ページ（ホーム、使い方、よくある質問、各ツールのページ）と、完成した文字起こしのそばにのみ表示されます。ファイルの文字起こし中は広告を表示せず、プライバシー、利用規約、ログのページにも表示しません。',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand}は、Google AdSenseで配信される広告によって無料で提供されています。広告は、情報ページ（ホーム、使い方、よくある質問、各ツールのページ）にのみ表示されます。ファイルの文字起こし中や、文字起こし結果のそばには広告を表示せず、プライバシー、利用規約、ログのページにも表示しません。',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand}は無料でご利用いただけます。ファイルがどう扱われるかは、[プライバシーポリシー](/privacy)で説明しています。',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand}は、情報ページと完成した文字起こしのそばに表示される広告（Google AdSense）で運営されています。文字起こしはお使いの端末で行われるため、ファイルごとのサーバー費用がかからず、それがサービスを無料かつ無制限に保っています。広告が何を利用し、設定をどう選べるかは、[プライバシーポリシー](/privacy)で説明しています。',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand}は、情報ページに表示される広告（Google AdSense）で運営されています。文字起こしはお使いの端末で行われるため、ファイルごとのサーバー費用がかからず、それがサービスを無料かつ無制限に保っています。広告が何を利用し、設定をどう選べるかは、[プライバシーポリシー](/privacy)で説明しています。',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand}は、動画や音声ファイルの話し声を、3つの簡単なステップでタイムスタンプ付きのテキストにします。',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand}は、動画、音声ファイル、ボイスレコーディングの話し声を、正確でタイムスタンプ付きのテキストにします。無料で、文字起こしできるファイル数に上限はなく、アカウントも不要です。上でファイルを選び、「文字起こしを開始」を押して、結果をお読みください。',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand}は、動画や音声ファイルをブラウザー上でテキストにします。認識はお使いの端末で行われ、ファイルが当社にアップロードされることはありません。無料で、アカウントも不要です。情報ページと完成した文字起こしのそばに表示される広告（Google AdSense。[プライバシーポリシー](/privacy)をご覧ください）で運営されています。当社は、機能をいつでも変更、制限、または終了することがあります。',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand}は、動画や音声ファイルをブラウザー上でテキストにします。認識はお使いの端末で行われ、ファイルが当社にアップロードされることはありません。無料で、アカウントも不要です。情報ページに表示される広告（Google AdSense。[プライバシーポリシー](/privacy)をご覧ください）で運営されています。当社は、機能をいつでも変更、制限、または終了することがあります。',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand}は、動画や音声を、正確でタイムスタンプ付きのテキストに無料で変換します。登録もログインも透かしもありません。ページを開き、ファイルを選んで、文字起こしをお読みください。',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand}は、動画や音声をブラウザー上でテキストにします。このページでは、それがお客様のデータにとって何を意味するのかを、わかりやすい言葉で説明します。要点は次のとおりです。ファイルがお使いの端末から出ることはありません。文字起こしはこのブラウザー内にのみ保存され、アカウントはなく、当サイト自身はCookieを設定しません。広告は情報ページと完成した文字起こしのそばにのみ表示され、Cookieを使用するGoogleによって配信されます。',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand}は、動画や音声をブラウザー上でテキストにします。このページでは、それがお客様のデータにとって何を意味するのかを、わかりやすい言葉で説明します。要点は次のとおりです。ファイルがお使いの端末から出ることはありません。文字起こしはこのブラウザー内にのみ保存され、アカウントはなく、当サイト自身はCookieを設定しません。広告は情報ページにのみ表示され、Cookieを使用するGoogleによって配信されます。',
   '{done} of {total}': '{done} / {total}',
   '{duration} (estimate)': '{duration}（目安）',
   '{gb} GB of memory recommended': 'メモリ {gb} GB を推奨',
@@ -97,8 +97,8 @@ const dict: Record<string, string> = {
     '**語彙のヒントを追加する**：音声に出てくる名前、ブランド名、専門用語を、書きたい表記で入れます。',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**語彙のヒントを追加する**：名前、ブランド名、専門用語を、書きたい表記で入れます。',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**広告。** 広告は情報ページと完成した文字起こしのそばにのみ表示され、Cookieを使用するGoogleによって配信されます。ファイルの文字起こし中は広告を表示しません。',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**広告。** 広告は情報ページにのみ表示され、Cookieを使用するGoogleによって配信されます。ファイルの文字起こし中や、文字起こし結果のそばには広告を表示しません。',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**マークの付いた行を確認し**、文字起こしエディターで直します。',
   '**Choose the spoken language** instead of auto-detect.':
@@ -220,8 +220,8 @@ const dict: Record<string, string> = {
   'Accurate text': '正確なテキスト',
   'Add another file': 'ファイルを追加',
   'Add your file': 'ファイルを追加する',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    '広告は、情報ページと完成した文字起こしのそばにのみ表示され、Cookieを使用するGoogleによって配信されます。ファイルの文字起こし中は広告を表示せず、このウェブサイト自身はCookieを設定しません。詳しくは[プライバシーポリシー](/privacy)をご覧ください。',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    '広告は、情報ページにのみ表示され、Cookieを使用するGoogleによって配信されます。ファイルの文字起こし中や、文字起こし結果のそばには広告を表示せず、このウェブサイト自身はCookieを設定しません。詳しくは[プライバシーポリシー](/privacy)をご覧ください。',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'どの機能にも広告は必要ありません。広告をブロックまたは拒否しても、すべて同じように動作します。',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1135,5 +1135,7 @@ const dict: Record<string, string> = {
   'label:/guides/what-is-whisper': 'Whisperとは？',
   'an independent software developer': '独立系のソフトウェア開発者',
   'Bengaluru, India': 'インド・ベンガルール',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'このページはAIで翻訳されています。[誤りを見つけたらお知らせください。](/contact)',
 };
 export default dict;

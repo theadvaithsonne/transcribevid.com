@@ -2,7 +2,7 @@
 
 Plain-English steps for you, the owner. The website side is done: every page has its own title, description and address,
 there is a sitemap and a robots.txt, every page is delivered as ready-made HTML that search engines can read without
-running JavaScript, and there are 24 pages written for what people search for plus 5 guides (details in "What is on the
+running JavaScript, and there are 31 pages written for what people search for plus 5 guides (details in "What is on the
 site" below). The whole site also exists in 15 more languages (Spanish, Portuguese, French, German, Italian, Indonesian,
 Japanese, Korean, Thai, Vietnamese, Turkish, Hindi, Bengali, Arabic, Urdu), so a visitor in Spain, Brazil or Japan reads it in
 their own language and Google lists each country's pages in that language ("Languages and countries" below). The site runs on Cloudflare Pages (static, in-browser transcription); the Docker / backend setup that
@@ -25,15 +25,17 @@ minutes or need an upload).
 | Home | `/` |
 | Core tools (linked from every footer) | `/video-to-text`, `/audio-to-text`, `/mp4-to-text`, `/mp3-to-text`, `/srt-subtitle-generator`, `/voice-recording-to-text` |
 | By file type | `/wav-to-text`, `/m4a-to-text`, `/webm-to-text`, `/mov-to-text` |
-| By use | `/whatsapp-voice-message-to-text`, `/meeting-recording-to-text`, `/lecture-to-text`, `/podcast-transcript-generator`, `/interview-transcription` |
+| By use | `/whatsapp-voice-message-to-text`, `/whatsapp-voice-note-to-text`, `/meeting-recording-to-text`, `/lecture-to-text`, `/podcast-transcript-generator`, `/podcast-to-text`, `/interview-transcription`, `/private-transcription`, `/subtitle-generator-for-reels` |
 | Subtitle files | `/vtt-subtitle-generator`, `/youtube-subtitle-generator` |
-| By language | `/hindi-audio-to-text`, `/hinglish-transcription`, `/translate-audio-to-english`, `/spanish-audio-to-text`, `/portuguese-audio-to-text`, `/french-audio-to-text`, `/german-audio-to-text` |
+| Alternatives | `/otter-ai-alternative`, `/turboscribe-alternative` |
+| By language | `/hindi-audio-to-text`, `/hinglish-transcription`, `/translate-audio-to-english`, `/translate-hindi-audio-to-english`, `/spanish-audio-to-text`, `/portuguese-audio-to-text`, `/french-audio-to-text`, `/german-audio-to-text` |
 | Lists | `/tools` (every tool, grouped), `/guides` (every guide) |
 | Guides | `/guides/srt-vs-vtt`, `/guides/how-to-add-subtitles-to-a-video`, `/guides/transcribe-video-without-uploading`, `/guides/accurate-transcripts`, `/guides/what-is-whisper` |
 | Information | `/how-it-works`, `/faq`, `/about`, `/contact`, `/privacy`, `/terms` |
 
-38 English addresses, and the same pages in 15 languages (32 each: the home page, the six information pages, the two lists, 18 tool
-pages and the 5 guides; the six "by language" pages have no translation, a Spanish page about Spanish would only repeat the generic page): 518
+45 English addresses, and the same pages in 15 languages (32 each: the home page, the six information pages, the two lists, 18 tool
+pages and the 5 guides; 13 tool pages exist in English only: the six "by language" pages, because a Spanish page about Spanish would only
+repeat the generic page, and the two alternatives pages and five more that have not been translated yet): 525
 addresses in all, all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
 chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
 
@@ -52,7 +54,7 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    "backend setting" methods do not exist on the static site; the DNS record is the one to use.)
 
 3. **Submit the sitemap.** In Search Console open *Sitemaps*, type `sitemap.xml`, press *Submit*. Within a day or two it
-   should say *Success* with 518 pages discovered (38 English + 480 translated).
+   should say *Success* with 525 pages discovered (45 English + 480 translated).
 
 4. **Ask Google to look now.** *URL inspection* (search bar at the top) > *Request indexing*, about 10 a day are allowed.
    Day 1: `/`, `/video-to-text`, `/audio-to-text`, `/mp4-to-text`, `/mp3-to-text`, `/srt-subtitle-generator`,
@@ -72,10 +74,10 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
      an AI assistant about it (ChatGPT-User, Perplexity-User, Claude-User), which stops assistants from citing the site,
      and (b) adds a `Content-Signal:` line that Lighthouse reports as an "unknown directive" (Google ignores it; harmless).
      Recommended: keep the training bots blocked if you like, but allow the three "-User" agents, or switch the managed
-     block off. Google Search itself is never blocked.
+     block off. Google Search itself is never blocked. (Checked on the live site on 2026-10-27: the managed block is still on.)
    - **Email Address Obfuscation** (Scrape Shield). It rewrites your e-mail into an encoded link plus an extra script, so
      crawlers see "[email protected]". Switch it **off**: a visible contact address is a trust signal for Google and for the
-     AdSense review.
+     AdSense review. (Checked on the live site on 2026-10-27: it is still on, `/contact` shows "[email protected]" to crawlers.)
    - Leave *Always Use HTTPS* on, and the www > apex redirect as it is.
 
 7. **Test the speed once.** At https://pagespeed.web.dev test `https://transcribevid.com/` and a guide on mobile. Aim for
@@ -84,7 +86,7 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    WebApplication, FAQ). There are no star ratings anywhere, on purpose: never add made-up ones.
 
 8. **Wait, then check monthly (15 minutes).** In Search Console:
-   - **Pages** (page indexing): the 38 English pages should move to *Indexed* over 1 to 6 weeks, the translated ones over 2 to 10
+   - **Pages** (page indexing): the 45 English pages should move to *Indexed* over 1 to 6 weeks, the translated ones over 2 to 10
      (a large batch of new pages on a new site is crawled slowly; that is normal). Normal and nothing to fix: *Page with
      redirect* (http and www addresses), *Not found (404)* (mistyped addresses), *Excluded by 'noindex' tag* and *Blocked by
      robots.txt* (private transcript pages `/jobs/...`, `/logs`, `/api/...`). Worth attention: *Crawled - currently not

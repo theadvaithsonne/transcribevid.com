@@ -31,22 +31,22 @@ const dict: Record<string, string> = {
     '{brand} do **{name}**, {role} tại {city}, xây dựng và vận hành. Tôi tạo ra nó để mang đến cho mọi người trải nghiệm chuyển giọng nói thành văn bản tốt nhất có thể: liền mạch từ cú nhấp đầu tiên, không cần tạo tài khoản, và một giao diện gọn gàng không gây vướng víu.',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand} dành cho mọi đối tượng và không hướng đến trẻ em dưới 13 tuổi.',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand} miễn phí vì có hiển thị quảng cáo, do Google AdSense cung cấp. Quảng cáo chỉ xuất hiện ở các trang thông tin (Trang chủ, Cách hoạt động, Câu hỏi thường gặp và các trang công cụ) và bên cạnh bản gỡ băng đã hoàn thành. Không có quảng cáo nào hiển thị khi tệp đang được chuyển thành văn bản, và không bao giờ xuất hiện ở các trang quyền riêng tư, điều khoản hay nhật ký (logs).',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand} miễn phí vì có hiển thị quảng cáo, do Google AdSense cung cấp. Quảng cáo chỉ xuất hiện ở các trang thông tin (Trang chủ, Cách hoạt động, Câu hỏi thường gặp và các trang công cụ). Không có quảng cáo nào hiển thị khi tệp đang được chuyển thành văn bản, cũng như bên cạnh bản gỡ băng của bạn, và không bao giờ xuất hiện ở các trang quyền riêng tư, điều khoản hay nhật ký (logs).',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand} miễn phí sử dụng. [Chính sách quyền riêng tư](/privacy) giải thích điều gì xảy ra với tệp của bạn.',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand} được tài trợ bằng quảng cáo hiển thị trên các trang thông tin và bên cạnh bản gỡ băng đã hoàn thành (Google AdSense). Vì chính thiết bị của bạn thực hiện việc chuyển thành văn bản nên không phát sinh chi phí máy chủ cho mỗi tệp, và đó là điều giúp dịch vụ luôn miễn phí và không giới hạn. [Chính sách quyền riêng tư](/privacy) giải thích quảng cáo sử dụng những gì và cách chọn thiết lập của bạn.',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand} được tài trợ bằng quảng cáo hiển thị trên các trang thông tin (Google AdSense). Vì chính thiết bị của bạn thực hiện việc chuyển thành văn bản nên không phát sinh chi phí máy chủ cho mỗi tệp, và đó là điều giúp dịch vụ luôn miễn phí và không giới hạn. [Chính sách quyền riêng tư](/privacy) giải thích quảng cáo sử dụng những gì và cách chọn thiết lập của bạn.',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand} chuyển giọng nói trong tệp video hoặc âm thanh thành văn bản có mốc thời gian, qua ba bước đơn giản.',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand} chuyển giọng nói trong video, tệp âm thanh và bản ghi âm thành văn bản chính xác, có mốc thời gian. Dịch vụ miễn phí, không giới hạn số tệp bạn chuyển và bạn không cần tài khoản: hãy chọn tệp ở trên, nhấn Chuyển thành văn bản rồi đọc kết quả.',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand} chuyển tệp video và âm thanh thành văn bản ngay trong trình duyệt của bạn: quá trình nhận dạng chạy trên thiết bị của bạn và tệp của bạn không được tải lên chỗ chúng tôi. Dịch vụ miễn phí và không cần tài khoản. Dịch vụ được tài trợ bằng quảng cáo trên các trang thông tin và bên cạnh bản gỡ băng đã hoàn thành (Google AdSense; xem [Chính sách quyền riêng tư](/privacy)). Chúng tôi có thể thay đổi, hạn chế hoặc ngừng các tính năng bất cứ lúc nào.',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand} chuyển tệp video và âm thanh thành văn bản ngay trong trình duyệt của bạn: quá trình nhận dạng chạy trên thiết bị của bạn và tệp của bạn không được tải lên chỗ chúng tôi. Dịch vụ miễn phí và không cần tài khoản. Dịch vụ được tài trợ bằng quảng cáo trên các trang thông tin (Google AdSense; xem [Chính sách quyền riêng tư](/privacy)). Chúng tôi có thể thay đổi, hạn chế hoặc ngừng các tính năng bất cứ lúc nào.',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand} chuyển video và âm thanh thành văn bản chính xác, có mốc thời gian, hoàn toàn miễn phí. Không cần đăng ký, không cần đăng nhập và không có hình mờ: mở trang, chọn tệp và đọc bản gỡ băng của bạn.',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand} chuyển video và âm thanh thành văn bản ngay trong trình duyệt của bạn. Trang này giải thích bằng ngôn từ đơn giản điều đó có ý nghĩa gì với dữ liệu của bạn. Tóm lại: Tệp của bạn không bao giờ rời khỏi thiết bị. Bản gỡ băng của bạn chỉ được lưu trong trình duyệt này, không có tài khoản và trang web không tự đặt cookie. Quảng cáo chỉ xuất hiện ở các trang thông tin và bên cạnh bản gỡ băng đã hoàn thành, do Google cung cấp và Google sử dụng cookie.',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand} chuyển video và âm thanh thành văn bản ngay trong trình duyệt của bạn. Trang này giải thích bằng ngôn từ đơn giản điều đó có ý nghĩa gì với dữ liệu của bạn. Tóm lại: Tệp của bạn không bao giờ rời khỏi thiết bị. Bản gỡ băng của bạn chỉ được lưu trong trình duyệt này, không có tài khoản và trang web không tự đặt cookie. Quảng cáo chỉ xuất hiện ở các trang thông tin, do Google cung cấp và Google sử dụng cookie.',
   '{done} of {total}': '{done}/{total}',
   '{duration} (estimate)': '{duration} (ước tính)',
   '{gb} GB of memory recommended': 'Khuyến nghị {gb} GB bộ nhớ',
@@ -98,8 +98,8 @@ const dict: Record<string, string> = {
     '**Thêm gợi ý từ vựng**: tên riêng, thương hiệu và thuật ngữ xuất hiện trong âm thanh, viết đúng theo cách bạn muốn.',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**Thêm gợi ý từ vựng**: tên riêng, thương hiệu và thuật ngữ, viết đúng theo cách bạn muốn.',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**Quảng cáo.** Quảng cáo chỉ xuất hiện ở các trang thông tin và bên cạnh bản gỡ băng đã hoàn thành, do Google cung cấp và Google sử dụng cookie. Không có quảng cáo nào hiển thị khi tệp đang được chuyển thành văn bản.',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**Quảng cáo.** Quảng cáo chỉ xuất hiện ở các trang thông tin, do Google cung cấp và Google sử dụng cookie. Không có quảng cáo nào hiển thị khi tệp đang được chuyển thành văn bản, cũng như bên cạnh bản gỡ băng của bạn.',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**Kiểm tra các dòng được đánh dấu** và sửa chúng trong trình chỉnh sửa bản gỡ băng.',
   '**Choose the spoken language** instead of auto-detect.':
@@ -219,8 +219,8 @@ const dict: Record<string, string> = {
   'Accurate text': 'Văn bản chính xác',
   'Add another file': 'Thêm tệp khác',
   'Add your file': 'Thêm tệp của bạn',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    'Quảng cáo chỉ xuất hiện ở các trang thông tin và bên cạnh bản gỡ băng đã hoàn thành, do Google cung cấp và Google sử dụng cookie. Không có quảng cáo nào hiển thị khi tệp đang được chuyển thành văn bản, và trang web này không tự đặt cookie. Chi tiết có trong [Chính sách quyền riêng tư](/privacy).',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    'Quảng cáo chỉ xuất hiện ở các trang thông tin, do Google cung cấp và Google sử dụng cookie. Không có quảng cáo nào hiển thị khi tệp đang được chuyển thành văn bản, cũng như bên cạnh bản gỡ băng của bạn, và trang web này không tự đặt cookie. Chi tiết có trong [Chính sách quyền riêng tư](/privacy).',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'Không tính năng nào cần đến quảng cáo: khi quảng cáo bị chặn hoặc bị từ chối, mọi thứ vẫn hoạt động như cũ.',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1135,6 +1135,8 @@ const dict: Record<string, string> = {
   'description:/youtube-subtitle-generator':
     'Tạo tệp phụ đề SRT cho video YouTube của chính bạn, miễn phí và không cần đăng nhập. Khớp theo lời nói, hơn 50 ngôn ngữ. Tải lên trong YouTube Studio.',
   'label:/youtube-subtitle-generator': 'Tạo phụ đề YouTube',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'Trang này được dịch bằng AI. [Phát hiện lỗi? Hãy báo cho chúng tôi.](/contact)',
 };
 
 export default dict;

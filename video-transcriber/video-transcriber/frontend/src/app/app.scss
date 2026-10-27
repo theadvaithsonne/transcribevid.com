@@ -478,6 +478,20 @@ summary:focus-visible {
   background: color-mix(in srgb, var(--warn) 14%, var(--surface));
   border: 2px solid var(--warn);
 }
+/* "This page was translated with AI. Found a mistake?": the last line of every translated page (not of a transcript) */
+.ai-note {
+  margin: 0;
+  padding: 24px var(--edge) 28px;
+  text-align: center;
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  color: var(--muted);
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
 
 /* ---------------------------------------------------------------------------------------- footer */
 .foot {

@@ -29,22 +29,22 @@ const dict: Record<string, string> = {
     'أنشأ {brand} ويديره **{name}**، {role} مقيم في {city}. بنيته ليمنح الناس أفضل تجربة تفريغ ممكنة: سلسة منذ النقرة الأولى، دون حساب يجب إنشاؤه، وبواجهة نظيفة لا تعترض طريقك.',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand} موجّه إلى الجمهور العام، وليس موجّهًا إلى الأطفال دون سن 13 عامًا.',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand} مجاني لأنه يعرض إعلانات تقدّمها Google AdSense. تظهر الإعلانات في صفحات المعلومات فقط (الرئيسية، وكيف يعمل، والأسئلة الشائعة، وصفحات الأدوات) وبجوار التفريغ المكتمل. لا يُعرض أي إعلان أثناء تفريغ ملف، ولا يظهر أبدًا في صفحات الخصوصية أو الشروط أو السجلات.',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand} مجاني لأنه يعرض إعلانات تقدّمها Google AdSense. تظهر الإعلانات في صفحات المعلومات فقط (الرئيسية، وكيف يعمل، والأسئلة الشائعة، وصفحات الأدوات). لا يُعرض أي إعلان أثناء تفريغ ملف ولا بجوار تفريغك، ولا يظهر أبدًا في صفحات الخصوصية أو الشروط أو السجلات.',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     'استخدام {brand} مجاني. توضّح [سياسة الخصوصية](/privacy) ما يحدث لملفاتك.',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    'يُموَّل {brand} بإعلانات تظهر في صفحات المعلومات وبجوار التفريغات المكتملة (Google AdSense). ولأن جهازك هو الذي يتولى التفريغ، لا تترتب أي تكلفة خادم على كل ملف، وهذا ما يُبقي الخدمة مجانية وبلا حدود. توضّح [سياسة الخصوصية](/privacy) ما تستخدمه الإعلانات وكيف تختار إعداداتك.',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    'يُموَّل {brand} بإعلانات تظهر في صفحات المعلومات (Google AdSense). ولأن جهازك هو الذي يتولى التفريغ، لا تترتب أي تكلفة خادم على كل ملف، وهذا ما يُبقي الخدمة مجانية وبلا حدود. توضّح [سياسة الخصوصية](/privacy) ما تستخدمه الإعلانات وكيف تختار إعداداتك.',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     'يحوّل {brand} الكلام في ملف فيديو أو صوت إلى نص بطوابع زمنية، في ثلاث خطوات بسيطة.',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     'يحوّل {brand} الكلام في مقاطع الفيديو والملفات الصوتية والتسجيلات الصوتية إلى نص دقيق مزوّد بطوابع زمنية. وهو مجاني، ولا حدّ لعدد الملفات التي تفرّغها، ولا تحتاج إلى حساب: اختر ملفًا بالأعلى، واضغط «ابدأ التفريغ»، ثم اقرأ النتيجة.',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    'يحوّل {brand} ملفات الفيديو والصوت إلى نص داخل متصفحك مباشرة: يجري التعرّف على الكلام على جهازك، ولا تُرفع ملفاتك إلينا. الاستخدام مجاني ولا يتطلب حسابًا. ويُموَّل بإعلانات في صفحات المعلومات وبجوار التفريغات المكتملة (Google AdSense؛ راجع [سياسة الخصوصية](/privacy)). وقد نغيّر الميزات أو نقيّدها أو نوقفها في أي وقت.',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    'يحوّل {brand} ملفات الفيديو والصوت إلى نص داخل متصفحك مباشرة: يجري التعرّف على الكلام على جهازك، ولا تُرفع ملفاتك إلينا. الاستخدام مجاني ولا يتطلب حسابًا. ويُموَّل بإعلانات في صفحات المعلومات (Google AdSense؛ راجع [سياسة الخصوصية](/privacy)). وقد نغيّر الميزات أو نقيّدها أو نوقفها في أي وقت.',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     'يحوّل {brand} الفيديو والصوت إلى نص دقيق بطوابع زمنية مجانًا. لا تسجيل ولا تسجيل دخول ولا علامة مائية: افتح الصفحة، واختر ملفًا، واقرأ التفريغ.',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    'يحوّل {brand} الفيديو والصوت إلى نص داخل متصفحك مباشرة. تشرح هذه الصفحة بكلمات بسيطة ما يعنيه ذلك لبياناتك. باختصار: ملفك لا يغادر جهازك أبدًا. وتُحفظ تفريغاتك في هذا المتصفح فقط، ولا يوجد حساب، ولا يضع الموقع أي ملفات تعريف ارتباط خاصة به. وتظهر الإعلانات في صفحات المعلومات وبجوار التفريغات المكتملة فقط، وتقدّمها Google التي تستخدم ملفات تعريف الارتباط.',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    'يحوّل {brand} الفيديو والصوت إلى نص داخل متصفحك مباشرة. تشرح هذه الصفحة بكلمات بسيطة ما يعنيه ذلك لبياناتك. باختصار: ملفك لا يغادر جهازك أبدًا. وتُحفظ تفريغاتك في هذا المتصفح فقط، ولا يوجد حساب، ولا يضع الموقع أي ملفات تعريف ارتباط خاصة به. وتظهر الإعلانات في صفحات المعلومات فقط، وتقدّمها Google التي تستخدم ملفات تعريف الارتباط.',
   '{done} of {total}': '{done} من {total}',
   '{duration} (estimate)': '{duration} (تقدير)',
   '{gb} GB of memory recommended': 'يُوصى بذاكرة {gb} GB',
@@ -94,8 +94,8 @@ const dict: Record<string, string> = {
     '**أضف تلميح مفردات**: الأسماء والعلامات التجارية والمصطلحات المتخصصة التي ترد في الصوت، مكتوبة بالطريقة التي تريدها.',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**أضف تلميح مفردات**: الأسماء والعلامات التجارية والمصطلحات المتخصصة، مكتوبة بالطريقة التي تريدها.',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**الإعلانات.** تظهر الإعلانات في صفحات المعلومات وبجوار التفريغات المكتملة فقط، وتقدّمها Google التي تستخدم ملفات تعريف الارتباط. ولا يُعرض أي إعلان أثناء تفريغ ملف.',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**الإعلانات.** تظهر الإعلانات في صفحات المعلومات فقط، وتقدّمها Google التي تستخدم ملفات تعريف الارتباط. ولا يُعرض أي إعلان أثناء تفريغ ملف ولا بجوار تفريغك.',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**راجع الأسطر المعلَّمة** وصحّحها في محرّر التفريغ.',
   '**Choose the spoken language** instead of auto-detect.':
@@ -216,8 +216,8 @@ const dict: Record<string, string> = {
   'Accurate text': 'نص دقيق',
   'Add another file': 'إضافة ملف آخر',
   'Add your file': 'أضف ملفك',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    'تظهر الإعلانات في صفحات المعلومات وبجوار التفريغات المكتملة فقط، وتقدّمها Google التي تستخدم ملفات تعريف الارتباط. لا يُعرض أي إعلان أثناء تفريغ ملف، ولا يضع هذا الموقع أي ملفات تعريف ارتباط خاصة به. التفاصيل في [سياسة الخصوصية](/privacy).',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    'تظهر الإعلانات في صفحات المعلومات فقط، وتقدّمها Google التي تستخدم ملفات تعريف الارتباط. لا يُعرض أي إعلان أثناء تفريغ ملف ولا بجوار تفريغك، ولا يضع هذا الموقع أي ملفات تعريف ارتباط خاصة به. التفاصيل في [سياسة الخصوصية](/privacy).',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'الإعلانات ليست مطلوبة لأي ميزة: حتى مع حجب الإعلانات أو رفضها، يعمل كل شيء بالطريقة نفسها.',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1113,6 +1113,8 @@ const dict: Record<string, string> = {
   'description:/youtube-subtitle-generator':
     'أنشئ ملف ترجمة SRT لفيديو يوتيوب الخاص بك مجانًا ودون تسجيل دخول. متزامن مع الكلام وبأكثر من 50 لغة. ارفعه في YouTube Studio.',
   'label:/youtube-subtitle-generator': 'مولّد ترجمات يوتيوب',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'تمت ترجمة هذه الصفحة بالذكاء الاصطناعي. [وجدت خطأً؟ أخبرنا.](/contact)',
 };
 
 export default dict;

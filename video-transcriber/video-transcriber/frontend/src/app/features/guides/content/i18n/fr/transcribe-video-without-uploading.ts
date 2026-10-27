@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'La publicité.',
-          text: 'Le site est gratuit parce qu’il affiche des publicités diffusées par Google AdSense, sur les pages d’information et à côté d’une transcription terminée, jamais pendant qu’un fichier est transcrit. Google utilise des cookies pour la publicité et, là où la loi l’exige, demande d’abord votre consentement. Les scripts publicitaires de Google font leurs propres requêtes vers Google, mais votre fichier et votre transcription ne sont jamais envoyés à Google.',
+          text: 'Le site est gratuit parce qu’il affiche des publicités diffusées par Google AdSense, sur les pages d’information, jamais pendant qu’un fichier est transcrit ni à côté de votre transcription. Google utilise des cookies pour la publicité et, là où la loi l’exige, demande d’abord votre consentement. Les scripts publicitaires de Google font leurs propres requêtes vers Google, mais votre fichier et votre transcription ne sont jamais envoyés à Google.',
         },
       ],
       after: [

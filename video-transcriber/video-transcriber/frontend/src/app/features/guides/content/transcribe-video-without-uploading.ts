@@ -112,7 +112,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Advertising.',
-          text: "The site is free because it shows ads served by Google AdSense, on information pages and beside a finished transcript, never while a file is being transcribed. Google uses cookies for ads and, where the law requires it, asks for your consent first. Google's ad scripts make requests of their own to Google, but your file and transcript are never sent to Google.",
+          text: "The site is free because it shows ads served by Google AdSense, on information pages, never while a file is being transcribed and never beside your transcript. Google uses cookies for ads and, where the law requires it, asks for your consent first. Google's ad scripts make requests of their own to Google, but your file and transcript are never sent to Google.",
         },
       ],
       after: [

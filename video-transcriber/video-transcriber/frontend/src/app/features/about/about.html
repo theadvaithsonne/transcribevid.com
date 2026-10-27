@@ -30,7 +30,7 @@
 
   <h2>{{ 'How it stays free' | t }}</h2>
   @if (site.inBrowser()) {
-    <p><app-rich [text]="'{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.' | t: { brand: site.brand().name }" /></p>
+    <p><app-rich [text]="'{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.' | t: { brand: site.brand().name }" /></p>
   } @else {
     <p><app-rich [text]="'{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.' | t: { brand: site.brand().name }" /></p>
   }

@@ -142,11 +142,14 @@
       <div class="banner warn" role="status">{{ 'Your session ends in {mins} min. Export what you need.' | t: { mins } }}</div>
     }
     <router-outlet />
-    <!-- tablet / phone: the in-flow unit of the home page and the finished transcript, after the page (48 px clear of its buttons) -->
+    <!-- tablet / phone: the in-flow unit of the home page, after the page (48 px clear of its buttons) -->
     @if (ads.endSlot()) {
       @for (p of [ads.path()]; track p) {
         <app-ad-slot placement="inline" [upTo]="1000" />
       }
+    }
+    @if (translated() && !onJobPage()) {
+      <p class="ai-note"><app-rich [text]="'This page was translated with AI. [Found a mistake? Tell us.](/contact)' | t" /></p>
     }
   </main>
 

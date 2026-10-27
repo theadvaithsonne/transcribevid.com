@@ -112,7 +112,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Reklamcılık.',
-          text: 'Site, bilgi sayfalarında ve bitmiş bir transkriptin yanında, bir dosya yazıya dökülürken asla olmamak üzere Google AdSense tarafından sunulan reklamlar gösterdiği için ücretsizdir. Google reklamlar için çerezler kullanır ve yasanın gerektirdiği yerlerde önce onayınızı ister. Google’ın reklam betikleri Google’a kendi isteklerini yapar, ancak dosyanız ve transkriptiniz Google’a asla gönderilmez.',
+          text: 'Site, bilgi sayfalarında, bir dosya yazıya dökülürken ve transkriptinizin yanında asla olmamak üzere Google AdSense tarafından sunulan reklamlar gösterdiği için ücretsizdir. Google reklamlar için çerezler kullanır ve yasanın gerektirdiği yerlerde önce onayınızı ister. Google’ın reklam betikleri Google’a kendi isteklerini yapar, ancak dosyanız ve transkriptiniz Google’a asla gönderilmez.',
         },
       ],
       after: [

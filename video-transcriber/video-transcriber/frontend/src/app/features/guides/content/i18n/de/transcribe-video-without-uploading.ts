@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Werbung.',
-          text: 'Die Seite ist kostenlos, weil sie von Google AdSense ausgelieferte Werbung zeigt, auf Informationsseiten und neben einem fertigen Transkript, nie während eine Datei transkribiert wird. Google verwendet Cookies für Werbung und fragt, wo das Gesetz es verlangt, zuerst nach Ihrer Einwilligung. Die Werbeskripte von Google stellen eigene Anfragen an Google, aber Ihre Datei und Ihr Transkript werden nie an Google gesendet.',
+          text: 'Die Seite ist kostenlos, weil sie von Google AdSense ausgelieferte Werbung zeigt, auf Informationsseiten, nie während eine Datei transkribiert wird und nie neben Ihrem Transkript. Google verwendet Cookies für Werbung und fragt, wo das Gesetz es verlangt, zuerst nach Ihrer Einwilligung. Die Werbeskripte von Google stellen eigene Anfragen an Google, aber Ihre Datei und Ihr Transkript werden nie an Google gesendet.',
         },
       ],
       after: [

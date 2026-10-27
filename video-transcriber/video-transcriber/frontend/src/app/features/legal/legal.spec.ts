@@ -245,11 +245,11 @@ describe('PrivacyPage in the browser edition', () => {
     }
   });
 
-  it('leads with the promise: the file never leaves the device, ads only on information pages and beside finished transcripts', () => {
+  it('leads with the promise: the file never leaves the device, ads only on information pages', () => {
     const el = render(PrivacyPage, makeBrowserHealth()).nativeElement as HTMLElement;
     const lede = el.querySelector('.lede')!.textContent!.replace(/\s+/g, ' ');
     expect(lede).toContain('Your file never leaves your device.');
-    expect(lede).toContain('Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.');
+    expect(lede).toContain('Ads appear only on information pages, and are served by Google, which uses cookies.');
   });
 
   it("no longer makes the server edition's promises, and has no 'runs on your own computer' note", () => {
@@ -300,7 +300,7 @@ describe('PrivacyPage in the browser edition', () => {
     expect(t).toContain('served by Google AdSense');
     expect(t).toContain('Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites.');
     expect(t).toContain("Google's use of advertising cookies enables it and its partners to serve ads to you");
-    expect(t).toContain('No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.');
+    expect(t).toContain('No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.');
     expect(t).toContain('We never send your file, your transcript or any personal information to Google.');
     expect(t).toContain("Google's certified consent message asks for your choice when ads load.");
     expect(t).toContain('with ads blocked or declined, everything works the same');
@@ -413,7 +413,7 @@ describe('TermsPage in the browser edition', () => {
 
   it('says the service is funded by ads and names the third-party downloads', () => {
     const t = textOf(render(TermsPage, makeBrowserHealth()));
-    expect(t).toContain('It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the Privacy policy).');
+    expect(t).toContain('It is funded by ads on information pages (Google AdSense; see the Privacy policy).');
     expect(t).toContain(
       'your browser downloads speech models from Hugging Face and program files from jsDelivr; they are provided under their own licences and terms.',
     );

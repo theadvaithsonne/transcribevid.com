@@ -57,6 +57,7 @@ const ES: Record<string, string> = {
   'Session time left: about {n} min': 'Tiempo de sesión restante: unos {n} min',
   'label:/video-to-text': 'Video a texto',
   'Video to text, accurately.': 'Video a texto, con precisión.',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)': 'Esta página se ha traducido con IA. [¿Has encontrado un error? Cuéntanoslo.](/contact)',
 };
 
 describe('App shell in another language', () => {
@@ -134,6 +135,18 @@ describe('App shell in another language', () => {
       ['Video a texto', '/es/video-a-texto'],
       ['Todas las herramientas', '/es/tools'],
     ]);
+  });
+
+  it('every translated page ends with a note that it was translated with AI, and a link to report a mistake, in the language', () => {
+    const note = q('main .ai-note')!;
+    expect(text(note)).toBe('Esta página se ha traducido con IA. ¿Has encontrado un error? Cuéntanoslo.');
+    expect(note.querySelector('a')!.getAttribute('href')).toBe('/es/contact');
+  });
+
+  it('the note is left off a transcript page: the transcript is not our text', async () => {
+    await TestBed.inject(Router).navigateByUrl('/es/jobs/abc');
+    fixture.detectChanges();
+    expect(q('.ai-note')).toBeNull();
   });
 
   it('the language menu is there, and says its name in the language', () => {

@@ -30,22 +30,22 @@ const dict: Record<string, string> = {
     '{brand}, **{name}** ({role}, {city}) tarafından geliştirilmiş ve işletilmektedir. Bunu insanlara olabilecek en iyi yazıya dökme deneyimini sunmak için geliştirdim: ilk tıklamadan itibaren sorunsuz, oluşturulacak bir hesap olmadan ve yolunuza çıkmayan temiz bir arayüzle.',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand} genel kitleye yöneliktir ve 13 yaşın altındaki çocuklara yönelik değildir.',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand} reklam gösterdiği için ücretsizdir; reklamları Google AdSense sunar. Reklamlar yalnızca bilgi sayfalarında (ana sayfa, Nasıl çalışır, SSS ve araç sayfaları) ve tamamlanmış bir transkriptin yanında görünür. Bir dosya yazıya dökülürken hiçbir reklam gösterilmez; gizlilik, şartlar veya günlük sayfalarında da asla gösterilmez.',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand} reklam gösterdiği için ücretsizdir; reklamları Google AdSense sunar. Reklamlar yalnızca bilgi sayfalarında (ana sayfa, Nasıl çalışır, SSS ve araç sayfaları) görünür. Bir dosya yazıya dökülürken ve transkriptinizin yanında hiçbir reklam gösterilmez; gizlilik, şartlar veya günlük sayfalarında da asla gösterilmez.',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand} kullanım için ücretsizdir. [Gizlilik politikası](/privacy) dosyalarınıza ne olduğunu açıklar.',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand}, bilgi sayfalarında ve tamamlanmış transkriptlerin yanında gösterilen reklamlarla (Google AdSense) finanse edilir. Yazıya dökme işlemini kendi cihazınız yaptığı için her dosya için sunucu maliyeti yoktur; hizmeti ücretsiz ve sınırsız tutan da budur. [Gizlilik politikası](/privacy) reklamların neyi kullandığını ve ayarlarınızı nasıl seçeceğinizi açıklar.',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand}, bilgi sayfalarında gösterilen reklamlarla (Google AdSense) finanse edilir. Yazıya dökme işlemini kendi cihazınız yaptığı için her dosya için sunucu maliyeti yoktur; hizmeti ücretsiz ve sınırsız tutan da budur. [Gizlilik politikası](/privacy) reklamların neyi kullandığını ve ayarlarınızı nasıl seçeceğinizi açıklar.',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand}, bir video veya ses dosyasındaki konuşmayı üç basit adımda zaman damgalı metne dönüştürür.',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand}, videolardaki, ses dosyalarındaki ve ses kayıtlarındaki konuşmayı doğru, zaman damgalı metne dönüştürür. Ücretsizdir, yazıya dökeceğiniz dosya sayısında sınır yoktur ve hesap gerekmez: yukarıdan bir dosya seçin, Yazıya dök düğmesine basın ve sonucu okuyun.',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand}, video ve ses dosyalarını doğrudan tarayıcınızda metne dönüştürür: tanıma cihazınızda çalışır ve dosyalarınız bize yüklenmez. Kullanımı ücretsizdir ve hesap gerektirmez. Bilgi sayfalarındaki ve tamamlanmış transkriptlerin yanındaki reklamlarla (Google AdSense; bkz. [Gizlilik politikası](/privacy)) finanse edilir. Özellikleri istediğimiz zaman değiştirebilir, sınırlayabilir veya durdurabiliriz.',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand}, video ve ses dosyalarını doğrudan tarayıcınızda metne dönüştürür: tanıma cihazınızda çalışır ve dosyalarınız bize yüklenmez. Kullanımı ücretsizdir ve hesap gerektirmez. Bilgi sayfalarındaki reklamlarla (Google AdSense; bkz. [Gizlilik politikası](/privacy)) finanse edilir. Özellikleri istediğimiz zaman değiştirebilir, sınırlayabilir veya durdurabiliriz.',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand}, videoyu ve sesi ücretsiz olarak doğru, zaman damgalı metne dönüştürür. Kayıt yok, giriş yok, filigran yok: sayfayı açın, bir dosya seçin ve transkriptinizi okuyun.',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand}, video ve sesi doğrudan tarayıcınızda metne dönüştürür. Bu sayfa, bunun verileriniz açısından ne anlama geldiğini sade bir dille açıklar. Kısaca: Dosyanız cihazınızdan hiç ayrılmaz. Transkriptleriniz yalnızca bu tarayıcıda saklanır, hesap yoktur ve site kendi çerezlerini ayarlamaz. Reklamlar yalnızca bilgi sayfalarında ve tamamlanmış transkriptlerin yanında görünür ve çerez kullanan Google tarafından sunulur.',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand}, video ve sesi doğrudan tarayıcınızda metne dönüştürür. Bu sayfa, bunun verileriniz açısından ne anlama geldiğini sade bir dille açıklar. Kısaca: Dosyanız cihazınızdan hiç ayrılmaz. Transkriptleriniz yalnızca bu tarayıcıda saklanır, hesap yoktur ve site kendi çerezlerini ayarlamaz. Reklamlar yalnızca bilgi sayfalarında görünür ve çerez kullanan Google tarafından sunulur.',
   '{done} of {total}': '{done} / {total}',
   '{duration} (estimate)': '{duration} (tahmini)',
   '{gb} GB of memory recommended': '{gb} GB bellek önerilir',
@@ -96,8 +96,8 @@ const dict: Record<string, string> = {
     '**Kelime ipucu ekleyin**: seste geçen isimleri, markaları ve terimleri istediğiniz yazımla yazın.',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**Kelime ipucu ekleyin**: isimleri, markaları ve terimleri istediğiniz yazımla yazın.',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**Reklamlar.** Reklamlar yalnızca bilgi sayfalarında ve tamamlanmış transkriptlerin yanında görünür ve çerez kullanan Google tarafından sunulur. Bir dosya yazıya dökülürken hiçbir reklam gösterilmez.',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**Reklamlar.** Reklamlar yalnızca bilgi sayfalarında görünür ve çerez kullanan Google tarafından sunulur. Bir dosya yazıya dökülürken ve transkriptinizin yanında hiçbir reklam gösterilmez.',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**İşaretli satırları kontrol edin** ve transkript düzenleyicisinde düzeltin.',
   '**Choose the spoken language** instead of auto-detect.':
@@ -217,8 +217,8 @@ const dict: Record<string, string> = {
   'Accurate text': 'Doğru metin',
   'Add another file': 'Başka bir dosya ekle',
   'Add your file': 'Dosyanızı ekleyin',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    'Reklamlar yalnızca bilgi sayfalarında ve tamamlanmış transkriptlerin yanında görünür ve çerez kullanan Google tarafından sunulur. Bir dosya yazıya dökülürken hiçbir reklam gösterilmez ve bu web sitesi kendi çerezlerini ayarlamaz. Ayrıntılar [Gizlilik politikası](/privacy) sayfasındadır.',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    'Reklamlar yalnızca bilgi sayfalarında görünür ve çerez kullanan Google tarafından sunulur. Bir dosya yazıya dökülürken ve transkriptinizin yanında hiçbir reklam gösterilmez ve bu web sitesi kendi çerezlerini ayarlamaz. Ayrıntılar [Gizlilik politikası](/privacy) sayfasındadır.',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'Hiçbir özellik için reklamlara gerek yoktur: reklamlar engellendiğinde veya reddedildiğinde her şey aynı şekilde çalışır.',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1130,6 +1130,8 @@ const dict: Record<string, string> = {
   'label:/guides/what-is-whisper': 'Whisper nedir?',
   'an independent software developer': 'bağımsız bir yazılım geliştirici',
   'Bengaluru, India': 'Bengaluru, Hindistan',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'Bu sayfa yapay zekâ ile çevrildi. [Bir hata mı buldunuz? Bize bildirin.](/contact)',
 };
 
 export default dict;

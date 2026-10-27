@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Iklan.',
-          text: 'Situs ini gratis karena menampilkan iklan yang disajikan oleh Google AdSense, di halaman informasi dan di samping transkrip yang sudah selesai, tidak pernah saat sebuah file sedang ditranskripsikan. Google memakai cookie untuk iklan dan, jika hukum mewajibkannya, meminta persetujuan Anda terlebih dahulu. Skrip iklan Google membuat permintaannya sendiri ke Google, tetapi file dan transkrip Anda tidak pernah dikirim ke Google.',
+          text: 'Situs ini gratis karena menampilkan iklan yang disajikan oleh Google AdSense, di halaman informasi, tidak pernah saat sebuah file sedang ditranskripsikan maupun di samping transkrip Anda. Google memakai cookie untuk iklan dan, jika hukum mewajibkannya, meminta persetujuan Anda terlebih dahulu. Skrip iklan Google membuat permintaannya sendiri ke Google, tetapi file dan transkrip Anda tidak pernah dikirim ke Google.',
         },
       ],
       after: [

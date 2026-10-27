@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Quảng cáo.',
-          text: 'Trang web miễn phí vì hiển thị quảng cáo do Google AdSense cung cấp, trên các trang thông tin và bên cạnh một bản gỡ băng đã hoàn tất, không bao giờ trong lúc một tệp đang được chuyển thành văn bản. Google dùng cookie cho quảng cáo và, ở nơi luật pháp yêu cầu, sẽ xin sự đồng ý của bạn trước. Các đoạn mã quảng cáo của Google tự gửi các yêu cầu riêng đến Google, nhưng tệp và bản gỡ băng của bạn không bao giờ được gửi đến Google.',
+          text: 'Trang web miễn phí vì hiển thị quảng cáo do Google AdSense cung cấp, trên các trang thông tin, không bao giờ trong lúc một tệp đang được chuyển thành văn bản hay bên cạnh bản gỡ băng của bạn. Google dùng cookie cho quảng cáo và, ở nơi luật pháp yêu cầu, sẽ xin sự đồng ý của bạn trước. Các đoạn mã quảng cáo của Google tự gửi các yêu cầu riêng đến Google, nhưng tệp và bản gỡ băng của bạn không bao giờ được gửi đến Google.',
         },
       ],
       after: [

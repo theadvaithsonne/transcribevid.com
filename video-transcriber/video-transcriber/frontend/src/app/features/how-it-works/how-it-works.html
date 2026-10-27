@@ -114,7 +114,7 @@
           <li><app-rich [text]="'**File limits.** None set by us. Your file is processed on your device, so very large or long files take longer and need enough free memory; the page warns you on a slower device.' | t" /></li>
           <li><app-rich [text]="'**Speed.** It depends on your device, the quality you pick and the length of the file. The first use of a quality level downloads its model once: your browser fetches the model files from Hugging Face and the engine\'s program files from jsDelivr, then keeps them cached. Keep the tab open while it works.' | t" /></li>
           <li><app-rich [text]="'**Nothing is saved for later.** Transcripts and the file stay in this browser only and are deleted automatically after {idle} of inactivity, or when you press **Delete my data now**. Export what you need before you leave. Details are in the [Privacy policy](/privacy).' | t: { idle: idleOrPeriod() }" /></li>
-          <li><app-rich [text]="'**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.' | t" /></li>
+          <li><app-rich [text]="'**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.' | t" /></li>
         } @else {
           <li>
             <b>{{ 'File limits.' | t }}</b>

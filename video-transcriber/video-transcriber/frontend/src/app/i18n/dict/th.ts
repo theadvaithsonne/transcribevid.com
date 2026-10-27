@@ -29,22 +29,22 @@ const dict: Record<string, string> = {
     '{brand} สร้างและดูแลโดย **{name}** ซึ่งเป็น{role}ที่อาศัยอยู่ใน {city} เว็บไซต์นี้สร้างขึ้นเพื่อมอบประสบการณ์การถอดเสียงที่ดีที่สุด: ราบรื่นตั้งแต่คลิกแรก ไม่ต้องสร้างบัญชี และหน้าตาเรียบง่ายที่ไม่เกะกะสายตา',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand} มีไว้สำหรับผู้ใช้ทั่วไป และไม่ได้มุ่งเป้าไปที่เด็กอายุต่ำกว่า 13 ปี',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand} ให้ใช้ฟรีเพราะมีโฆษณา ซึ่งแสดงโดย Google AdSense โฆษณาจะปรากฏเฉพาะในหน้าข้อมูล (หน้าแรก วิธีการทำงาน คำถามที่พบบ่อย และหน้าเครื่องมือ) และข้างข้อความถอดเสียงที่เสร็จแล้วเท่านั้น จะไม่แสดงโฆษณาขณะกำลังถอดเสียงไฟล์ และไม่แสดงในหน้านโยบายความเป็นส่วนตัว ข้อกำหนด หรือบันทึก (Logs) เลย',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand} ให้ใช้ฟรีเพราะมีโฆษณา ซึ่งแสดงโดย Google AdSense โฆษณาจะปรากฏเฉพาะในหน้าข้อมูล (หน้าแรก วิธีการทำงาน คำถามที่พบบ่อย และหน้าเครื่องมือ) เท่านั้น จะไม่แสดงโฆษณาขณะกำลังถอดเสียงไฟล์หรือข้างข้อความถอดเสียงของคุณ และไม่แสดงในหน้านโยบายความเป็นส่วนตัว ข้อกำหนด หรือบันทึก (Logs) เลย',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand} ใช้งานได้ฟรี [นโยบายความเป็นส่วนตัว](/privacy) อธิบายว่าไฟล์ของคุณจะถูกจัดการอย่างไร',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand} ได้รับเงินทุนจากโฆษณาที่แสดงในหน้าข้อมูลและข้างข้อความถอดเสียงที่เสร็จแล้ว (Google AdSense) เนื่องจากอุปกรณ์ของคุณเป็นผู้ถอดเสียงเอง จึงไม่มีค่าเซิร์ฟเวอร์ต่อไฟล์ และนี่คือสิ่งที่ทำให้บริการฟรีและไม่จำกัด [นโยบายความเป็นส่วนตัว](/privacy) อธิบายว่าโฆษณาใช้ข้อมูลอะไรและคุณเลือกตั้งค่าได้อย่างไร',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand} ได้รับเงินทุนจากโฆษณาที่แสดงในหน้าข้อมูล (Google AdSense) เนื่องจากอุปกรณ์ของคุณเป็นผู้ถอดเสียงเอง จึงไม่มีค่าเซิร์ฟเวอร์ต่อไฟล์ และนี่คือสิ่งที่ทำให้บริการฟรีและไม่จำกัด [นโยบายความเป็นส่วนตัว](/privacy) อธิบายว่าโฆษณาใช้ข้อมูลอะไรและคุณเลือกตั้งค่าได้อย่างไร',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand} เปลี่ยนเสียงพูดในไฟล์วิดีโอหรือไฟล์เสียงให้เป็นข้อความพร้อมไทม์สแตมป์ ใน 3 ขั้นตอนง่าย ๆ',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand} เปลี่ยนเสียงพูดในวิดีโอ ไฟล์เสียง และการบันทึกเสียงให้เป็นข้อความที่แม่นยำพร้อมไทม์สแตมป์ ใช้ฟรี ไม่จำกัดจำนวนไฟล์ที่ถอดเสียง และไม่ต้องมีบัญชี: เลือกไฟล์ด้านบน กดถอดเสียง แล้วอ่านผลลัพธ์ได้เลย',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand} เปลี่ยนไฟล์วิดีโอและไฟล์เสียงให้เป็นข้อความได้ในเบราว์เซอร์ของคุณเลย: การรู้จำเสียงทำงานบนอุปกรณ์ของคุณ และไฟล์ของคุณจะไม่ถูกอัปโหลดมาที่เรา ใช้ฟรีและไม่ต้องมีบัญชี ได้รับเงินทุนจากโฆษณาในหน้าข้อมูลและข้างข้อความถอดเสียงที่เสร็จแล้ว (Google AdSense ดู [นโยบายความเป็นส่วนตัว](/privacy)) เราอาจเปลี่ยนแปลง จำกัด หรือหยุดฟีเจอร์ได้ทุกเมื่อ',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand} เปลี่ยนไฟล์วิดีโอและไฟล์เสียงให้เป็นข้อความได้ในเบราว์เซอร์ของคุณเลย: การรู้จำเสียงทำงานบนอุปกรณ์ของคุณ และไฟล์ของคุณจะไม่ถูกอัปโหลดมาที่เรา ใช้ฟรีและไม่ต้องมีบัญชี ได้รับเงินทุนจากโฆษณาในหน้าข้อมูล (Google AdSense ดู [นโยบายความเป็นส่วนตัว](/privacy)) เราอาจเปลี่ยนแปลง จำกัด หรือหยุดฟีเจอร์ได้ทุกเมื่อ',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand} เปลี่ยนวิดีโอและเสียงให้เป็นข้อความที่แม่นยำพร้อมไทม์สแตมป์ ฟรี ไม่ต้องสมัครสมาชิก ไม่ต้องเข้าสู่ระบบ และไม่มีลายน้ำ: เปิดหน้านี้ เลือกไฟล์ แล้วอ่านข้อความถอดเสียงได้เลย',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand} เปลี่ยนวิดีโอและเสียงให้เป็นข้อความได้ในเบราว์เซอร์ของคุณเลย หน้านี้อธิบายด้วยภาษาง่าย ๆ ว่าสิ่งนี้เกี่ยวข้องกับข้อมูลของคุณอย่างไร สรุปสั้น ๆ: ไฟล์ของคุณไม่เคยออกจากอุปกรณ์ ข้อความถอดเสียงของคุณเก็บไว้ในเบราว์เซอร์นี้เท่านั้น ไม่มีบัญชี และเว็บไซต์ไม่ตั้งค่าคุกกี้ของตัวเอง โฆษณาจะปรากฏเฉพาะในหน้าข้อมูลและข้างข้อความถอดเสียงที่เสร็จแล้ว และแสดงโดย Google ซึ่งใช้คุกกี้',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand} เปลี่ยนวิดีโอและเสียงให้เป็นข้อความได้ในเบราว์เซอร์ของคุณเลย หน้านี้อธิบายด้วยภาษาง่าย ๆ ว่าสิ่งนี้เกี่ยวข้องกับข้อมูลของคุณอย่างไร สรุปสั้น ๆ: ไฟล์ของคุณไม่เคยออกจากอุปกรณ์ ข้อความถอดเสียงของคุณเก็บไว้ในเบราว์เซอร์นี้เท่านั้น ไม่มีบัญชี และเว็บไซต์ไม่ตั้งค่าคุกกี้ของตัวเอง โฆษณาจะปรากฏเฉพาะในหน้าข้อมูล และแสดงโดย Google ซึ่งใช้คุกกี้',
   '{done} of {total}': '{done} จาก {total}',
   '{duration} (estimate)': '{duration} (ประมาณการ)',
   '{gb} GB of memory recommended': 'แนะนำหน่วยความจำ {gb} GB',
@@ -94,8 +94,8 @@ const dict: Record<string, string> = {
     '**เพิ่มคำใบ้คำศัพท์**: ชื่อ แบรนด์ และศัพท์เฉพาะที่ปรากฏในเสียง เขียนตามที่ต้องการให้สะกด',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**เพิ่มคำใบ้คำศัพท์**: ชื่อ แบรนด์ และศัพท์เฉพาะ เขียนตามที่ต้องการให้สะกด',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**โฆษณา** โฆษณาจะปรากฏเฉพาะในหน้าข้อมูลและข้างข้อความถอดเสียงที่เสร็จแล้ว และแสดงโดย Google ซึ่งใช้คุกกี้ จะไม่แสดงโฆษณาขณะกำลังถอดเสียงไฟล์',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**โฆษณา** โฆษณาจะปรากฏเฉพาะในหน้าข้อมูล และแสดงโดย Google ซึ่งใช้คุกกี้ จะไม่แสดงโฆษณาขณะกำลังถอดเสียงไฟล์หรือข้างข้อความถอดเสียงของคุณ',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**ตรวจสอบบรรทัดที่มีเครื่องหมาย** แล้วแก้ในตัวแก้ไขข้อความถอดเสียง',
   '**Choose the spoken language** instead of auto-detect.':
@@ -215,8 +215,8 @@ const dict: Record<string, string> = {
   'Accurate text': 'ข้อความที่แม่นยำ',
   'Add another file': 'เพิ่มไฟล์อีกไฟล์',
   'Add your file': 'เพิ่มไฟล์ของคุณ',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    'โฆษณาจะปรากฏเฉพาะในหน้าข้อมูลและข้างข้อความถอดเสียงที่เสร็จแล้ว และแสดงโดย Google ซึ่งใช้คุกกี้ จะไม่แสดงโฆษณาขณะกำลังถอดเสียงไฟล์ และเว็บไซต์นี้ไม่ตั้งคุกกี้ของตัวเอง รายละเอียดอยู่ใน[นโยบายความเป็นส่วนตัว](/privacy)',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    'โฆษณาจะปรากฏเฉพาะในหน้าข้อมูล และแสดงโดย Google ซึ่งใช้คุกกี้ จะไม่แสดงโฆษณาขณะกำลังถอดเสียงไฟล์หรือข้างข้อความถอดเสียงของคุณ และเว็บไซต์นี้ไม่ตั้งคุกกี้ของตัวเอง รายละเอียดอยู่ใน[นโยบายความเป็นส่วนตัว](/privacy)',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'ไม่มีฟีเจอร์ใดที่ต้องพึ่งโฆษณา: หากบล็อกหรือปฏิเสธโฆษณา ทุกอย่างก็ใช้งานได้เหมือนเดิม',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1116,5 +1116,7 @@ const dict: Record<string, string> = {
   'description:/guides/what-is-whisper':
     'OpenAI Whisper คืออะไร ฝึกจากข้อมูลอะไร แม่นยำแค่ไหน อ่อนตรงไหน และทำงานในเบราว์เซอร์ของคุณบน TranscribeVid ได้อย่างไร',
   'label:/guides/what-is-whisper': 'Whisper คืออะไร',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'หน้านี้แปลโดยใช้ AI [พบข้อผิดพลาด? บอกเรา](/contact)',
 };
 export default dict;

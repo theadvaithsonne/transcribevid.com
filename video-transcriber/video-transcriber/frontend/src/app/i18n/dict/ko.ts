@@ -31,22 +31,22 @@ const dict: Record<string, string> = {
     '{brand}를 만들고 운영하는 사람은 {city}에 거주하는 {role} **{name}**입니다. 저는 사람들이 최고의 텍스트 변환 경험을 하도록 이 서비스를 만들었습니다. 첫 클릭부터 매끄럽고, 계정을 만들 필요가 없으며, 방해되지 않는 깔끔한 화면을 갖췄습니다.',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand}는 일반 이용자를 위한 서비스이며 13세 미만 아동을 대상으로 하지 않습니다.',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand}는 Google AdSense가 제공하는 광고를 표시하므로 무료입니다. 광고는 안내 페이지(홈, 사용 방법, 자주 묻는 질문, 도구 페이지)와 완료된 변환 텍스트 옆에만 표시됩니다. 파일을 변환하는 동안에는 광고가 표시되지 않으며, 개인정보 처리방침, 이용약관, 로그 페이지에는 절대 표시되지 않습니다.',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand}는 Google AdSense가 제공하는 광고를 표시하므로 무료입니다. 광고는 안내 페이지(홈, 사용 방법, 자주 묻는 질문, 도구 페이지)에만 표시됩니다. 파일을 변환하는 동안이나 변환 텍스트 옆에는 광고가 표시되지 않으며, 개인정보 처리방침, 이용약관, 로그 페이지에는 절대 표시되지 않습니다.',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand}는 무료로 사용할 수 있습니다. 파일이 어떻게 처리되는지는 [개인정보 처리방침](/privacy)에서 확인하세요.',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand}는 안내 페이지와 완료된 변환 텍스트 옆에 표시되는 광고(Google AdSense)로 운영됩니다. 변환은 이용자의 기기에서 이루어지므로 파일마다 서버 비용이 들지 않으며, 그 덕분에 서비스를 무료로 무제한 제공할 수 있습니다. 광고가 무엇을 사용하는지, 설정은 어떻게 고르는지는 [개인정보 처리방침](/privacy)에 설명되어 있습니다.',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand}는 안내 페이지에 표시되는 광고(Google AdSense)로 운영됩니다. 변환은 이용자의 기기에서 이루어지므로 파일마다 서버 비용이 들지 않으며, 그 덕분에 서비스를 무료로 무제한 제공할 수 있습니다. 광고가 무엇을 사용하는지, 설정은 어떻게 고르는지는 [개인정보 처리방침](/privacy)에 설명되어 있습니다.',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand}는 세 단계로 동영상이나 오디오 파일 속 음성을 타임스탬프가 붙은 텍스트로 바꿔 줍니다.',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand}는 동영상, 오디오 파일, 음성 녹음 속 음성을 정확하고 타임스탬프가 붙은 텍스트로 바꿔 줍니다. 무료이고, 변환할 수 있는 파일 수에 제한이 없으며, 계정도 필요 없습니다. 위에서 파일을 선택하고 ‘변환 시작’을 누른 다음 결과를 읽어 보세요.',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand}는 브라우저에서 바로 동영상과 오디오 파일을 텍스트로 바꿉니다. 인식은 이용자의 기기에서 실행되며 파일은 당사에 업로드되지 않습니다. 무료이고 계정이 필요 없습니다. 운영 비용은 안내 페이지와 완료된 변환 텍스트 옆의 광고(Google AdSense, [개인정보 처리방침](/privacy) 참고)로 충당합니다. 당사는 언제든지 기능을 변경, 제한 또는 중단할 수 있습니다.',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand}는 브라우저에서 바로 동영상과 오디오 파일을 텍스트로 바꿉니다. 인식은 이용자의 기기에서 실행되며 파일은 당사에 업로드되지 않습니다. 무료이고 계정이 필요 없습니다. 운영 비용은 안내 페이지의 광고(Google AdSense, [개인정보 처리방침](/privacy) 참고)로 충당합니다. 당사는 언제든지 기능을 변경, 제한 또는 중단할 수 있습니다.',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand}는 동영상과 오디오를 정확하고 타임스탬프가 붙은 텍스트로 무료로 바꿔 줍니다. 가입도, 로그인도, 워터마크도 없습니다. 페이지를 열고 파일을 선택해 변환 텍스트를 읽으면 됩니다.',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand}는 브라우저에서 바로 동영상과 오디오를 텍스트로 바꿉니다. 이 페이지는 그 과정이 이용자의 데이터에 어떤 의미인지 쉬운 말로 설명합니다. 요약하면 이렇습니다. 파일은 기기 밖으로 나가지 않습니다. 변환 텍스트는 이 브라우저에만 저장되고, 계정은 없으며, 사이트는 자체 쿠키를 설정하지 않습니다. 광고는 안내 페이지와 완료된 변환 텍스트 옆에만 표시되며, 쿠키를 사용하는 Google이 제공합니다.',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand}는 브라우저에서 바로 동영상과 오디오를 텍스트로 바꿉니다. 이 페이지는 그 과정이 이용자의 데이터에 어떤 의미인지 쉬운 말로 설명합니다. 요약하면 이렇습니다. 파일은 기기 밖으로 나가지 않습니다. 변환 텍스트는 이 브라우저에만 저장되고, 계정은 없으며, 사이트는 자체 쿠키를 설정하지 않습니다. 광고는 안내 페이지에만 표시되며, 쿠키를 사용하는 Google이 제공합니다.',
   '{done} of {total}': '{total} 중 {done}',
   '{duration} (estimate)': '{duration}(예상)',
   '{gb} GB of memory recommended': '메모리 {gb}GB 권장',
@@ -97,8 +97,8 @@ const dict: Record<string, string> = {
     '**어휘 힌트를 추가하세요**: 오디오에 나오는 이름, 브랜드, 전문 용어를 원하는 표기대로 적어 주세요.',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**어휘 힌트를 추가하세요**: 이름, 브랜드, 전문 용어를 원하는 표기대로 적어 주세요.',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**광고.** 광고는 안내 페이지와 완료된 변환 텍스트 옆에만 표시되며, 쿠키를 사용하는 Google이 제공합니다. 파일을 변환하는 동안에는 광고가 표시되지 않습니다.',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**광고.** 광고는 안내 페이지에만 표시되며, 쿠키를 사용하는 Google이 제공합니다. 파일을 변환하는 동안이나 변환 텍스트 옆에는 광고가 표시되지 않습니다.',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**표시된 줄을 확인**하고 변환 텍스트 편집기에서 수정하세요.',
   '**Choose the spoken language** instead of auto-detect.':
@@ -219,8 +219,8 @@ const dict: Record<string, string> = {
   'Accurate text': '정확한 텍스트',
   'Add another file': '파일 추가',
   'Add your file': '파일 추가하기',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    '광고는 안내 페이지와 완료된 변환 텍스트 옆에만 표시되며, 쿠키를 사용하는 Google이 제공합니다. 파일을 변환하는 동안에는 광고가 표시되지 않으며, 이 웹사이트는 자체 쿠키를 설정하지 않습니다. 자세한 내용은 [개인정보 처리방침](/privacy)에 있습니다.',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    '광고는 안내 페이지에만 표시되며, 쿠키를 사용하는 Google이 제공합니다. 파일을 변환하는 동안이나 변환 텍스트 옆에는 광고가 표시되지 않으며, 이 웹사이트는 자체 쿠키를 설정하지 않습니다. 자세한 내용은 [개인정보 처리방침](/privacy)에 있습니다.',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     '어떤 기능도 광고가 있어야만 작동하지는 않습니다. 광고를 차단하거나 거부해도 모든 것이 똑같이 작동합니다.',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1121,6 +1121,8 @@ const dict: Record<string, string> = {
   'description:/guides/what-is-whisper':
     'OpenAI Whisper가 무엇인지, 무엇으로 학습했는지, 얼마나 정확하고 어떤 점에 약한지, TranscribeVid에서 브라우저 안에서 어떻게 실행되는지 설명합니다.',
   'label:/guides/what-is-whisper': 'Whisper란?',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    '이 페이지는 AI로 번역되었습니다. [오류를 발견하셨나요? 알려 주세요.](/contact)',
 };
 
 export default dict;

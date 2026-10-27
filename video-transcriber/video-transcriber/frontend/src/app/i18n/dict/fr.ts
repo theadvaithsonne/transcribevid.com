@@ -30,22 +30,22 @@ const dict: Record<string, string> = {
     '{brand} est conçu et géré par **{name}**, {role} basé à {city}. Je l’ai créé pour offrir la meilleure expérience de transcription possible : fluide dès le premier clic, sans compte à créer, avec une interface épurée qui ne gêne pas.',
   '{brand} is for a general audience and is not directed to children under 13.':
     '{brand} s’adresse à un public général et ne cible pas les enfants de moins de 13 ans.',
-  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages) and beside a finished transcript. No ad is shown while a file is being transcribed, and never on the privacy, terms or logs pages.':
-    '{brand} est gratuit parce qu’il affiche des publicités, diffusées par Google AdSense. Les publicités n’apparaissent que sur les pages d’information (accueil, Comment ça marche, FAQ et pages des outils) et à côté d’une transcription terminée. Aucune publicité n’est affichée pendant la transcription d’un fichier, ni jamais sur les pages de confidentialité, de conditions ou de journaux.',
+  '{brand} is free because it shows ads, served by Google AdSense. Ads appear only on information pages (home, How it works, FAQ and the tool pages). No ad is shown while a file is being transcribed or beside your transcript, and never on the privacy, terms or logs pages.':
+    '{brand} est gratuit parce qu’il affiche des publicités, diffusées par Google AdSense. Les publicités n’apparaissent que sur les pages d’information (accueil, Comment ça marche, FAQ et pages des outils). Aucune publicité n’est affichée pendant la transcription d’un fichier ni à côté de votre transcription, ni jamais sur les pages de confidentialité, de conditions ou de journaux.',
   '{brand} is free to use. The [Privacy policy](/privacy) explains what happens to your files.':
     '{brand} est gratuit. La [Politique de confidentialité](/privacy) explique ce qu’il advient de vos fichiers.',
-  '{brand} is funded by ads shown on its information pages and beside finished transcripts (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
-    '{brand} est financé par les publicités affichées sur ses pages d’information et à côté des transcriptions terminées (Google AdSense). Comme c’est votre propre appareil qui effectue la transcription, chaque fichier ne coûte rien en serveur, et c’est ce qui rend le service gratuit et illimité. La [Politique de confidentialité](/privacy) explique ce que les publicités utilisent et comment choisir vos réglages.',
+  '{brand} is funded by ads shown on its information pages (Google AdSense). Because your own device does the transcription, there is no server cost for each file, and that is what keeps the service free and unlimited. The [Privacy policy](/privacy) explains what the ads use and how to choose your settings.':
+    '{brand} est financé par les publicités affichées sur ses pages d’information (Google AdSense). Comme c’est votre propre appareil qui effectue la transcription, chaque fichier ne coûte rien en serveur, et c’est ce qui rend le service gratuit et illimité. La [Politique de confidentialité](/privacy) explique ce que les publicités utilisent et comment choisir vos réglages.',
   '{brand} turns the speech in a video or audio file into text with timestamps, in three simple steps.':
     '{brand} transforme la parole d’un fichier vidéo ou audio en texte horodaté, en trois étapes simples.',
   '{brand} turns the speech in videos, audio files and voice recordings into accurate, timestamped text. It is free, there is no limit on how many files you transcribe, and you do not need an account: choose a file above, press Transcribe and read the result.':
     '{brand} transforme la parole des vidéos, des fichiers audio et des enregistrements vocaux en texte précis et horodaté. C’est gratuit, il n’y a aucune limite au nombre de fichiers que vous transcrivez, et vous n’avez pas besoin de compte : choisissez un fichier ci-dessus, appuyez sur Transcrire et lisez le résultat.',
-  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages and beside finished transcripts (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
-    '{brand} transforme les fichiers vidéo et audio en texte, directement dans votre navigateur : la reconnaissance s’exécute sur votre appareil et vos fichiers ne nous sont pas envoyés. Le service est gratuit et ne demande aucun compte. Il est financé par des publicités sur les pages d’information et à côté des transcriptions terminées (Google AdSense ; voir la [Politique de confidentialité](/privacy)). Nous pouvons modifier, limiter ou arrêter des fonctionnalités à tout moment.',
+  '{brand} turns video and audio files into text, right in your browser: the recognition runs on your device, and your files are not uploaded to us. It is free to use and needs no account. It is funded by ads on information pages (Google AdSense; see the [Privacy policy](/privacy)). We may change, limit or stop features at any time.':
+    '{brand} transforme les fichiers vidéo et audio en texte, directement dans votre navigateur : la reconnaissance s’exécute sur votre appareil et vos fichiers ne nous sont pas envoyés. Le service est gratuit et ne demande aucun compte. Il est financé par des publicités sur les pages d’information (Google AdSense ; voir la [Politique de confidentialité](/privacy)). Nous pouvons modifier, limiter ou arrêter des fonctionnalités à tout moment.',
   '{brand} turns video and audio into accurate, timestamped text for free. There is no sign-up, no sign-in and no watermark: open the page, choose a file and read your transcript.':
     '{brand} transforme gratuitement la vidéo et l’audio en texte précis et horodaté. Il n’y a ni inscription, ni connexion, ni filigrane : ouvrez la page, choisissez un fichier et lisez votre transcription.',
-  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies.':
-    '{brand} transforme la vidéo et l’audio en texte, directement dans votre navigateur. Cette page explique, en termes simples, ce que cela implique pour vos données. En bref : votre fichier ne quitte jamais votre appareil. Vos transcriptions sont conservées uniquement dans ce navigateur, il n’y a aucun compte, et le site ne dépose aucun cookie de sa part. Les publicités n’apparaissent que sur les pages d’information et à côté des transcriptions terminées, et sont diffusées par Google, qui utilise des cookies.',
+  '{brand} turns video and audio into text, right in your browser. This page explains what that involves for your data, in plain words. In short: Your file never leaves your device. Your transcripts are kept in this browser only, there is no account, and the site sets no cookies of its own. Ads appear only on information pages, and are served by Google, which uses cookies.':
+    '{brand} transforme la vidéo et l’audio en texte, directement dans votre navigateur. Cette page explique, en termes simples, ce que cela implique pour vos données. En bref : votre fichier ne quitte jamais votre appareil. Vos transcriptions sont conservées uniquement dans ce navigateur, il n’y a aucun compte, et le site ne dépose aucun cookie de sa part. Les publicités n’apparaissent que sur les pages d’information, et sont diffusées par Google, qui utilise des cookies.',
   '{done} of {total}': '{done} sur {total}',
   '{duration} (estimate)': '{duration} (estimation)',
   '{gb} GB of memory recommended': '{gb} Go de mémoire recommandés',
@@ -97,8 +97,8 @@ const dict: Record<string, string> = {
     '**Ajoutez un indice de vocabulaire** : les noms, marques et termes techniques présents dans l’audio, orthographiés comme vous le souhaitez.',
   '**Add a vocabulary hint**: names, brands and jargon, spelled the way you want them.':
     '**Ajoutez un indice de vocabulaire** : noms, marques et termes techniques, orthographiés comme vous le souhaitez.',
-  '**Ads.** Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed.':
-    '**Publicités.** Les publicités n’apparaissent que sur les pages d’information et à côté des transcriptions terminées, et sont diffusées par Google, qui utilise des cookies. Aucune publicité n’est affichée pendant la transcription d’un fichier.',
+  '**Ads.** Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript.':
+    '**Publicités.** Les publicités n’apparaissent que sur les pages d’information, et sont diffusées par Google, qui utilise des cookies. Aucune publicité n’est affichée pendant la transcription d’un fichier ni à côté de votre transcription.',
   '**Check the marked lines** and fix them in the transcript editor.':
     '**Vérifiez les lignes signalées** et corrigez-les dans l’éditeur de transcription.',
   '**Choose the spoken language** instead of auto-detect.':
@@ -220,8 +220,8 @@ const dict: Record<string, string> = {
   'Accurate text': 'Un texte précis',
   'Add another file': 'Ajouter un autre fichier',
   'Add your file': 'Ajoutez votre fichier',
-  'Ads appear only on information pages and beside finished transcripts, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
-    'Les publicités n’apparaissent que sur les pages d’information et à côté des transcriptions terminées, et sont diffusées par Google, qui utilise des cookies. Aucune publicité n’est affichée pendant la transcription d’un fichier, et ce site web ne dépose aucun cookie de sa part. Les détails figurent dans la [Politique de confidentialité](/privacy).',
+  'Ads appear only on information pages, and are served by Google, which uses cookies. No ad is shown while a file is being transcribed or beside your transcript, and this website sets no cookies of its own. Details are in the [Privacy policy](/privacy).':
+    'Les publicités n’apparaissent que sur les pages d’information, et sont diffusées par Google, qui utilise des cookies. Aucune publicité n’est affichée pendant la transcription d’un fichier ni à côté de votre transcription, et ce site web ne dépose aucun cookie de sa part. Les détails figurent dans la [Politique de confidentialité](/privacy).',
   'Ads are not needed for any feature: with ads blocked or declined, everything works the same.':
     'Aucune fonctionnalité n’a besoin des publicités : que vous les bloquiez ou les refusiez, tout fonctionne de la même façon.',
   'Ads keep TranscribeVid free. Everything works without them.':
@@ -1147,5 +1147,7 @@ const dict: Record<string, string> = {
   'label:/guides/what-is-whisper': 'Qu’est-ce que Whisper ?',
   'an independent software developer': 'un développeur de logiciels indépendant',
   'Bengaluru, India': 'Bengaluru, Inde',
+  'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
+    'Cette page a été traduite avec l’IA. [Une erreur ? Dites-le-nous.](/contact)',
 };
 export default dict;

@@ -18,7 +18,9 @@ import { AdRail } from './shared/ad-rail';
 import { I18nService } from './i18n/i18n.service';
 import { LanguageSwitcher } from './i18n/language-switcher';
 import { LocaleHintBar } from './i18n/locale-hint-bar';
+import { DEFAULT_LOCALE } from './i18n/locales';
 import { _t } from './i18n/mark';
+import { RichText } from './i18n/rich-text';
 import { LocalePathPipe, TPipe } from './i18n/t.pipe';
 import { AdSlot } from './shared/ad-slot';
 import { Logo } from './shared/logo';
@@ -27,7 +29,7 @@ import { Toasts } from './shared/toasts';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts, AdRail, AdSlot, LanguageSwitcher, LocaleHintBar, TPipe, LocalePathPipe, ToolLabelPipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Logo, Toasts, AdRail, AdSlot, LanguageSwitcher, LocaleHintBar, RichText, TPipe, LocalePathPipe, ToolLabelPipe],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -51,6 +53,8 @@ export class App {
   deleting = signal(false);
   readonly tagline = TAGLINE;
   readonly year = new Date().getFullYear();
+  /** the page is shown in a translation (written with AI): the end of the page says so, with a way to report a mistake */
+  readonly translated = computed(() => this.i18n.locale() !== DEFAULT_LOCALE);
   /** the keyword landing pages: linked from the footer so every page links to them */
   /** the footer pages (`footer: true`) that exist in the page's language, linked from every page (the rest are one click away on "All tools") */
   readonly tools = computed(() => FOOTER_TOOLS.filter((t) => this.i18n.isAvailable(this.i18n.locale(), t.path)));
