@@ -185,3 +185,8 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   Not changed, left to the owner: Search Console and Bing setup, AdSense account steps, the language redirect on the bare home page (Google
   advises against automatic language redirects; ours only fires there, from the browser language, never for Googlebot), a named author for the
   guides, native review of the translations. Verified: frontend 98 files / 3,543 tests, backend 917 passed + 17 skipped, script tests 386.
+  **Deployed** as Pages deployment 19a6045d (c9819ea, `--branch main`, no `--force`) after the safe-deploy checks: the live commit d84b85e is an ancestor of HEAD,
+  `feature/in-browser` has nothing newer, the build is newer than every source file. Live checks: sitemap 525 addresses, the pages answer 200 (a missing page 404),
+  `/img/transcript-es.webp` is served as image/webp with a day of cache, the translated page carries the AI note and the English page does not, the privacy
+  text no longer says "beside finished transcripts", 21 of 21 checks in a real Chrome against transcribevid.com, the figure loads at 937x484 on a desktop window
+  and 358x186 on a phone with no sideways scroll. Lighthouse (mobile, a Spanish tool page, local build): performance 98, accessibility 100, SEO 100, layout shift 0.
