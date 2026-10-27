@@ -545,7 +545,12 @@ describe('StatsService', () => {
 
   describe('the static website: the counter Worker (workers/counter)', () => {
     const WORKER = 'https://counter.test/api';
+    /** the browser's own fetch, which the service uses once after a report to read the total again past the HTTP cache */
+    let refetch: ReturnType<typeof vi.fn>;
+    afterEach(() => vi.unstubAllGlobals());
     function setupWorker() {
+      refetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(makeStats({ transcribed: 11, counting: true })) }));
+      vi.stubGlobal('fetch', refetch);
       TestBed.configureTestingModule({
         providers: [
           silentLog,
@@ -622,6 +627,53 @@ describe('StatsService', () => {
       list([makeSummary({ id: 'a', status: 'done' })]);
       posts()[0].flush(...httpError(429));
       expect(svc.count()).toBe(10);
+      expect(svc.visible()).toBe(true);
+      expect(refetch).not.toHaveBeenCalled(); // nothing was counted, so there is nothing to refresh
+    });
+
+    /** a tab that saw one of its own videos finish: the page shows 10, the Worker answers the report with 11 */
+    function reportedOne() {
+      setupWorker();
+      read().flush(makeStats({ transcribed: 10, counting: true }));
+      list([makeSummary({ id: 'a', status: 'running' })]);
+      list([makeSummary({ id: 'a', status: 'done' })]);
+      posts()[0].flush(makeStats({ transcribed: 11, counting: true }));
+    }
+
+    it("after its own report it reads the total once more past the browser's 5-minute cache, so a reload shows the new number too", async () => {
+      reportedOne();
+      expect(refetch).toHaveBeenCalledTimes(1);
+      expect(refetch).toHaveBeenCalledWith(`${WORKER}/stats`, { cache: 'reload' });
+      await vi.advanceTimersByTimeAsync(0);
+      expect(svc.count()).toBe(11);
+    });
+
+    it('the number a tab shows never goes down: an older answer (a poll the browser served from its cache) is ignored', () => {
+      reportedOne();
+      expect(svc.count()).toBe(11);
+      pollsIn(MINUTE);
+      read().flush(makeStats({ transcribed: 10, counting: true })); // the copy the browser kept from before the report
+      expect(svc.count()).toBe(11);
+      pollsIn(MINUTE);
+      read().flush(makeStats({ transcribed: 14, counting: true })); // other visitors counted meanwhile
+      expect(svc.count()).toBe(14);
+    });
+
+    it('a number from a page that knows nothing yet is shown as it is', () => {
+      setupWorker();
+      read().flush(makeStats({ transcribed: 2, counting: true }));
+      expect(svc.count()).toBe(2);
+    });
+
+    it('a re-read that fails is silent and keeps the number', async () => {
+      setupWorker();
+      refetch.mockRejectedValueOnce(new Error('offline'));
+      read().flush(makeStats({ transcribed: 10, counting: true }));
+      list([makeSummary({ id: 'a', status: 'running' })]);
+      list([makeSummary({ id: 'a', status: 'done' })]);
+      posts()[0].flush(makeStats({ transcribed: 11, counting: true }));
+      await vi.advanceTimersByTimeAsync(0);
+      expect(svc.count()).toBe(11);
       expect(svc.visible()).toBe(true);
     });
   });

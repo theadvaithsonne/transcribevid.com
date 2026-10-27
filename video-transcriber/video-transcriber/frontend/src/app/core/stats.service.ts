@@ -36,7 +36,8 @@ function parse(raw: unknown): SiteStats | null {
 
 /**
  * "How many videos this website has transcribed", for the counter in the header. It only ever shows what the server
- * says: it never guesses, offsets or fakes a number, and a failure is silent (the pill just stays hidden).
+ * says: it never guesses, offsets or fakes a number, and a failure is silent (the pill just stays hidden). On the static
+ * website it never shows a lower total than it already showed (see `adopt`).
  *
  * Fetched once on start, then every 60 seconds while the tab is visible, and once more shortly after one of the
  * visitor's own transcriptions finishes.
@@ -132,7 +133,7 @@ export class StatsService {
         const s = parse(raw);
         if (s) {
           this.failures = 0;
-          this.stats.set(s);
+          this.adopt(s);
         } else {
           this.fail();
         }
@@ -164,11 +165,39 @@ export class StatsService {
           const s = parse(raw);
           if (!s) return;
           this.failures = 0;
-          this.stats.set(s);
+          this.adopt(s);
+          this.refreshCache();
         },
         error: () => undefined,
       });
     }
+  }
+
+  /**
+   * Shows an answer. On the static website the total only ever goes up, and the Worker lets a browser keep its answer for
+   * 5 minutes (`Cache-Control: max-age=300`), so a lower number is an older one: a poll the browser served from its cache
+   * after this tab's own report. It is ignored; the pill never drops back to the number from before the visitor's own video.
+   */
+  private adopt(s: SiteStats) {
+    const now = this.stats();
+    this.stats.set(this.counter && now?.counting && s.counting && s.transcribed < now.transcribed ? now : s);
+  }
+
+  /**
+   * After this tab's own report the browser still holds the total from before it, for up to 5 minutes: a reload, another
+   * tab or the next poll would show the old number again. Reading the total once more past the cache (`cache: 'reload'`)
+   * makes the browser store the new answer in its place. The XHR backend of HttpClient cannot do that, hence `fetch`.
+   * Silent on any failure: the number shown is already right.
+   */
+  private refreshCache() {
+    if (typeof fetch !== 'function') return;
+    fetch(`${this.counter}/stats`, { cache: 'reload' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((raw) => {
+        const s = parse(raw);
+        if (s) this.adopt(s);
+      })
+      .catch(() => undefined);
   }
 
   /** Never throws or toasts. A shown number survives a hiccup or two; after that the pill hides. */
