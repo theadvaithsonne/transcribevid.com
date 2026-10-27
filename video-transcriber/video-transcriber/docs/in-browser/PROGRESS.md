@@ -153,3 +153,18 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   Deployments > 03eb46b1 (cb8c821, the release before this one) > Rollback. The branch is also pushed to GitHub as `seo/improvements`
   (the repo is public); `main` there is still the first commit and `swapnil` is untouched. Still open for the owner: AdSense consent
   message for EEA / UK / CH, Search Console, native review of the translations.
+* 2026-10-27 (correction and merged release): the earlier release of the language branch (17d300e, Pages deployment d9b6e696) was a
+  mistake: the branch had been cut from d68dbf4, four commits behind `feature/in-browser` (cb8c821 was live), so the deploy dropped
+  batched beam decoding (transcribing about 3x slower), resume after reload, the job clock, Word and PDF downloads, 7 landing pages
+  (they answered 404) and 15 edge-case fixes. Production was put back to cb8c821 (rebuilt from a clean checkout, deployment 67331cb2),
+  then the two lines of work were merged (d84b85e, branch `release/all`) and deployed as **f4de282b**. Merge decisions: every address
+  that was ever live stays (31 tool pages); for the 7 pages both sides wrote, the other side's page is the base with the long-form
+  sections, related reading and format lists on top; one related-tools component with three modes (explicit list, rotating neighbours,
+  grouped full list); their facts line, exports, keep-open note and print document, translated; engine download notes translated by
+  shape (`core/download-note.ts`); 45 new strings in all 15 languages; sitemap regenerated (525 addresses). Also fixed in the same
+  release: the header counter showed the number from before the visitor's own video (the Worker lets browsers keep `GET /stats` for 5
+  minutes; the tab now re-reads it past the cache after its own count and never shows a lower total than it already showed).
+  Verified before and after deploy: frontend 97 files / 3,538 tests, backend 917 passed + 17 skipped, script tests 383, audit 525 pages
+  clean in 16 languages, 21 checks in a real Chrome (against the local build and against transcribevid.com), and the 35 s test video
+  on this PC's integrated AMD GPU, Standard model: transcribing 52 s (was 129 s on the mistaken build). Rule from this: before any
+  deploy, `git merge-base --is-ancestor <commit that is live> HEAD` must succeed; the live commit is in `wrangler pages deployment list`.
