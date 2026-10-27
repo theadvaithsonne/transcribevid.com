@@ -200,3 +200,9 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   rail300 = 2259151539 (300x600), inline300 = 4089565965 (300x250). Committed and tested (frontend 98 files / 3,544 tests) but NOT deployed yet: with every id set the production
   build loads Google's script on the ad pages and shows the footer "Privacy and cookie settings" button, which does nothing until the owner has published the European regulations
   message in AdSense > Privacy & messaging, so the deploy waits for that. Google serves no ad before it approves the site; the boxes then keep showing the house note.
+  **Deployed** as Pages deployment 7dee3508 (6cd5b2b) after the owner published the European regulations message (consent, Do not consent on in every country, logo, privacy URL, site name) and the
+  US state regulations message (both "1 active"). Safe-deploy checks passed (live 76881f2 is an ancestor, nothing newer on `feature/in-browser`, build newer than every source file). Checked in a real
+  Chrome with every request to Google blocked, locally and on transcribevid.com: the home page, tool pages, FAQ and guides load Google's script and create one ad box (160x600 id 8631446200 at
+  1400 px, 300x600 id 2259151539 at 1800 px; the in-flow 300x250 id 4089565965 below 1100 px loads when scrolled into view); privacy, terms, about, contact, a transcript page and a 404 load nothing
+  from Google and show no consent button; the prerendered HTML has no ad script. 21 of 21 checks pass. Google serves no ad until it approves the site (review requested 26 Oct 2026 21:49).
+  Still the owner's: set the ad partners in AdSense > Privacy & messaging > European regulations > Settings (the message preview said "0 partners"), turn Auto optimize off.
