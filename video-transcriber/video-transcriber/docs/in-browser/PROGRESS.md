@@ -195,3 +195,8 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   injects a cookieless script into every page (found with a real Chrome; curl without a browser user agent does not see it); the owner chose to keep it, so the
   privacy policy now has a "Visit statistics" bullet in section 2 in all 16 languages (731 strings), worded as what Cloudflare says (no cookies, no identifier on the
   device, no cross-site tracking), and the legal "Last updated" date is 27 October 2026 (the ad sentences had changed earlier the same day).
+* 2026-10-27 (AdSense ad units): the AdSense account shows the site "Getting ready" (ownership verified, ads.txt Authorized, review requested 26 Oct 21:49, Auto ads OFF; the owner
+  was asked to switch Auto optimize off). The owner created the three fixed-size display units and `core/ads.config.ts` now holds their ids: rail160 = 8631446200 (160x600),
+  rail300 = 2259151539 (300x600), inline300 = 4089565965 (300x250). Committed and tested (frontend 98 files / 3,544 tests) but NOT deployed yet: with every id set the production
+  build loads Google's script on the ad pages and shows the footer "Privacy and cookie settings" button, which does nothing until the owner has published the European regulations
+  message in AdSense > Privacy & messaging, so the deploy waits for that. Google serves no ad before it approves the site; the boxes then keep showing the house note.

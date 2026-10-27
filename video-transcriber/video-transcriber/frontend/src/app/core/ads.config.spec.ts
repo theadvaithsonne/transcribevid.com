@@ -6,7 +6,9 @@ describe('ads.config', () => {
   });
 
   it('keeps ads inert until every ad unit id is filled in', () => {
-    expect(adsConfigured()).toBe(false); // no slot ids yet: nothing may load Google's script
+    expect(adsConfigured()).toBe(true); // the three ad units exist (AdSense > Ads > By ad unit)
+    expect(Object.keys(ADSENSE.slots).sort()).toEqual(['inline300', 'rail160', 'rail300']);
+    expect(new Set(Object.values(ADSENSE.slots)).size).toBe(3); // one distinct unit per placement
     const empty = { ...ADSENSE, slots: { rail160: '', rail300: '', inline300: '' } };
     expect(adsConfigured(empty)).toBe(false);
     const partial = { ...ADSENSE, slots: { rail160: '1234567890', rail300: '', inline300: '1234567890' } };

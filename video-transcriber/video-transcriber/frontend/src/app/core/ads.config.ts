@@ -1,9 +1,10 @@
 /**
  * Google AdSense identifiers, in one place. The publisher id is public (it is in the page source of every AdSense site):
  * it is also in public/ads.txt and in the <meta name="google-adsense-account"> tag of index.html, which is how Google
- * verifies that the site is ours. The slot ids come from AdSense > Ads > By ad unit once the site is approved. Until
- * every one of them is filled in, nothing on the site loads Google's script or shows an ad: the reserved ad rail is an
- * empty column, and dev, tests and CI never contact Google.
+ * verifies that the site is ours. The slot ids come from AdSense > Ads > By ad unit (three fixed-size display units, made by the
+ * owner on 2026-10-27 while the site was still "Getting ready"). Google serves nothing until it approves the site. If any id is
+ * empty, nothing on the site loads Google's script or shows an ad: the reserved ad rail is an empty column, and dev, tests and
+ * CI never contact Google (the specs pass their own config).
  */
 export interface AdSenseConfig {
   /** "ca-pub-" followed by 16 digits */
@@ -21,7 +22,7 @@ export interface AdSenseConfig {
 
 export const ADSENSE: AdSenseConfig = {
   client: 'ca-pub-5152758693265080',
-  slots: { rail160: '', rail300: '', inline300: '' },
+  slots: { rail160: '8631446200', rail300: '2259151539', inline300: '4089565965' },
 };
 
 /** True only when the publisher id and every slot id are set: the one state in which the ad code may run at all. */
