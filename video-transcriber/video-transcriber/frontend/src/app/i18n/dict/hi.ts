@@ -1128,5 +1128,9 @@ const dict: Record<string, string> = {
   'label:/youtube-subtitle-generator': 'YouTube सबटाइटल जनरेटर',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'यह पेज AI से अनुवादित है। [कोई गलती मिली? हमें बताएँ।](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'तैयार ट्रांसक्रिप्ट: मीडिया प्लेयर के साथ छोटी-छोटी पंक्तियों में टेक्स्ट, हर पंक्ति के साथ टाइमस्टैम्प।',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'तैयार ट्रांसक्रिप्ट। हर पंक्ति पर टाइमस्टैम्प है, और एक्सपोर्ट इसे SRT, VTT, TXT, PDF और अन्य रूपों में सहेजता है।',
 };
 export default dict;

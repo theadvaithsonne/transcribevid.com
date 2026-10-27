@@ -1138,6 +1138,10 @@ const dict: Record<string, string> = {
   'Bengaluru, India': 'Bengaluru, India',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'Halaman ini diterjemahkan dengan AI. [Menemukan kesalahan? Beri tahu kami.](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'Transkrip yang sudah selesai: pemutar media di samping teks dalam baris-baris pendek, masing-masing dengan penanda waktu.',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'Transkrip yang sudah selesai. Setiap baris punya penanda waktu, dan Ekspor menyimpannya sebagai SRT, VTT, TXT, PDF, dan lainnya.',
 };
 
 export default dict;

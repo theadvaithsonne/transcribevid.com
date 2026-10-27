@@ -1149,5 +1149,9 @@ const dict: Record<string, string> = {
   'Bengaluru, India': 'Bengaluru, Inde',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'Cette page a été traduite avec l’IA. [Une erreur ? Dites-le-nous.](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'Une transcription terminée : un lecteur à côté du texte en lignes courtes, chacune avec son horodatage.',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'Une transcription terminée. Chaque ligne a son horodatage, et Exporter l’enregistre en SRT, VTT, TXT, PDF et plus.',
 };
 export default dict;

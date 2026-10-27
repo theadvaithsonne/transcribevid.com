@@ -1123,6 +1123,10 @@ const dict: Record<string, string> = {
   'label:/guides/what-is-whisper': 'Whisper란?',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     '이 페이지는 AI로 번역되었습니다. [오류를 발견하셨나요? 알려 주세요.](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    '완료된 변환 텍스트: 미디어 플레이어 옆에 짧은 줄로 나뉜 텍스트가 있고, 각 줄에 타임스탬프가 붙어 있습니다.',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    '완료된 변환 텍스트. 모든 줄에 타임스탬프가 있고, 내보내기로 SRT, VTT, TXT, PDF 등으로 저장할 수 있습니다.',
 };
 
 export default dict;

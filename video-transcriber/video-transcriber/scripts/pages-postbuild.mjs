@@ -88,6 +88,8 @@ const HEADERS_BASE = `# TranscribeVid on Cloudflare Pages: security, caching and
   Cache-Control: public, max-age=86400
 /og-image.png
   Cache-Control: public, max-age=86400
+/img/*
+  Cache-Control: public, max-age=86400
 /manifest.webmanifest
   Cache-Control: public, max-age=86400
 /robots.txt

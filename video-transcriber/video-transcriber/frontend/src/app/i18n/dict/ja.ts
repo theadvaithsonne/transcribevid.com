@@ -1137,5 +1137,9 @@ const dict: Record<string, string> = {
   'Bengaluru, India': 'インド・ベンガルール',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'このページはAIで翻訳されています。[誤りを見つけたらお知らせください。](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    '完成した文字起こし：メディアプレーヤーの横に、短い行に分けたテキストが並び、各行にタイムスタンプが付いています。',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    '完成した文字起こし。すべての行にタイムスタンプが付き、「書き出し」でSRT、VTT、TXT、PDFなどの形式で保存できます。',
 };
 export default dict;

@@ -8,6 +8,7 @@ import { I18nService } from '../../i18n/i18n.service';
 import { LocalePathPipe, TPipe } from '../../i18n/t.pipe';
 import { FreeChips } from '../../shared/free-chips';
 import { RelatedTools } from '../../shared/related-tools';
+import { ResultFigure } from '../../shared/result-figure';
 import { ToolDrop } from './tool-drop';
 import { ToolFaq, ToolPageContent, ToolSection, ToolStep, ToolTip } from './tool-page.model';
 import { TOOL_PAGES } from './tool-pages.list';
@@ -51,7 +52,7 @@ export const DEFAULT_LIMITS = `Up to ${fmtBytesShort(PUBLIC_DEFAULTS.maxUploadMb
  */
 @Component({
   selector: 'app-tool-page',
-  imports: [RouterLink, FreeChips, RelatedTools, ToolDrop, AdSlot, TPipe, LocalePathPipe],
+  imports: [RouterLink, FreeChips, RelatedTools, ResultFigure, ToolDrop, AdSlot, TPipe, LocalePathPipe],
   templateUrl: './tool-page.html',
   styleUrl: './tool-page.scss',
 })

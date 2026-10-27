@@ -168,3 +168,20 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   clean in 16 languages, 21 checks in a real Chrome (against the local build and against transcribevid.com), and the 35 s test video
   on this PC's integrated AMD GPU, Standard model: transcribing 52 s (was 129 s on the mistaken build). Rule from this: before any
   deploy, `git merge-base --is-ancestor <commit that is live> HEAD` must succeed; the live commit is in `wrangler pages deployment list`.
+* 2026-10-27 (Google Search and AdSense documentation review): read Google's SEO starter guide, ranking-systems guide, Search docs hub and the
+  spam, international, helpful-content, generative-AI and JavaScript pages, then AdSense (start, how it works, program policies, ad placement,
+  eligibility, supported languages), and compared them with the live site (headers, robots.txt, redirects, 526 built pages, Lighthouse mobile
+  98 / 100 / 100 / 92). Already right: prerendered text, unique titles and descriptions, canonicals, hreflang (self, return links, x-default, no
+  errors on 480 pages), real 404s, noindex on private URLs, valid structured data, no thin or copied pages, privacy text with Google's required
+  disclosures in all 16 languages, ads.txt and the AdSense meta tag, no ad script on privacy, terms, logs or 404, all 15 languages on AdSense's
+  supported list. Changed: (1) **a finished transcript is no longer an ad page**: it is the visitor's own machine-made text, which Google's
+  crawler cannot read, beside the Download and Export buttons (no publisher content, spike/adsense.md section 5); `jobs/:id` carries no ad flag,
+  `routes.spec.ts` pins it, and the six sentences of the privacy, terms, about, FAQ and how-it-works texts and the guide paragraph are reworded in all
+  16 languages; (2) translated pages end with "This page was translated with AI. Found a mistake? Tell us." (Google: say how automated
+  content was made); (3) a real screenshot of a finished transcript, one per language (`frontend/public/img/transcript-<language>.webp`, 1280x660,
+  about 45 KB, taken from the app with the sample recording of `frontend/fixtures`), with alt text and a caption, at the end of the formats section of
+  every tool page (`shared/result-figure.ts`); (4) deploy/SEO.md counts (525 addresses) and the two Cloudflare settings still on at the live check
+  (managed robots.txt blocks ChatGPT-User, Perplexity-User, Claude-User and Google-Extended; email obfuscation shows [email protected] to crawlers).
+  Not changed, left to the owner: Search Console and Bing setup, AdSense account steps, the language redirect on the bare home page (Google
+  advises against automatic language redirects; ours only fires there, from the browser language, never for Googlebot), a named author for the
+  guides, native review of the translations. Verified: frontend 98 files / 3,543 tests, backend 917 passed + 17 skipped, script tests 386.

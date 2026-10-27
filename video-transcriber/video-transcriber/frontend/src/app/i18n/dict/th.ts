@@ -1118,5 +1118,9 @@ const dict: Record<string, string> = {
   'label:/guides/what-is-whisper': 'Whisper คืออะไร',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'หน้านี้แปลโดยใช้ AI [พบข้อผิดพลาด? บอกเรา](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'ข้อความถอดเสียงที่เสร็จแล้ว: เครื่องเล่นสื่ออยู่ข้างข้อความที่แบ่งเป็นบรรทัดสั้น ๆ แต่ละบรรทัดมีไทม์สแตมป์',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'ข้อความถอดเสียงที่เสร็จแล้ว ทุกบรรทัดมีไทม์สแตมป์ และปุ่มส่งออกจะบันทึกเป็น SRT, VTT, TXT, PDF และอื่น ๆ',
 };
 export default dict;

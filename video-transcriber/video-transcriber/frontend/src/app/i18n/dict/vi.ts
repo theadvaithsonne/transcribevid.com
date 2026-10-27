@@ -1137,6 +1137,10 @@ const dict: Record<string, string> = {
   'label:/youtube-subtitle-generator': 'Tạo phụ đề YouTube',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'Trang này được dịch bằng AI. [Phát hiện lỗi? Hãy báo cho chúng tôi.](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'Một bản gỡ băng đã hoàn thành: trình phát media bên cạnh văn bản chia thành các dòng ngắn, mỗi dòng có một mốc thời gian.',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'Một bản gỡ băng đã hoàn thành. Mỗi dòng có mốc thời gian, và nút Xuất lưu bản này thành SRT, VTT, TXT, PDF và nhiều định dạng khác.',
 };
 
 export default dict;

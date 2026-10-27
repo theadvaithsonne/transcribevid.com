@@ -1115,6 +1115,10 @@ const dict: Record<string, string> = {
   'label:/youtube-subtitle-generator': 'مولّد ترجمات يوتيوب',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'تمت ترجمة هذه الصفحة بالذكاء الاصطناعي. [وجدت خطأً؟ أخبرنا.](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'تفريغ نصي مكتمل: مشغّل وسائط بجانب النص في أسطر قصيرة، لكل سطر طابع زمني.',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'تفريغ نصي مكتمل. لكل سطر طابع زمني، ويحفظه زر تصدير بصيغ SRT وVTT وTXT وPDF وغيرها.',
 };
 
 export default dict;

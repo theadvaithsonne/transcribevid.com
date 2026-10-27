@@ -1127,5 +1127,9 @@ const dict: Record<string, string> = {
   'label:/youtube-subtitle-generator': 'YouTube সাবটাইটেল জেনারেটর',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'এই পৃষ্ঠাটি AI দিয়ে অনুবাদ করা হয়েছে। [কোনো ভুল পেয়েছেন? আমাদের জানান।](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'সম্পন্ন ট্রান্সক্রিপ্ট: মিডিয়া প্লেয়ারের পাশে ছোট ছোট লাইনে টেক্সট, প্রতিটি লাইনে একটি টাইমস্ট্যাম্প।',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'সম্পন্ন ট্রান্সক্রিপ্ট। প্রতিটি লাইনে টাইমস্ট্যাম্প আছে, আর এক্সপোর্ট এটিকে SRT, VTT, TXT, PDF ও আরও ফরম্যাটে সংরক্ষণ করে।',
 };
 export default dict;

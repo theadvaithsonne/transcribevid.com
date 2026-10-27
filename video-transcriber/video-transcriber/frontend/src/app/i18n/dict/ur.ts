@@ -1127,6 +1127,10 @@ const dict: Record<string, string> = {
   'label:/youtube-subtitle-generator': 'YouTube سب ٹائٹل جنریٹر',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'اس صفحے کا ترجمہ AI سے کیا گیا ہے۔ [کوئی غلطی ملی؟ ہمیں بتائیں۔](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'مکمل ٹرانسکرپٹ: میڈیا پلیئر کے برابر میں مختصر سطروں میں متن، ہر سطر کے ساتھ ٹائم اسٹیمپ۔',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'مکمل ٹرانسکرپٹ۔ ہر سطر پر ٹائم اسٹیمپ ہے، اور ایکسپورٹ اسے SRT، VTT، TXT، PDF اور دیگر شکلوں میں محفوظ کرتا ہے۔',
 };
 
 export default dict;

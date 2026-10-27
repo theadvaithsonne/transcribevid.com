@@ -1132,6 +1132,10 @@ const dict: Record<string, string> = {
   'Bengaluru, India': 'Bengaluru, Hindistan',
   'This page was translated with AI. [Found a mistake? Tell us.](/contact)':
     'Bu sayfa yapay zekâ ile çevrildi. [Bir hata mı buldunuz? Bize bildirin.](/contact)',
+  'A finished transcript: a media player next to the text in short lines, each with a timestamp.':
+    'Tamamlanmış bir transkript: bir medya oynatıcının yanında, her biri zaman damgalı kısa satırlara bölünmüş metin.',
+  'A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more.':
+    'Tamamlanmış bir transkript. Her satırın bir zaman damgası vardır ve Dışa aktar onu SRT, VTT, TXT, PDF ve daha fazlası olarak kaydeder.',
 };
 
 export default dict;
