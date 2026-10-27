@@ -1,16 +1,18 @@
 import { ToolPageContent } from '../tool-page.model';
 
 export const CONTENT: ToolPageContent = {
-  eyebrow: 'Hinglish transcriber',
-  h1: 'Hinglish transcriber: Hindi speech in Roman letters',
-  lead: 'Drop in a Hindi video or voice note and get it written the way people type Hindi on their phones: in English letters, with English words left as they are. Timestamped, free and with no login.',
+  eyebrow: 'Hinglish transcription',
+  h1: 'Hinglish transcription: Hindi speech, Roman letters',
+  lead: 'Get Hindi and Hindi-English speech written the way people type it in chats: "aap kaise ho", not Devanagari. English words stay English, every line has a timestamp, and it is free with no login.',
+  browserLead:
+    'Get Hindi and Hindi-English speech written the way people type it in chats: "aap kaise ho", not Devanagari. English words stay English, every line has a timestamp, and it is free, with no login, right in your browser.',
   dropKind: 'video',
-  dropNoun: 'Hindi video or audio',
+  dropNoun: 'Hindi recording',
 
-  whyTitle: 'What Hinglish is, and what this page does',
+  whyTitle: 'Why Hinglish, and how the spelling works',
   why: [
-    'Hinglish is Hindi written in the Latin alphabet, usually mixed with English words. It is how many people write messages, comments and captions, for example “aap kaise hain” or “kya haal hai”. There is no official spelling, so the same word can be written in several ways.',
-    'This page turns spoken Hindi into that kind of text. It is not a translation: the words stay Hindi and only the letters change. The speech is recognised first, then a converter spells each Hindi word in English letters. Words that are already in English letters stay as they are, and the timestamps do not change.',
+    'Most people who speak Hindi online type it in Roman letters. Hinglish text is easy to search, paste into WhatsApp and edit on any keyboard. It also suits readers who speak Hindi but read Devanagari slowly, and it is what many creators want for captions on Reels and Shorts.',
+    'Speech recognition first writes Hindi in Devanagari. TranscribeVid then turns each Hindi word into Roman letters and leaves English words as they are. Hinglish has no official spelling, so the converter follows common chat spelling: "hai", "mein", "kya", "nahi". Names and rare words are spelled by their sound, which is why a quick review is part of the job.',
   ],
 
   sections: [
@@ -52,100 +54,108 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  howTitle: 'How to get Hinglish text from Hindi audio',
-  howToDescription:
-    'Add a Hindi video or audio file, check that Hindi and the Hinglish style are selected, wait for the transcript and download it.',
+  howTitle: 'How to get a Hinglish transcript',
+  howToDescription: 'Add a Hindi recording, set the language to Hindi and Transcript style to Hinglish, wait, review names and download the Roman text.',
   steps: [
     {
-      title: 'Add your Hindi file',
-      text: 'Drop the video or audio in the box at the top of this page, or press Choose a file. You land on the uploader with Hindi and Hinglish (Roman Hindi) already selected. Change either one first if you wish.',
+      title: 'Add the recording',
+      text: 'Drop a video, voice note or audio file in the box at the top of this page, or press Choose a file.',
     },
     {
-      title: 'Check the conversion, then press Transcribe',
-      text: 'Leave Hinglish conversion on Automatic for the best spelling. Open More options if you want IndicXlit only, or Basic phonetic spelling. Then press Transcribe.',
-      browser: {
-        text: 'Leave Hinglish conversion on Automatic for the best spelling. The first time, the converter downloads once (about 13 MB) and is kept for next time. Open More options if you want IndicXlit only, or Basic phonetic spelling. Then press Transcribe.',
-      },
+      title: 'Choose Hindi and Hinglish',
+      text: 'Set the language to Hindi, then set Transcript style to Hinglish (Roman Hindi). Choosing Hindi yourself works better than auto-detect when the speaker mixes in a lot of English.',
     },
     {
       title: 'Wait for the text',
-      text: 'The speech is recognised first and then converted to Roman letters. Every line keeps its timestamp.',
-    },
-    {
-      title: 'Check the spelling and download',
-      text: 'Read the lines marked as unsure, fix names and unusual words, then download TXT, SRT, VTT, Markdown, JSON or PDF.',
-    },
-  ],
-
-  formatsTitle: 'Hinglish files you can download',
-  formatsIntro:
-    'Any video or audio with Hindi speech works, and only its sound is used. The text you download is in Roman letters, so it opens anywhere.',
-  uploadTitle: 'Files you can add',
-  accepts: ['MP4', 'MP3', 'M4A', 'WAV', 'OPUS', 'OGG', 'MOV'],
-  downloads: [
-    { name: 'TXT', use: 'Hinglish text for chats, notes and posts' },
-    { name: 'SRT', use: 'Roman Hindi captions for short videos' },
-    { name: 'VTT', use: 'captions for web players' },
-    { name: 'Markdown', use: 'text with headings and times' },
-    { name: 'PDF', use: 'a printable transcript' },
-    { name: 'JSON', use: 'lines and times for your own tools' },
-  ],
-
-  tipsTitle: 'Tips for clean Hinglish transcripts',
-  tips: [
-    {
-      title: 'Choose Hindi rather than leaving detection on.',
-      text: 'It is the setting that matters most for mixed Hindi and English speech. This page starts with it already chosen.',
-    },
-    {
-      title: 'Leave Skip silence & music on.',
-      text: 'It is on by default and stops songs and long pauses from turning into invented lines.',
-    },
-    {
-      title: 'Use the vocabulary hint for hard words.',
-      text: 'Names and technical terms in More options help the recogniser hear them. The Roman spelling is still chosen by the converter, so check them afterwards.',
-    },
-    {
-      title: 'Compare two qualities on quick mixed speech.',
-      text: 'Quick speech that jumps between Hindi and English is where a Standard result slips first. Under More, Re-transcribe lets you pick Large v3 Turbo (High accuracy) or Large v3 (Best accuracy) under Quality and press Start. The first transcript stays, so you can compare the Roman spellings. To change only the spelling method, set Hinglish conversion there and press Apply style only instead.',
+      text: 'A progress bar shows how far it is. When it finishes, every Hindi line is in Roman letters.',
       browser: {
-        text: 'Quick speech that jumps between Hindi and English is where a Standard result slips first. Under More, Re-transcribe lets you pick Large v3 Turbo (High accuracy) or Large v3 (Best accuracy) under Quality, if your device offers them, and press Start. The first transcript stays, so you can compare the Roman spellings. To change only the spelling method, set Hinglish conversion there and press Apply style only instead.',
+        text: 'A progress bar shows how far it is. Speed depends on your device, and the first use downloads the speech model once. When it finishes, every Hindi line is in Roman letters.',
       },
     },
     {
-      title: 'Edit once, then export.',
-      text: 'Fix spellings in the editor before you download, so that the TXT, SRT and VTT files all carry the same corrections.',
+      title: 'Review names, then download',
+      text: 'Check names, places and rare words, then download TXT, SRT or VTT. Already have a Devanagari transcript? Open More, then Re-transcribe, choose Hinglish and press Apply style only. The audio is not processed again.',
+    },
+  ],
+
+  formatsTitle: 'An example, files and downloads',
+  formatsIntro: 'Real output of the Hinglish converter for a mixed Hindi-English sentence. The downloads use the same Roman text.',
+  exampleLabel: 'A Hindi-English sentence in Devanagari and in Hinglish',
+  example: `As recognised (Devanagari):
+यह वीडियो हिंदी में है, but some English words भी हैं.
+
+As you download it (Hinglish):
+yeh video Hindi mein hai, but some English words bhi hain.`,
+  uploadTitle: 'Files you can use',
+  accepts: ['MP4', 'MOV', 'MP3', 'M4A', 'OPUS', 'WAV', 'AAC', 'WEBM'],
+  downloads: [
+    { name: 'SRT', use: 'Hinglish captions for Reels, Shorts and YouTube' },
+    { name: 'VTT', use: 'Hinglish captions for web players' },
+    { name: 'TXT', use: 'Roman Hindi text to paste anywhere' },
+    { name: 'Markdown', use: 'notes with timestamps' },
+    { name: 'PDF', use: 'a printable copy' },
+    { name: 'JSON', use: 'lines and times for programs' },
+  ],
+
+  tipsTitle: 'How to get clean Hinglish',
+  tips: [
+    {
+      title: 'Know the two converters.',
+      text: 'Under More options, Hinglish conversion offers IndicXlit, a trained transliteration model, and Basic phonetic spelling. Automatic uses IndicXlit when it is available. The trained model usually spells names better: "narendra modi" rather than "narendr modee".',
+    },
+    {
+      title: 'Capitalise names yourself.',
+      text: 'Hindi has no capital letters, so names come out in lower case (dilli, modi). Use search and replace in the transcript to fix a name everywhere at once.',
+    },
+    {
+      title: 'Expect a few sound spellings.',
+      text: 'Many words can be spelled more than one way in Hinglish ("ne" or "ney", "kaha" or "kahaa"). Pick the spelling your readers expect and replace it throughout.',
+    },
+    {
+      title: 'Only Hindi changes.',
+      text: 'Hinglish applies to Hindi. English stays English, and other languages, such as Marathi, Urdu or Punjabi, keep their own script.',
+    },
+    {
+      title: 'Translation switches it off.',
+      text: 'When Output is set to Translate to English, the text is English and Transcript style is not used. Set Output back to Transcribe for Hinglish.',
     },
   ],
 
   faqs: [
     {
-      question: 'Is Hinglish the same as translating Hindi into English?',
+      question: 'What is Hinglish transcription?',
       answer:
-        'No. A translation changes the words into English. Hinglish keeps the Hindi words and changes only the letters, so “आप कैसे हैं” becomes something like “aap kaise hain”. For English text, use the Translate speech to English page.',
+        'Hindi speech written in Roman (English) letters, with English words kept as English: "kal meeting hai" instead of the Devanagari spelling. It is how most people type Hindi in chats and captions.',
     },
     {
-      question: 'Why is one Hindi word spelled two ways in my Hinglish transcript?',
+      question: 'Is Hinglish the same as translating to English?',
       answer:
-        'Roman Hindi has no standard spelling, and the converter spells by sound and from a list of common spellings, so a word can appear in two forms. Use search and replace in the editor to settle on the one you prefer.',
+        'No. Hinglish keeps the Hindi words and only changes the letters. Translation replaces them with English words. Choose Hinglish for captions and chat-style text, and Translate to English when your readers do not speak Hindi.',
     },
     {
-      question: 'Can I get Hinglish subtitles for a video?',
+      question: 'Can I turn a Devanagari transcript into Hinglish later?',
       answer:
-        'Yes. Download SRT or VTT after the conversion. The lines keep their timing and the text is in Roman letters. Read them through before you publish, because names and unusual words need checking.',
+        'Yes, while it is still in your Transcripts. Open it, choose More, then Re-transcribe, set Transcript style to Hinglish and press Apply style only. It uses the saved recognition, so it is quick, and lines you edited are kept.',
     },
     {
-      question: 'What does the Check Hinglish spelling message mean?',
+      question: 'Why are some Hinglish words spelled oddly?',
       answer:
-        'It appears when the basic phonetic spelling was used for some or all words, for example when the trained converter was not available, or for a very long word. Names and unfamiliar words may then look awkward, so review them.',
+        'Each Hindi word is converted by its sound, and Hinglish has no fixed spelling. Rare words, names and English words that were heard as Hindi can come out odd. Fix them in the editor, or use search and replace for a word that repeats.',
     },
     {
-      question: 'Does the Hinglish style work for Marathi, Nepali or other languages?',
+      question: 'Can I make Hinglish subtitles?',
       answer:
-        'No. The Hinglish style is for Hindi. Other languages keep their own script, including those that are also written in Devanagari.',
+        'Yes. Choose Hinglish, then download SRT or VTT, and every subtitle line is in Roman letters. Keep Word-level timing on in More options so each line starts and ends with its words.',
     },
   ],
 
+  related: [
+    '/hindi-audio-to-text',
+    '/translate-hindi-audio-to-english',
+    '/subtitle-generator-for-reels',
+    '/whatsapp-voice-note-to-text',
+    '/srt-subtitle-generator',
+  ],
   links: [
     {
       label: 'Hindi audio to text in Devanagari',

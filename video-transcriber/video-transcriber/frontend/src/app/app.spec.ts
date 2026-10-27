@@ -9,7 +9,7 @@ import { Health, SiteStats } from './core/models';
 import { SessionService } from './core/session.service';
 import { StatsService } from './core/stats.service';
 import { TOAST_DURATION, ToastService } from './core/toast.service';
-import { CORE_TOOLS } from './features/tool-pages/tool-pages.list';
+import { FOOTER_TOOLS, TOOL_PAGES } from './features/tool-pages/tool-pages.list';
 import { httpError, makeHealth, makePublicHealth, makeSession, makeStats, makeSummary, silentLog, useEnglishNumbers } from './testing/fakes';
 
 @Component({ template: '' })
@@ -252,11 +252,12 @@ describe('App shell', () => {
       expect(text(q('footer'))).toContain('v3.1.4');
     });
 
-    it('has a second footer row "Free tools" that links the core keyword pages and "All tools"', () => {
+    it('has a second footer row "Free tools" that links the main keyword pages (not all of them: the home page lists the rest) and "All tools"', () => {
       const row = q('footer nav[aria-label="Free tools"]')!;
       expect(text(row.querySelector('.foot-tools-label'))).toBe('Free tools:');
-      expect(links('footer nav[aria-label="Free tools"] a')).toEqual([...CORE_TOOLS.map((t) => [t.label, t.path]), ['All tools', '/tools']]);
-      expect(CORE_TOOLS.length).toBe(6);
+      expect(links('footer nav[aria-label="Free tools"] a')).toEqual([...FOOTER_TOOLS.map((t) => [t.label, t.path]), ['All tools', '/tools']]);
+      expect(FOOTER_TOOLS.length).toBeGreaterThanOrEqual(6);
+      expect(FOOTER_TOOLS.length).toBeLessThan(TOOL_PAGES.length);
     });
 
     it('shows a contact e-mail in the footer only when the server has one', () => {

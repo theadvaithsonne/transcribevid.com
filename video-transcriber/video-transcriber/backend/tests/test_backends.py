@@ -29,7 +29,7 @@ def test_qwen_outputs_incremental_chunks_without_fabricated_word_scores(monkeypa
             return [NS(language="Hindi", text="तो student है।" if self.calls == 1 else "तो student है। और आगे")]
     monkeypatch.setattr(qwen_engine, "load_model", lambda _: Model())
     live = []
-    result = backends.transcribe("unused", {"engine": "qwen", "model": "qwen3-asr-0.6b", "language": "hi", "romanizer": "basic"},
+    result = backends.transcribe("unused", {"engine": "qwen", "model": "qwen3-asr-0.6b", "language": "hi", "romanizer": "basic", "output_script": "hinglish"},
                                 on_segment=lambda s, *a: live.append(s))
     assert result["segments"] == live and result["duration"] == 3
     assert [s["start"] for s in live] == [0, 1.5]

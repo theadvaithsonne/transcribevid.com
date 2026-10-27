@@ -8,6 +8,7 @@
     "“{title}” was deleted.",
     "(optional)",
     "{base} Word timing: {timing}.",
+    "{blurb} Not sure? Keep this one.",
     "{brand} ({domain}) is operated by **{name}**, {address} (\"we\", \"us\"). We decide how and why your data is processed, as described here.",
     "{brand} ({domain}) is run by **{name}**, {address}. Read more on the [About](/about) page.",
     "{brand} is a general-audience service and is not directed to children under 13 (or under 16 in the EU where applicable).",
@@ -35,7 +36,6 @@
     "{label}. {title}.",
     "{label}. Look for it in your downloads.",
     "{language} → English",
-    "{m} min {s} s",
     "{message} {done} of {total} file(s) were already queued; the other {left} are still in the list, press Transcribe to retry.",
     "{message} {done} of {total} file(s) were already queued; the other {left} is still in the list, press Transcribe to retry.",
     "{model} runs slower than real time on this device: {wait} for {audio} of audio (estimate). Tiny or base finish sooner.",
@@ -49,7 +49,6 @@
     "{n} minutes",
     "{n} of {total}",
     "{n} of those files are already in the list.",
-    "{n} s",
     "{n} video transcribed",
     "{n} videos transcribed",
     "{n} words",
@@ -57,6 +56,7 @@
     "{n}% model confidence",
     "{n}s left",
     "{name} home",
+    "{reason} Retrying in {n} s…",
     "{size} download",
     "{title}: {blurb}",
     "{title}: {blurb} {note}.",
@@ -158,6 +158,7 @@
     "Already added",
     "Already finished",
     "Also delete the downloaded speech models?",
+    "Alternatives",
     "an independent software developer",
     "An upload is in progress. Wait for it to finish before adding more files.",
     "Apply style only",
@@ -192,6 +193,7 @@
     "Change or delete a line, or search and replace. Your edits are in every download.",
     "Changed in {n} lines.",
     "Check Hinglish spelling",
+    "Checking the downloaded file…",
     "Choose \"Save as PDF\" in the print dialog.",
     "Choose a file",
     "Choose a file first",
@@ -205,7 +207,10 @@
     "Close menu",
     "Close: {title}",
     "Common questions",
+    "Connection lost.",
     "Contact",
+    "Continued after the page reloaded.",
+    "Continuing the download ({size} already saved)",
     "Converting…",
     "Copied",
     "Copy text",
@@ -241,6 +246,7 @@
     "Download started",
     "Download the result as plain text, SRT or VTT subtitles, Markdown or JSON.",
     "Download the transcript as",
+    "Downloaded: ready to start",
     "Downloading the speech model (first time only): {loaded} of {total}",
     "Drop a video or audio file on the [home page](/), or record from your microphone.",
     "Drop to add your file",
@@ -253,6 +259,7 @@
     "English only, very fast and accurate",
     "English translation is selected in More options.",
     "Enter saves · Esc cancels",
+    "Every language in its own script: English in English letters, Hindi in Devanagari. Choose Hinglish to write Hindi in English letters.",
     "Every line has a time. Play the media from any line to hear what was said.",
     "Every page does the same job: it turns the speech in a video or audio file into text with a timestamp on each line, in more than 50 languages, with no sign-up. Pick the one that matches the file you have or what you want to make.",
     "Experimental: compare on your audio; chunk timestamps",
@@ -277,6 +284,7 @@
     "Find it automatically",
     "first time only, also downloads the {size} MB word-timing model",
     "First time only: downloads {size} (needs internet)",
+    "First time only: downloads {size}, now downloading in the background",
     "Follow playback",
     "Following playback",
     "Footer",
@@ -294,12 +302,13 @@
     "Free, unlimited, no login",
     "Frequently asked questions",
     "Get in touch",
+    "Getting the model ready: {loaded} of {total}",
     "Getting the speech engine ready…",
     "Give it a new name",
     "Go to the home page",
     "Go to Video to text",
     "Good balance (default)",
-    "Good for most videos. Not sure? Keep this one.",
+    "Good for most videos.",
     "Good to know",
     "Google's consent tool could not be loaded, probably because an ad blocker or the network stopped it. Without it no ads and no ad cookies are loaded.",
     "Guides",
@@ -315,6 +324,7 @@
     "Hinglish conversion",
     "History",
     "Home",
+    "Honest, dated comparisons with other transcription services.",
     "How {brand} works",
     "How accurate is it?",
     "How do I get better accuracy?",
@@ -341,11 +351,13 @@
     "just now",
     "Just the words, in paragraphs",
     "Keep reading",
+    "Keep this page open until it is finished. If it reloads or closes, it continues where it stopped when you open the site again.",
     "Keep this page open until the upload is done.",
     "Kept only for this session, then deleted automatically.",
     "Language",
     "Larger or longer files are refused before they are processed, so split them first.",
     "Last updated: {date}",
+    "Length {time}",
     "Licence text",
     "Light",
     "Limits.",
@@ -409,6 +421,7 @@
     "On clear speech in a supported language it is usually very accurate, but no speech recognition is perfect. Accuracy depends on the audio quality, accents, background noise, overlapping speakers, music, and rare names or jargon. Every line has a confidence score, and low-confidence lines are marked so you can check them first. Always verify a transcript before relying on it for anything important.",
     "Open menu",
     "Opening your transcript…",
+    "Opens in Word and Google Docs",
     "or drop it anywhere on this page.",
     "Original script",
     "Output",
@@ -457,6 +470,7 @@
     "Ready to try it? [See all free tools](/tools) or [transcribe a file now](/).",
     "Recognition engine",
     "Recommended",
+    "Reconnecting…",
     "Record from microphone",
     "Record straight from your microphone and turn it into text.",
     "Record with your microphone",
@@ -538,6 +552,8 @@
     "That is not an audio file. Choose an MP3, WAV, M4A or another audio file.",
     "The [Privacy policy](/privacy) explains what is processed and why. To ask a question about your data or to exercise your rights, write to the same address.",
     "The {label} model cannot run on this device: {reason}. Choose another one.",
+    "The download server is busy (HTTP {status}).",
+    "The download stalled.",
     "the exact error message, or a screenshot of it.",
     "The file is larger than the server accepts.",
     "The first time you use a quality level, your browser downloads its speech model once and keeps it for next time, so later files start sooner.",
@@ -577,6 +593,7 @@
     "This local copy does not count transcriptions",
     "This transcript has low model confidence. Listen to the recording and check the spoken language before using the text.",
     "This will take {wait} on this device (estimate). Keep the tab open until it finishes.",
+    "Time so far {time}",
     "Timestamps",
     "Tips for the best results",
     "Tips for the best transcript",
@@ -612,6 +629,7 @@
     "Transcripts are only kept for the browser session that created them.",
     "Transcripts are produced automatically and will contain mistakes, especially with noisy audio, strong accents, overlapping speakers, music, and names or technical terms. Always check a transcript before relying on it, particularly for legal, medical, financial or published use. The service is provided \"as is\" and \"as available\", without any warranty, express or implied, including about accuracy, completeness or fitness for a particular purpose.",
     "Translate to English",
+    "Translated to English",
     "Try again",
     "Try another quality or language",
     "try to spread malware or anything meant to damage the service.",
@@ -648,6 +666,7 @@
     "Voice notes, meetings, lectures, podcasts and interviews.",
     "Waiting for microphone permission…",
     "Waiting for the first words…",
+    "Waiting for the internet connection…",
     "Waiting in line…",
     "Watch the text appear live, fix any mistakes, then download it as SRT, VTT, TXT, Markdown, JSON or PDF.",
     "We do not ask for your name, e-mail address or any other account details.",
@@ -669,6 +688,7 @@
     "Who builds it",
     "Who runs this website",
     "Why it exists",
+    "Word document (.docx)",
     "Working…",
     "Yes. It is free, and there is no account or login, ever. There is no daily or monthly quota and no paywall; ads keep the website free.",
     "Yes. It is free, and there is no account or login, ever. There is no daily or monthly quota and no paywall.",
@@ -711,7 +731,7 @@
   ],
   "meta": {
     "/": {
-      "title": "Free Video to Text Transcription, No Login",
+      "title": "Free Video & Audio to Text Transcription",
       "description": "Free video to text and audio to text transcription. No login, no daily limit, 50+ languages. Get timestamped text and export SRT, VTT, TXT, PDF."
     },
     "/about": {
@@ -772,36 +792,36 @@
     },
     "/hindi-audio-to-text": {
       "title": "Hindi Audio to Text: Free, No Login",
-      "description": "Convert Hindi audio and video to text for free, in Devanagari or in Roman letters (Hinglish). Timestamps, no login. Download TXT, SRT, VTT or PDF.",
+      "description": "Convert Hindi audio or video to text for free. Get Devanagari or Hinglish (Roman) output with timestamps. No login, no daily limit. Export TXT, SRT, PDF.",
       "label": "Hindi audio to text"
     },
     "/hinglish-transcription": {
-      "title": "Hinglish Transcriber: Hindi in Roman Text",
-      "description": "Get Hindi speech written in Roman letters (Hinglish) for free. Timestamped text from video or audio, no login. Download TXT, SRT, VTT or PDF.",
-      "label": "Hinglish transcriber"
+      "title": "Hinglish Transcription: Hindi in Roman Text",
+      "description": "Turn Hindi or Hindi-English speech into Hinglish text written in Roman letters. Free, no login, no daily limit. Timestamps, SRT and TXT downloads.",
+      "label": "Hinglish transcription"
     },
     "/how-it-works": {
       "title": "How it works",
       "description": "How TranscribeVid turns video and audio into accurate, timestamped text in three simple steps, what you get, and tips for the best results."
     },
     "/interview-transcription": {
-      "title": "Interview Transcription: Private and Free",
-      "description": "Transcribe interviews for free without making an account. Timestamped text in 50+ languages, made for research, journalism and hiring. Download TXT or PDF.",
+      "title": "Free Interview Transcription, No Login",
+      "description": "Transcribe research, journalism or job interviews for free. No login, a timestamp on every line, marks on unsure words, and editing before you download.",
       "label": "Interview transcription"
     },
     "/lecture-to-text": {
-      "title": "Lecture to Text: Free Lecture Transcriber",
-      "description": "Turn a recorded lecture into text notes you can search and study. Free, no login, 50+ languages, timestamps. Download TXT, Markdown, SRT or PDF.",
+      "title": "Lecture to Text: Free Lecture Transcription",
+      "description": "Turn a recorded lecture or class into searchable notes. Free, no login, no daily limit, 50+ languages including Hindi. Export Markdown, PDF, TXT or SRT.",
       "label": "Lecture to text"
     },
     "/m4a-to-text": {
-      "title": "M4A to Text: Transcribe Voice Memos Free",
-      "description": "Turn an M4A voice memo or recording into text for free. Works with iPhone Voice Memos, no login, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.",
+      "title": "M4A to Text: Transcribe iPhone Voice Memos",
+      "description": "Convert M4A files, like iPhone voice memos, to text for free. No login, no daily limit, 50+ languages. Timestamps, editing, and TXT, SRT or PDF downloads.",
       "label": "M4A to text"
     },
     "/meeting-recording-to-text": {
-      "title": "Zoom, Teams & Meet Recording to Text",
-      "description": "Turn a Zoom, Teams or Google Meet recording into a searchable, timestamped transcript for free. No login, 50+ languages. Download TXT, SRT, VTT or PDF.",
+      "title": "Meeting Recording to Text: Zoom, Meet, Teams",
+      "description": "Turn a Zoom, Google Meet or Teams recording into text. No bot joins your call. Free, no login, no daily limit, 50+ languages. Download TXT, PDF or SRT.",
       "label": "Meeting recording to text"
     },
     "/mov-to-text": {
@@ -819,6 +839,16 @@
       "description": "Convert an MP4 video to text with timestamps. Free, no login, no daily limit, 50+ languages. Download TXT, SRT, VTT, Markdown, JSON or PDF.",
       "label": "MP4 to text"
     },
+    "/otter-ai-alternative": {
+      "title": "Free Otter.ai Alternative for Recordings",
+      "description": "Need to transcribe a recording without Otter's monthly minutes or import limits? A free alternative with no account and no daily cap, compared fairly.",
+      "label": "Otter.ai alternative"
+    },
+    "/podcast-to-text": {
+      "title": "Podcast to Text: Free Podcast Transcription",
+      "description": "Transcribe a podcast episode to text for show notes, blogs and captions. Free, no login, no limit on episodes. Word timing, editing, SRT, VTT and PDF.",
+      "label": "Podcast to text"
+    },
     "/podcast-transcript-generator": {
       "title": "Free Podcast Transcript Generator",
       "description": "Generate a podcast transcript from an MP3 or WAV for free. Timestamps, 50+ languages, no login. Edit it, then download TXT, Markdown, SRT, VTT or PDF.",
@@ -833,6 +863,11 @@
       "title": "Privacy policy",
       "description": "What TranscribeVid processes when you transcribe a file and where, why, how long it is kept, cookies, ads and browser storage, and your rights."
     },
+    "/private-transcription": {
+      "title": "Private Transcription, No Account Needed",
+      "description": "Transcribe confidential audio and video with no account. Your file is used only for your transcript and deleted when your session ends. Free, no login.",
+      "label": "Private transcription"
+    },
     "/spanish-audio-to-text": {
       "title": "Spanish Audio to Text: Free Transcriber",
       "description": "Transcribe Spanish audio and video to text for free: Spain, Mexico and Latin America. Timestamps, no login. Download TXT, SRT, VTT or PDF.",
@@ -842,6 +877,11 @@
       "title": "Free SRT Subtitle Generator from Video",
       "description": "Generate an SRT subtitle file from any video or audio for free. Timed to the speech, 50+ languages, no login. Edit the lines, then download SRT or VTT.",
       "label": "SRT subtitle generator"
+    },
+    "/subtitle-generator-for-reels": {
+      "title": "Subtitle Generator for Reels, No Watermark",
+      "description": "Make captions for Instagram Reels, YouTube Shorts and other short videos. Free, no watermark, no login. Hindi, Hinglish and 50+ languages. SRT or VTT.",
+      "label": "Subtitles for Reels"
     },
     "/terms": {
       "title": "Terms of use",
@@ -855,6 +895,16 @@
       "title": "Translate Speech to English Text, Free",
       "description": "Turn speech in another language into English text for free. Upload a video or audio file, get timestamped English text or subtitles. No login. SRT, VTT, TXT.",
       "label": "Translate speech to English"
+    },
+    "/translate-hindi-audio-to-english": {
+      "title": "Translate Hindi Audio to English Text Free",
+      "description": "Translate Hindi, Marathi, Tamil or any of 50+ languages from audio or video into English text. Free, no login, no daily limit. Timestamped lines.",
+      "label": "Translate Hindi to English"
+    },
+    "/turboscribe-alternative": {
+      "title": "Free TurboScribe Alternative, No Daily Cap",
+      "description": "A free TurboScribe alternative with no sign-up and no 3-a-day cap. An honest comparison of limits, privacy, speed and accuracy, checked in October 2026.",
+      "label": "TurboScribe alternative"
     },
     "/video-to-text": {
       "title": "Free Video to Text Converter, No Login",
@@ -872,8 +922,8 @@
       "label": "VTT subtitle generator"
     },
     "/wav-to-text": {
-      "title": "WAV to Text: Free Transcription Online",
-      "description": "Convert a WAV file to text for free. Handles long recordings from field recorders and calls, 50+ languages, timestamps, no login. Download TXT, SRT or PDF.",
+      "title": "WAV to Text Converter: Free, No Login",
+      "description": "Convert a WAV recording to text with timestamps. Free, no login, no daily limit, 50+ languages. Edit the transcript and download TXT, SRT, VTT or PDF.",
       "label": "WAV to text"
     },
     "/webm-to-text": {
@@ -885,6 +935,11 @@
       "title": "WhatsApp Voice Message to Text, Free",
       "description": "Turn a WhatsApp voice message into text for free. Save the voice note, drop it in, read it in 50+ languages including Hindi. No login, no account.",
       "label": "WhatsApp voice message to text"
+    },
+    "/whatsapp-voice-note-to-text": {
+      "title": "WhatsApp Voice Note to Text: Free, No Login",
+      "description": "Turn a WhatsApp voice note (OPUS) or any voice message into text. Works in Hindi, Hinglish, English and 50+ languages. Free, no login, no daily limit.",
+      "label": "WhatsApp voice note to text"
     },
     "/youtube-subtitle-generator": {
       "title": "YouTube Subtitle Generator: Free SRT File",

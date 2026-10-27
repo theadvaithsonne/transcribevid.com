@@ -8,7 +8,7 @@ shapes of `core/models.ts`, unchanged.
 ## API
 
 ```ts
-const backend = await IndexedDbBackend.open();            // database 'tv-session'
+const backend = await openSessionBackend();               // database 'tv-session' (memory where IndexedDB fails)
 const store = await SessionStore.open(backend, { onEnded: (e) => ... });   // checks expiry at once
 ```
 
@@ -61,9 +61,19 @@ quota error); `IndexedDbBackend` is the real one and is exercised by the browser
   ends silently (nothing was lost).
 * **A job in progress keeps the session alive.** In progress = `queued` / `running` and something is working on
   it: this page (it holds a Web Lock `tv-job-<id>` while the job is queued or running), another tab (its lock
-  shows in `navigator.locks.query()`), or, without Web Locks, a write in the last `staleAfterSeconds`.
+  shows in `navigator.locks.query()`, held or still pending), or, without Web Locks, a write in the last
+  `staleAfterSeconds` (the page's own check refreshes its jobs every `staleAfterSeconds / 2`, so a long model
+  download without writes is not taken for a page that went away).
 * A `queued` / `running` job that nothing is working on any more (the page was reloaded or closed mid-job) is
   marked `error` with "The page was closed or reloaded while this job was running. Run it again." on the next
-  check; its file stays, so re-run works.
+  check; its file stays, so re-run works. With `resumeInterrupted` it is queued again instead (see the runner),
+  and a job whose file is not stored ends with `INTERRUPTED_NO_FILE_ERROR` ("Choose the file again").
+* Taking over such a job: the check of a page that just opened does it at once; a background check waits one more
+  check (a page that is only reloading takes its own job back). Before it queues the job, a page claims the job's
+  lock with `ifAvailable` and reads the job again, so two tabs that open at the same moment never both run it.
+* A file the browser will not store (quota, Safari's large-Blob error) is kept by this page only
+  (`mediaOnlyInPage`): the job runs now, a reload loses it.
+* `openSessionBackend()` falls back to `MemoryBackend` where IndexedDB is missing, refuses to open (Firefox private
+  windows before 115, blocked site data) or does not open within 10 s: the site works until the tab is closed.
 * Several tabs share one database: a touch in any tab keeps the session alive for all of them, and expiry in one
   tab clears it for all.

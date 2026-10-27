@@ -7,7 +7,7 @@ from app.schemas import JobOptions, RerunRequest
 def test_defaults():
     o = JobOptions()
     assert o.model == "small" and o.language is None and o.task == "transcribe" and o.beam_size == 5
-    assert o.output_script == "hinglish"
+    assert o.output_script == "original"
 
 
 def test_output_script_validation_and_partial_rerun():

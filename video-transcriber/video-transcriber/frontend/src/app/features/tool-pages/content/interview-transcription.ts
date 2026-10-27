@@ -2,19 +2,22 @@ import { ToolPageContent } from '../tool-page.model';
 
 export const CONTENT: ToolPageContent = {
   eyebrow: 'Interview transcription',
-  h1: 'Interview transcription without an account',
-  lead: 'Turn a recorded interview into timestamped text you can search, quote and check against the recording. Made for research, journalism and hiring conversations: free, no login, in more than 50 languages.',
+  h1: 'Interview transcription with a timestamp on every line',
+  browserH1: 'Interview transcription that keeps recordings private',
+  lead: 'For researchers, journalists and recruiters: turn an interview recording into text you can quote, code and check against the audio. Words the model was unsure of are marked. Free, with no login.',
+  browserLead:
+    'For researchers, journalists and recruiters: turn an interview recording into text you can quote, code and check against the audio. Words the model was unsure of are marked. Free, with no login, and the recording never leaves your device.',
   dropKind: 'video',
   dropNoun: 'interview recording',
 
-  whyTitle: 'Why transcribe an interview',
+  whyTitle: 'Made for quoting and checking',
   why: [
-    'An interview is worth more once you can search it. A transcript lets you find where a participant mentioned a topic, quote them exactly, check a quote against the recording and compare answers across several interviews. Researchers, journalists, oral historians and people who run user-research or hiring interviews all work this way.',
-    "Interviews often hold private or sensitive details. Here the recording is uploaded over an encrypted connection and deleted automatically afterwards. Get consent from everyone before you record, follow your organisation's or ethics board's rules, and treat the transcript as carefully as the recording.",
+    'An interview transcript is only useful if you can trust it. Every line here carries the time it was said, so you can jump to that moment and confirm a quote. With Word-level timing on, words the model was unsure of are marked, which shows you where to listen again.',
+    'Research interviews often come with a consent form that limits who may handle the audio. Sources speak to journalists in confidence, and job interviews contain personal data. Here there is no account, and the file is kept only for your session.',
   ],
   browserWhy: [
-    'An interview is worth more once you can search it. A transcript lets you find where a participant mentioned a topic, quote them exactly, check a quote against the recording and compare answers across several interviews. Researchers, journalists, oral historians and people who run user-research or hiring interviews all work this way.',
-    "Interviews often contain private or sensitive details, so where the file goes matters. Your browser transcribes the recording on your own device and nothing is uploaded. Get consent from everyone before you record, follow your organisation's or ethics board's rules, and treat the transcript as carefully as the recording: the downloaded text is a file on your device like any other.",
+    'An interview transcript is only useful if you can trust it. Every line here carries the time it was said, so you can jump to that moment and confirm a quote. With Word-level timing on, words the model was unsure of are marked, which shows you where to listen again.',
+    'Research interviews often come with a consent form that limits who may handle the audio. Sources speak to journalists in confidence, and job interviews contain personal data. Here the recording is transcribed on your own device and never uploaded, so it stays under your control.',
   ],
 
   sections: [
@@ -52,31 +55,29 @@ export const CONTENT: ToolPageContent = {
   ],
 
   howTitle: 'How to transcribe an interview',
-  howToDescription:
-    'Add the interview recording, choose the language, add names, wait for the transcript, then check it and download it.',
+  howToDescription: 'Add the interview recording, choose the language and a high quality level, check the marked words and export the text.',
   steps: [
     {
-      title: 'Add the interview recording',
-      text: 'Press Choose a file, or drag the interview onto the box above. Audio or video both work. Add one interview here, then use Add another file on the next page for the rest of your set.',
+      title: 'Add the recording',
+      text: 'Drop the audio or video in the box at the top of this page, or press Choose a file. Phone recordings, Zoom files and WAVs from a recorder all work.',
     },
     {
       title: 'Choose language and quality',
-      text: 'On the next page, select the language of the interview, or keep Detect automatically. Standard suits a quiet one-to-one conversation. Echo, a phone line or a heavy accent call for High accuracy where your device can run it; a device that cannot shows the choice greyed out with a reason. It is slower and a larger first-time download.',
+      text: 'Set the language of the interview. Use High accuracy or Best accuracy when you will quote the text; they make the fewest mistakes.',
     },
     {
-      title: 'Add names and terms, then start',
-      text: "In More options, list the participants' names, their organisations and any specialist terms in the vocabulary hint, so they are spelled the way you want. Then press Transcribe.",
+      title: 'Check the marked words',
+      text: 'Read it through, listen again where words are marked as unsure, and fix them in place. Type speaker names or initials at the start of lines where you need them.',
     },
     {
-      title: 'Check, label and export',
-      text: 'Play lines from their timestamps, fix the mistakes and add speaker labels by hand. Then download TXT or PDF for your files, or Markdown or JSON if you need timed lines.',
+      title: 'Export for your work',
+      text: 'Download TXT for your analysis software, PDF for an archive or a participant check, or JSON if you need the time of every word.',
     },
   ],
 
-  formatsTitle: 'Interview recording files and downloads',
-  formatsIntro:
-    'Interviews come from phones, recorders and video calls. Any of these can be added, and the sound track is all that is read.',
-  uploadTitle: 'Recording files you can add',
+  formatsTitle: 'Recordings and exports',
+  formatsIntro: 'Audio recorders, phones and video calls all produce files that work here.',
+  uploadTitle: 'Interview files you can add',
   accepts: ['MP4', 'MOV', 'M4A', 'MP3', 'WAV', 'WEBM', 'MKV'],
   downloads: [
     { name: 'TXT', use: 'plain text to read, quote and code' },
@@ -85,69 +86,65 @@ export const CONTENT: ToolPageContent = {
     { name: 'JSON', use: 'timed lines for analysis software' },
   ],
 
-  tipsTitle: 'Tips for interview recordings',
+  tipsTitle: 'Tips for interview transcripts',
   tips: [
     {
-      title: 'Put the microphone close.',
-      text: 'Place it near the participant, and use a headset or a clip-on microphone for phone and video calls. A microphone across the room or an echoing space usually costs more accuracy than any setting can win back.',
+      title: 'Get consent for the recording.',
+      text: 'Ask before you record, and say how the recording and the transcript will be used and stored. Many countries and ethics boards require this in writing.',
     },
     {
-      title: 'State the date and names at the start.',
-      text: 'Say who is taking part and when, at the start of the recording. It makes the file easy to label and the transcript easy to file later.',
+      title: 'Place the recorder between you.',
+      text: 'Accuracy drops when one voice is far from the microphone. Put the phone or recorder in the middle, not next to yourself.',
     },
     {
-      title: 'Keep the original recording.',
-      text: 'Never delete the audio once you have the text. The recording is what settles a doubt about a quote.',
+      title: 'Mark the speakers.',
+      text: 'Speaker labels are not added automatically. Type "Q:" and "A:", or initials, at the start of lines while you edit.',
     },
     {
-      title: 'Stay under the limits.',
-      text: 'Anything over the limits shown on this page is turned away, so cut a very long interview at a natural break first.',
-      browser: {
-        title: 'Long interviews take longer.',
-        text: 'There is no cap on length, though a long recording needs time and free memory on your device, and a browser without WebCodecs may struggle with a very long file. Cut it at a natural break if you would rather start with the first part.',
-      },
+      title: 'Anonymise before you share.',
+      text: 'Use search and replace to swap names for codes such as P01 across the whole transcript before anyone else sees it.',
     },
     {
-      title: 'Clear your data on a shared computer.',
-      text: 'When you have saved what you need, press Delete my data now, so the transcript does not stay in the session.',
+      title: 'Keep the vocabulary hint short.',
+      text: "Add the interviewee's name, organisation and a few technical terms. A very long list can confuse the model.",
     },
   ],
 
   faqs: [
     {
-      question: 'Can I transcribe a confidential interview here?',
+      question: 'Can it tell the interviewer and the interviewee apart?',
+      answer: 'No. Speaker labels are not added. Each line has a timestamp, and you can add names or initials while you edit.',
+    },
+    {
+      question: 'Is it accurate enough to quote?',
       answer:
-        'Your recording is uploaded over an encrypted connection and deleted by the server when the session ends, or sooner if you press Delete my data now. Before you rely on that, check what your organisation or ethics board requires. This is not legal advice.',
+        'On a clear recording with Best accuracy, most lines are right, but no automatic transcript is perfect. Always check a quote against the audio before you publish it; the timestamp takes you straight there.',
+    },
+    {
+      question: 'Can I use it for research data under an ethics approval?',
+      answer:
+        'Check what your approval says about third-party tools. Here there is no account and the file is deleted when your session ends, but it is processed on the server that runs this site. Your ethics board has the final word.',
       browser: {
         answer:
-          'No upload happens: the recording stays on your device while your browser transcribes it, and the browser clears it after a period of inactivity or when you press Delete my data now. A downloaded transcript is an ordinary file, so check the rules of your organisation or ethics board. This is not legal advice.',
+          'Check what your approval says about tools. Here the recording is processed only on your own device and is never uploaded to a third party, which is often the deciding question. Your ethics board has the final word.',
       },
     },
     {
-      question: 'Does the interview transcript include um and uh?',
-      answer:
-        'Often not. The transcript is a clean read rather than a strict verbatim record, and some stutters and filler words are left out. If you need every one, play the recording alongside the text and add them.',
+      question: 'Which file should I export for qualitative analysis?',
+      answer: 'Plain text (.txt) imports into most analysis tools. Choose Text with times if you want each line to keep its timestamp.',
     },
     {
-      question: 'Can the transcript tell the interviewer from the participant?',
+      question: 'How long does an hour-long interview take?',
       answer:
-        'No. The transcript does not mark who is speaking. Type Interviewer and Participant into the text while you edit, using the recording to check each turn.',
-    },
-    {
-      question: 'How long an interview can I transcribe?',
-      answer: '{limits} A longer interview may need splitting.',
+        'It depends on the quality level and how busy the service is. Fastest is quick; Best accuracy takes longest. Progress and the time left are shown while it works.',
       browser: {
         answer:
-          'Interview length is not capped. Your own device does the work, so a long interview takes longer and needs free memory, and the page tells you if your device looks too slow.',
+          'It depends on your device and the quality level. A recent laptop with a good graphics chip is much faster than an older phone, where it can take longer than the recording itself. Progress and the time left are shown while it works.',
       },
-    },
-    {
-      question: 'Can I use these transcripts in my research or article?',
-      answer:
-        'Yes. Check them against the recording before you quote anyone, say in your method that speech recognition was used, and follow the rules of your institution or publication.',
     },
   ],
 
+  related: ['/private-transcription', '/audio-to-text', '/meeting-recording-to-text', '/podcast-to-text', '/wav-to-text'],
   links: [
     {
       label: 'Meeting recording to text',

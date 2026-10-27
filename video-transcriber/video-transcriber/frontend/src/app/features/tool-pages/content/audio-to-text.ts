@@ -107,4 +107,13 @@ export const CONTENT: ToolPageContent = {
       },
     },
   ],
+
+  related: [
+    '/mp3-to-text',
+    '/wav-to-text',
+    '/m4a-to-text',
+    '/podcast-to-text',
+    '/interview-transcription',
+    '/whatsapp-voice-note-to-text',
+  ],
 };

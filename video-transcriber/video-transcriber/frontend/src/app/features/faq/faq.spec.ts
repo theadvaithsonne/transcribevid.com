@@ -6,7 +6,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { JobsStore } from '../../core/jobs.store';
 import { Health } from '../../core/models';
 import { makeBrowserHealth, makeHealth, makePublicHealth, silentLog } from '../../testing/fakes';
-import { CORE_TOOLS } from '../tool-pages/tool-pages.list';
+import { TOOL_PAGES } from '../tool-pages/tool-pages.list';
 import { FaqPage } from './faq';
 
 const QUESTIONS = [
@@ -88,7 +88,7 @@ describe('FaqPage', () => {
       expect(clean(start.textContent)).toBe('Transcribe a file');
       expect(clean(q('.still')?.textContent)).toBe('Still stuck? Read How it works');
       expect(q('.still a')?.getAttribute('href')).toBe('/how-it-works');
-      expect(qa('app-related-tools a').map((a) => a.getAttribute('href'))).toEqual([...CORE_TOOLS.map((t) => t.path), '/tools']);
+      expect(qa('app-related-tools a').map((a) => a.getAttribute('href'))).toEqual([...TOOL_PAGES.map((t) => t.path), '/tools']);
     });
   });
 

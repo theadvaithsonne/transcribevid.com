@@ -11,7 +11,7 @@ class JobOptions(BaseModel):
     model: str = "small"
     language: Optional[str] = None
     task: str = "transcribe"
-    output_script: Literal["hinglish", "original"] = "hinglish"
+    output_script: Literal["hinglish", "original"] = "original"
     prompt: str = Field("", max_length=1000)
     beam_size: int = Field(5, ge=1, le=10)
     vad: bool = True

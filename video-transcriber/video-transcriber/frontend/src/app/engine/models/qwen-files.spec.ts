@@ -2,12 +2,27 @@ import { CancelledError, ProgressInfo } from '../asr/types';
 import { CacheLike, CacheStorageLike, ModelError, ModelManager } from './model-manager';
 import { GQA, JZ06, JZ17, QWEN_CATALOG, QwenCatalogEntry, QwenFile, qwenEntry, qwenFileUrl } from './qwen-catalog';
 import { fetchQwenFiles, missingQwenFiles, QwenDownloadError } from './qwen-files';
+import { FetchLike, MemoryPartStore } from './resumable-download';
 import { Sha256, sha256Hex } from './sha256';
 
-// The Qwen downloads: pinned URLs, byte progress, SHA-256 while streaming, the Cache API bucket, delete by exact URL.
-// A fake fetch and a fake cache; nothing is downloaded.
+// The Qwen downloads: pinned URLs, byte progress, resumable parts, SHA-256 over the finished file, the Cache API
+// bucket, delete by exact URL. A fake fetch, a fake cache and an in-memory parts store; nothing is downloaded.
+
+// jsdom's Blob cannot be read back and `new Response(blob)` turns it into the text "[object Blob]"; Node's own Blob
+// behaves like a browser's, so these tests use it.
+let jsdomBlob: typeof Blob;
+beforeAll(() => {
+  jsdomBlob = globalThis.Blob;
+  const node = (globalThis as unknown as { process: { getBuiltinModule(m: string): { Blob: typeof Blob } } }).process;
+  globalThis.Blob = node.getBuiltinModule('node:buffer').Blob;
+});
+afterAll(() => {
+  globalThis.Blob = jsdomBlob;
+});
 
 const enc = new TextEncoder();
+/** A fresh parts store and no real waits between attempts. */
+const quick = () => ({ store: new MemoryPartStore(), tuning: { sleep: async () => undefined } });
 
 class BytesCache implements CacheLike {
   readonly entries = new Map<string, Uint8Array>();
@@ -29,24 +44,50 @@ class BytesCache implements CacheLike {
   }
 }
 
-/** A streamed response that yields `bytes` in `chunk`-sized pieces. */
+/** A 200 (Range ignored) that streams `bytes` in `chunk`-sized pieces. */
 function streamed(bytes: Uint8Array, chunk = 3): Response {
   let at = 0;
-  return {
-    ok: true,
-    status: 200,
-    body: {
-      getReader: () => ({
-        read: async () => {
-          if (at >= bytes.length) return { done: true, value: undefined };
-          const value = bytes.subarray(at, at + chunk);
-          at += chunk;
-          return { done: false, value };
-        },
-        cancel: async () => undefined,
-      }),
+  const body = new ReadableStream<Uint8Array>({
+    pull(c) {
+      if (at >= bytes.length) c.close();
+      else {
+        c.enqueue(bytes.slice(at, at + chunk));
+        at += chunk;
+      }
     },
-  } as unknown as Response;
+  });
+  return new Response(body, { status: 200 });
+}
+
+/** A server that honours Range (206) for `files` (by URL); `dropAfter` cuts the first answer after that many bytes. */
+function rangeServer(files: Map<string, Uint8Array>, dropAfter?: number) {
+  const requests: string[] = [];
+  let cut = dropAfter;
+  const fetch: FetchLike = async (u, init) => {
+    const range = init?.headers?.['Range'] ?? '';
+    requests.push(`${u.split('/').pop()} ${range}`);
+    const b = files.get(u)!;
+    const m = /^bytes=(\d+)-(\d*)$/.exec(range)!;
+    const start = Number(m[1]);
+    const end = m[2] ? Number(m[2]) : b.length - 1;
+    const slice = b.slice(start, end + 1);
+    const stop = cut;
+    cut = undefined;
+    let at = 0;
+    const body = new ReadableStream<Uint8Array>({
+      pull(c) {
+        if (stop !== undefined && at >= stop) c.error(new TypeError('network error'));
+        else if (at >= slice.length) c.close();
+        else {
+          const to = Math.min(slice.length, at + 256, stop ?? Infinity);
+          c.enqueue(slice.slice(at, to));
+          at = to;
+        }
+      },
+    });
+    return new Response(body, { status: 206, headers: { 'content-range': `bytes ${start}-${end}/${b.length}` } });
+  };
+  return { fetch, requests };
 }
 
 function tinyEntry(contents: Record<string, string>): QwenCatalogEntry {
@@ -108,6 +149,7 @@ describe('fetchQwenFiles', () => {
     const cache = new BytesCache();
     const urls: string[] = [];
     const events: ProgressInfo[] = [];
+    const parts = quick();
     const set = await fetchQwenFiles(entry, {
       cache,
       fetch: async (url) => {
@@ -116,10 +158,14 @@ describe('fetchQwenFiles', () => {
         return streamed(enc.encode({ 'prompt_config.json': '{"a":1}', 'tokenizer.json': '{"t":true}', 'encoder.onnx': 'ENCODERBYTES' }[f.name]!));
       },
       onProgress: (p) => events.push(p),
+      ...parts,
     });
     expect(urls).toEqual(entry.files.map((f) => qwenFileUrl(f)));
     expect(new TextDecoder().decode(set['encoder'])).toBe('ENCODERBYTES');
     expect(cache.puts).toBe(3);
+    expect(new TextDecoder().decode(cache.entries.get(qwenFileUrl(entry.files[2])))).toBe('ENCODERBYTES');
+    expect(await parts.store.list()).toEqual([]); // dropped once the cache has the file
+    expect(events.filter((e) => e.note === 'Checking the downloaded file…').length).toBe(3);
     expect(events.every((e) => e.total === entry.bytes)).toBe(true);
     expect(events[events.length - 1]).toMatchObject({ status: 'ready', loaded: entry.bytes, progress: 100 });
     const loaded = events.map((e) => e.loaded);
@@ -134,19 +180,52 @@ describe('fetchQwenFiles', () => {
     const reply = (text: string) => async () => streamed(enc.encode(text));
     const cases: [string, RegExp][] = [
       ['{"a":2}', /SHA-256/], // same length, other bytes
-      ['{"a"', /4 bytes, expected 7/],
-      ['{"a":1}!!', /more than the expected/],
+      ['{"a"', /closed at byte 4 of 7 \(8 failed attempts in a row/], // a short body is a cut connection, retried
+      ['{"a":1}!!', /more than the expected 7 bytes/],
     ];
     for (const [text, why] of cases) {
       const cache = new BytesCache();
-      const e = await fetchQwenFiles(entry, { cache, fetch: reply(text) }).catch((x) => x);
+      const parts = quick();
+      const e = await fetchQwenFiles(entry, { cache, fetch: reply(text), ...parts }).catch((x) => x);
       expect(e).toBeInstanceOf(QwenDownloadError);
       expect(e.message).toMatch(why);
       expect(cache.puts).toBe(0);
+      expect(await parts.store.list()).toEqual([]); // no part of a wrong file is kept
     }
     const cache = new BytesCache();
-    await expect(fetchQwenFiles(entry, { cache, fetch: async () => ({ ok: false, status: 404 }) as Response })).rejects.toThrow(/HTTP 404/);
+    await expect(
+      fetchQwenFiles(entry, { cache, fetch: async () => new Response('', { status: 404 }), ...quick() }),
+    ).rejects.toThrow(/HTTP 404/);
     expect(cache.puts).toBe(0);
+  });
+
+  it('continues a file after a reload and checks the SHA-256 over the whole file', async () => {
+    const big = 'E'.repeat(5000);
+    const resumable = tinyEntry({ 'prompt_config.json': '{"a":1}', 'tokenizer.json': '{"t":true}', 'encoder.onnx': big });
+    const files = new Map(resumable.files.map((f, i) => [qwenFileUrl(f), enc.encode(['{"a":1}', '{"t":true}', big][i])]));
+    const store = new MemoryPartStore();
+    const tuning = { sleep: async () => undefined, chunkBytes: 1024, maxAttempts: 1 };
+    // first visit: the connection drops 2500 bytes into the encoder and this try gives up
+    const first = rangeServer(files, undefined);
+    const cut = rangeServer(files, 2500);
+    const e = await fetchQwenFiles(resumable, {
+      cache: new BytesCache(),
+      store,
+      tuning,
+      fetch: (u, init) => (u.endsWith('encoder.onnx') ? cut.fetch(u, init) : first.fetch(u, init)),
+    }).catch((x) => x);
+    expect(e).toBeInstanceOf(QwenDownloadError);
+    expect((await store.parts(qwenFileUrl(resumable.files[2]))).length).toBe(2);
+
+    // the reloaded page: only the rest of the encoder comes over the network
+    const cache = new BytesCache();
+    const again = rangeServer(files);
+    const events: ProgressInfo[] = [];
+    const set = await fetchQwenFiles(resumable, { cache, store, tuning, fetch: again.fetch, onProgress: (p) => events.push(p) });
+    expect(again.requests).toEqual(['prompt_config.json bytes=0-6', 'tokenizer.json bytes=0-9', 'encoder.onnx bytes=2048-4999']);
+    expect(new TextDecoder().decode(set['encoder'])).toBe(big);
+    expect(events.some((p) => p.note?.startsWith('Continuing the download'))).toBe(true);
+    expect(await store.list()).toEqual([]);
   });
 
   it('stops with CancelledError when the signal fires', async () => {
@@ -163,6 +242,7 @@ describe('fetchQwenFiles', () => {
     let fetched = 0;
     await fetchQwenFiles(entry, {
       cache,
+      ...quick(),
       fetch: async (url) => {
         fetched++;
         const f = entry.files.find((x) => qwenFileUrl(x) === url)!;
@@ -178,7 +258,13 @@ describe('ModelManager with Qwen', () => {
   function manager(estimate = { usage: 0, quota: 10e12 }) {
     const cache = new BytesCache();
     const caches: CacheStorageLike = { open: async () => cache };
-    const m = new ModelManager({ caches, storage: { estimate: async () => estimate }, env: async () => ({ backends: { onnx: {} } }) });
+    const m = new ModelManager({
+      caches,
+      storage: { estimate: async () => estimate },
+      env: async () => ({ backends: { onnx: {} } }),
+      parts: new MemoryPartStore(),
+      download: { sleep: async () => undefined },
+    });
     return { m, cache };
   }
 
@@ -189,7 +275,8 @@ describe('ModelManager with Qwen', () => {
     const e = await m.ensureQwen('qwen3-asr-0.6b', loader, { gpu: { shaderF16: true } }).catch((x) => x);
     expect(e).toBeInstanceOf(ModelError);
     expect(e.code).toBe('quota');
-    expect(e.userMessage).toMatch(/897 MB needed/);
+    // 897 MB of files + the largest (the 376 MB encoder) once more: its parts and its cache copy exist side by side
+    expect(e.userMessage).toMatch(/1\.3 GB needed/);
     await expect(m.ensureQwen('qwen3-asr-9b', loader)).rejects.toMatchObject({ code: 'unknown-model' });
   });
 

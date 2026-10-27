@@ -1,11 +1,13 @@
 import { DEFAULT_TOKEN_IDS } from './logits';
-import { CancelledError, PartialInfo, ProgressInfo } from './types';
+import { CancelledError, LoadOptions, PartialInfo, ProgressInfo, TranscribeOptions } from './types';
 import type { AlignedWord } from './alignment';
 import { ExternalAlignRequest, TensorLike, TransformersModule, WhisperEngine, textTokenProbabilities } from './whisper-engine';
 
 // A scripted stand-in for Transformers.js: the "decoder" always makes the next token of a script the
 // most likely one (logit 20, everything else 0), so the engine's own decode loop, logit rules, seek
-// rule, prompt prefix, fallback ladder and cancel points run exactly as with a real model.
+// rule, prompt prefix, fallback ladder and cancel points run exactly as with a real model. Like the real
+// merged decoder it takes a batch (one row per hypothesis): its self-attention "cache" is each row's token
+// history (`present.0.decoder.key`, dims [batch, length]) and the cross KV must have one row per batch row.
 const ids = DEFAULT_TOKEN_IDS;
 const EN = 50259;
 const FR = 50265;
@@ -37,14 +39,25 @@ class FakeTensor implements TensorLike {
 interface FakeOptions {
   /** Next token for the tokens generated so far (after the prefix). */
   script: (gen: number[]) => number;
+  /** Fills the logits row of a step instead of `script` (gen = the tokens after the prefix). */
+  logits?: (gen: number[], row: Float32Array) => void;
   stepDelayMs?: number;
   progressEvents?: Array<Record<string, unknown>>;
+  /** Give the decoder session a `run(feeds, fetches)` like onnxruntime's (the engine's direct step path). */
+  sessionRun?: boolean;
+  /** List `cross_attentions.0` among the decoder outputs (a `_timestamped` export; no alignment heads here). */
+  crossAttentions?: boolean;
+  /** Batched rows come out slightly different from the same row alone (like a q8 export's per-tensor quantization). */
+  batchDependent?: boolean;
 }
 
 interface ForwardArgs {
   decoder_input_ids: FakeTensor;
   past_key_values?: Record<string, FakeTensor>;
 }
+
+const SELF = 'past_key_values.0.decoder.key';
+const CROSS = 'past_key_values.0.encoder.key';
 
 const HEAD_END = new Set([ids.transcribe, ids.translate, ids.noTimestamps]);
 const FILES: Record<string, number> = {
@@ -55,6 +68,9 @@ const FILES: Record<string, number> = {
 
 function fake(o: FakeOptions) {
   const calls: number[][] = [];
+  /** [batch, new tokens] of every decoder call, and the outputs a direct session call fetched */
+  const batches: Array<[number, number]> = [];
+  const fetched: string[][] = [];
   const loadOptions: Array<Record<string, unknown>> = [];
   const special: Record<string, number> = {
     '<|startoftranscript|>': ids.sot,
@@ -85,7 +101,43 @@ function fake(o: FakeOptions) {
         break;
       }
     }
-    row[o.script(hist.slice(h + 1))] = 20;
+    if (o.logits) o.logits(hist.slice(h + 1), row);
+    else row[o.script(hist.slice(h + 1))] = 20;
+  };
+  /** One decoder call over a batch: each row continues its own history (its row of the past self cache). */
+  const decode = async (input: FakeTensor, past: Record<string, FakeTensor | undefined>) => {
+    const [B, t] = input.dims;
+    const flat = Array.from(input.data as BigInt64Array, Number);
+    const self = past[SELF];
+    const cross = past[CROSS];
+    if (self && self.dims[0] !== B) throw new Error(`self cache batch ${self.dims[0]} != ${B}`);
+    if (cross && cross.dims[0] !== B) throw new Error(`cross KV batch ${cross.dims[0]} != ${B}`);
+    batches.push([B, t]);
+    if (o.stepDelayMs) await new Promise((r) => setTimeout(r, o.stepDelayMs));
+    const L = self ? self.dims[1] : 0;
+    const logits = new Float32Array(B * t * V);
+    const present = new Float32Array(B * (L + t));
+    for (let b = 0; b < B; b++) {
+      const hist = self ? Array.from((self.data as Float32Array).subarray(b * L, (b + 1) * L)) : [];
+      const toks = flat.slice(b * t, (b + 1) * t);
+      calls.push(toks);
+      toks.forEach((tok, p) => {
+        hist.push(tok);
+        fillRow(logits.subarray((b * t + p) * V, (b * t + p + 1) * V), hist);
+      });
+      present.set(hist, b * (L + t));
+      if (o.batchDependent && B > 1) for (let p = 0; p < t; p++) logits[(b * t + p) * V + 101] += 0.5;
+    }
+    const out: Record<string, FakeTensor> = {
+      logits: new FakeTensor('float32', logits, [B, t, V]),
+      'present.0.decoder.key': new FakeTensor('float32', present, [B, L + t]),
+    };
+    // like the merged decoder: the no-cache branch computes the cross KV, the cache branch returns an empty placeholder
+    out['present.0.encoder.key'] = cross
+      ? new FakeTensor('float32', new Float32Array(0), [0, 1])
+      : new FakeTensor('float32', new Float32Array(B), [B, 1]);
+    out['cross_attentions.0'] = new FakeTensor('float32', new Float32Array(B * t), [B, 1, t, 1]);
+    return out;
   };
   const model = {
     generation_config: {
@@ -104,32 +156,31 @@ function fake(o: FakeOptions) {
     config: {},
     sessions: {
       decoder_model_merged: {
-        outputNames: ['logits', 'present.0.decoder.key', 'present.0.encoder.key'],
+        outputNames: [
+          'logits',
+          'present.0.decoder.key',
+          'present.0.encoder.key',
+          ...(o.crossAttentions ? ['cross_attentions.0'] : []),
+        ],
+        inputNames: ['input_ids', 'encoder_hidden_states', 'use_cache_branch', SELF, CROSS],
         inputMetadata: [],
+        ...(o.sessionRun
+          ? {
+              async run(feeds: Record<string, FakeTensor>, fetches: string[]) {
+                if (!(feeds['use_cache_branch'].data as boolean[])[0]) throw new Error('steps use the cache branch');
+                fetched.push(fetches);
+                const out = await decode(feeds['input_ids'], feeds);
+                return Object.fromEntries(fetches.map((n) => [n, out[n]]));
+              },
+            }
+          : {}),
       },
     },
     async _prepare_encoder_decoder_kwargs_for_generation() {
       return { encoder_outputs: new FakeTensor('float32', new Float32Array(1), [1, 1500, 4]) };
     },
     async forward({ decoder_input_ids, past_key_values }: ForwardArgs) {
-      const input = Array.from(decoder_input_ids.data as BigInt64Array, Number);
-      calls.push(input);
-      if (o.stepDelayMs) await new Promise((r) => setTimeout(r, o.stepDelayMs));
-      const prev = (past_key_values?.['past_key_values.0.decoder.key']?.data as number[]) ?? [];
-      const hist = [...prev];
-      const logits = new Float32Array(input.length * V);
-      input.forEach((tok, p) => {
-        hist.push(tok);
-        fillRow(logits.subarray(p * V, (p + 1) * V), hist);
-      });
-      const out: Record<string, FakeTensor> = {
-        logits: new FakeTensor('float32', logits, [1, input.length, V]),
-        'present.0.decoder.key': new FakeTensor('float32', hist, [1]),
-      };
-      if (!past_key_values?.['past_key_values.0.encoder.key']) {
-        out['present.0.encoder.key'] = new FakeTensor('float32', [], [1]);
-      }
-      return out;
+      return decode(decoder_input_ids, past_key_values ?? {});
     },
     async dispose() {},
   };
@@ -155,16 +206,16 @@ function fake(o: FakeOptions) {
       get_file_metadata: async (_repo: string, f: string) => ({ exists: true, size: FILES[f] }),
     },
   } as unknown as TransformersModule;
-  return { T, calls, loadOptions };
+  return { T, calls, batches, fetched, loadOptions };
 }
 
-async function loaded(o: FakeOptions) {
+async function loaded(o: FakeOptions, dtype: LoadOptions['dtype'] = 'q8') {
   const f = fake(o);
   const engine = new WhisperEngine(async () => f.T);
   await engine.load({
     repo: 'onnx-community/whisper-tiny_timestamped',
     device: 'wasm',
-    dtype: 'q8',
+    dtype,
   });
   return { engine, ...f };
 }
@@ -431,5 +482,123 @@ describe('WhisperEngine word timing through an aligner (large-v3 / distil-large-
   it('textTokenProbabilities: exp(log-prob) of the text tokens only, in order', () => {
     const p = textTokenProbabilities([ids.tsBegin, 100, 101, ids.tsBegin + 50], [-0.1, Math.log(0.5), Math.log(0.25), -0.2], ids.eot);
     expect(Array.from(p)).toEqual([expect.closeTo(0.5, 6), expect.closeTo(0.25, 6)]);
+  });
+});
+
+describe('WhisperEngine batched decoding (beam search / best-of in one forward pass)', () => {
+  // Three text tokens and <|endoftext|> compete with history-dependent logits, so beams fork, reorder and finish at
+  // different lengths: a real test of the beam bookkeeping, not just of one dominant token.
+  const branching = (gen: number[], row: Float32Array) => {
+    let h = 7;
+    for (const t of gen) h = (h * 31 + t) % 1009;
+    row[100] = 10 + (h % 7) * 0.3;
+    row[101] = 10 + ((h >> 1) % 5) * 0.35;
+    row[102] = 10 + ((h >> 2) % 3) * 0.5;
+    row[ids.eot] = gen.length >= 14 ? 30 : 8.5 + gen.length * 0.15 + (h % 4) * 0.2;
+  };
+  const opts: TranscribeOptions = { language: 'en', timestamps: false, temperatures: [0], beamSize: 5, debugTokens: true };
+  const summary = (r: Awaited<ReturnType<WhisperEngine['transcribeWindow']>>) => ({
+    tokens: r.tokens,
+    logprobs: r.tokenLogprobs,
+    avgLogprob: r.avgLogprob,
+    text: r.text,
+  });
+  // fp16 / fp32 exports batch exactly; q8 is checked separately below
+  async function decodeWith(
+    o: Partial<FakeOptions>,
+    setup: (e: WhisperEngine) => void,
+    extra: Record<string, unknown> = {},
+    dtype = 'fp16',
+  ) {
+    const f = await loaded({ script: forever, logits: branching, ...o }, dtype);
+    setup(f.engine);
+    const r = await f.engine.transcribeWindow(audio(2), { ...opts, ...extra });
+    return { r, ...f };
+  }
+  const steps = (batches: Array<[number, number]>) => batches.filter(([, t]) => t === 1).map(([b]) => b);
+
+  it('beam 5: one forward pass per step for all beams, the same tokens / log-probs / score as one beam per pass', async () => {
+    const one = await decodeWith({}, (e) => (e.batching = 'never'));
+    const all = await decodeWith({}, () => undefined);
+    expect(all.engine.batchCheck).toEqual({ maxDiff: 0, exact: true });
+    expect(summary(all.r)).toEqual(summary(one.r));
+    expect(one.r.tokens.length).toBeGreaterThan(3);
+    // the beams matter here: greedy picks another sequence
+    const greedy = await decodeWith({}, () => undefined, { beamSize: 1 });
+    expect(greedy.r.tokens).not.toEqual(all.r.tokens);
+    // never: only batch-1 steps; auto: the check (5 alone) once, then batch-5 steps (the fake throws on a cross KV or
+    // a self cache whose batch is not the step's)
+    expect(Math.max(...steps(one.batches))).toBe(1);
+    const s = steps(all.batches).slice(1); // [0] = the <|startoftranscript|> step
+    expect(s.slice(0, 6)).toEqual([5, 1, 1, 1, 1, 1]);
+    expect(s.slice(6).every((b) => b === 5)).toBe(true);
+    expect(all.engine.stats.decoderRuns).toBeLessThan(one.engine.stats.decoderRuns / 2);
+  });
+
+  it('chunks the batch under a small cross-KV byte cap and still decodes the same', async () => {
+    const one = await decodeWith({}, (e) => (e.batching = 'never'));
+    // the fake's cross KV is one float32 per row: 8 bytes = 2 rows per pass
+    const two = await decodeWith({}, (e) => (e.maxBatchBytes = 8));
+    expect(summary(two.r)).toEqual(summary(one.r));
+    const s = steps(two.batches).slice(1);
+    expect(s.slice(0, 3)).toEqual([2, 1, 1]); // the check on the first chunk, then the rest of the step
+    expect(Math.max(...s)).toBe(2);
+  });
+
+  it('best-of sampling: the samples share a pass and draw the same tokens from the same seed', async () => {
+    const extra = { temperatures: [0.6], bestOf: 5, beamSize: 1 };
+    const one = await decodeWith({}, (e) => (e.batching = 'never'), extra);
+    const all = await decodeWith({}, () => undefined, extra);
+    expect(summary(all.r)).toEqual(summary(one.r));
+    expect(all.r.temperature).toBe(0.6);
+    expect(Math.max(...steps(all.batches))).toBe(5);
+  });
+
+  it('a q8 decoder (per-tensor dynamic quantization) is never batched in auto mode, without a check pass', async () => {
+    const one = await decodeWith({}, (e) => (e.batching = 'never'), {}, 'q8');
+    const auto = await decodeWith({}, () => undefined, {}, 'q8');
+    expect(auto.engine.batchCheck).toEqual({ maxDiff: null, exact: false });
+    expect(summary(auto.r)).toEqual(summary(one.r));
+    expect(Math.max(...steps(auto.batches))).toBe(1);
+    // per-file dtypes: the decoder's counts
+    const q8 = await loaded({ script: forever }, { encoder_model: 'fp16', decoder_model_merged: 'q8' });
+    expect(q8.engine.batchCheck?.exact).toBe(false);
+    const fp16 = await loaded({ script: forever }, { encoder_model: 'q8', decoder_model_merged: 'fp16' });
+    expect(fp16.engine.batchCheck).toBeNull();
+  });
+
+  it('a model whose batched rows differ keeps one hypothesis per pass, with exactly the unbatched result', async () => {
+    const one = await decodeWith({ batchDependent: true }, (e) => (e.batching = 'never'));
+    const auto = await decodeWith({ batchDependent: true }, () => undefined);
+    expect(auto.engine.batchCheck?.exact).toBe(false);
+    expect(auto.engine.batchCheck?.maxDiff).toBeCloseTo(0.5, 5);
+    expect(summary(auto.r)).toEqual(summary(one.r));
+    expect(steps(auto.batches).slice(2).every((b) => b === 1)).toBe(true);
+    // 'always' trades that exactness for speed: batched passes all the way
+    const always = await decodeWith({ batchDependent: true }, (e) => (e.batching = 'always'));
+    expect(always.engine.batchCheck).toBeNull();
+    expect(steps(always.batches).slice(1).every((b) => b === 5)).toBe(true);
+  });
+
+  it('drives the decoder session directly, fetching only logits and the self-attention cache', async () => {
+    const viaForward = await decodeWith({ crossAttentions: true }, () => undefined);
+    const direct = await decodeWith({ crossAttentions: true, sessionRun: true }, () => undefined);
+    expect(summary(direct.r)).toEqual(summary(viaForward.r));
+    expect(direct.fetched.length).toBeGreaterThan(5);
+    for (const f of direct.fetched) expect(f).toEqual(['logits', 'present.0.decoder.key']);
+  });
+
+  it('a cancel during a batched beam search settles and the engine decodes again', async () => {
+    const f = await loaded({ script: forever, logits: branching, stepDelayMs: 2 }, 'fp16');
+    const run = f.engine.transcribeWindow(audio(2), { ...opts, maxNewTokens: 200 });
+    const settled = run.then(
+      () => 'finished',
+      (e) => (e instanceof CancelledError ? 'cancelled' : 'error'),
+    );
+    await new Promise((r) => setTimeout(r, 30));
+    f.engine.cancel();
+    expect(await settled).toBe('cancelled');
+    const again = await f.engine.transcribeWindow(audio(2), opts);
+    expect(again.tokens.length).toBeGreaterThan(3);
   });
 });

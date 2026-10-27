@@ -159,17 +159,17 @@ def test_validation(client):
     assert client.get("/api/jobs/" + "0" * 32 + "%0A").status_code == 404
 
 
-def test_hinglish_default_and_original_script_rerun(client):
+def test_original_script_default_and_hinglish_rerun(client):
     created = upload(client).json()
-    assert created["options"]["output_script"] == "hinglish"
+    assert created["options"]["output_script"] == "original"
     wait(client, created["id"])
-    rerun = client.post(f"/api/jobs/{created['id']}/rerun", json={"output_script": "original"})
+    rerun = client.post(f"/api/jobs/{created['id']}/rerun", json={"output_script": "hinglish"})
     assert rerun.status_code == 201
-    assert rerun.json()["options"]["output_script"] == "original"
+    assert rerun.json()["options"]["output_script"] == "hinglish"
     wait(client, rerun.json()["id"])
     again = client.post(f"/api/jobs/{rerun.json()['id']}/rerun", json={"model": "base"})
     assert again.status_code == 201
-    assert again.json()["options"]["output_script"] == "original"
+    assert again.json()["options"]["output_script"] == "hinglish"
 
 
 def test_cancel_and_delete(client):

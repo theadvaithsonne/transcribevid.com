@@ -107,4 +107,12 @@ export const CONTENT: ToolPageContent = {
       },
     },
   ],
+
+  related: [
+    '/m4a-to-text',
+    '/whatsapp-voice-note-to-text',
+    '/audio-to-text',
+    '/lecture-to-text',
+    '/private-transcription',
+  ],
 };

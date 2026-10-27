@@ -65,6 +65,8 @@ APP_PAGES = (
     "youtube-subtitle-generator", "hindi-audio-to-text", "hinglish-transcription",
     "translate-audio-to-english", "spanish-audio-to-text", "portuguese-audio-to-text",
     "french-audio-to-text", "german-audio-to-text",
+    "translate-hindi-audio-to-english", "subtitle-generator-for-reels", "whatsapp-voice-note-to-text",
+    "podcast-to-text", "private-transcription", "turboscribe-alternative", "otter-ai-alternative",
     "tools", "guides",
     "guides/srt-vs-vtt", "guides/how-to-add-subtitles-to-a-video",
     "guides/transcribe-video-without-uploading", "guides/accurate-transcripts", "guides/what-is-whisper",

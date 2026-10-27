@@ -2,15 +2,21 @@ import { ToolPageContent } from '../tool-page.model';
 
 export const CONTENT: ToolPageContent = {
   eyebrow: 'M4A to text',
-  h1: 'Transcribe an M4A voice memo to text',
-  lead: 'M4A is what Voice Memos on iPhone and Mac, many Android recorders and Apple apps save. Add the file and get a timestamped transcript, free, with no login and no conversion to MP3.',
+  h1: 'Convert M4A to text',
+  lead: 'M4A is the audio format of iPhone Voice Memos, Zoom audio files and many recorder apps. Add an M4A and get it back as text with timestamps, free and with no login.',
+  browserLead:
+    'M4A is the audio format of iPhone Voice Memos, Zoom audio files and many recorder apps. Add an M4A and get it back as text with timestamps, free, with no login and no upload.',
   dropKind: 'audio',
   dropNoun: 'M4A',
 
-  whyTitle: 'Why M4A files transcribe well',
+  whyTitle: 'Where M4A files come from',
   why: [
-    'An M4A is an audio-only MPEG-4 file. It usually holds AAC sound, which is compressed but more than good enough for speech, so M4A files are small and transcribe well. TranscribeVid reads them directly. There is nothing to convert first.',
-    'Voice memos are made on the go, so they are often quiet, echoey or recorded with the phone in a pocket. The quality choices and clean-up options on this page exist for exactly that kind of recording.',
+    'Voice Memos on iPhone, iPad and Mac saves every recording as M4A. Zoom saves an audio-only M4A next to each local recording, and many Android recorder apps and podcast tools use it too. It is AAC audio in an MP4 container: small files with good speech quality.',
+    'That makes M4A a good file to transcribe. A one-hour voice memo is usually well under 100 MB, and the sound is clear enough for the model to do well.',
+  ],
+  browserWhy: [
+    'Voice Memos on iPhone, iPad and Mac saves every recording as M4A. Zoom saves an audio-only M4A next to each local recording, and many Android recorder apps and podcast tools use it too. It is AAC audio in an MP4 container: small files with good speech quality.',
+    'That makes M4A a good file to transcribe. A one-hour voice memo is usually well under 100 MB, and your browser reads it straight from the device, with nothing to upload.',
   ],
 
   sections: [
@@ -47,31 +53,29 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  howTitle: 'How to turn an M4A into text',
-  howToDescription:
-    'Add the M4A file, choose the spoken language, wait for the transcript and download it as text.',
+  howTitle: 'How to convert an M4A file to text',
+  howToDescription: 'Get the M4A out of Voice Memos or your recorder app, add it here, choose the language and download the text.',
   steps: [
     {
-      title: 'Add the M4A',
-      text: 'Drop the .m4a memo on the box at the top of this page, or press Choose a file and, on a phone, pick it from Files or your recordings folder. Only one memo goes in this box; once you are on the next page, Add another file brings in the rest.',
+      title: 'Get the file',
+      text: 'On iPhone, open Voice Memos, tap the recording, tap the three dots, then Share and Save to Files. On a Mac, drag a memo out of the Voice Memos app onto the desktop.',
+    },
+    {
+      title: 'Add it here',
+      text: 'Drop the .m4a in the box at the top of this page, or press Choose a file. On an iPhone, Choose a file opens Files, where you saved the memo.',
     },
     {
       title: 'Choose the language',
-      text: 'On the next page, select the spoken language. A short memo gives Detect automatically little to work with, so naming the language is more reliable. Standard quality suits most memos. Then press Transcribe.',
+      text: 'Pick the spoken language, or keep auto-detect. For Hindi you can choose Devanagari or Hinglish under Transcript style.',
     },
     {
-      title: 'Wait for the transcript',
-      text: 'Lines appear one by one with a progress bar and an estimate of the time left. Play from any line to hear what was said.',
-    },
-    {
-      title: 'Fix and save it',
-      text: 'Correct any wrong word, then download TXT, Markdown or PDF for notes, or SRT or VTT if the memo goes with a video. A transcript lives only for your session, so download it before you close the page.',
+      title: 'Download',
+      text: 'Fix any line, then download TXT or PDF to keep, or Markdown for your notes app.',
     },
   ],
 
-  formatsTitle: 'M4A and other audio formats',
-  formatsIntro:
-    'Phone and desktop recorders save in different formats. This box takes all of these.',
+  formatsTitle: 'M4A and related formats',
+  formatsIntro: 'M4A and AAC files hold the same kind of audio. Both work, and so do these other audio formats.',
   uploadTitle: 'Audio files you can add',
   accepts: ['M4A', 'MP3', 'WAV', 'AAC', 'FLAC', 'OGG', 'OPUS', '3GP'],
   downloads: [
@@ -83,58 +87,70 @@ export const CONTENT: ToolPageContent = {
     { name: 'JSON', use: 'structured lines for programs' },
   ],
 
-  tipsTitle: 'Tips for transcribing voice memos',
+  tipsTitle: 'Tips for M4A files',
   tips: [
     {
-      title: 'Hold the phone close.',
-      text: 'A memo recorded with the phone in a pocket or across a table is hard for any recogniser. Hold the phone a hand width from your mouth and talk across it, not into it.',
+      title: 'Save to Files first.',
+      text: 'On an iPhone, a memo saved to Files is easy to pick in your browser with Choose a file.',
+      browser: {
+        title: 'Use Fastest on an iPhone.',
+        text: 'For long memos on an iPhone, Fastest is the safe choice: the bigger models need more memory than Safari allows on many phones.',
+      },
     },
     {
-      title: 'Trim before you share.',
-      text: 'Most voice memo apps let you cut the start and end of a recording. Removing a long pause at either end saves waiting time.',
+      title: 'Lossless memos are bigger.',
+      text: 'If Voice Memos is set to Lossless, files are much larger but transcribe the same. Compressed is fine for speech.',
     },
     {
-      title: 'Name the language.',
-      text: 'For a memo of ten or twenty seconds, choosing the spoken language beats automatic detection, especially for accented speech or a mix of languages.',
+      title: 'Zoom audio file.',
+      text: 'For a Zoom meeting, use the audio-only M4A in the meeting folder instead of the MP4: the same speech in a smaller file.',
     },
     {
-      title: 'Give it the hard names.',
-      text: 'Add unusual names to the vocabulary hint in More options and they are far more likely to come out right.',
+      title: 'Name it.',
+      text: 'The transcript takes the name of the file. Rename the memo before you add it, or rename the transcript afterwards under More.',
+    },
+    {
+      title: 'Or record here.',
+      text: 'You can skip the app: press Record from microphone on the home page and speak. The recording is transcribed when you stop.',
     },
   ],
 
   faqs: [
     {
-      question: 'Can I transcribe an iPhone Voice Memo without converting it?',
-      answer:
-        'Yes. Voice Memos are M4A files and TranscribeVid reads M4A directly. Share the memo to Files or to your computer, then add it here. Do not convert it to MP3 first.',
+      question: 'Is M4A the same as MP4?',
+      answer: 'Almost. Both use the same container, but an M4A holds only audio, usually AAC. You can add either one here.',
     },
     {
-      question: 'Is an M4A file the same as an MP4?',
+      question: 'How do I transcribe an iPhone voice memo?',
       answer:
-        'They are close relatives. Both use the MPEG-4 container; an M4A holds audio only, while an MP4 usually carries video as well. TranscribeVid reads the sound from either.',
+        'Save it to Files from the share menu in Voice Memos, open this page in Safari, press Choose a file and pick the memo. Or AirDrop it to a Mac and drop it here.',
     },
     {
-      question: 'Why is my M4A transcript empty or very short?',
+      question: 'Why does my M4A not open?',
       answer:
-        'The memo may be silent, very quiet or mostly background noise. Play it back first. If it is faint, keep Enhance audio on in More options, and check that the file was not cut short when you shared it.',
+        'The file may be damaged, still downloading from iCloud, or protected against copying. Open it in a media player to check, or export it again as MP3.',
     },
     {
-      question: 'Can I transcribe a long meeting recorded on my phone?',
+      question: 'Voice Memos can show a transcript. Why use this?',
       answer:
-        'Yes. M4A files are small, so a long recording is easy to add. {limits} There is no daily or monthly quota.',
+        'Recent versions of iOS show a transcript in Voice Memos for some languages. Use this page for languages it does not cover, for Hinglish, or when you want timestamps and files to download.',
+    },
+    {
+      question: 'How long can an M4A be?',
+      answer: '{limits} A one-hour voice memo is usually far below the size limit. There is no daily or monthly quota.',
       browser: {
-        answer:
-          'Yes. M4A files are small, so a long recording is easy to add. The site sets no size or length limit because your own device does the work, so a very long memo simply takes longer, and on a slower device the page says so before you start. An older browser may refuse a very long file.',
+        answer: 'We set no limit. A long memo simply takes longer on your device, and the page warns you on a slower one. There is no daily or monthly quota.',
       },
-    },
-    {
-      question: 'Can I transcribe a voice memo in Hindi or Spanish?',
-      answer:
-        'Yes. Pick the spoken language from the list of more than 50, or leave Detect automatically on for a memo in one language. For Hindi, Transcript style (next to Language) lets you choose Roman letters (Hinglish) or the original Devanagari script.',
     },
   ],
 
+  related: [
+    '/voice-recording-to-text',
+    '/mp3-to-text',
+    '/wav-to-text',
+    '/whatsapp-voice-note-to-text',
+    '/meeting-recording-to-text',
+  ],
   links: [
     {
       label: 'Voice recording to text',

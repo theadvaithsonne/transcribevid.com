@@ -2,15 +2,15 @@ import { ToolPageContent } from '../tool-page.model';
 
 export const CONTENT: ToolPageContent = {
   eyebrow: 'Lecture to text',
-  h1: 'Lecture to text: turn a recording into a searchable transcript',
-  lead: 'Record the lecture, drop the file here and read it as text with timestamps: something you can search for an exam topic, copy into your notes and check against the recording. No account, no fee and more than 50 languages.',
+  h1: 'Lecture to text: transcribe a class recording',
+  lead: 'Turn a recorded lecture, seminar or online class into text you can search, highlight and revise from. Long recordings are fine, more than 50 languages work, including Hindi, and it is free with no login.',
   dropKind: 'video',
   dropNoun: 'lecture recording',
 
-  whyTitle: 'Why transcribe a lecture',
+  whyTitle: 'Revise from text, not from replays',
   why: [
-    'A lecture is easy to attend and hard to revise from. You cannot search a recording for the one definition you need, and replaying an hour to find it takes as long as the lecture did. A transcript gives you the words in order, with the time beside each line, so you can jump to the part you need.',
-    "It also helps people who find reading easier than listening, who study in a second language, who missed a class, or who want the text of a talk they gave themselves. Ask your lecturer before you record, and follow your institution's rules on recordings.",
+    'A one-hour lecture takes an hour to replay and a few minutes to read. With a transcript you can search for the term the teacher defined, copy the exact wording of a key point, and jump to the timestamp when you want to hear the explanation again.',
+    'It also helps students who are hard of hearing, who study in a second language or who missed the class. In many Indian classrooms lectures mix Hindi and English; Hinglish style keeps both readable in one script.',
   ],
 
   sections: [
@@ -47,32 +47,33 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  howTitle: 'How to convert a lecture to text',
-  howToDescription:
-    'Add the lecture recording, set the language and technical terms, wait for the transcript and download it as notes.',
+  howTitle: 'How to transcribe a lecture',
+  howToDescription: 'Add the lecture recording, choose the language and a quality level, wait for the transcript and download it as Markdown notes or PDF.',
   steps: [
     {
-      title: 'Add the lecture recording',
-      text: 'Drag the file onto the box above, or press Choose a file. A file from a phone voice recorder, a saved lecture video or a screen recording of an online class all work, and only the sound is used. The box takes one file at a time and moves it to the uploader on the next page, where Add another file brings in the other sessions of a course.',
+      title: 'Get the recording',
+      text: 'Download the class video from your course portal, Google Classroom, Moodle or Teams, or use a recording from your phone. Use only recordings you are allowed to keep.',
     },
     {
-      title: 'Set the language and quality',
-      text: 'On the next page, choose the language of the lecture. Standard suits a clear recording. For an echoing hall or a fast speaker, High accuracy helps if your device can run it (the choice is greyed out, with a reason, when it cannot). Expect a slower job and a larger first-time download.',
+      title: 'Add it here',
+      text: 'Drop the file in the box at the top of this page. For a long video, an audio-only copy (M4A or MP3) is smaller and gives the same text.',
     },
     {
-      title: 'Add the technical terms, then start',
-      text: 'In More options, type the key terms, names and abbreviations in the vocabulary hint, for example Krebs cycle, Bayesian, Dr. Okafor. Then press Transcribe.',
+      title: 'Choose language and quality',
+      text: 'Pick the language of the lecture. Standard suits most clear lectures; High accuracy helps with technical terms and strong accents.',
+      browser: {
+        text: 'Pick the language of the lecture. On a laptop, Standard suits most clear lectures and High accuracy helps with technical terms. On a phone, Fastest is the safer choice for a long file.',
+      },
     },
     {
-      title: 'Read, correct and download',
-      text: 'Play lines from their timestamps to check them and fix the mistakes. Then download TXT or Markdown for your notes app, or PDF to print.',
+      title: 'Download your notes',
+      text: 'Download Markdown for notes with a timestamp at each paragraph, ready for Obsidian, Notion or any notes app, or PDF to print.',
     },
   ],
 
-  formatsTitle: 'Lecture recording files and downloads',
-  formatsIntro:
-    'Phone recordings, saved videos and screen recordings of classes can all be added; only the sound track is read.',
-  uploadTitle: 'Recording files you can add',
+  formatsTitle: 'Lecture files and note formats',
+  formatsIntro: 'Recorded lectures are usually MP4 from a video platform or M4A from a phone. Both work.',
+  uploadTitle: 'Lecture files you can add',
   accepts: ['MP4', 'M4A', 'MP3', 'WAV', 'WEBM', 'MKV', 'MOV'],
   downloads: [
     { name: 'TXT', use: 'plain text for a notes app' },
@@ -81,65 +82,63 @@ export const CONTENT: ToolPageContent = {
     { name: 'SRT', use: 'captions, if the lecture is a video you share' },
   ],
 
-  tipsTitle: 'Tips for lecture recordings',
+  tipsTitle: 'Tips for lecture transcripts',
   tips: [
     {
-      title: 'Ask permission first.',
-      text: 'Some lecturers and institutions do not allow recording. Ask, and follow the rules you are given.',
+      title: "Add the subject's terms.",
+      text: "Put technical terms and the lecturer's name in the vocabulary hint under More options, for example: eigenvalue, Kirchhoff, Dr. Iyer.",
     },
     {
-      title: 'Record close to the speaker.',
-      text: 'A recorder at the front of the room usually beats a better one at the back, because distance and echo often cost more accuracy than any setting can win back.',
+      title: 'Sit near the speaker.',
+      text: 'If you record it yourself, put the phone near the lecturer, not at the back of the hall. Room echo costs more accuracy than anything else.',
     },
     {
-      title: 'Split very long sessions.',
-      text: 'If a session is larger or longer than the limits on this page, cut it into parts at the break before you add it.',
+      title: 'Long recordings.',
+      text: 'If the lecture is longer than the length limit, split it into parts in an audio editor and transcribe each part.',
       browser: {
-        title: 'Long sessions take longer.',
-        text: 'No limit is set on length, but a long lecture keeps your device busy for a while and needs free memory, and a browser that cannot use WebCodecs may struggle with a very long file. Cutting it at the break gives you the first half to read sooner.',
+        text: 'A two-hour lecture is fine, but it takes a while on a slower device. Keep the tab open and the laptop on charge, and read the first lines while the rest is transcribed.',
       },
     },
     {
-      title: 'Keep the slides open while you review.',
-      text: 'Slide titles give you a ready-made outline to match against the timestamps.',
+      title: 'Ask before recording.',
+      text: "Many colleges allow recording only with the lecturer's permission. Check your institution's rules.",
     },
     {
-      title: 'Download before you leave.',
-      text: 'Transcripts exist only for your session. Save TXT or Markdown before you close the page.',
+      title: 'English notes from any language.',
+      text: 'For a lecture in Hindi, Tamil or another language, set Output to Translate to English in More options to get English notes.',
     },
   ],
 
   faqs: [
     {
-      question: 'Is it allowed to record a lecture and transcribe it?',
-      answer:
-        'That depends on your lecturer and your institution, so ask before you record and follow their rules. Use a transcript for your own study unless you have permission to share it. This is not legal advice.',
-    },
-    {
-      question: 'Can I turn a lecture transcript into notes automatically?',
-      answer:
-        'No. TranscribeVid gives you the words, with a timestamp on every line, but it does not summarise or add headings. You build the notes from the text, which is also a good way to learn the material.',
-    },
-    {
-      question: 'Does it work for lectures with equations or technical terms?',
-      answer:
-        'It writes the words it hears, so spoken terms usually come out well when you add them to the vocabulary hint. Symbols and equations are not written out as formulas, so check them against your slides.',
-    },
-    {
-      question: 'How long a lecture can I transcribe?',
-      answer: '{limits} A longer lecture needs splitting into parts first.',
+      question: 'Can it transcribe a two-hour lecture?',
+      answer: '{limits} Split longer recordings into parts first. There is no limit on how many parts or lectures you transcribe.',
       browser: {
         answer:
-          'There is no cap on lecture length. Because your own device does the work, a long lecture mostly costs patience and free memory, and the page warns you when your device looks too slow for it.',
+          'Yes. We set no length limit. The lecture is transcribed on your own device, so a long one takes longer, and the page warns you on a slower device. Fastest is the quickest choice for very long files.',
       },
     },
     {
-      question: 'Can I transcribe an online class I recorded on my screen?',
+      question: 'Does it work with a Hindi-medium or Hinglish lecture?',
       answer:
-        'Yes. A screen recording saved as MP4, MOV or WebM works. Only the sound is read, so text on the slides is not included. Add the slide terms to the vocabulary hint.',
+        'Yes. Choose Hindi, then Original script for Devanagari or Hinglish for Roman letters. In Hinglish, technical English words stay in English.',
+    },
+    {
+      question: 'Can I turn the transcript into notes?',
+      answer:
+        'Markdown gives you clean paragraphs with timestamps that open in any notes app; add your own headings and highlights there. The tool does not write summaries.',
+    },
+    {
+      question: 'Are formulas and slides included?',
+      answer: 'No. Only speech is transcribed. Anything written on the board or shown on slides is in the text only if the lecturer says it aloud.',
+    },
+    {
+      question: 'Can I make captions for a recorded class?',
+      answer: 'Yes. Download SRT or VTT and add it to the video on your course platform, or upload it with the video on YouTube.',
     },
   ],
 
+  related: ['/video-to-text', '/mp4-to-text', '/translate-hindi-audio-to-english', '/podcast-to-text', '/hindi-audio-to-text'],
   links: [
     {
       label: 'Video to text',

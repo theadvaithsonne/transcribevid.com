@@ -20,6 +20,8 @@ import { I18nService } from '../../i18n/i18n.service';
 import { _t } from '../../i18n/mark';
 import { RichText } from '../../i18n/rich-text';
 import { TPipe } from '../../i18n/t.pipe';
+import { translateDownloadNote } from '../../core/download-note';
+import { ModelPrefetch } from '../../core/transport/model-prefetch';
 
 const KEY = 'vt-options';
 
@@ -77,6 +79,7 @@ export class UploadPage {
   private toast = inject(ToastService);
   private i18n = inject(I18nService);
   private device = inject(EngineDevice);
+  private prefetch = inject(ModelPrefetch);
   private converter = inject(ConverterConsent);
   /** the converter question is being prepared (the files are probed): a second click must not start twice */
   private converterCheck = false;
@@ -119,10 +122,36 @@ export class UploadPage {
   /** The quality choices: English texts that are translation keys, shown with the `t` pipe. */
   presets: Preset[] = [
     { model: 'base', title: _t('Fastest'), blurb: _t('Quick results. Good for clear speech.'), speed: 4, speedLabel: _t('Quickest') },
-    { model: 'small', title: _t('Standard'), blurb: _t('Good for most videos. Not sure? Keep this one.'), speed: 3, speedLabel: _t('Fast'), recommended: true },
+    { model: 'small', title: _t('Standard'), blurb: _t('Good for most videos.'), speed: 3, speedLabel: _t('Fast'), recommended: true },
     { model: 'large-v3-turbo', title: _t('High accuracy'), blurb: _t('Fewer mistakes. Takes longer.'), speed: 2, speedLabel: _t('Slower') },
     { model: 'large-v3', title: _t('Best accuracy'), blurb: _t('Fewest mistakes. Takes the longest.'), speed: 1, speedLabel: _t('Slowest') },
   ];
+
+  /**
+   * The choice marked "Recommended": in the in-browser edition the one the device plan starts with (Fastest on a
+   * phone, where Standard's bigger model can run out of memory), else Standard.
+   */
+  recommendedModel = computed<string | null>(() => {
+    const fallback = this.presets.find((p) => p.recommended)?.model ?? null;
+    if (!this.site.inBrowser()) return fallback;
+    const models = this.store.models();
+    const suggested = models.find((m) => m.default && !m.reason)?.id;
+    if (!suggested) return fallback;
+    if (this.presets.some((p) => p.model === suggested)) return suggested;
+    // the plan starts with a model that has no preset (tiny on a weak phone): the lightest choice that can run here
+    const runs = (id: string) => models.some((m) => m.id === id && !m.reason);
+    return this.presets.find((p) => runs(p.model))?.model ?? fallback;
+  });
+
+  isRecommended(p: Preset): boolean {
+    return p.model === this.recommendedModel();
+  }
+
+  /** what a choice is for, in the page's language (the recommended one adds "Not sure? Keep this one.") */
+  blurbOf(p: Preset): string {
+    const blurb = this.i18n.t(p.blurb);
+    return this.isRecommended(p) ? this.i18n.t('{blurb} Not sure? Keep this one.', { blurb }) : blurb;
+  }
 
   /** The home page text below the tool: the keys (rich texts use **bold** and [links](/path)). */
   readonly info = {
@@ -178,6 +207,9 @@ export class UploadPage {
     return translateMessage(message, (key, params) => this.i18n.t(key, params));
   }
 
+  /** the pages the "Popular" line links to exist in English only */
+  readonly isEnglish = computed(() => this.i18n.locale() === 'en');
+
   /** The languages for the select, named in the page's language ("Alemán" on the Spanish page) and sorted by that name. English keeps the list as it comes. */
   readonly languageOptions = computed(() => {
     const locale = this.i18n.locale();
@@ -222,7 +254,7 @@ export class UploadPage {
   tip(p: Preset) {
     const why = this.unavailableReason(p.model);
     const title = this.i18n.t(p.title);
-    const blurb = this.i18n.t(p.blurb);
+    const blurb = this.blurbOf(p);
     return why
       ? this.i18n.t('{title}. {blurb} Not available on this device: {reason}.', { title, blurb, reason: this.tm(why) })
       : this.i18n.t('{title}. {blurb}', { title, blurb });
@@ -233,7 +265,7 @@ export class UploadPage {
     const p = this.presets.find((x) => x.model === this.opts.model);
     if (!p) return '';
     const title = this.i18n.t(p.title);
-    const blurb = this.i18n.t(p.blurb);
+    const blurb = this.blurbOf(p);
     const note = this.downloadNote(p.model);
     const timing = this.modelInfo(p.model)?.word_timing_note;
     const base = note ? this.i18n.t('{title}: {blurb} {note}.', { title, blurb, note }) : this.i18n.t('{title}: {blurb}', { title, blurb });
@@ -263,6 +295,11 @@ export class UploadPage {
   /** Recomputes the estimate (files or model changed). Only the in-browser edition has one. */
   refreshAdvice() {
     if (!this.site.inBrowser()) return;
+    this.chosenModel.set(this.opts.model);
+    // the chosen model starts downloading in the background (a chosen file: at once, whatever the connection)
+    if (this.opts.engine === 'whisper' && this.available(this.opts.model) && !this.modelInfo(this.opts.model)?.downloaded) {
+      this.prefetch.request(this.opts.model, this.files().length ? 'user' : 'auto');
+    }
     const seq = ++this.adviceSeq;
     const files = this.files();
     if (!files.length) {
@@ -402,9 +439,24 @@ export class UploadPage {
   }
   /** a sentence for a normal person: only for a model that still has to be downloaded */
   downloadNote(id: string) {
+    const bg = this.prefetch.state();
+    if (bg?.model === id && bg.done) return this.i18n.t('Downloaded: ready to start');
     const size = this.downloadSize(id);
-    return size ? this.i18n.t('First time only: downloads {size} (needs internet)', { size }) : '';
+    if (!size) return '';
+    if (bg?.model === id) return this.i18n.t('First time only: downloads {size}, now downloading in the background', { size });
+    return this.i18n.t('First time only: downloads {size} (needs internet)', { size });
   }
+
+  /** the background download's progress under the help line (not read out on every step: no aria-live) */
+  prefetchLine = computed(() => {
+    const bg = this.prefetch.state();
+    if (!bg || bg.done || bg.model !== this.chosenModel() || !bg.total) return '';
+    const mb = (n: number) => (n >= 1e9 ? `${(n / 1e9).toFixed(2)} GB` : `${Math.round(n / 1e6)} MB`);
+    const line = this.i18n.t('Getting the model ready: {loaded} of {total}', { loaded: mb(bg.loaded), total: mb(bg.total) });
+    return bg.note ? `${line} · ${translateDownloadNote(bg.note, (k, p) => this.i18n.t(k, p))}` : line;
+  });
+  /** opts is a plain object; the preset choice and the model select update this copy for prefetchLine */
+  private readonly chosenModel = signal('');
   /** the short form for a select option: "3.1 GB download" */
   downloadShort(id: string) {
     const size = this.downloadSize(id);
@@ -775,7 +827,7 @@ export class UploadPage {
       // `prompt` is never persisted; ignore one left behind by an older version too
       const saved = JSON.parse(sessionStorage.getItem(KEY) ?? '{}');
       this.savedModel = typeof saved?.model === 'string' ? saved.model : '';
-      return { ...DEFAULT_OPTIONS, ...saved, output_script: saved?.output_script === 'original' ? 'original' : 'hinglish', prompt: '' };
+      return { ...DEFAULT_OPTIONS, ...saved, output_script: saved?.output_script === 'hinglish' ? 'hinglish' : 'original', prompt: '' };
     } catch {
       return { ...DEFAULT_OPTIONS };
     }

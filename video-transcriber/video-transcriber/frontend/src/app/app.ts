@@ -13,7 +13,7 @@ import { SessionService } from './core/session.service';
 import { SiteService, TAGLINE } from './core/site.service';
 import { StatsService } from './core/stats.service';
 import { ThemeService } from './core/theme.service';
-import { CORE_TOOLS } from './features/tool-pages/tool-pages.list';
+import { FOOTER_TOOLS } from './features/tool-pages/tool-pages.list';
 import { AdRail } from './shared/ad-rail';
 import { I18nService } from './i18n/i18n.service';
 import { LanguageSwitcher } from './i18n/language-switcher';
@@ -52,8 +52,8 @@ export class App {
   readonly tagline = TAGLINE;
   readonly year = new Date().getFullYear();
   /** the keyword landing pages: linked from the footer so every page links to them */
-  /** the main tools that exist in the page's language, linked from every page's footer (the rest are one click away on "All tools") */
-  readonly tools = computed(() => CORE_TOOLS.filter((t) => this.i18n.isAvailable(this.i18n.locale(), t.path)));
+  /** the footer pages (`footer: true`) that exist in the page's language, linked from every page (the rest are one click away on "All tools") */
+  readonly tools = computed(() => FOOTER_TOOLS.filter((t) => this.i18n.isAvailable(this.i18n.locale(), t.path)));
 
   private popWrap = viewChild<ElementRef<HTMLElement>>('popWrap');
   private popBtn = viewChild<ElementRef<HTMLButtonElement>>('popBtn');

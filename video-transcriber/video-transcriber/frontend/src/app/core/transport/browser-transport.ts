@@ -6,7 +6,9 @@ import { MODEL_UI, languageList, playableByName } from '../../engine/jobs/refere
 import { alignerOf } from '../../engine/models/catalog';
 import { qwenEntry } from '../../engine/models/qwen-catalog';
 import { qwenReason } from '../../engine/qwen/qwen-capability';
+import { DOCX_MIME, writeDocx } from '../../engine/export/docx';
 import { exportFilename, render } from '../../engine/export/formats';
+import { PDF_MIME, writePdf } from '../../engine/export/pdf';
 import type { StoredJob } from '../../engine/session/session-store';
 import { _t } from '../../i18n/mark';
 import { LogRing, LogService } from '../log.service';
@@ -51,9 +53,26 @@ export const BROWSER_ENGINE = new InjectionToken<() => Promise<BrowserEngine>>('
 });
 
 const FINAL = new Set(['done', 'error', 'cancelled']);
+/** watch(): how often the store is read for a job that another tab of this browser runs (its runner's events stay there). */
+export const OTHER_TAB_POLL_MS = 2000;
+/** WAV players are the decoded audio held in memory (an hour is over 100 MB): only the most recent ones are kept. */
+export const MAX_PREVIEWS = 2;
 /** Qwen3-ASR returns chunk times only (the server's `words: null`). */
 const QWEN_WORD_TIMING_NOTE = _t('not available with Qwen (times are per chunk)');
-const BOOKKEEPING = ['updated_at', 'version', 'media_type', 'language_candidates'] as const;
+const BOOKKEEPING = [
+  'updated_at',
+  'version',
+  'media_type',
+  'language_candidates',
+  // resuming after a reload (engine/session RESUME_FIELDS; resume_count stays: the page says it continued)
+  'checkpoint',
+  'stuck_count',
+  'resume_mark',
+  'downloaded_bytes',
+  'download_mark',
+  'low_memory',
+  'worker_retries',
+] as const;
 
 /** Store / runner errors as HTTP-shaped errors (status + detail), so every page's error handling stays as it is. */
 function asTransportError(e: unknown): unknown {
@@ -93,14 +112,30 @@ export class BrowserTransport implements Transport {
   private readonly mediaUrls = new Map<string, string>();
   /** WAV previews of files the browser cannot play, being built or built (object URL; null = nothing to play) */
   private readonly previews = new Map<string, Promise<MediaPreview | null>>();
+  /** the jobs with a built WAV player, oldest first (MAX_PREVIEWS) */
+  private readonly previewOrder: string[] = [];
   private readonly consent = inject(ConverterConsent);
 
   private get(): Promise<BrowserEngine> {
-    this.engine ??= this.createEngine().catch((e) => {
-      this.engine = null; // e.g. IndexedDB blocked: try again on the next call
-      throw e;
-    });
+    this.engine ??= this.createEngine().then(
+      (engine) => {
+        // the session expired (30 minutes idle): its files are deleted, and their player URLs must not keep them alive
+        engine.store.onEnded(() => this.forgetAllMedia());
+        return engine;
+      },
+      (e) => {
+        this.engine = null; // try again on the next call
+        throw e;
+      },
+    );
     return this.engine;
+  }
+
+  private forgetAllMedia() {
+    for (const url of this.mediaUrls.values()) URL.revokeObjectURL(url);
+    this.mediaUrls.clear();
+    this.previews.clear();
+    this.previewOrder.length = 0;
   }
 
   // ------------------------------------------------------------------ reference data
@@ -133,6 +168,20 @@ export class BrowserTransport implements Transport {
   /** The website counter comes from a Cloudflare Worker in a later milestone; until then nothing is counted. */
   stats(_fresh = false): Observable<SiteStats> {
     return of({ transcribed: 0, counting: false });
+  }
+
+  /**
+   * In-browser edition only (not part of Transport): downloads a Whisper model for this device in the background
+   * (core/transport/model-prefetch.ts), so the first transcription does not wait. False when nothing was downloaded
+   * (already here, cannot run here, a job is running, no room).
+   */
+  async prefetchModel(id: string, o: { signal?: AbortSignal; onProgress?: (loaded: number, total: number, note?: string) => void } = {}): Promise<boolean> {
+    const [plan, engine] = await Promise.all([this.device.plan(), this.get()]);
+    if (!engine.prefetchModel || !plan.offered.some((m) => m.id === id)) return false;
+    return engine.prefetchModel(id, plan.backend, plan.shaderF16, {
+      signal: o.signal,
+      onProgress: (p) => o.onProgress?.(p.loaded, p.total, p.note),
+    });
   }
 
   models(): Observable<ModelInfo[]> {
@@ -205,9 +254,7 @@ export class BrowserTransport implements Transport {
       await store.clear();
       if (opts.deleteModels) await store.deleteModels();
       this.consent.forget();
-      for (const url of this.mediaUrls.values()) URL.revokeObjectURL(url);
-      this.mediaUrls.clear();
-      this.previews.clear();
+      this.forgetAllMedia();
     });
   }
 
@@ -264,11 +311,26 @@ export class BrowserTransport implements Transport {
     return call(async () => {
       const { runner } = await this.get();
       await runner.delete(id);
-      const url = this.mediaUrls.get(id);
-      if (url) URL.revokeObjectURL(url);
-      this.mediaUrls.delete(id);
-      this.previews.delete(id);
+      this.forgetMedia(id);
     });
+  }
+
+  /** Lets the player source of a job go (its object URL, and the WAV it points to). */
+  private forgetMedia(id: string) {
+    const url = this.mediaUrls.get(id);
+    if (url) URL.revokeObjectURL(url);
+    this.mediaUrls.delete(id);
+    this.previews.delete(id);
+    const i = this.previewOrder.indexOf(id);
+    if (i >= 0) this.previewOrder.splice(i, 1);
+  }
+
+  /** A WAV player was built for `id`: the oldest ones beyond MAX_PREVIEWS go (they are rebuilt if opened again). */
+  private keepPreview(id: string) {
+    const i = this.previewOrder.indexOf(id);
+    if (i >= 0) this.previewOrder.splice(i, 1);
+    this.previewOrder.push(id);
+    while (this.previewOrder.length > MAX_PREVIEWS) this.forgetMedia(this.previewOrder[0]);
   }
 
   /**
@@ -295,6 +357,7 @@ export class BrowserTransport implements Transport {
         .then((wav): MediaPreview => {
           const url = URL.createObjectURL(wav);
           this.mediaUrls.set(id, url);
+          this.keepPreview(id);
           return { url, audioOnly: true };
         })
         .catch((e) => {
@@ -350,19 +413,41 @@ export class BrowserTransport implements Transport {
   }
 
   exportBlob(id: string, format: ExportFormat, extra: Record<string, number> = {}): Observable<ExportFile> {
+    if (format === 'pdf' || format === 'docx') return this.document(id, format);
     return this.rendered(id, format, extra).pipe(
       map((r) => ({ blob: new Blob([r.body], { type: r.mime }), filename: r.filename })),
     );
   }
 
+  /**
+   * The Word file, or the PDF written directly (engine/export/pdf.ts). A PDF whose text the standard PDF fonts cannot
+   * draw (Hindi, Chinese, Arabic, ...) is a 422: the job page checks canWriteJobPdf first and prints those instead.
+   */
+  private document(id: string, format: 'pdf' | 'docx'): Observable<ExportFile> {
+    return call(async () => {
+      const job = await this.storedJob(id);
+      const creator = SITE_BRAND.name;
+      if (format === 'docx') {
+        const docx = writeDocx(job, { creator });
+        return { blob: new Blob([docx], { type: DOCX_MIME }), filename: `${job.title}.docx` };
+      }
+      const pdf = writePdf(job, { creator, footer: `${SITE_BRAND.name} - ${SITE_BRAND.domain}` });
+      if (!pdf) throw new TransportError(422, _t('PDF is made by your browser: choose "Save as PDF" in the print dialog.'));
+      return { blob: new Blob([pdf], { type: PDF_MIME }), filename: exportFilename(job.title, 'pdf') };
+    });
+  }
+
+  private async storedJob(id: string) {
+    const { store } = await this.get();
+    const job = await store.get(id);
+    if (!job) throw new TransportError(404, _t('Job not found'));
+    return job;
+  }
+
   private rendered(id: string, format: ExportFormat, extra: Record<string, number>) {
     return call(async () => {
-      if (format === 'pdf') {
-        throw new TransportError(422, _t('PDF is made by your browser: choose "Save as PDF" in the print dialog.'));
-      }
-      const { store } = await this.get();
-      const job = await store.get(id);
-      if (!job) throw new TransportError(404, _t('Job not found'));
+      if (format === 'pdf' || format === 'docx') throw new TransportError(422, `${format.toUpperCase()} is a file, not text.`);
+      const job = await this.storedJob(id);
       const maxChars = Math.min(80, Math.max(20, Math.round(extra['max_chars'] ?? 42)));
       const maxLines = Math.min(3, Math.max(1, Math.round(extra['max_lines'] ?? 2)));
       const r = render(job, format, { maxChars, maxLines });
@@ -378,10 +463,41 @@ export class BrowserTransport implements Transport {
   watch(id: string, since = 0): Observable<JobEvent> {
     return new Observable<JobEvent>((sub) => {
       let off: (() => void) | null = null;
+      let poll: ReturnType<typeof setInterval> | null = null;
       let closed = false;
       let sent = since;
       let replaying = true;
       const buffered: RunnerEvent[] = [];
+      /**
+       * A job that another tab of this browser runs (or one whose page went away, until a tab takes it over): this
+       * tab's runner never hears of it, so the stored job is read every OTHER_TAB_POLL_MS. Without this the job page
+       * stood still at "Waiting in line…" until it was reloaded.
+       */
+      const followStore = (engine: BrowserEngine, version: number) => {
+        let seen = version;
+        let reading = false;
+        poll = setInterval(() => {
+          if (closed || reading || engine.runner.isActive(id)) return; // run here: the runner's events come
+          reading = true;
+          engine.store
+            .get(id)
+            .then(async (j) => {
+              if (closed) return;
+              if (!j) return sub.complete();
+              if (j.version === seen) return;
+              seen = j.version;
+              const segs = j.segments.slice(sent);
+              if (segs.length) {
+                sent += segs.length;
+                sub.next({ type: 'segments', data: segs });
+              }
+              sub.next({ type: 'job', data: await this.summary(engine, j) });
+              if (FINAL.has(j.status)) sub.complete();
+            })
+            .catch(() => undefined) // the next read tries again
+            .finally(() => (reading = false));
+        }, OTHER_TAB_POLL_MS);
+      };
       const forward = async (engine: BrowserEngine, e: RunnerEvent) => {
         if (e.type === 'segments') {
           if (e.id !== id) return;
@@ -421,11 +537,13 @@ export class BrowserTransport implements Transport {
           }
           replaying = false;
           for (const e of buffered.splice(0)) await forward(engine, e);
+          if (!closed) followStore(engine, job.version);
         })
         .catch((e) => sub.error(asTransportError(e)));
       return () => {
         closed = true;
         off?.();
+        if (poll) clearInterval(poll);
       };
     });
   }

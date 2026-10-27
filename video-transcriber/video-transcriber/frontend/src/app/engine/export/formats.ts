@@ -3,8 +3,8 @@
  * `render`) and the download name of main.py:599-614. Pure functions of the stored (edited) job; the output is
  * byte-identical to the server's for the same data (UTF-8, no BOM).
  *
- * PDF is not generated here. The browser edition prints a print-styled page (window.print(), "Save as PDF"), see
- * README.md and parity/engine.md EN-089; render() refuses 'pdf'.
+ * render() refuses 'pdf': the PDF and the Word file are binary documents, written by pdf.ts and docx.ts (or, for
+ * text the standard PDF fonts cannot draw, by the browser's print dialog, core/transport/print-view.ts). See README.md.
  */
 import type { JobOptions, Stats } from '../../core/models';
 import { pyJsonDumps, pyLen, pyStr } from '../post/py';

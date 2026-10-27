@@ -34,6 +34,13 @@ export const TOOL_CONTENT_LOADERS: Readonly<Record<string, Loader>> = {
   'portuguese-audio-to-text': () => import('./portuguese-audio-to-text'),
   'french-audio-to-text': () => import('./french-audio-to-text'),
   'german-audio-to-text': () => import('./german-audio-to-text'),
+  'translate-hindi-audio-to-english': () => import('./translate-hindi-audio-to-english'),
+  'subtitle-generator-for-reels': () => import('./subtitle-generator-for-reels'),
+  'whatsapp-voice-note-to-text': () => import('./whatsapp-voice-note-to-text'),
+  'podcast-to-text': () => import('./podcast-to-text'),
+  'private-transcription': () => import('./private-transcription'),
+  'turboscribe-alternative': () => import('./turboscribe-alternative'),
+  'otter-ai-alternative': () => import('./otter-ai-alternative'),
 };
 
 /**

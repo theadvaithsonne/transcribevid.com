@@ -72,7 +72,7 @@
       <a [routerLink]="'/how-it-works' | lp" routerLinkActive="active" class="navlink" (click)="closeAll()">{{ 'How it works' | t }}</a>
       <a [routerLink]="'/faq' | lp" routerLinkActive="active" class="navlink" (click)="closeAll()">{{ 'FAQ' | t }}</a>
       <a [routerLink]="'/guides' | lp" routerLinkActive="active" class="navlink" (click)="closeAll()">{{ 'Guides' | t }}</a>
-      @if (site.logsEnabled()) {
+      @if (site.logsEnabled() && !site.inBrowser()) {
         <a routerLink="/logs" routerLinkActive="active" class="navlink logs-link" title="Live server and client logs" (click)="closeAll()"><span class="prompt" aria-hidden="true">&gt;_</span> Logs</a>
       }
     </nav>
@@ -189,7 +189,7 @@
         <a [routerLink]="'/how-it-works' | lp" routerLinkActive="active" class="sheet-link" (click)="closeAll()">{{ 'How it works' | t }}</a>
         <a [routerLink]="'/faq' | lp" routerLinkActive="active" class="sheet-link" (click)="closeAll()">{{ 'FAQ' | t }}</a>
         <a [routerLink]="'/guides' | lp" routerLinkActive="active" class="sheet-link" (click)="closeAll()">{{ 'Guides' | t }}</a>
-        @if (site.logsEnabled()) {
+        @if (site.logsEnabled() && !site.inBrowser()) {
           <a routerLink="/logs" routerLinkActive="active" class="sheet-link" (click)="closeAll()">Logs</a>
         }
       </nav>

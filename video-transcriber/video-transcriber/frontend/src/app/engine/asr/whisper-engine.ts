@@ -40,6 +40,7 @@ import {
   topK,
 } from './dsp';
 import { averageLogprob, chooseFallback, needsFallback, resolveOptions } from './fallback';
+import { gatherRows, GpuDeviceLike, isWholeTensor, rowBytes, TensorFactory } from './kv-rows';
 import { applyLogitRules, DEFAULT_TOKEN_IDS, languageProbabilities, TokenIds } from './logits';
 import { ProgressTracker } from './progress';
 import { confidenceOf, parseSegments, reconcileSegmentEdges } from './segments';
@@ -59,6 +60,37 @@ import {
 const MAX_WINDOW_SAMPLES = 30 * SAMPLE_RATE;
 const MIN_WINDOW_SAMPLES = SAMPLE_RATE * 0.1;
 
+/**
+ * Batched decoding tiles the window's cross-attention KV (fp32, layers x 2 x heads x 1500 x 64 per row) to the batch
+ * size, so the batch is capped by how many bytes those copies may take. GPU: small's 110.6 MB per row fits all 5 beams
+ * (553 MB), large-v3-turbo / distil 5, medium 2, large-v3 (491 MB per row) 1 = the hypotheses one after another as
+ * before. WASM: every step also copies its inputs into the WASM heap, which never shrinks, so less is allowed there
+ * (small: 3 rows). Measured in engine/asr/README.md ("Batched decoding").
+ */
+export const GPU_BATCH_BYTES = 640 * 2 ** 20;
+export const WASM_BATCH_BYTES = 352 * 2 ** 20;
+
+/**
+ * Largest logit difference between a batched row and the same row decoded alone that still counts as "batching changes
+ * nothing" (batchCheck). fp16 rounding stays far below it (measured: 0 on WebGPU fp16); a q8 export's per-tensor
+ * activation quantization moves logits by 0.27-0.97 when other rows share the batch.
+ */
+export const BATCH_EXACT_TOLERANCE = 0.05;
+
+/** 'auto' = batch when the self-check shows identical results; 'always' = batch anyway; 'never' = one row per pass. */
+export type BatchingMode = 'auto' | 'always' | 'never';
+
+/**
+ * Transformers.js dtypes whose decoder quantizes its activations per tensor at run time (DynamicQuantizeLinear: one
+ * scale for all batch rows), so a batched row is not the row decoded alone. 'auto' never batches them and skips the
+ * self-check, whose one batched pass would also grow the WASM heap for good (measured +500 MB with small q8).
+ */
+const DYNAMIC_QUANT_DTYPES = new Set(['q8', 'int8', 'uint8', 'quantized']);
+
+function decoderDtype(dtype: LoadOptions['dtype']): string | undefined {
+  return typeof dtype === 'string' ? dtype : dtype?.decoder_model_merged;
+}
+
 /* The library objects are untyped on purpose: Transformers.js 4.3.1 ships partial typings for the
    pieces used here (sessions, forward with past_key_values, cross attentions). */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -67,6 +99,8 @@ export interface TensorLike {
   type: string;
   data: any;
   location?: string;
+  /** the onnxruntime-web tensor behind a Transformers.js Tensor (WebGPU buffer access for the KV row copies) */
+  ort_tensor?: any;
   to(type: string): TensorLike;
   dispose(): void;
 }
@@ -89,11 +123,20 @@ export async function loadTransformers(): Promise<TransformersModule> {
   return (await import('@huggingface/transformers')) as unknown as TransformersModule;
 }
 
+/**
+ * Where a hypothesis's self-attention cache lives: row `row` of the batched `past_key_values.*.decoder.*` tensors in
+ * `kv` (the output of the step that made it, or the prefix pass's batch-1 cache).
+ */
+interface CacheRow {
+  kv: KV;
+  row: number;
+}
+
 interface Hyp {
   tokens: number[];
   logprobs: number[];
   sum: number;
-  past: KV;
+  cache: CacheRow;
   last: number;
   finished: boolean;
 }
@@ -180,6 +223,34 @@ export class WhisperEngine {
   private info: LoadInfo | null = null;
   /** word timing for a model without cross-attention outputs (see the header) */
   private aligner: ExternalAligner | null = null;
+  /**
+   * Cap of the tiled cross-attention KV of one batched decoder step, in bytes; it sets how many hypotheses share a
+   * forward pass (at least 1). null = the device default (GPU_BATCH_BYTES / WASM_BATCH_BYTES).
+   */
+  maxBatchBytes: number | null = null;
+  /**
+   * Batched decoding (beam search / best-of: all hypotheses in one forward pass). 'auto' checks once per load that a
+   * batched row equals the row decoded alone and otherwise decodes one hypothesis per pass, as before; 'always' skips
+   * that check (faster on WASM q8, whose results then depend on the batch: README "Batched decoding"); 'never' = off.
+   */
+  batching: BatchingMode = 'auto';
+  /**
+   * Whether batching leaves the loaded model's results unchanged (null = not checked yet): the self-check's largest
+   * logit difference and verdict, or `maxDiff: null, exact: false` for a dynamically quantized decoder (q8).
+   */
+  batchCheck: { maxDiff: number | null; exact: boolean } | null = null;
+  /**
+   * Outputs a decoding step fetches: logits and the self-attention cache. Fetching every output (model.forward) also
+   * copies each layer's cross_attentions (WebGPU: a GPU readback each) and the empty encoder placeholders, which the
+   * steps never use (word timing runs its own pass). null = the session cannot be driven directly: model.forward.
+   */
+  private stepFetches: string[] | null = null;
+  private cacheBranchTrue: TensorLike | null = null;
+  private gpu: GpuDeviceLike | null = null;
+  /** the window's cross-attention KV tiled to a batch size (released with it, see releaseCrossKV) */
+  private crossTiles = new Map<number, KV>();
+  /** the running window's cross KV until it is released (a cancelled or failed window releases it too) */
+  private windowCross: KV | null = null;
 
   constructor(
     private readonly transformers: () => Promise<TransformersModule> = loadTransformers,
@@ -264,6 +335,8 @@ export class WhisperEngine {
     this.processor = processor;
     this.model = model;
     this.readConfig(model, tokenizer);
+    const dt = decoderDtype(o.dtype);
+    if (dt && DYNAMIC_QUANT_DTYPES.has(dt)) this.batchCheck = { maxDiff: null, exact: false };
     const info: LoadInfo = {
       repo: o.repo,
       device: o.device,
@@ -315,6 +388,16 @@ export class WhisperEngine {
       .filter((m: any) => m.name.startsWith('past_key_values') && m.name.includes('.decoder.'))
       .map((m: any) => ({ name: m.name, type: m.type, shape: m.shape }));
     this.multiTokenCacheOk = null;
+    const fillable = (n: string) =>
+      n === 'input_ids' || n === 'encoder_hidden_states' || n === 'use_cache_branch' || n.startsWith('past_key_values.');
+    const inputs: string[] = Array.isArray(dec.inputNames) ? dec.inputNames : [];
+    this.stepFetches =
+      typeof dec.run === 'function' && inputs.includes('use_cache_branch') && inputs.every(fillable)
+        ? dec.outputNames.filter((n: string) => n === 'logits' || (n.startsWith('present') && n.includes('.decoder.')))
+        : null;
+    this.cacheBranchTrue = this.stepFetches ? new this.T!.Tensor('bool', [true], [1]) : null;
+    this.gpu = null;
+    this.batchCheck = null;
   }
 
   /** Cooperative cancel: the running call rejects with CancelledError at its next cancel point. */
@@ -452,6 +535,215 @@ export class WhisperEngine {
     return { row: this.logitsRow(c), kv: this.mergeKV(c, {}) };
   }
 
+  // ---------------------------------------------------------------- batched decoding steps
+
+  private tensors(): TensorFactory<TensorLike> {
+    const T = this.T!;
+    return {
+      cpu: (type, data, dims) => new T.Tensor(type, data, dims),
+      gpu: (ort) => new (T.Tensor as unknown as new (o: unknown) => TensorLike)(ort),
+    };
+  }
+
+  /** The GPUDevice onnxruntime-web runs on (the KV row copies must use the same one); null on WASM or unknown. */
+  private async gpuDevice(): Promise<GpuDeviceLike | null> {
+    if (this.device !== 'webgpu') return null;
+    if (!this.gpu) {
+      try {
+        this.gpu = ((await this.T!.env?.backends?.onnx?.webgpu?.device) as GpuDeviceLike) ?? null;
+      } catch {
+        this.gpu = null;
+      }
+    }
+    return this.gpu;
+  }
+
+  /**
+   * How many hypotheses share one decoder forward pass: all of them (`nHyp`) unless the tiled cross-attention KV would
+   * exceed the byte cap (see GPU_BATCH_BYTES). 1 when the cache is on the GPU but its device is unknown (no copies).
+   */
+  private batchLimit(crossKV: KV, nHyp: number, gpu: GpuDeviceLike | null): number {
+    if (nHyp <= 1) return 1;
+    const tensors = Object.values(crossKV);
+    if (!gpu && tensors.some((t) => t.location === 'gpu-buffer')) return 1;
+    let perRow = 0;
+    for (const t of tensors) perRow += rowBytes(t);
+    const cap = this.maxBatchBytes ?? (this.device === 'webgpu' ? GPU_BATCH_BYTES : WASM_BATCH_BYTES);
+    return Math.max(1, Math.min(nHyp, Math.floor(cap / Math.max(1, perRow))));
+  }
+
+  /** The window's cross-attention KV with `n` identical rows (n = 1: the KV itself). Kept until the window ends. */
+  private crossFor(crossKV: KV, n: number, gpu: GpuDeviceLike | null): KV {
+    if (n === 1) return crossKV;
+    let tiled = this.crossTiles.get(n);
+    if (!tiled) {
+      // at most two sizes live (the batch and the last chunk's / a shrinking sampling batch's): bound the memory
+      if (this.crossTiles.size >= 2) {
+        const [oldest] = this.crossTiles.keys();
+        this.disposeKV(this.crossTiles.get(oldest)!, new Set());
+        this.crossTiles.delete(oldest);
+      }
+      tiled = {};
+      const make = this.tensors();
+      for (const [k, t] of Object.entries(crossKV))
+        tiled[k] = gatherRows(Array.from({ length: n }, () => ({ t, row: 0 })), make, gpu);
+      this.crossTiles.set(n, tiled);
+    }
+    return tiled;
+  }
+
+  /**
+   * One decoder step for every active hypothesis: its logits row and new cache row, in `active` order, plus the new
+   * caches. The hypotheses go through the decoder in chunks of `limit` rows. The first multi-row chunk after a load
+   * also runs its rows one at a time and compares (batchCheck): a quantized export fails, since its per-tensor
+   * activation quantization makes a row's numbers depend on its batch neighbours, and from then on every hypothesis
+   * gets its own pass, as before batching existed. On failure the step keeps the one-at-a-time results, so the
+   * decode is exactly the unbatched one.
+   */
+  private async decodeStep(
+    encoderOut: TensorLike,
+    crossKV: KV,
+    active: readonly Hyp[],
+    limit: number,
+    gpu: GpuDeviceLike | null,
+  ): Promise<{ results: Array<{ h: Hyp; row: Float32Array; cache: CacheRow }>; presents: KV[] }> {
+    const results: Array<{ h: Hyp; row: Float32Array; cache: CacheRow }> = [];
+    const presents: KV[] = [];
+    const take = (chunk: readonly Hyp[], b: { rows: Float32Array[]; present: KV }) => {
+      presents.push(b.present);
+      chunk.forEach((h, i) => results.push({ h, row: b.rows[i], cache: { kv: b.present, row: i } }));
+    };
+    const alone = async (chunk: readonly Hyp[]) => {
+      const out: Array<{ rows: Float32Array[]; present: KV }> = [];
+      for (const h of chunk) out.push(await this.forwardBatch(encoderOut, crossKV, [h], gpu));
+      return out;
+    };
+    let c = 0;
+    while (c < active.length) {
+      const size = this.batchCheck && !this.batchCheck.exact && this.batching === 'auto' ? 1 : limit;
+      const chunk = active.slice(c, c + size);
+      c += chunk.length;
+      if (chunk.length > 1 && this.batching === 'auto' && !this.batchCheck) {
+        // rows with the same last token cannot show a batching effect: decode them alone until a chunk can
+        if (new Set(chunk.map((h) => h.last)).size < 2) {
+          (await alone(chunk)).forEach((b, i) => take([chunk[i]], b));
+          continue;
+        }
+        const batched = await this.forwardBatch(encoderOut, crossKV, chunk, gpu);
+        const singles = await alone(chunk);
+        let maxDiff = 0;
+        singles.forEach((b, i) => (maxDiff = Math.max(maxDiff, maxAbsDiff(b.rows[0], batched.rows[i]))));
+        this.batchCheck = { maxDiff, exact: maxDiff <= BATCH_EXACT_TOLERANCE };
+        if (this.batchCheck.exact) {
+          for (const b of singles) this.disposeKV(b.present, new Set());
+          take(chunk, batched);
+        } else {
+          this.disposeKV(batched.present, new Set());
+          singles.forEach((b, i) => take([chunk[i]], b));
+        }
+        continue;
+      }
+      take(chunk, await this.forwardBatch(encoderOut, crossKV, chunk, gpu));
+    }
+    return { results, presents };
+  }
+
+  /**
+   * One decoder forward pass for `chunk` (each hypothesis's last token and cache row): its input cache is the rows of
+   * the hypotheses' caches (the tensors themselves when they are already that batch, else row copies), its output is
+   * one logits row per hypothesis (in chunk order) and the new batched self-attention cache.
+   */
+  private async forwardBatch(
+    encoderOut: TensorLike,
+    crossKV: KV,
+    chunk: readonly Hyp[],
+    gpu: GpuDeviceLike | null,
+  ): Promise<{ rows: Float32Array[]; present: KV }> {
+    const past: KV = { ...this.crossFor(crossKV, chunk.length, gpu) };
+    const made: TensorLike[] = [];
+    const make = this.tensors();
+    try {
+      for (const name of Object.keys(chunk[0].cache.kv)) {
+        const rows = chunk.map((h) => ({ t: h.cache.kv[name], row: h.cache.row }));
+        if (isWholeTensor(rows)) past[name] = rows[0].t;
+        else made.push((past[name] = gatherRows(rows, make, gpu)));
+      }
+      return await this.stepRun(encoderOut, chunk.map((h) => h.last), past);
+    } finally {
+      for (const t of made) if (t.location === 'gpu-buffer') t.dispose();
+    }
+  }
+
+  /**
+   * A cache-branch decoder call for one new token per row: logits rows + the self-attention `present` (renamed
+   * `past_key_values.*`). Drives the ONNX session directly with only the outputs a step uses (stepFetches) when it
+   * can, else model.forward.
+   */
+  private async stepRun(
+    encoderOut: TensorLike,
+    last: number[],
+    past: KV,
+  ): Promise<{ rows: Float32Array[]; present: KV }> {
+    const ids = last.map((t) => [t]);
+    const out: Record<string, TensorLike> = this.stepFetches
+      ? await this.directRun(encoderOut, ids, past, this.stepFetches)
+      : await this.run(encoderOut, ids, past);
+    const present: KV = {};
+    for (const [k, v] of Object.entries(out)) {
+      if (!k.startsWith('present')) continue;
+      // the cache branch's encoder outputs are empty placeholders: the cross KV stays the window's
+      if (k.includes('.encoder.')) {
+        if (v?.location === 'gpu-buffer' && !Object.values(past).includes(v)) v.dispose();
+        continue;
+      }
+      present[k.replace('present', 'past_key_values')] = v;
+    }
+    const lg: TensorLike = out['logits'];
+    const f32 = lg.type === 'float32' ? lg : lg.to('float32');
+    const V = lg.dims[2];
+    const t = lg.dims[1];
+    const data = f32.data as Float32Array;
+    const rows = last.map((_, i) => data.subarray((i * t + t - 1) * V, (i * t + t) * V));
+    return { rows, present };
+  }
+
+  /**
+   * A cache-branch call of the merged decoder session itself (what model.forward does, see decoder_forward in
+   * Transformers.js 4.3.1), returning only `fetches`: outputs that are not fetched are neither copied to the CPU nor
+   * left behind in GPU buffers. Only when stepFetches says every input can be filled. Like the Silero VAD (engine/vad)
+   * it does not go through Transformers.js's run queue; the engine never overlaps its own calls (one call at a time).
+   */
+  private async directRun(
+    encoderOut: TensorLike,
+    ids: number[][],
+    past: KV,
+    fetches: string[],
+  ): Promise<Record<string, TensorLike>> {
+    const dec = this.model.sessions.decoder_model_merged;
+    const inputIds = this.i64(ids);
+    const feeds: Record<string, unknown> = {};
+    for (const name of dec.inputNames as string[]) {
+      const t =
+        name === 'input_ids'
+          ? inputIds
+          : name === 'encoder_hidden_states'
+            ? encoderOut
+            : name === 'use_cache_branch'
+              ? this.cacheBranchTrue
+              : past[name];
+      if (!t) throw new Error(`WhisperEngine: no value for decoder input ${name}`);
+      feeds[name] = t.ort_tensor ?? t;
+    }
+    const t0 = performance.now();
+    const raw = await dec.run(feeds, fetches);
+    this.stats.decoderRuns++;
+    this.stats.decoderMs += performance.now() - t0;
+    const T = this.T!.Tensor as unknown as new (o: unknown) => TensorLike;
+    const out: Record<string, TensorLike> = {};
+    for (const [k, v] of Object.entries<any>(raw)) out[k] = v instanceof this.T!.Tensor ? v : new T(v);
+    return out;
+  }
+
   // ---------------------------------------------------------------- features, encoder, first step
 
   private async encode(audio: Float32Array, timings: Record<string, number>): Promise<Encoded> {
@@ -497,6 +789,12 @@ export class WhisperEngine {
 
   private releaseCrossKV(crossKV: KV): void {
     for (const v of Object.values(crossKV)) if (v?.location === 'gpu-buffer') v.dispose();
+    this.releaseCrossTiles();
+  }
+
+  private releaseCrossTiles(): void {
+    for (const kv of this.crossTiles.values()) this.disposeKV(kv, new Set());
+    this.crossTiles.clear();
   }
 
   /** One decoder step over the language tokens (85-740 ms); the encoder pass is the main cost. */
@@ -523,6 +821,14 @@ export class WhisperEngine {
 
   // ---------------------------------------------------------------- one decoding attempt
 
+  /**
+   * One decoding attempt at one temperature: greedy, beam search (OpenAI / faster-whisper semantics, below) or best-of
+   * sampling. Every step runs the active hypotheses through the decoder together as one batch (or in chunks of
+   * batchLimit() rows when the tiled cross-attention KV would be too big) instead of one forward pass each. Each row's
+   * logits are then processed exactly as the one-at-a-time loop did, in the same hypothesis order (the same candidate
+   * order, ties and sampling draws), so the chosen tokens and scores do not depend on the batching; only the float
+   * rounding of a batched matrix product could differ (README "Batched decoding" has the measured comparison).
+   */
   private async decodeAttempt(
     encoderOut: TensorLike,
     crossKV: KV,
@@ -544,10 +850,27 @@ export class WhisperEngine {
     const shared = new Set<TensorLike>(Object.values(crossKV));
 
     await this.check();
+    const gpu = await this.gpuDevice();
     const pre = await this.prefixPass(encoderOut, crossKV, prefix);
-    const kv0 = pre.kv;
+    // the prefix's self-attention cache (batch 1): every first-step hypothesis starts from its row 0. The steps use
+    // the window's cross KV; a second copy the prefix pass may have computed is not needed.
+    const kv0: KV = {};
+    for (const [k, v] of Object.entries(pre.kv)) {
+      if (!k.includes('.encoder.')) kv0[k] = v;
+      else if (!shared.has(v) && v?.location === 'gpu-buffer') v.dispose();
+    }
     const finished: Finished[] = [];
     const maxFinished = nHyp; // patience 1.0
+    // every batched cache of this attempt; one is freed as soon as no active hypothesis refers to it
+    const caches = new Set<KV>([kv0]);
+    const release = (alive: readonly Hyp[]) => {
+      const used = new Set(alive.map((h) => h.cache.kv));
+      for (const kv of caches) {
+        if (used.has(kv)) continue;
+        this.disposeKV(kv, shared);
+        caches.delete(kv);
+      }
+    };
 
     const process = (row: Float32Array, genTokens: number[], first: boolean) => {
       const raw = new Float32Array(row);
@@ -556,11 +879,11 @@ export class WhisperEngine {
       logSoftmaxInPlace(lp); // log-probs of the processed distribution (what CT2 / openai score with)
       return { raw, lp };
     };
-    const hyp = (h: Hyp | null, tok: number, lp: number, past: KV): Hyp => ({
+    const hyp = (h: Hyp | null, tok: number, lp: number, cache: CacheRow): Hyp => ({
       tokens: h ? [...h.tokens, tok] : [tok],
       logprobs: h ? [...h.logprobs, lp] : [lp],
       sum: (h?.sum ?? 0) + lp,
-      past,
+      cache,
       last: tok,
       finished: tok === eot,
     });
@@ -568,13 +891,14 @@ export class WhisperEngine {
     let active: Hyp[] = [];
     {
       const { raw, lp } = process(pre.row, [], true);
+      const start: CacheRow = { kv: kv0, row: 0 };
       if (sampling) {
         for (let i = 0; i < nHyp; i++) {
           const tok = sampleWithTemperature(raw, a.temperature, a.rng);
-          active.push(hyp(null, tok, lp[tok], kv0));
+          active.push(hyp(null, tok, lp[tok], start));
         }
       } else {
-        for (const tok of topK(lp, nHyp)) active.push(hyp(null, tok, lp[tok], kv0));
+        for (const tok of topK(lp, nHyp)) active.push(hyp(null, tok, lp[tok], start));
       }
     }
     const settle = () => {
@@ -590,84 +914,73 @@ export class WhisperEngine {
     };
     settle();
 
+    const limit = this.batching === 'never' ? 1 : this.batchLimit(crossKV, nHyp, gpu);
     let step = 0;
-    while (active.length && step < a.maxNew - 1) {
-      await this.check();
-      a.onTokens?.(active[0].tokens);
-      step++;
-      const results: Array<{ h: Hyp; row: Float32Array; kv: KV }> = [];
-      for (const h of active) {
-        const out = await this.run(encoderOut, [[h.last]], h.past);
-        results.push({ h, row: this.logitsRow(out), kv: this.mergeKV(out, h.past) });
-      }
-      if (sampling) {
-        const next: Hyp[] = [];
-        for (const r of results) {
-          const { raw, lp } = process(r.row, r.h.tokens, false);
-          const tok = sampleWithTemperature(raw, a.temperature, a.rng);
-          next.push(hyp(r.h, tok, lp[tok], r.kv));
-        }
-        const keep = new Set<TensorLike>(shared);
-        for (const h of next) for (const t of Object.values(h.past)) keep.add(t);
-        for (const r of results) if (r.h.past !== kv0) this.disposeKV(r.h.past, keep);
-        active = next;
-        settle();
-      } else if (nHyp === 1) {
-        const r = results[0];
-        const { lp } = process(r.row, r.h.tokens, false);
-        const tok = argmax(lp);
-        const keep = new Set<TensorLike>([...shared, ...Object.values(r.kv)]);
-        if (r.h.past !== kv0) this.disposeKV(r.h.past, keep);
-        active = [hyp(r.h, tok, lp[tok], r.kv)];
-        settle();
-      } else {
-        // beam search (OpenAI semantics): top (beam+1) of every active beam, keep the best `beam` unfinished
-        const cands: Array<{
-          score: number;
-          r: (typeof results)[number];
-          tok: number;
-          lp: number;
-        }> = [];
-        for (const r of results) {
-          const { lp } = process(r.row, r.h.tokens, false);
-          for (const tok of topK(lp, nHyp + 1))
-            cands.push({ score: r.h.sum + lp[tok], r, tok, lp: lp[tok] });
-        }
-        cands.sort((x, y) => y.score - x.score);
-        const next: Hyp[] = [];
-        for (const c of cands) {
-          const nh = hyp(c.r.h, c.tok, c.lp, c.r.kv);
-          if (nh.finished) {
-            if (finished.length < maxFinished) {
-              finished.push({
-                tokens: nh.tokens.slice(0, -1),
-                logprobs: nh.logprobs.slice(),
-                sum: nh.sum,
-              });
-            }
-          } else {
-            next.push(nh);
-            if (next.length === nHyp) break;
+    try {
+      while (active.length && step < a.maxNew - 1) {
+        await this.check();
+        a.onTokens?.(active[0].tokens);
+        step++;
+        const { results, presents } = await this.decodeStep(encoderOut, crossKV, active, limit, gpu);
+        for (const p of presents) caches.add(p);
+        if (sampling) {
+          const next: Hyp[] = [];
+          for (const r of results) {
+            const { raw, lp } = process(r.row, r.h.tokens, false);
+            const tok = sampleWithTemperature(raw, a.temperature, a.rng);
+            next.push(hyp(r.h, tok, lp[tok], r.cache));
           }
+          active = next;
+          settle();
+        } else if (nHyp === 1) {
+          const r = results[0];
+          const { lp } = process(r.row, r.h.tokens, false);
+          const tok = argmax(lp);
+          active = [hyp(r.h, tok, lp[tok], r.cache)];
+          settle();
+        } else {
+          // beam search (OpenAI semantics): top (beam+1) of every active beam, keep the best `beam` unfinished
+          const cands: Array<{
+            score: number;
+            r: (typeof results)[number];
+            tok: number;
+            lp: number;
+          }> = [];
+          for (const r of results) {
+            const { lp } = process(r.row, r.h.tokens, false);
+            for (const tok of topK(lp, nHyp + 1))
+              cands.push({ score: r.h.sum + lp[tok], r, tok, lp: lp[tok] });
+          }
+          cands.sort((x, y) => y.score - x.score);
+          const next: Hyp[] = [];
+          for (const c of cands) {
+            const nh = hyp(c.r.h, c.tok, c.lp, c.r.cache);
+            if (nh.finished) {
+              if (finished.length < maxFinished) {
+                finished.push({
+                  tokens: nh.tokens.slice(0, -1),
+                  logprobs: nh.logprobs.slice(),
+                  sum: nh.sum,
+                });
+              }
+            } else {
+              next.push(nh);
+              if (next.length === nHyp) break;
+            }
+          }
+          active = next;
+          if (finished.length >= maxFinished) active = [];
         }
-        const keep = new Set<TensorLike>(shared);
-        for (const h of next) for (const t of Object.values(h.past)) keep.add(t);
-        for (const r of results) {
-          if (r.h.past !== kv0) this.disposeKV(r.h.past, keep);
-          if (!next.some((h) => h.past === r.kv)) this.disposeKV(r.kv, keep);
-        }
-        active = next;
-        if (finished.length >= maxFinished) active = [];
+        release(active);
       }
+    } finally {
+      release([]); // done, length limit, cancel or error: no cache outlives the attempt
     }
-    const leftover = new Set<TensorLike>(shared);
     // hypotheses that hit the length limit join the pool as if they had ended
     if (finished.length < Math.max(1, sampling ? 1 : a.beam)) {
       for (const h of active)
         finished.push({ tokens: h.tokens.slice(), logprobs: h.logprobs.slice(), sum: h.sum });
     }
-    for (const h of active) this.disposeKV(h.past, leftover);
-    this.disposeKV(kv0, leftover);
     // rank by sum_logprob / length (CTranslate2 length_penalty = 1)
     let best: Finished | undefined = finished[0];
     let bestScore = -Infinity;
@@ -702,10 +1015,35 @@ export class WhisperEngine {
     const { eot } = this.ids;
     const seq = [...head, ...textTokens, eot];
     const S = seq.length;
-    const out = this.multiTokenCacheOk
-      ? await this.run(encoderOut, [seq], { ...crossKV, ...this.emptyDecoderKV() })
-      : await this.run(encoderOut, [seq], null);
-    const lg: TensorLike = out.logits.type === 'float32' ? out.logits : out.logits.to('float32');
+    const shared = new Set<TensorLike>(Object.values(crossKV));
+    const needed = [...new Set(this.alignmentHeads.map(([l]) => l))].map((l) => `cross_attentions.${l}`);
+    // only the logits and the alignment heads' layers (small: 4 of 12): no readback of the other layers' attention
+    const out: Record<string, TensorLike> =
+      this.stepFetches && this.multiTokenCacheOk
+        ? await this.directRun(encoderOut, [seq], { ...crossKV, ...this.emptyDecoderKV() }, ['logits', ...needed])
+        : this.multiTokenCacheOk
+          ? await this.run(encoderOut, [seq], { ...crossKV, ...this.emptyDecoderKV() })
+          : await this.run(encoderOut, [seq], null);
+    try {
+      return this.wordsFromPass(out, head, textTokens, audioSeconds, S, probsOverride);
+    } finally {
+      // the pass's cache outputs live in GPU buffers on WebGPU: free them (they used to stay allocated per window)
+      for (const v of Object.values(out)) if (v?.location === 'gpu-buffer' && !shared.has(v)) v.dispose();
+    }
+  }
+
+  /** Word times (cross-attention DTW of the alignment heads) and probabilities from the teacher-forced pass's outputs. */
+  private wordsFromPass(
+    out: Record<string, TensorLike>,
+    head: number[],
+    textTokens: number[],
+    audioSeconds: number,
+    S: number,
+    probsOverride?: Float32Array,
+  ): AlignedWord[] {
+    const { eot } = this.ids;
+    const logits = out['logits'];
+    const lg: TensorLike = logits.type === 'float32' ? logits : logits.to('float32');
     const probs =
       probsOverride && probsOverride.length === textTokens.length
         ? probsOverride
@@ -780,6 +1118,8 @@ export class WhisperEngine {
     try {
       return await this.transcribeWindowInner(audio, options);
     } finally {
+      if (this.windowCross) this.releaseCrossKV(this.windowCross);
+      this.windowCross = null;
       this.busy = false;
     }
   }
@@ -798,6 +1138,7 @@ export class WhisperEngine {
     let t = performance.now();
     const first = await this.firstStep(encoderOut);
     const { crossKV, noSpeechProb } = first;
+    this.windowCross = crossKV;
     const langProbs = this.multilingual ? first.languages : [];
     let language = o.language ?? null;
     let detected = false;
@@ -925,7 +1266,8 @@ export class WhisperEngine {
       });
     }
     const words = segments.flatMap((s) => s.words);
-    this.releaseCrossKV(crossKV); // free the per-window GPU tensors
+    this.releaseCrossKV(crossKV); // free the per-window GPU tensors (and their batch tiles)
+    this.windowCross = null;
     timings['total'] = ms(T0);
     timings['decoderRuns'] = this.stats.decoderRuns - runs0;
     return {
@@ -985,6 +1327,17 @@ export function textTokenProbabilities(tokens: readonly number[], logprobs: read
   const out: number[] = [];
   for (let i = 0; i < tokens.length; i++) if (tokens[i] < eot) out.push(Math.exp(logprobs[i] ?? -Infinity));
   return Float32Array.from(out);
+}
+
+/** Largest |a[i] - b[i]| of two raw logits rows (finite numbers; a NaN counts as an infinite difference). */
+function maxAbsDiff(a: Float32Array, b: Float32Array): number {
+  let m = 0;
+  for (let i = 0; i < a.length; i++) {
+    const d = Math.abs(a[i] - b[i]);
+    if (Number.isNaN(d)) return Infinity;
+    if (d > m) m = d;
+  }
+  return m;
 }
 
 function ms(since: number): number {

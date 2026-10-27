@@ -73,7 +73,7 @@ DEFAULT_OPTIONS = {
     "model": "small",
     "language": None,          # None = auto-detect
     "task": "transcribe",      # or "translate" (any language -> English)
-    "output_script": "hinglish",  # Hindi in Roman letters; original leaves recognition text unchanged
+    "output_script": "original",  # original leaves recognition text unchanged; hinglish = Hindi in Roman letters
     "prompt": "",              # vocabulary / context hint: names, jargon, spelling
     "beam_size": 5,
     "vad": True,               # skip non-speech

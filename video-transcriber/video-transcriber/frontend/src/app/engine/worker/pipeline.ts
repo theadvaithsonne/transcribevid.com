@@ -169,15 +169,20 @@ export async function runPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
 }
 
 /** Download progress of the main model, then the aligner's continuing the same total (the job page shows one bar). */
-function downloadReporter(emit: (loaded: number, total: number, file?: string) => void) {
+function downloadReporter(emit: (loaded: number, total: number, file?: string, note?: string) => void) {
   let mainTotal = 0;
   return {
     main: (p: ProgressInfo) => {
       mainTotal = Math.max(mainTotal, p.total);
-      emit(p.loaded, p.total, p.file);
+      emit(p.loaded, p.total, p.file, p.note);
     },
-    aligner: (p: ProgressInfo) => emit(mainTotal + p.loaded, mainTotal + p.total, p.file),
+    aligner: (p: ProgressInfo) => emit(mainTotal + p.loaded, mainTotal + p.total, p.file, p.note),
   };
+}
+
+/** The part of the state a reloaded page needs to continue: everything but the audio (decoded again on resume). */
+function checkpointOf(state: ResumeState, filter: SegmentFilter, streaming: boolean): ResumeState {
+  return { ...state, pcm: new Int16Array(0), chunks: null, filter: filterState(filter), streaming, redecode: true, qwen: undefined };
 }
 
 async function runWhisperPipeline(req: RunRequest, deps: PipelineDeps, ctx: PipelineContext): Promise<PipelineOutcome> {
@@ -192,14 +197,16 @@ async function runWhisperPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
   ctx.onEngine?.(engine);
   let aligner: AsrEngine | null = null;
   let loadSettled = false;
-  const progress = downloadReporter((loaded, total, file) => emit({ type: 'progress', id, kind: 'download', loaded, total, file }));
+  const progress = downloadReporter((loaded, total, file, note) =>
+    emit({ type: 'progress', id, kind: 'download', loaded, total, file, ...(note ? { note } : {}) }),
+  );
   const loading = (async (): Promise<AsrEngine | null> => {
-    await deps.ensureModel(o.model, plan.backend, engine, { gpu: { shaderF16: plan.shaderF16 }, onProgress: progress.main });
+    await deps.ensureModel(o.model, plan.backend, engine, { gpu: { shaderF16: plan.shaderF16 }, onProgress: progress.main, signal });
     const alignerId = wantWords && !engine.hasWordTimestamps && engine.attachAligner ? (deps.alignerFor?.(o.model) ?? null) : null;
     if (!alignerId) return null;
     const a = deps.createEngine();
     try {
-      await deps.ensureModel(alignerId, plan.backend, a, { gpu: { shaderF16: plan.shaderF16 }, onProgress: progress.aligner });
+      await deps.ensureModel(alignerId, plan.backend, a, { gpu: { shaderF16: plan.shaderF16 }, onProgress: progress.aligner, signal });
       engine.attachAligner!(a);
       log('INFO', `word timing: ${o.model} is aligned with the ${alignerId} timing model`);
       return a;
@@ -235,7 +242,11 @@ async function runWhisperPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
       durationNow = s.duration;
       decoding = s.decoding;
     } else {
-      state = req.resume ?? (await decodeAll(req, deps, ctx, log));
+      state = !req.resume
+        ? await decodeAll(req, deps, ctx, log)
+        : req.resume.redecode
+          ? continueFrom(await decodeAll(req, deps, ctx, log), req.resume)
+          : req.resume;
       timeline = new SpeechTimeline(state.pcm, state.scale, state.chunks);
       const d = state.duration;
       durationNow = () => d;
@@ -316,6 +327,7 @@ async function runWhisperPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
     const filter = restoreFilter(state.filter);
     const initialPrompt = pyStrip(o.prompt ?? '');
     let windowsHere = 0;
+    let checkpointed = state.windowsDone;
     for (;;) {
       throwIfAborted(signal);
       const previousSeek = state.seek;
@@ -332,6 +344,11 @@ async function runWhisperPipeline(req: RunRequest, deps: PipelineDeps, ctx: Pipe
       const contentFrames = timeline.done ? knownFrames() : Number.POSITIVE_INFINITY;
       const segFrames = Math.min(WINDOW_FRAMES, knownFrames() - previousSeek);
       if (audio.length < MIN_WINDOW_SAMPLES) break;
+      // another window follows and everything before it is emitted: a page that reloads from now on continues here
+      if (state.windowsDone > checkpointed) {
+        checkpointed = state.windowsDone;
+        emit({ type: 'checkpoint', id, state: checkpointOf(state, filter, streaming) });
+      }
       const timeOffset = previousSeek / FRAMES_PER_SECOND;
       const prompt = [initialPrompt, o.condition_on_previous ? state.context : ''].filter(Boolean).join(' ');
       const r = await engine.transcribeWindow(audio, {
@@ -487,6 +504,22 @@ async function decodeAll(
     lastSpeechTimestamp: 0,
     windowsDone: 0,
     wordTimestamps: o.word_timestamps,
+  };
+}
+
+/** A checkpoint on freshly decoded audio: the audio, its length and speech chunks are new, where to go on is the checkpoint's. */
+function continueFrom(fresh: ResumeState, checkpoint: ResumeState): ResumeState {
+  return {
+    ...fresh,
+    seek: checkpoint.seek,
+    emitted: checkpoint.emitted,
+    filter: checkpoint.filter,
+    language: checkpoint.language,
+    languageProbability: checkpoint.languageProbability,
+    context: checkpoint.context,
+    lastSpeechTimestamp: checkpoint.lastSpeechTimestamp,
+    windowsDone: checkpoint.windowsDone,
+    wordTimestamps: checkpoint.wordTimestamps,
   };
 }
 

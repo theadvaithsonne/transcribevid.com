@@ -29,6 +29,8 @@ export interface ProgressInfo {
   progress: number;
   fileLoaded?: number;
   fileTotal?: number;
+  /** a short status for the page while the download is not simply running ("Waiting for the internet connection…") */
+  note?: string;
 }
 
 export interface PartialInfo {

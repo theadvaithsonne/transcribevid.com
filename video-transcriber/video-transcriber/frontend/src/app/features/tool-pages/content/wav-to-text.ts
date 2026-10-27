@@ -2,15 +2,19 @@ import { ToolPageContent } from '../tool-page.model';
 
 export const CONTENT: ToolPageContent = {
   eyebrow: 'WAV to text',
-  h1: 'Convert a WAV file to text, free and with timestamps',
-  lead: 'WAV is the format of handheld recorders, call recorders and studio sessions. Add yours and read the words as timestamped text, free, with no login and no need to compress the file first.',
+  h1: 'Convert WAV to text',
+  lead: 'WAV is the uncompressed audio that recorders, studios and dictation devices save. Add a WAV file and get a timestamped transcript in more than 50 languages, free and with no login.',
   dropKind: 'audio',
   dropNoun: 'WAV',
 
-  whyTitle: 'Why a WAV file is a good thing to transcribe',
+  whyTitle: 'Why WAV gives good transcripts',
   why: [
-    'A WAV file usually stores sound without compression, so nothing was thrown away when it was saved. That makes it a good source for speech recognition: no compression artefacts, and every consonant is still in the file. You do not need to turn it into an MP3 first. TranscribeVid reads the WAV as it is.',
-    'The price of that quality is size. CD-quality stereo takes about 10 MB for every minute, so an hour of audio is more than half a gigabyte. This page is made for those big files: it skips silence and most non-speech sound (the Skip silence & music option, on by default) and gives you text with a timestamp on every line.',
+    'WAV keeps every detail of the recording, with no compression. That suits speech recognition: consonants stay crisp, and quiet speakers are easier to pick out than in a heavily compressed file.',
+    'The catch is size. One hour of CD-quality stereo WAV is about 635 MB, which can be more than the size limit here. A mono recording at 16 kHz is far smaller, about 115 MB an hour, and keeps everything the model needs.',
+  ],
+  browserWhy: [
+    'WAV keeps every detail of the recording, with no compression. That suits speech recognition: consonants stay crisp, and quiet speakers are easier to pick out than in a heavily compressed file.',
+    'The catch is size. One hour of CD-quality stereo WAV is about 635 MB. Here that matters less: the file is read in your browser and never uploaded, so there is no upload to wait for. Very long files need enough free memory on your device.',
   ],
 
   sections: [
@@ -49,32 +53,28 @@ export const CONTENT: ToolPageContent = {
   ],
 
   howTitle: 'How to convert a WAV file to text',
-  howToDescription:
-    'Add the WAV file, choose the spoken language and quality, wait for the transcript and download it as text or subtitles.',
+  howToDescription: 'Add the WAV file, choose the language and quality, wait for the transcript and download TXT, SRT, VTT or PDF.',
   steps: [
     {
-      title: 'Drop in the WAV',
-      text: 'Add the .wav file in the box at the top of this page: drop it there or press Choose a file. If it is still on a recorder, copy it to your computer first. The box takes one file; on the next page, Add another file lines up more WAVs, and each gets its own transcript.',
+      title: 'Add the WAV',
+      text: 'Drop the .wav in the box at the top of this page, or press Choose a file.',
     },
     {
-      title: 'Choose language and quality',
-      text: 'On the next page, pick the spoken language, or leave Detect automatically for a recording in one language. Standard suits most speech. For a quiet or difficult recording, High accuracy and Best accuracy take longer and make fewer mistakes. Then press Transcribe.',
-      browser: {
-        text: 'On the next page, pick the spoken language, or leave Detect automatically for a recording in one language. Standard suits most speech. For a quiet or difficult recording, try High accuracy or Best accuracy if your device offers them: they take longer, they are a bigger first-time download, and they are greyed out, with the reason, on a device that cannot run them. Then press Transcribe.',
-      },
+      title: 'Choose the language',
+      text: 'Pick the spoken language, or keep auto-detect for a recording in one language.',
     },
     {
-      title: 'Watch the text appear',
-      text: 'The transcript fills in line by line, each line with its time. Play from any line to check it against the recording.',
+      title: 'Pick a quality',
+      text: 'Clean studio WAVs do well even on Standard. For field recordings with noise or several speakers, choose High accuracy or Best accuracy.',
     },
     {
       title: 'Edit and download',
-      text: 'Correct wrong words, then download TXT to read, SRT or VTT for subtitles, or PDF to print. Nothing is kept after your session, so save what you need.',
+      text: 'Fix any line, then download TXT, SRT, VTT, PDF, Markdown or JSON.',
     },
   ],
 
-  formatsTitle: 'WAV and other audio formats',
-  formatsIntro: 'WAV is the lossless format, and this box takes these audio types too.',
+  formatsTitle: 'WAV and other lossless audio',
+  formatsIntro: 'Ordinary PCM WAV files work, mono or stereo. FLAC is the same quality in about half the size, and works too.',
   uploadTitle: 'Audio files you can add',
   accepts: ['WAV', 'MP3', 'M4A', 'AAC', 'FLAC', 'OGG', 'OPUS', '3GP'],
   downloads: [
@@ -86,66 +86,71 @@ export const CONTENT: ToolPageContent = {
     { name: 'JSON', use: 'data for your own tools' },
   ],
 
-  tipsTitle: 'Tips for transcribing WAV recordings',
+  tipsTitle: 'Tips for WAV recordings',
   tips: [
     {
-      title: 'Add it exactly as it is.',
-      text: 'There is nothing to gain from converting a WAV first, and a low-bitrate MP3 can lose detail. Add the file as it came off the recorder.',
-    },
-    {
-      title: 'Listen to both channels.',
-      text: 'Stereo is mixed down to mono. If one microphone is much quieter or noisier than the other, the mix inherits it, so check both channels in your player before a long job.',
-    },
-    {
-      title: 'Trim long silences.',
-      text: 'Field recordings often start and end with minutes of nothing. Cutting them in an editor makes the file smaller, and the transcript starts where the talking does.',
-    },
-    {
-      title: 'Split a very long session.',
-      text: 'Recordings over the size or length limit are refused, so split a long session at a natural break and transcribe the parts.',
+      title: 'Too big for the limit?',
+      text: 'Save a copy as FLAC (lossless, about half the size) or as a mono 16 kHz WAV. Both give the same transcript.',
       browser: {
-        title: 'Several hours take several hours.',
-        text: 'The site sets no size or length limit, but a recording of several hours needs a lot of time and free memory, and an older browser may refuse a very long file. On a phone, split it at a natural break and transcribe the parts.',
+        title: 'Very big files.',
+        text: 'There is no size limit here, but a WAV of several hours needs a lot of memory. A mono 16 kHz copy is far smaller and gives the same transcript.',
       },
     },
     {
-      title: 'Spell the hard words.',
-      text: 'List names, places and technical terms in the vocabulary hint under More options, written the way you want to see them.',
+      title: 'One voice per channel?',
+      text: 'If each person was recorded on their own channel, the channels are mixed into one before transcription. Speaker labels are not added.',
+    },
+    {
+      title: 'Skip the silences.',
+      text: 'Keep Skip silence & music on in More options, so long pauses at the start and end are skipped instead of turned into made-up words.',
+    },
+    {
+      title: 'Even out quiet speakers.',
+      text: 'Enhance audio evens out quiet voices and filters rumble. Leave it on unless the recording is already studio-clean.',
+    },
+    {
+      title: 'Dictation recorders.',
+      text: 'Many dictation devices save WAV. You do not need to say "comma" or "full stop": the model adds punctuation itself.',
     },
   ],
 
   faqs: [
     {
-      question: 'Can I transcribe a WAV recorded on a phone call?',
+      question: 'Is a WAV more accurate than an MP3?',
       answer:
-        'Yes, if the call is saved as a WAV file and both people can be heard. Both channels are mixed into one transcript and speaker names are not added, so type names into the text while you edit. Tell people you are recording, and check the rules where you live before recording calls.',
+        'A little, on difficult audio. On clear speech the difference is small. The recording itself, the microphone and the room matter much more than the file format.',
     },
     {
-      question: 'Is WAV more accurate than MP3 for transcription?',
-      answer:
-        'It can help a little, because nothing was removed from the sound. But a clear MP3 usually transcribes well and a noisy WAV does not. The microphone, the room and how close the speaker is matter more than the file format.',
-    },
-    {
-      question: 'Why is my WAV file so large, and does that matter?',
-      answer:
-        'WAV usually stores sound without compression: about 10 MB a minute for CD-quality stereo. Big files take longer to read. {limits} If a file is over the limit, trim it, or export a compressed copy (M4A or MP3) and use that.',
+      question: 'What is the largest WAV I can use?',
+      answer: '{limits} An hour of CD-quality stereo WAV is about 635 MB, so a long WAV may need converting to FLAC or MP3 first.',
       browser: {
         answer:
-          'WAV usually stores sound without compression: about 10 MB a minute for CD-quality stereo. Big files take a little longer to read, but the format is not the problem: in testing, a file of about 2.5 GB was read without trouble in a current browser. The site sets no size or length limit because your own device does the work, so a very long recording needs time and free memory, and an older browser may refuse a very long file. On a phone, split it first.',
+          'We set no size limit, because the WAV is read on your own device. The real limit is memory: long files are fine on most computers, but a phone may run out of memory on a very long one.',
       },
     },
     {
-      question: 'Does it handle 24-bit and 48 kHz WAV files?',
-      answer:
-        'Yes. The usual WAV settings, such as 16 or 24 bits at 44.1 or 48 kHz, are read without any preparation, and the sound is converted for the speech model automatically.',
+      question: 'Do I need to convert a WAV before transcribing it?',
+      answer: 'No. Add the WAV as it is. Converting only helps when the file is larger than the size limit.',
+      browser: {
+        answer: 'No. Add the WAV as it is. Converting only helps when a very long file is too big for the memory of your device.',
+      },
     },
     {
-      question: 'Can I transcribe several WAV files in one go?',
+      question: 'Can I transcribe a WAV in another language?',
       answer:
-        'Yes, on the next page. The box on this page takes one file; there, Add another file lines up the rest. Each file gets its own transcript, so a whole day of recordings can run one after another.',
+        'Yes, in more than 50 languages, from Hindi and Tamil to Spanish and Japanese. Choose the language for the best result, or set Output to Translate to English to get English text.',
+    },
+    {
+      question: 'Is my WAV file kept?',
+      answer: 'Only for your session. It is deleted automatically when the session ends, or when you press Delete my data now.',
+      browser: {
+        answer:
+          'Only in this browser: the WAV never leaves your device. It is deleted after a period of inactivity, or when you press Delete my data now.',
+      },
     },
   ],
 
+  related: ['/audio-to-text', '/mp3-to-text', '/m4a-to-text', '/interview-transcription', '/podcast-to-text'],
   links: [
     {
       label: 'MP3 to text',

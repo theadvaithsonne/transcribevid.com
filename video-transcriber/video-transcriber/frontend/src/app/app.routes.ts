@@ -41,7 +41,7 @@ export const appPages: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    title: 'Free Video to Text Transcription, No Login',
+    title: 'Free Video & Audio to Text Transcription',
     data: { description: DEFAULT_DESCRIPTION, ads: true, adSlot: 'end' },
     loadComponent: () => import('./features/upload/upload').then((m) => m.UploadPage),
   },
@@ -88,7 +88,7 @@ export const appPages: Routes = [
     },
     loadComponent: () => import('./features/contact/contact').then((m) => m.ContactPage),
   },
-  // keyword landing pages: /video-to-text, /audio-to-text, /mp4-to-text, /mp3-to-text, /srt-subtitle-generator, /voice-recording-to-text
+  // keyword landing pages (formats, Hindi and Hinglish, use cases, alternatives): one list, tool-pages.list.ts
   ...TOOL_PAGES.map(toolRoute),
   {
     path: 'tools',

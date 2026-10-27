@@ -2,19 +2,17 @@ import { ToolPageContent } from '../tool-page.model';
 
 export const CONTENT: ToolPageContent = {
   eyebrow: 'Meeting recording to text',
-  h1: 'Meeting recording to text: Zoom, Teams and Google Meet',
-  lead: 'Save the recording after your call, drop it here and get a timestamped transcript you can search, quote and turn into minutes. It costs nothing, needs no account and covers more than 50 languages.',
+  h1: 'Meeting recording to text, with no bot in your call',
+  lead: 'Already recorded the meeting in Zoom, Google Meet or Microsoft Teams? Add the file and get a timestamped transcript to search, quote and turn into minutes. Nothing joins your call, and there is no login.',
+  browserLead:
+    'Already recorded the meeting in Zoom, Google Meet or Microsoft Teams? Add the file and get a timestamped transcript to search, quote and turn into minutes. Nothing joins your call, and the recording never leaves your device.',
   dropKind: 'video',
   dropNoun: 'meeting recording',
 
-  whyTitle: 'Why transcribe a meeting recording',
+  whyTitle: 'Transcribe after the meeting, not during it',
   why: [
-    'Few people replay an hour-long meeting, but many need one thing from it: who agreed to what, and by when. A transcript lets you search for a deadline or a name, find the minute it was said and quote it exactly. It is a faster start for minutes and action lists than playing the call again.',
-    'This page works on a recording that already exists. It cannot join a live call, and it does not add speaker names, so it replaces the replay, not the note-taker. Meetings often hold confidential details, so know where a recording goes: here it is uploaded over an encrypted connection and removed automatically afterwards.',
-  ],
-  browserWhy: [
-    'Few people replay an hour-long meeting, but many need one thing from it: who agreed to what, and by when. A transcript lets you search for a deadline or a name, find the minute it was said and quote it exactly. It is a faster start for minutes and action lists than playing the call again.',
-    'This page works on a recording that already exists. It cannot join a live call, and it does not add speaker names, so it replaces the replay, not the note-taker. Meetings often contain confidential details: your browser transcribes the recording on your own device and nothing is uploaded, and nothing is kept once your session ends.',
+    'Meeting assistants work by sending a bot into your call. Some guests find that awkward, and many companies block it. TranscribeVid works from the recording you already have, after the meeting, so nobody new appears in the list of participants.',
+    'Use it for team calls, client meetings, board minutes, webinars and online classes. The transcript gives you exact quotes for the minutes and the moment a decision was made, and you can search it instead of scrubbing through an hour of video.',
   ],
 
   sections: [
@@ -53,34 +51,32 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  howTitle: 'How to convert a meeting recording to text',
-  howToDescription:
-    'Add the meeting recording, choose the language, wait for the transcript and download it as text or subtitles.',
+  howTitle: 'How to turn a meeting recording into text',
+  howToDescription: 'Find the Zoom, Meet or Teams recording, add it here, choose the language and quality, then edit and download the transcript.',
   steps: [
     {
-      title: 'Add the recording',
-      text: 'Press Choose a file, or drag the recording onto the box above. An MP4 video or an M4A audio file both work, and only the sound is used. The box takes one recording at a time and passes it to the uploader on the next page, where Add another file brings in the rest of a day of calls.',
+      title: 'Find the recording',
+      text: "Zoom saves local recordings in a Zoom folder inside Documents, usually with an audio-only M4A next to the MP4. Google Meet saves recordings to the organiser's Google Drive, in a Meet Recordings folder. Teams saves them to OneDrive or SharePoint; open the recording from the meeting chat to download it.",
     },
     {
-      title: 'Choose language and quality',
-      text: 'On the next page, pick the language people spoke, or keep Detect automatically. Standard suits most calls. Where your device offers them, High accuracy and Best accuracy suit fast talkers or poor audio; otherwise they show greyed out with the reason. Both are slower and need a bigger first-time download. If people switch language, pick the main one and check the lines marked as unsure. Then press Transcribe.',
-    },
-    {
-      title: 'Wait for the transcript',
-      text: 'Lines appear as the recording is processed, with a progress bar and an estimate of the time left. A long meeting takes longer.',
+      title: 'Add it here',
+      text: 'Drop the MP4 or the M4A in the box at the top of this page. The audio-only M4A is smaller and gives the same text.',
       browser: {
-        text: 'Lines appear as the recording is processed, with a progress bar and an estimate of the time left. Your own device does the work, so a long meeting takes longer: keep this page open until it finishes.',
+        text: 'Drop the MP4 or the M4A in the box at the top of this page. The audio-only M4A is smaller, so it is read faster and needs less memory, and it gives the same text.',
       },
     },
     {
-      title: 'Search, edit and export',
-      text: 'Type names and decision words into Search the text to jump between lines, play a line from its timestamp to check it, and fix mistakes. Then download TXT, Markdown or PDF. Add speaker names by hand while you edit.',
+      title: 'Set language and quality',
+      text: 'Choose the language of the meeting. For calls with several accents or poor microphones, High accuracy or Best accuracy makes fewer mistakes.',
+    },
+    {
+      title: 'Edit and download',
+      text: 'Type in speaker names where they matter, then download TXT or PDF for the minutes, or Markdown for your notes app.',
     },
   ],
 
-  formatsTitle: 'Meeting recording files and downloads',
-  formatsIntro:
-    'Zoom, Teams and Meet recordings are usually MP4 or M4A. Other video and audio files work too, and only the sound track is read.',
+  formatsTitle: 'Meeting files you can use',
+  formatsIntro: 'Zoom, Meet and Teams all save MP4 video, and Zoom also saves an M4A audio file. Phone recordings of meetings in a room work too.',
   uploadTitle: 'Recording files you can add',
   accepts: ['MP4', 'M4A', 'MKV', 'MOV', 'WEBM', 'MP3', 'WAV'],
   downloads: [
@@ -93,66 +89,60 @@ export const CONTENT: ToolPageContent = {
   tipsTitle: 'Tips for meeting transcripts',
   tips: [
     {
-      title: 'Use the audio-only file when there is one.',
-      text: 'It holds the same speech in a much smaller file, so it is quicker to add and to process.',
+      title: 'Tell people first.',
+      text: 'Say at the start that the meeting is recorded and will be transcribed. In many places you need everyone\'s consent to record.',
     },
     {
-      title: 'Put names and terms in the vocabulary hint.',
-      text: 'In More options, list the people, product names and acronyms used in the meeting. That way names and acronyms come out as you expect.',
+      title: 'Use the audio-only file.',
+      text: "Zoom's M4A has the same speech as the MP4 in a much smaller file.",
     },
     {
-      title: 'Expect crosstalk to cause mistakes.',
-      text: 'When two people speak at once, the recogniser cannot separate them. Lines it is unsure about are marked, so review those first.',
+      title: 'No speaker names.',
+      text: 'Lines are not labelled by speaker. The timestamps make it quick to check who said what in the recording, and you can type the names in.',
     },
     {
-      title: 'Stay under the limits.',
-      text: 'Recordings over the size or length limits shown on this page cannot be processed, so cut a very long call into parts first.',
+      title: 'Add jargon to the vocabulary hint.',
+      text: "Project names, product codes and colleagues' names in More options come out right far more often.",
+    },
+    {
+      title: 'Long meetings.',
+      text: 'If a meeting is longer than the length limit shown under the drop box, split the recording into parts first.',
       browser: {
-        title: 'Long calls take longer.',
-        text: 'The site sets no limit on length, but an all-day workshop recording needs time and free memory on your device. To read the first hour sooner, cut the file into parts in a video editor.',
+        text: 'There is no length limit, but a two-hour meeting takes a while on a slower device. Keep the tab open and the laptop plugged in.',
       },
-    },
-    {
-      title: 'Share the transcript with care.',
-      text: 'Send it only to the people who were in the meeting or who need it, and delete it when you no longer need it.',
     },
   ],
 
   faqs: [
     {
-      question: 'Can TranscribeVid join my Zoom or Teams call and transcribe it live?',
-      answer:
-        'No. It works on a recording that you save after the meeting. It cannot join a call, and it is not live captioning. For live captions, use the feature of your meeting tool.',
+      question: 'Does a bot join my meeting?',
+      answer: 'No. Nothing connects to Zoom, Meet or Teams. You add a recording after the meeting, the way you would add any other file.',
     },
     {
-      question: 'Does a meeting transcript show who said what?',
-      answer:
-        'No. Lines carry a time but no name. Add the names yourself while you edit, and check each one against the recording.',
+      question: 'Can it transcribe a meeting live?',
+      answer: 'No. It works on recordings, not live calls. Record the meeting with your meeting app, then add the file here when it ends.',
     },
     {
-      question: 'Is it safe to transcribe a confidential meeting recording here?',
+      question: 'Where does Zoom save recordings?',
       answer:
-        'The server receives the recording over an encrypted connection and deletes it when your session ends, or earlier if you press Delete my data now. Check what your organisation allows first. This is not legal advice.',
+        'Local recordings go to a Zoom folder in your Documents folder, one folder per meeting. Cloud recordings are on the Zoom website under Recordings, where you can download them.',
+    },
+    {
+      question: 'Can I write meeting minutes from it?',
+      answer:
+        'Yes, the transcript is the raw material. Download Markdown or TXT and cut it down to the decisions and actions. The tool does not write summaries for you.',
+    },
+    {
+      question: 'How long can a meeting recording be?',
+      answer: "{limits} Zoom's audio-only M4A is the smallest file for the same meeting. There is no daily or monthly quota.",
       browser: {
         answer:
-          'The recording is not uploaded: your browser transcribes it on your own device, and clears it after a period of inactivity or when you press Delete my data now. A transcript you download is an ordinary file on your device, so look after it as you would the recording, and check what your organisation allows. This is not legal advice.',
+          'We set no limit. The recording is transcribed on your own device, so a long meeting takes longer, and the page warns you on a slower device. There is no daily or monthly quota.',
       },
-    },
-    {
-      question: 'How long a meeting recording can I transcribe?',
-      answer: '{limits} Longer files cannot be processed, so split them first.',
-      browser: {
-        answer:
-          'No cap is set on the recording itself, because the work happens on your own device. What limits you is time and free memory: a multi-hour call is possible, the page warns you if your device looks too slow for it, and a browser without WebCodecs support may not cope with a very long file.',
-      },
-    },
-    {
-      question: 'What if people switch language during the meeting?',
-      answer:
-        'Choose the language that is spoken most. Recognition follows the main language best, so words in another language may be written wrongly. Lines it is unsure about are marked: check those against the recording.',
     },
   ],
 
+  related: ['/mp4-to-text', '/m4a-to-text', '/interview-transcription', '/private-transcription', '/otter-ai-alternative'],
   links: [
     {
       label: 'MP4 to text',

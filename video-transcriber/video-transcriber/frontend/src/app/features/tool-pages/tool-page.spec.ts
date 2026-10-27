@@ -130,17 +130,45 @@ describe('ToolPage (a keyword landing page)', () => {
       expect(clean(page.textContent)).not.toContain('{limits}'); // every placeholder was filled in
     });
 
-    it('links to its neighbours first, then the core tools, then "All free tools"; never to itself', () => {
+    it('ends with its related tools: the pages it lists, else its neighbours first; never itself, then "All free tools"', () => {
       const hrefs = qa('app-related-tools a').map((a) => a.getAttribute('href'));
       expect(hrefs).not.toContain(path);
       expect(hrefs.at(-1)).toBe('/tools');
       const tools = hrefs.slice(0, -1);
-      expect(tools.length).toBe(Math.min(8, TOOL_PAGES.length - 1));
       expect(new Set(tools).size).toBe(tools.length);
-      const neighbours = TOOL_PAGES.filter((x) => x.group === t.group && x.path !== path)
-        .slice(0, 4)
-        .map((x) => x.path);
-      expect(tools.slice(0, neighbours.length)).toEqual(neighbours);
+      expect(q('app-related-tools h3')).toBeNull(); // one short list, no group headings
+      if (content.related?.length) {
+        expect(tools).toEqual(content.related);
+        expect(clean(q('app-related-tools h2')!.textContent)).toBe('Related tools');
+      } else {
+        expect(tools.length).toBe(Math.min(8, TOOL_PAGES.length - 1));
+        const peers = TOOL_PAGES.filter((x) => x.group === t.group);
+        const at = peers.findIndex((x) => x.path === path);
+        const neighbours = [...peers.slice(at + 1), ...peers.slice(0, at)].slice(0, 4).map((x) => x.path);
+        expect(tools.slice(0, neighbours.length)).toEqual(neighbours);
+      }
+    });
+
+    it('has a dated comparison table with its sources (the comparison pages only)', () => {
+      const table = q('section.compare table');
+      if (!content.comparison) {
+        expect(q('section.compare')).toBeNull();
+        return;
+      }
+      const cmp = content.comparison;
+      expect(clean(q('#compare-title')!.textContent)).toBe(cmp.title);
+      expect(qa('section.compare thead th').slice(1).map((th) => clean(th.textContent))).toEqual(['TranscribeVid', cmp.them]);
+      const rows = Array.from(table!.querySelectorAll('tbody tr'));
+      expect(rows.map((r) => clean(r.querySelector('th')!.textContent))).toEqual(cmp.rows.map((r) => r.topic));
+      expect(rows.map((r) => Array.from(r.querySelectorAll('td')).map((td) => clean(td.textContent)))).toEqual(cmp.rows.map((r) => [r.us, r.them]));
+      expect(clean(q('section.compare .checked')!.textContent)).toContain(`checked on ${cmp.checked}`);
+      const links = qa('section.compare .sources a');
+      expect(links.map((a) => a.getAttribute('href'))).toEqual(cmp.sources.map((s) => s.url));
+      for (const a of links) {
+        expect(a.getAttribute('rel')).toContain('nofollow');
+        expect(a.getAttribute('rel')).toContain('noopener');
+      }
+      expect(qa('section.compare img').length).toBe(0); // no logos
     });
 
     it('shows its own extra sections, and the related links it lists (each to a page of this site)', () => {
@@ -283,6 +311,33 @@ describe('ToolPage (a keyword landing page)', () => {
       expect(shown).toContain('there is no size limit and nobody else is ahead of you');
       expect(shown).toContain('Long videos take longer.');
       expect(shown).not.toContain('Stay under the limit.');
+    });
+
+    it('private-transcription: the in-browser H1, lead and answers say the file is never uploaded; the server ones do not', async () => {
+      const c = await loadToolContent('private-transcription');
+      await open('/private-transcription', makeBrowserHealth());
+      expect(clean(q('h1')!.textContent)).toBe(c.browserH1);
+      expect(clean(q('.page-lead')!.textContent)).toBe(c.browserLead);
+      expect(clean(page.textContent)).toContain('the file is never uploaded, to us or to anyone else');
+      expect(qa('.why-text p').map((p) => clean(p.textContent))).toEqual(c.browserWhy);
+
+      TestBed.resetTestingModule();
+      await open('/private-transcription', makePublicHealth());
+      expect(clean(q('h1')!.textContent)).toBe(c.h1);
+      expect(clean(q('.page-lead')!.textContent)).toBe(c.lead);
+      expect(clean(page.textContent)).not.toContain('never uploaded');
+      expect(clean(page.textContent)).toContain('Yes, to the server that runs this site');
+    });
+
+    it('turboscribe-alternative: the comparison rows take the in-browser wording for TranscribeVid', async () => {
+      const cmp = (await loadToolContent('turboscribe-alternative')).comparison!;
+      await open('/turboscribe-alternative', makeBrowserHealth());
+      const us = qa('section.compare tbody tr').map((r) => clean(r.querySelector('td')!.textContent));
+      expect(us).toEqual(cmp.rows.map((r) => r.browserUs ?? r.us));
+      expect(us).toContain('In your browser, on your own device. The file is not uploaded.');
+      TestBed.resetTestingModule();
+      await open('/turboscribe-alternative', makePublicHealth());
+      expect(qa('section.compare tbody tr').map((r) => clean(r.querySelector('td')!.textContent))).toEqual(cmp.rows.map((r) => r.us));
     });
 
     it('the server editions keep their own words (the public site still states its limits and queue)', async () => {

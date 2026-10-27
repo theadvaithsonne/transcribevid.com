@@ -5,7 +5,7 @@ import { IS_BROWSER } from './platform';
 export type Theme = 'light' | 'dark';
 const KEY = 'vt-theme';
 /** the colour of the browser's own bar on phones: the page background of each theme */
-export const THEME_COLOR: Record<Theme, string> = { light: '#fff7ed', dark: '#000000' };
+export const THEME_COLOR: Record<Theme, string> = { light: '#fff7ed', dark: '#1f1d1b' };
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {

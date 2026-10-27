@@ -104,12 +104,15 @@
                   <span class="dot" aria-hidden="true"></span>
                   <span class="words">
                     <b>{{ p.title | t }}</b>
-                    <span class="sub">{{ p.recommended ? ('Recommended' | t) : (p.speedLabel | t) }}</span>
+                    <span class="sub">{{ isRecommended(p) ? ('Recommended' | t) : (p.speedLabel | t) }}</span>
                   </span>
                 </label>
               }
             </div>
             <p class="quality-help" aria-live="polite">{{ selectedHelp() }}</p>
+            @if (prefetchLine(); as line) {
+              <p class="quality-help prefetch-note">{{ line }}</p>
+            }
             @for (n of planNotes(); track n) {
               <p class="quality-help device-note">{{ tm(n) }}</p>
             }
@@ -136,10 +139,10 @@
         <div class="field">
           <label for="output-script">{{ 'Transcript style' | t }}</label>
           <select id="output-script" [(ngModel)]="opts.output_script" [disabled]="opts.task === 'translate'" aria-describedby="output-script-hint">
-            <option value="hinglish">{{ 'Hinglish (Roman Hindi)' | t }}</option>
             <option value="original">{{ 'Original script' | t }}</option>
+            <option value="hinglish">{{ 'Hinglish (Roman Hindi)' | t }}</option>
           </select>
-          <span id="output-script-hint" class="hint">{{ opts.task === 'translate' ? ('English translation is selected in More options.' | t) : ('Hindi in English letters, with English words preserved. Other languages keep their original script. Review unfamiliar words and names.' | t) }}</span>
+          <span id="output-script-hint" class="hint">{{ opts.task === 'translate' ? ('English translation is selected in More options.' | t) : opts.output_script === 'hinglish' ? ('Hindi in English letters, with English words preserved. Other languages keep their original script. Review unfamiliar words and names.' | t) : ('Every language in its own script: English in English letters, Hindi in Devanagari. Choose Hinglish to write Hindi in English letters.' | t) }}</span>
         </div>
         @if (showAdvanced()) {
           <div class="more-body" id="more-options">
@@ -165,7 +168,7 @@
                 <option value="transcribe">{{ 'Transcribe (same language)' | t }}</option>
                 <option value="translate" [disabled]="opts.engine === 'qwen'">{{ 'Translate to English' | t }}</option>
               </select>
-              @if (translateWarning(); as why) { <span class="hint" role="note">{{ why }}</span> }
+              @if (translateWarning(); as why) { <span class="hint warn-hint" role="note">{{ why }}</span> }
             </div>
             <div class="field">
               <label for="prompt">{{ 'Vocabulary hint' | t }} <span class="muted">{{ '(optional)' | t }}</span></label>
@@ -256,6 +259,13 @@
     <li><app-rich [text]="info.use3 | t" /></li>
     <li><app-rich [text]="info.use4 | t" /></li>
   </ul>
+  @if (isEnglish()) {
+    <p class="home-popular">
+      Popular: <a routerLink="/hindi-audio-to-text">Hindi audio to text</a>, <a routerLink="/hinglish-transcription">Hinglish transcription</a>,
+      <a routerLink="/meeting-recording-to-text">meeting recordings</a>, <a routerLink="/lecture-to-text">lectures</a> and
+      <a routerLink="/private-transcription">private transcription</a>.
+    </p>
+  }
 
   <h2 class="section-title">{{ info.tipsTitle | t }}</h2>
   <p><app-rich [text]="info.tips | t" /></p>

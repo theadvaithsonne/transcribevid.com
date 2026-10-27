@@ -143,7 +143,7 @@ describe('BrandTitleStrategy with the real routes', () => {
   });
 
   it.each([
-    ['/', 'Free Video to Text Transcription, No Login - TranscribeVid', 'https://transcribevid.com/'],
+    ['/', 'Free Video & Audio to Text Transcription - TranscribeVid', 'https://transcribevid.com/'],
     ['/how-it-works', 'How it works - TranscribeVid', 'https://transcribevid.com/how-it-works'],
     ['/faq', 'Frequently asked questions - TranscribeVid', 'https://transcribevid.com/faq'],
     ['/privacy', 'Privacy policy - TranscribeVid', 'https://transcribevid.com/privacy'],
@@ -159,7 +159,7 @@ describe('BrandTitleStrategy with the real routes', () => {
 
   it('the home page title is the one that says what the site does', async () => {
     await router.navigateByUrl('/');
-    expect(document.title).toBe('Free Video to Text Transcription, No Login - TranscribeVid');
+    expect(document.title).toBe('Free Video & Audio to Text Transcription - TranscribeVid');
     expect(meta('meta[name="description"]')).toBe(DEFAULT_DESCRIPTION);
   });
 

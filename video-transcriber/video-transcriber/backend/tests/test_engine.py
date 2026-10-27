@@ -140,12 +140,13 @@ def test_transcribe_passes_options_and_drops_unsupported(patched):
 
 
 @pytest.mark.parametrize("options,language,expected", [
-    ({}, "hi", "toh student hai."),
+    ({}, "hi", "तो student है।"),  # the default keeps the original script
+    ({"output_script": "hinglish"}, "hi", "toh student hai."),
     ({"output_script": "original"}, "hi", "तो student है।"),
-    ({"task": "translate"}, "hi", "तो student है।"),
-    ({}, "mr", "तो student है।"),
+    ({"output_script": "hinglish", "task": "translate"}, "hi", "तो student है।"),
+    ({"output_script": "hinglish"}, "mr", "तो student है।"),
 ])
-def test_hinglish_default_live_and_final_output(patched, options, language, expected):
+def test_original_default_and_hinglish_live_and_final_output(patched, options, language, expected):
     model = patched([fake_seg(0, 2, "तो student है।")])
     model.language = language
     live = []

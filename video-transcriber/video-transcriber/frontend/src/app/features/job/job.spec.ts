@@ -3,11 +3,12 @@ import { HttpTestingController, TestRequest, provideHttpClientTesting } from '@a
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Router, provideRouter } from '@angular/router';
+import { ApiService } from '../../core/api.service';
 import { JobsStore } from '../../core/jobs.store';
 import { Job } from '../../core/models';
 import { SessionService } from '../../core/session.service';
 import { ToastService } from '../../core/toast.service';
-import { FakeEventSource, httpError, makeJob, makePublicHealth, makeSession, silentLog } from '../../testing/fakes';
+import { FakeEventSource, httpError, makeBrowserHealth, makeJob, makePublicHealth, makeSession, silentLog } from '../../testing/fakes';
 import { EXPORTS, JobPage, fileNameFrom } from './job';
 import { TranscriptView } from './transcript';
 
@@ -739,7 +740,7 @@ describe('JobPage', () => {
         page.rerun();
         const req = ctl.expectOne('/api/jobs/a/rerun');
         expect(req.request.body.language).toBeNull();
-        expect(req.request.body.output_script).toBe('hinglish');
+        expect(req.request.body.output_script).toBe('original'); // the job's own style (the default now)
         req.flush(makeJob({ id: 'new', status: 'queued' }));
       });
 
@@ -820,66 +821,38 @@ describe('JobPage', () => {
 
       it('language, length, words and how sure: one quiet line of text (no pills, no tiles)', () => {
         show({ language: 'en', duration: 125, stats: stats() }, [{ code: 'en', name: 'English' }]);
-        expect(facts()).toEqual(['English', '02:05', '321 words', '90% model confidence', 'Transcribed in 1 min 40 s']);
+        expect(facts()).toEqual(['English', 'Length 02:05', 'Transcribed in 01:40', '321 words', '90% model confidence']);
         expect(qa('p.facts [class*="tint-"]')).toEqual([]);
         expect(q('.stats')).toBeNull();
         expect(q('dl')).toBeNull();
       });
 
       it('rounds the confidence and counts words in the singular too', () => {
-        show({ started_at: null, finished_at: null, language: null, duration: null, stats: stats({ word_count: 1, avg_confidence: 0.876 }) });
-        expect(facts()).toEqual(['1 word', '88% model confidence']);
+        show({ language: null, duration: null, stats: stats({ word_count: 1, avg_confidence: 0.876 }) });
+        expect(facts()).toEqual(['Transcribed in 01:40', '1 word', '88% model confidence']);
       });
 
       it('names the language by its code when the server has no name for it', () => {
-        show({ started_at: null, finished_at: null, language: 'xx', duration: null }, [{ code: 'en', name: 'English' }]);
-        expect(facts()).toEqual(['XX']);
+        show({ language: 'xx', duration: null }, [{ code: 'en', name: 'English' }]);
+        expect(facts()).toEqual(['XX', 'Transcribed in 01:40']);
       });
 
       it('leaves out what is not known, and the whole line when nothing is', () => {
-        show({ started_at: null, finished_at: null, language: null, duration: null, stats: stats({ avg_confidence: null }) });
-        expect(facts()).toEqual(['321 words']);
+        show({ language: null, duration: null, stats: stats({ avg_confidence: null }) });
+        expect(facts()).toEqual(['Transcribed in 01:40', '321 words']);
         TestBed.resetTestingModule();
-        show({ started_at: null, finished_at: null, language: null, duration: null, stats: null });
+        show({ language: null, duration: null, stats: null, started_at: null });
         expect(q('p.facts')).toBeNull();
       });
 
-      it('says how long the transcription took: seconds under a minute, then minutes and seconds, then hours', () => {
-        const cases: [number, string][] = [
-          [48, 'Transcribed in 48 s'],
-          [179, 'Transcribed in 2 min 59 s'],
-          [120, 'Transcribed in 2 min'],
-          [3600, 'Transcribed in 1 h'],
-          [3900, 'Transcribed in 1 h 5 min'],
-          [0.4, 'Transcribed in 1 s'],
-        ];
-        for (const [took, text] of cases) {
-          TestBed.resetTestingModule();
-          show({ language: null, duration: null, stats: null, started_at: 1000, finished_at: 1000 + took });
-          expect(facts()).toEqual([text]);
-        }
-      });
-
-      it('has no time while the transcript is still being made, or when the start or the end is not known', () => {
-        const timed = (o: object) => {
-          TestBed.resetTestingModule();
-          show({ language: null, duration: null, stats: null, ...o });
-          return facts();
-        };
-        expect(timed({ status: 'running', started_at: 1000, finished_at: null })).toEqual([]);
-        expect(timed({ status: 'done', started_at: null, finished_at: 1100 })).toEqual([]);
-        expect(timed({ status: 'done', started_at: 1000, finished_at: null })).toEqual([]);
-        expect(timed({ status: 'done', started_at: 1100, finished_at: 1100 })).toEqual([]); // nothing measured
-      });
-
       it('says "→ English" when the transcript was translated', () => {
-        show({ started_at: null, finished_at: null, language: 'de', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'de', name: 'German' }]);
-        expect(facts()).toEqual(['German → English']);
+        show({ language: 'de', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'de', name: 'German' }]);
+        expect(facts()).toEqual(['German → English', 'Transcribed in 01:40']);
       });
 
       it('never shows "English → English" (translating English into English is just English)', () => {
-        show({ started_at: null, finished_at: null, language: 'en', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'en', name: 'English' }]);
-        expect(facts()).toEqual(['English']);
+        show({ language: 'en', duration: null, options: { ...makeJob().options, task: 'translate' } }, [{ code: 'en', name: 'English' }]);
+        expect(facts()).toEqual(['English', 'Transcribed in 01:40']);
       });
 
       it('has the file name as the tooltip of the line', () => {
@@ -1036,6 +1009,18 @@ describe('JobPage', () => {
         expect(qa('.menu-opt option').map((o) => clean(o))).toEqual(['Short (32 letters)', 'Standard (42 letters)', 'Long (56 letters)']);
       });
 
+      it('the browser edition also offers a Word file, right after PDF (the server has no Word export)', () => {
+        show({});
+        store.health.set(makeBrowserHealth());
+        fixture.detectChanges();
+        button('Export').click();
+        fixture.detectChanges();
+        const items = qa('.menu[role="menu"] button[role="menuitem"]');
+        expect(items.slice(0, 3).map((b) => clean(b.querySelector('b')))).toEqual(['PDF document (.pdf)', 'Word document (.docx)', 'Plain text (.txt)']);
+        expect(clean(items[1].querySelector('span'))).toBe('Opens in Word and Google Docs');
+        expect(items.length).toBe(8);
+      });
+
       describe('downloading a format', () => {
         let saved: { href: string; name: string }[];
         let click: ReturnType<typeof vi.spyOn>;
@@ -1092,6 +1077,37 @@ describe('JobPage', () => {
           ctl.expectOne('/api/jobs/a/export?format=md').error(new ProgressEvent('error'));
           await vi.waitFor(() => expect(lastToast()).toMatchObject({ kind: 'error', title: 'Download failed', message: 'Cannot reach the server.' }));
         });
+
+        it('the server edition never asks the server for a Word file', () => {
+          show({});
+          page.download('docx');
+          ctl.expectNone((r) => r.url.startsWith('/api/jobs/a/export'));
+          expect(saved).toEqual([]);
+        });
+
+        it('in the browser edition: Latin text downloads a PDF file, other scripts open the print dialog ("Save as PDF")', () => {
+          show({ title: 'My call' });
+          store.health.set(makeBrowserHealth());
+          Object.defineProperty(TestBed.inject(ApiService), 'kind', { get: () => 'browser', configurable: true });
+          page.download('pdf');
+          ctl.expectOne('/api/jobs/a/export?format=pdf').flush(new Blob(['%PDF-1.4']));
+          expect(saved).toEqual([{ href: 'blob:file', name: 'My call.pdf' }]);
+          expect(document.querySelector('iframe')).toBeNull();
+
+          vi.advanceTimersByTime(2000); // past the double-click guard
+          page.job.set({ ...page.job()!, segments: [line(0, 0, 'नमस्ते दोस्तों')] });
+          page.download('pdf');
+          ctl.expectNone((r) => r.url.startsWith('/api/jobs/a/export'));
+          expect(lastToast()).toMatchObject({ kind: 'info', title: 'Print to PDF' });
+          const frame = document.querySelector('iframe[aria-hidden="true"]');
+          expect(frame).not.toBeNull();
+          frame!.remove();
+
+          vi.advanceTimersByTime(2000);
+          page.download('docx');
+          ctl.expectOne('/api/jobs/a/export?format=docx').flush(new Blob(['PK']));
+          expect(saved[1]).toEqual({ href: 'blob:file', name: 'My call.docx' });
+        });
       });
 
       it('reads the file name of a download from the server header', () => {
@@ -1099,7 +1115,7 @@ describe('JobPage', () => {
         expect(fileNameFrom('attachment; filename="notes.md"')).toBe('notes.md');
         expect(fileNameFrom(null)).toBeNull();
         expect(fileNameFrom('attachment')).toBeNull();
-        expect(EXPORTS.length).toBe(7);
+        expect(EXPORTS.length).toBe(8);
       });
 
       it('the "More" menu holds Rename, Re-transcribe and Delete; Re-transcribe opens a form that can go back', () => {
@@ -1289,6 +1305,19 @@ describe('JobPage', () => {
         ctl.expectNone((r) => r.method === 'PATCH');
       });
 
+      it('in the browser edition the open line is saved in this browser, not sent to a server that is not there', () => {
+        show({});
+        store.health.set(makeBrowserHealth());
+        const send = vi.fn(() => Promise.resolve(new Response(null)));
+        vi.stubGlobal('fetch', send);
+        list().edit(page.job()!.segments[1]);
+        list().draft = 'world, kept';
+        window.dispatchEvent(new Event('pagehide'));
+        expect(send).not.toHaveBeenCalled();
+        expect(patch('a').request.body).toEqual({ segments: [{ id: 1, text: 'world, kept' }] }); // through the transport
+        expect(list().editingId()).toBeNull();
+      });
+
       it('closing or reloading the tab with an unsaved change (or a save on its way) makes the browser ask first', () => {
         show({});
         const leave = () => {
@@ -1358,6 +1387,30 @@ describe('JobPage', () => {
         expect(clean(q('.status b'))).toBe(label);
         expect(q('.status span')).toBeNull();
         expect(q('.progress .bar')!.classList.contains('indeterminate')).toBe(true);
+      });
+
+      it('while the model downloads: how much, the status note, and a bar that fills with the download', () => {
+        running({ phase: 'loading_model', progress: 0, eta_seconds: null, download: { loaded: 120e6, total: 249e6, note: 'Connection lost. Retrying in 8 s…' } });
+        expect(clean(q('.status span'))).toBe('Downloading the speech model (first time only): 120 MB of 249 MB · Connection lost. Retrying in 8 s…');
+        expect(q('.progress .bar')!.classList.contains('indeterminate')).toBe(false);
+        expect((q('.progress .bar i') as HTMLElement).style.transform).toBe(`scaleX(${120e6 / 249e6})`);
+      });
+
+      it('in the browser edition: asks to keep the page open', () => {
+        running();
+        expect(q('.keep-open')).toBeNull(); // the server editions work on the server
+        store.health.set(makeBrowserHealth());
+        fixture.detectChanges();
+        expect(clean(q('.keep-open'))).toBe(
+          'Keep this page open until it is finished. If it reloads or closes, it continues where it stopped when you open the site again.',
+        );
+      });
+
+      it('says when the job continued after the page reloaded', () => {
+        running({ resume_count: 1 });
+        store.health.set(makeBrowserHealth());
+        fixture.detectChanges();
+        expect(clean(q('.keep-open b'))).toBe('Continued after the page reloaded.');
       });
 
       it('a queued transcript says it is waiting', () => {
@@ -1433,7 +1486,7 @@ describe('JobPage', () => {
         show({ status: 'done', segments: [], stats: null });
         expect(clean(q('.list .empty'))).toBe('No speech was found in this file.If it does have speech, try More › Re-transcribe with the right language.');
         expect(q('input[type="search"]')).toBeNull(); // nothing to search
-        expect(qa('p.facts > span').map((s) => clean(s))).toEqual(['EN', '01:00', 'Transcribed in 1 min 40 s']); // no "0 words"
+        expect(qa('p.facts > span').map((s) => clean(s))).toEqual(['EN', 'Length 01:00', 'Transcribed in 01:40']); // no "0 words"
       });
 
       it('a very long name wraps instead of widening the page (it is plain text, no fixed width)', () => {

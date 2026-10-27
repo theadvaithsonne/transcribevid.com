@@ -33,49 +33,49 @@
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* "Warm sunset" palette. Light is the default (no data-theme attribute = light); dark is the alternative and is plain
-   black and white. Flat colour only: no gradients, glow or shadows. The main button (--primary-*) is for the ONE main
-   action of an area; --accent is for small badges and links; the "tint" colours are for icon tiles and badges: always put
-   --tint-ink text on them. */
+/* "Warm sunset" palette. Light is the default (no data-theme attribute = light); dark is the alternative. Flat colour
+   only: no gradients, glow or shadows. The main button (--primary-*) is for the ONE main action of an area; --accent is
+   for small badges and links; the "tint" colours are for icon tiles and badges: always put --tint-ink text on them. */
 
-/* Dark: black and white only. Greys for the layers, white for the main button, links and the selected outline. The only
-   colours left are the status ones (green done, amber warning, red error), because they carry meaning. */
+/* Dark: "warm dusk", easy on the eyes. A warm charcoal page (not black), cards a step lighter, soft off-white text (not
+   pure white) and the light theme's brand colours toned down: a soft orange main button with dark text, teal links and
+   progress. Every text colour keeps at least 4.5:1 on the page and the cards; borders of controls at least 3:1. */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --bg: #000000;
-  --surface: #111111;
-  --surface-2: #1c1c1c;
-  --surface-3: #2a2a2a;        /* hover rows, menus, the disabled main button */
-  --field-bg: #000000;
-  --line: #333333;             /* card borders */
-  --line-strong: #5c5c5c;      /* outlines of buttons, inputs and pills */
-  --text: #f2f2f2;
-  --text-strong: #ffffff;
-  --muted: #b3b3b3;
-  --accent: #ffffff;           /* links, small badges, progress */
-  --accent-2: #ffffff;
-  --accent-hover: #d9d9d9;
-  --accent-ink: #000000;       /* text ON an accent-coloured background */
-  --accent-soft: rgba(255, 255, 255, 0.12);
-  --primary-bg: #ffffff;       /* the main button: white with black text */
-  --primary-ink: #000000;
-  --primary-hover: #d9d9d9;
-  --primary-bright: #ffffff;   /* focus ring, selected outline */
-  --grad-accent: #ffffff;      /* kept for old references: solid, not a gradient */
-  --tint-mint: #e6e6e6;
-  --tint-sky: #d9d9d9;
-  --tint-peach: #e6e6e6;
-  --tint-lilac: #d9d9d9;
-  --tint-rose: #e6e6e6;
-  --tint-lemon: #f2f2f2;
-  --tint-ink: #000000;
-  --ok: #4ade80;
-  --warn: #fbbf24;
-  --err: #ff8a8a;
-  --hl: rgba(255, 255, 255, 0.3);
+  --bg: #1f1d1b;
+  --surface: #2a2724;
+  --surface-2: #34302c;
+  --surface-3: #403b36;        /* hover rows, menus, the disabled main button */
+  --field-bg: #24211f;
+  --line: #3d3833;             /* card borders */
+  --line-strong: #85796e;      /* outlines of buttons, inputs and pills */
+  --text: #e9e2db;
+  --text-strong: #f7f1ea;
+  --muted: #b8ada2;
+  --accent: #5ccfc4;           /* links, small badges, progress */
+  --accent-2: #5ccfc4;
+  --accent-hover: #8ee3da;
+  --accent-ink: #10201e;       /* text ON an accent-coloured background */
+  --accent-soft: rgba(92, 207, 196, 0.14);
+  --primary-bg: #f08a4b;       /* the main button: soft orange with dark text */
+  --primary-ink: #1f1d1b;
+  --primary-hover: #f4a172;
+  --primary-bright: #f6a06b;   /* focus ring, selected outline */
+  --grad-accent: #5ccfc4;      /* kept for old references: solid, not a gradient */
+  --tint-mint: #9fd8cf;
+  --tint-sky: #a9cfe0;
+  --tint-peach: #f2c39f;
+  --tint-lilac: #d4c4e8;
+  --tint-rose: #eeb4b4;
+  --tint-lemon: #eedc9a;
+  --tint-ink: #1f1d1b;
+  --ok: #6fd08c;
+  --warn: #f0b85a;
+  --err: #f28b82;
+  --hl: rgba(240, 184, 90, 0.28);
   --shadow: none;
   --shadow-lg: none;
-  --glass: rgba(0, 0, 0, 0.96);
+  --glass: rgba(31, 29, 27, 0.96);
   --glow: none;
 }
 

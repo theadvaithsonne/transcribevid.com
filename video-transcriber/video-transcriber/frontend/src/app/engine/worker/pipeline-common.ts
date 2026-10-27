@@ -53,7 +53,8 @@ export interface PipelineDeps {
     id: string,
     device: 'webgpu' | 'wasm',
     engine: AsrEngine,
-    o: { gpu: { shaderF16: boolean }; onProgress: (p: ProgressInfo) => void },
+    /** `signal`: the job's cancel also stops its download (the saved parts are kept) */
+    o: { gpu: { shaderF16: boolean }; onProgress: (p: ProgressInfo) => void; signal?: AbortSignal },
   ): Promise<unknown>;
   /** The word-timing model for a size without its own (engine/models catalog `aligner`), null when none is needed. */
   alignerFor?(model: string): string | null;
