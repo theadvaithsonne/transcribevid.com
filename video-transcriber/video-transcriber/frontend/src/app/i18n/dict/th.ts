@@ -1124,5 +1124,6 @@ const dict: Record<string, string> = {
     'ข้อความถอดเสียงที่เสร็จแล้ว ทุกบรรทัดมีไทม์สแตมป์ และปุ่มส่งออกจะบันทึกเป็น SRT, VTT, TXT, PDF และอื่น ๆ',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**สถิติการเข้าชม** Cloudflare Web Analytics นับการเข้าชมหน้าเว็บของเรา ได้แก่ หน้าที่เปิด เว็บไซต์ที่คุณมาจาก ประเทศของคุณ เบราว์เซอร์และประเภทอุปกรณ์ และความเร็วในการโหลดหน้า Cloudflare ระบุว่าไม่ตั้งค่าคุกกี้ ไม่เก็บตัวระบุใด ๆ ไว้บนอุปกรณ์ของคุณ และไม่ใช้ข้อมูลเพื่อติดตามคุณข้ามจากเว็บไซต์หนึ่งไปอีกเว็บไซต์หนึ่ง',
+  'By {name}': 'โดย {name}',
 };
 export default dict;

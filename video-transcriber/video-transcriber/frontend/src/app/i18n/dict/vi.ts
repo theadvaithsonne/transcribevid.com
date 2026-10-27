@@ -1143,6 +1143,7 @@ const dict: Record<string, string> = {
     'Một bản gỡ băng đã hoàn thành. Mỗi dòng có mốc thời gian, và nút Xuất lưu bản này thành SRT, VTT, TXT, PDF và nhiều định dạng khác.',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**Thống kê lượt truy cập.** Cloudflare Web Analytics đếm lượt truy cập các trang của chúng tôi: trang nào được mở, bạn đến từ trang web nào, quốc gia, trình duyệt và loại thiết bị của bạn, và trang tải nhanh đến mức nào. Cloudflare cho biết họ không đặt cookie, không lưu mã định danh nào trên thiết bị của bạn và không dùng dữ liệu để theo dõi bạn từ trang web này sang trang web khác.',
+  'By {name}': 'Tác giả: {name}',
 };
 
 export default dict;

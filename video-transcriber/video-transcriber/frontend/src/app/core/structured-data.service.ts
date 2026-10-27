@@ -1,6 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { DestroyRef, Injectable, RendererFactory2, Signal, effect, inject, isSignal, untracked } from '@angular/core';
 import { I18nService } from '../i18n/i18n.service';
+import { OPERATOR } from './operator';
 import { SiteService } from './site.service';
 
 /** One question and its answer, exactly as the visitor reads them (plain text, no HTML). */
@@ -159,7 +160,7 @@ export class StructuredDataService {
         inLanguage: this.i18n.locale(),
         image: `${base}/og-image.png`,
         ...(a.wordCount ? { wordCount: a.wordCount } : {}),
-        author: this.publisher(base),
+        author: this.author(base),
         publisher: { ...this.publisher(base), logo: { '@type': 'ImageObject', url: `${base}/icon-512.png` } },
       };
     });
@@ -223,6 +224,11 @@ export class StructuredDataService {
       inLanguage: this.i18n.locale(),
       publisher: this.publisher(base),
     };
+  }
+
+  /** The person who runs the site and answers for its guides (the About page says who): the author of an article. */
+  private author(base: string): Json {
+    return { '@type': 'Person', name: OPERATOR.name, url: `${base}/about`, jobTitle: 'Independent software developer', worksFor: { '@id': `${base}/#organization` } };
   }
 
   /** The organisation by reference, with its name and address too: pages other than the home page do not carry the

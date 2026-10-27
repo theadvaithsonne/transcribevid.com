@@ -62,6 +62,10 @@ describe('GuidePage (an article)', () => {
       expect(time.getAttribute('datetime')).toBe(g.updated);
       expect(clean(time.textContent)).toBe(`Updated ${fmtLongDate(g.updated)}`);
       expect(clean(q('.meta')!.textContent)).toContain(`${content.readingMinutes} min read`);
+      const by = q('.meta a.by')!;
+      expect(clean(by.textContent)).toBe('By Advaith Bibhishan Sonne');
+      expect(by.getAttribute('href')).toBe('/about');
+      expect(by.getAttribute('rel')).toBe('author');
       expect(clean(q('.lede')!.textContent)).toBe(content.lead);
     });
 
@@ -108,6 +112,7 @@ describe('GuidePage (an article)', () => {
       expect(article.dateModified).toBe(g.updated);
       expect(article.url).toBe(`https://transcribevid.com${path}`);
       expect(article.publisher.name).toBe('TranscribeVid');
+      expect(article.author).toMatchObject({ '@type': 'Person', name: 'Advaith Bibhishan Sonne', url: 'https://transcribevid.com/about' });
       expect(article.wordCount).toBe(guideWordCount(content, editionBlocks(content, false)));
 
       const faq = ldBlock('page:faq');

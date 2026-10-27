@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { OPERATOR } from '../../core/operator';
 import { SiteService } from '../../core/site.service';
 import { StructuredDataService } from '../../core/structured-data.service';
 import { I18nService } from '../../i18n/i18n.service';
@@ -57,6 +58,8 @@ export class GuidePage {
   private i18n = inject(I18nService);
 
   readonly guidesPath = GUIDES_PATH;
+  /** who runs the site and answers for its guides: named in the byline and as the author in the Article data */
+  readonly op = OPERATOR;
   private slug = computed(() => String(this.data()['guide'] ?? ''));
   readonly c = computed<GuideContent>(() => this.data()['content'] as GuideContent);
   readonly meta = computed(() => GUIDES.find((g) => g.slug === this.slug()) ?? GUIDES[0]);

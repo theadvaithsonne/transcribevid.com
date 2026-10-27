@@ -1142,5 +1142,6 @@ const dict: Record<string, string> = {
     'Una transcripción terminada. Cada línea tiene su marca de tiempo y Exportar la guarda como SRT, VTT, TXT, PDF y más.',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**Estadísticas de visitas.** Cloudflare Web Analytics cuenta las visitas a nuestras páginas: qué página se abrió, desde qué sitio llegaste, tu país, tu navegador y tipo de dispositivo, y lo rápido que cargó la página. Cloudflare indica que no establece cookies, que no guarda ningún identificador en tu dispositivo y que no usa los datos para seguirte de un sitio web a otro.',
+  'By {name}': 'Por {name}',
 };
 export default dict;

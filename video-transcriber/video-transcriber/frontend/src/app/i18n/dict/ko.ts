@@ -1129,6 +1129,7 @@ const dict: Record<string, string> = {
     '완료된 변환 텍스트. 모든 줄에 타임스탬프가 있고, 내보내기로 SRT, VTT, TXT, PDF 등으로 저장할 수 있습니다.',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**방문 통계.** Cloudflare Web Analytics는 당사 페이지의 방문 수를 집계합니다. 어떤 페이지가 열렸는지, 어느 사이트에서 왔는지, 이용자의 국가, 브라우저와 기기 종류, 페이지가 얼마나 빨리 로드되었는지가 대상입니다. Cloudflare는 쿠키를 설정하지 않고, 이용자의 기기에 식별자를 남기지 않으며, 데이터를 이용해 다른 웹사이트까지 이용자를 추적하지 않는다고 밝히고 있습니다.',
+  'By {name}': '작성자: {name}',
 };
 
 export default dict;

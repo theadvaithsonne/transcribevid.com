@@ -105,10 +105,11 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
      Spanish speakers, the German page to German speakers, and the English page to everyone else. Search Console's old
      *International targeting* report is gone and not needed; there is nothing to set per country. Check *Pages* and
      *Performance* with the filter *Country* once a month to see which markets grow.
-   - The browser's language decides what a visitor sees, not their location: a visitor whose browser is Spanish and who opens
-     `transcribevid.com` is taken to `/es`; an English browser in Spain stays on English (the language menu is on every page,
-     and a choice made there is remembered). Googlebot, which states no language preference, is never redirected, so the English
-     page stays the one found at `/`.
+   - The browser's language never moves a visitor by itself (Google advises against redirecting by a guessed language): a visitor whose
+     browser is Spanish and who opens `transcribevid.com` stays on the English page and sees a thin bar in Spanish with a link to `/es`;
+     an English browser in Spain sees no bar. The language menu is on every page, and a choice made there is remembered: the next
+     time that visitor opens `transcribevid.com` they are taken to their language. Googlebot, which states no language preference and
+     keeps no storage, is never redirected, so the English page stays the one found at `/`.
    - **Ads work in every country** and need no per-country setup: the same ad units, in every language. In **Spain, Germany,
      France, Italy and the rest of the EU / EEA, the UK and Switzerland** Google requires a consent message before it serves
      personalised ads. In AdSense open *Privacy & messaging* and turn on the **European regulations** message (Google's own

@@ -10,6 +10,8 @@
       </nav>
       <h1 class="page-title">{{ c().h1 }}</h1>
       <p class="meta">
+        <a class="by" rel="author" [routerLink]="'/about' | lp">{{ 'By {name}' | t: { name: op.name } }}</a>
+        <span aria-hidden="true">·</span>
         <time [attr.datetime]="meta().updated">{{ 'Updated {date}' | t: { date: updatedLabel() } }}</time>
         <span aria-hidden="true">·</span>
         <span>{{ '{n} min read' | t: { n: c().readingMinutes } }}</span>

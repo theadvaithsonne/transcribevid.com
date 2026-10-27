@@ -20,6 +20,7 @@ const ES: Dict = {
   'Home': 'Inicio',
   'Guides': 'Guías',
   'Breadcrumb': 'Ruta de navegación',
+  'By {name}': 'Por {name}',
   'Updated {date}': 'Actualizado el {date}',
   '{n} min read': '{n} min de lectura',
   'Common questions': 'Preguntas frecuentes',
@@ -85,7 +86,7 @@ describe('the chrome of a guide and of the guides page is translatable', () => {
       ['SRT frente a VTT', null],
     ]);
     expect(page.querySelector('nav.crumbs')!.getAttribute('aria-label')).toBe('Ruta de navegación');
-    expect(clean(page.querySelector('.meta')!.textContent)).toMatch(/^Actualizado el 27 de octubre de 2026\s*·\s*\d+ min de lectura$/);
+    expect(clean(page.querySelector('.meta')!.textContent)).toMatch(/^Por Advaith Bibhishan Sonne\s*·\s*Actualizado el 27 de octubre de 2026\s*·\s*\d+ min de lectura$/);
     expect(clean(page.querySelector('#g-faq-title')!.textContent)).toBe('Preguntas frecuentes');
     expect(clean(page.querySelector('#g-links-title')!.textContent)).toBe('Sigue leyendo');
 

@@ -1143,5 +1143,6 @@ const dict: Record<string, string> = {
     '完成した文字起こし。すべての行にタイムスタンプが付き、「書き出し」でSRT、VTT、TXT、PDFなどの形式で保存できます。',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**アクセス統計。** Cloudflare Web Analyticsは、当サイトのページへの訪問数を集計します。どのページが開かれたか、どのサイトから来たか、お住まいの国、ブラウザーと端末の種類、ページの読み込みの速さが対象です。Cloudflareによると、Cookieは設定せず、お使いの端末に識別子も残さず、データを使って他のウェブサイトまであなたを追跡することもありません。',
+  'By {name}': '著者：{name}',
 };
 export default dict;

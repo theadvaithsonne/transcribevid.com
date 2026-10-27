@@ -206,3 +206,12 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   1400 px, 300x600 id 2259151539 at 1800 px; the in-flow 300x250 id 4089565965 below 1100 px loads when scrolled into view); privacy, terms, about, contact, a transcript page and a 404 load nothing
   from Google and show no consent button; the prerendered HTML has no ad script. 21 of 21 checks pass. Google serves no ad until it approves the site (review requested 26 Oct 2026 21:49).
   Still the owner's: set the ad partners in AdSense > Privacy & messaging > European regulations > Settings (the message preview said "0 partners"), turn Auto optimize off.
+* 2026-10-27 (owner approved the open SEO items): (1) **the language redirect no longer follows a guess**: a browser language only gets the thin bar ("Esta página también está disponible en español"), and only a language
+  the visitor chose with the menu (`vt-lang`) moves them from the English home page (`LocaleHintService.savedChoice()`; Google advises against redirecting by a guessed language); specs and I18N.md and
+  deploy/SEO.md updated. (2) **A named author on the guides**: the Article data has a Person (the operator, `core/operator.ts`, url /about) as author and the guide header shows "By Advaith Bibhishan Sonne"
+  (link to About, `rel="author"`, translated in all 15 languages: `By {name}`). The guides were drafted with AI assistance: no claim of writing or review was added, only the name of the person responsible.
+  (3) **Review packs for native speakers**: `node scripts/review-pack.mjs` writes `docs/in-browser/review/<lang>.md` (English and translation side by side for the home page, the video-to-text page and
+  the privacy policy, with a short note on what to look for), 15 files; send the file of a language to a native speaker and apply the corrections to `i18n/dict/<lang>.ts` and `tool-pages/content/i18n`.
+  (4) **Held on purpose**: translating the 13 English-only tool pages. Six of them are the "by language" pages (a Spanish page about Spanish repeats the generic page); the other seven would add 105
+  AI-translated pages to a site whose translated pages Google has not indexed yet (see the SEO review: watch Search Console's "Crawled - currently not indexed" per language first, and have native speakers read
+  the existing ones). Verified: frontend 98 files / 3,544 tests, script tests 386, audit 525 pages clean, 24 of 24 checks in a real Chrome.

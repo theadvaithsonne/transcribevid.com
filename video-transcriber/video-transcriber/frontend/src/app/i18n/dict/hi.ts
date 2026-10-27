@@ -1134,5 +1134,6 @@ const dict: Record<string, string> = {
     'तैयार ट्रांसक्रिप्ट। हर पंक्ति पर टाइमस्टैम्प है, और एक्सपोर्ट इसे SRT, VTT, TXT, PDF और अन्य रूपों में सहेजता है।',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**विज़िट के आँकड़े।** Cloudflare Web Analytics हमारे पेजों पर आने वाली विज़िट गिनता है: कौन-सा पेज खुला, आप किस साइट से आए, आपका देश, आपका ब्राउज़र और डिवाइस का प्रकार, और पेज कितनी तेज़ी से लोड हुआ। Cloudflare के अनुसार वह कोई कुकी नहीं लगाता, आपके डिवाइस पर कोई पहचान-चिह्न नहीं रखता और डेटा का इस्तेमाल आपको एक वेबसाइट से दूसरी वेबसाइट तक ट्रैक करने के लिए नहीं करता।',
+  'By {name}': 'लेखक: {name}',
 };
 export default dict;

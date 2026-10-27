@@ -21,10 +21,12 @@ export interface LocaleSuggestion {
  *
  *  - Only in the browser, and only from what the visitor's browser says it prefers (`navigator.languages`) or the choice
  *    they saved with the language menu. Never from the IP address. Googlebot sends no such preference, so it never moves.
- *  - Landing on the English home page "/" with a different preferred language: replaced (no history entry) by that
- *    language's home page. Only the bare home page is redirected: a deep English page (a search result) is left alone.
- *  - Anywhere else, in another language than the preferred one: a small bar, written in the preferred language, offers
- *    the same page there (only when that page exists in that language).
+ *  - A guess is never acted on: when the browser language differs from the page (the bare English home page included), a small
+ *    bar, written in the preferred language, offers the same page there (only when that page exists in that language). Google
+ *    advises against redirecting by a guessed language.
+ *  - Only a language the visitor chose themselves with the language menu (saved in this browser) moves them: landing on the
+ *    English home page "/" with a saved choice of another language replaces it (no history entry) by that language's home
+ *    page. Deep English pages (search results) are left alone.
  */
 @Injectable({ providedIn: 'root' })
 export class LocaleHintService {
@@ -40,10 +42,16 @@ export class LocaleHintService {
     this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)).subscribe((e) => this.evaluate(e.urlAfterRedirects));
   }
 
+  /** The language the visitor chose with the language menu, when this site still has it. */
+  savedChoice(): Locale | null {
+    const saved = this.read(localStorage, LANG_KEY);
+    return isLocale(saved) && (saved === DEFAULT_LOCALE || this.i18n.available(saved).length) ? saved : null;
+  }
+
   /** The language the visitor wants: their saved choice, else the first of their browser languages that the site offers (English counts). */
   preferred(): Locale | null {
-    const saved = this.read(localStorage, LANG_KEY);
-    if (isLocale(saved) && (saved === DEFAULT_LOCALE || this.i18n.available(saved).length)) return saved;
+    const saved = this.savedChoice();
+    if (saved) return saved;
     let tags: readonly string[] = [];
     try {
       tags = navigator.languages?.length ? navigator.languages : [navigator.language];
@@ -76,7 +84,8 @@ export class LocaleHintService {
     if (!wanted || wanted === current) return this.suggestion.set(null);
 
     const bareHome = url.split(/[?#]/)[0] === '/';
-    if (bareHome && current === DEFAULT_LOCALE && !this.redirected && this.i18n.isAvailable(wanted, '/')) {
+    // only a choice the visitor made themselves moves them; a guess from the browser language gets the bar below
+    if (bareHome && current === DEFAULT_LOCALE && !this.redirected && this.savedChoice() === wanted && this.i18n.isAvailable(wanted, '/')) {
       this.redirected = true;
       this.suggestion.set(null);
       void this.router.navigateByUrl(this.i18n.path('/', wanted), { replaceUrl: true });

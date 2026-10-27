@@ -1121,6 +1121,7 @@ const dict: Record<string, string> = {
     'تفريغ نصي مكتمل. لكل سطر طابع زمني، ويحفظه زر تصدير بصيغ SRT وVTT وTXT وPDF وغيرها.',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**إحصاءات الزيارات.** يحسب Cloudflare Web Analytics الزيارات إلى صفحاتنا: أي صفحة فُتحت، ومن أي موقع جئت، وبلدك، ومتصفحك ونوع جهازك، ومدى سرعة تحميل الصفحة. وتذكر Cloudflare أنها لا تضع ملفات تعريف ارتباط، ولا تحتفظ بأي معرّف على جهازك، ولا تستخدم البيانات لتتبعك من موقع إلى آخر.',
+  'By {name}': 'بقلم {name}',
 };
 
 export default dict;

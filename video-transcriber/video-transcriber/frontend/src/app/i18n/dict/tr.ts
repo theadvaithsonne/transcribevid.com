@@ -1138,6 +1138,7 @@ const dict: Record<string, string> = {
     'Tamamlanmış bir transkript. Her satırın bir zaman damgası vardır ve Dışa aktar onu SRT, VTT, TXT, PDF ve daha fazlası olarak kaydeder.',
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**Ziyaret istatistikleri.** Cloudflare Web Analytics, sayfalarımızın ziyaretlerini sayar: hangi sayfanın açıldığı, hangi siteden geldiğiniz, ülkeniz, tarayıcınız ve cihaz türünüz ile sayfanın ne kadar hızlı yüklendiği. Cloudflare, çerez ayarlamadığını, cihazınızda hiçbir tanımlayıcı tutmadığını ve verileri sizi bir web sitesinden diğerine izlemek için kullanmadığını belirtiyor.',
+  'By {name}': 'Yazar: {name}',
 };
 
 export default dict;

@@ -188,12 +188,14 @@ describe('LocaleHintService and the "also available" bar', () => {
     return { i18n, hint, harness, router };
   }
 
-  it('first visit to the English home page with a Spanish browser: replaced by the Spanish home page (no history entry)', async () => {
+  it('first visit to the English home page with a Spanish browser: not moved (a guess is never acted on), a bar offers the Spanish home page', async () => {
     setLanguages('es-MX', 'es', 'en');
-    const { i18n, router, harness } = await start();
+    const { i18n, hint, router, harness } = await start();
     await harness.navigateByUrl('/');
-    await vi.waitFor(() => expect(router.url).toBe('/es'));
-    expect(i18n.locale()).toBe('es');
+    await new Promise((r) => setTimeout(r, 50));
+    expect(router.url).toBe('/');
+    expect(i18n.locale()).toBe('en');
+    expect(hint.suggestion()).toEqual({ locale: 'es', href: '/es' });
   });
 
   it('a deep English page is never redirected: a bar offers the same page in the visitor\'s language', async () => {
@@ -263,6 +265,7 @@ describe('LocaleHintService and the "also available" bar', () => {
 
   it('does nothing at all in an edition without languages, and never redirects twice', async () => {
     setLanguages('es');
+    localStorage.setItem(LANG_KEY, 'es');
     const a = await start(fakeData({ enabled: false }));
     await a.harness.navigateByUrl('/');
     expect(a.router.url).toBe('/');
