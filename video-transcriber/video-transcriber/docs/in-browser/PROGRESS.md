@@ -144,3 +144,12 @@ Known gaps that are not solved by the spike: large-v3 and distil-large-v3 have n
   SEO 100, layout shift 0.000, desktop performance 100, mobile 93-99; frontend 91 files / 3,097 tests, backend 902 passed + 17
   skipped, script tests 383, audit 518 pages clean. Owner items (AdSense consent message for EEA / UK / CH, Search Console) are in
   `deploy/SEO.md` step 9. Translations are AI-written and not yet read by native speakers (legal pages carry a convenience note).
+* 2026-10-27 (release): `seo/improvements` @ 17d300e is **live on transcribevid.com**. Fresh `npm run build:pages` (518 routes, 986 files,
+  `_headers` 68 rules), `audit-prerender` 518 pages clean in 16 languages, then `wrangler pages deploy dist/frontend/browser
+  --project-name transcribevid --branch main` (deployment d9b6e696, no `--force`). Checked on the real domain: `/`, the 15 language home
+  pages, `/es/video-a-texto`, `/tools`, `/jobs/abc123` answer 200 (a missing page 404), translated pages send `Content-Language`, `/ar`
+  is `dir=rtl`, the sitemap lists 518 addresses (512 carry the `es` alternate, the 6 English-only language pages do not), HSTS and the
+  other headers are unchanged (the site never sent a CSP), `/api/stats` and `ads.txt` answer. Rollback: Pages dashboard > transcribevid >
+  Deployments > 03eb46b1 (cb8c821, the release before this one) > Rollback. The branch is also pushed to GitHub as `seo/improvements`
+  (the repo is public); `main` there is still the first commit and `swapnil` is untouched. Still open for the owner: AdSense consent
+  message for EEA / UK / CH, Search Console, native review of the translations.
