@@ -20,6 +20,8 @@ const NAMES = {
 const PAGES = [
   ['/', 'Home page'],
   ['/video-to-text', 'Main tool page: video to text'],
+  ['/transcribe-video-to-text', 'New tool page: transcribe video to text'],
+  ['/guides/how-to-transcribe-video-to-text', 'New guide: how to transcribe a video to text'],
   ['/privacy', 'Privacy policy'],
 ];
 

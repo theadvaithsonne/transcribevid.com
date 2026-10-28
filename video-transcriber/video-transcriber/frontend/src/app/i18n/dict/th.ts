@@ -1028,6 +1028,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'แปลงวิดีโอเป็นข้อความฟรี ได้ข้อความถอดเสียงที่แม่นยำพร้อมไทม์สแตมป์ในมากกว่า 50 ภาษา ไม่ต้องเข้าสู่ระบบ ไม่จำกัดรายวัน ดาวน์โหลด SRT, VTT, TXT หรือ PDF',
   'label:/video-to-text': 'แปลงวิดีโอเป็นข้อความ',
+  'title:/transcribe-video-to-text': 'ถอดเสียงวิดีโอเป็นข้อความ ฟรี ไม่ต้องสมัคร',
+  'description:/transcribe-video-to-text':
+    'ถอดเสียงวิดีโอเป็นข้อความฟรี ไม่ต้องสมัครสมาชิก ไม่มีโควตารายวัน ได้ข้อความพร้อมเวลากำกับทุกบรรทัด ดาวน์โหลดเป็น TXT, SRT, VTT หรือ PDF',
+  'label:/transcribe-video-to-text': 'ถอดเสียงวิดีโอเป็นข้อความ',
   'title:/audio-to-text': 'แปลงเสียงเป็นข้อความ ฟรี ไม่จำกัด',
   'description:/audio-to-text':
     'เปลี่ยนพอดแคสต์ บทสัมภาษณ์ และการบรรยายเป็นข้อความ ฟรี มีไทม์สแตมป์ มากกว่า 50 ภาษา ไม่ต้องเข้าสู่ระบบ ดาวน์โหลด TXT, SRT, VTT หรือ PDF',
@@ -1100,6 +1104,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT หรือ VTT? ซับไตเติ้ลแต่ละรูปแบบคืออะไร ต่างกันอย่างไร ใช้ได้ที่ไหนบ้าง และสร้างไฟล์ทั้งสองแบบจากวิดีโอของคุณฟรีได้อย่างไร',
   'label:/guides/srt-vs-vtt': 'SRT กับ VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'วิธีถอดเสียงวิดีโอเป็นข้อความ 5 วิธี',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'ห้าวิธีถอดเสียงวิดีโอเป็นข้อความ ตั้งแต่ข้อความถอดเสียงของ YouTube ไปจนถึงเครื่องมือออนไลน์ พร้อมบอกว่าวิธีไหนเหมาะกับวิดีโอของคุณ',
+  'label:/guides/how-to-transcribe-video-to-text': 'วิธีถอดเสียงวิดีโอ',
   'title:/guides/how-to-add-subtitles-to-a-video': 'วิธีเพิ่มซับไตเติ้ลให้วิดีโอ (ฟรี)',
   'description:/guides/how-to-add-subtitles-to-a-video':
     'ทำซับไตเติ้ลใน 4 ขั้นตอน: ถอดเสียงวิดีโอ แก้ข้อความ ส่งออกเป็น SRT หรือ VTT แล้วเพิ่มไฟล์ใน YouTube, VLC, โปรแกรมตัดต่อ หรือเครื่องเล่นเว็บของคุณ',

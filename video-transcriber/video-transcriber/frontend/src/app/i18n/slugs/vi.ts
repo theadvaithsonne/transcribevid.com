@@ -6,6 +6,7 @@
  */
 export const SLUGS: Readonly<Record<string, string>> = {
   '/video-to-text': 'chuyen-video-thanh-van-ban',
+  '/transcribe-video-to-text': 'go-bang-video-thanh-van-ban',
   '/audio-to-text': 'chuyen-am-thanh-thanh-van-ban',
   '/mp4-to-text': 'mp4-thanh-van-ban',
   '/mp3-to-text': 'mp3-thanh-van-ban',
@@ -28,5 +29,6 @@ export const SLUGS: Readonly<Record<string, string>> = {
   '/guides/transcribe-video-without-uploading':
     'guides/chuyen-video-thanh-van-ban-khong-can-tai-len',
   '/guides/accurate-transcripts': 'guides/ban-go-bang-chinh-xac-hon',
+  '/guides/how-to-transcribe-video-to-text': 'guides/cach-chuyen-video-thanh-van-ban',
   '/guides/what-is-whisper': 'guides/whisper-la-gi',
 };

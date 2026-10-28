@@ -1033,6 +1033,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     '동영상을 텍스트로 무료 변환하세요. 50개 이상의 언어로 정확하고 타임스탬프가 붙은 변환 텍스트를 받아 보세요. 로그인 불필요, 하루 제한 없음. SRT, VTT, TXT, PDF 다운로드.',
   'label:/video-to-text': '동영상 텍스트 변환',
+  'title:/transcribe-video-to-text': '동영상을 텍스트로 변환: 무료, 가입 불필요',
+  'description:/transcribe-video-to-text':
+    '동영상을 텍스트로 무료 변환하세요. 계정 없이, 일일 한도 없이 줄마다 시간이 붙은 변환 텍스트를 받아 TXT, SRT, VTT, PDF로 다운로드할 수 있습니다.',
+  'label:/transcribe-video-to-text': '동영상을 텍스트로 변환',
   'title:/audio-to-text': '음성 텍스트 변환: 무료, 무제한',
   'description:/audio-to-text':
     '팟캐스트, 인터뷰, 강의를 텍스트로 바꾸세요. 타임스탬프, 50개 이상의 언어, 로그인 불필요. TXT, SRT, VTT, PDF로 다운로드할 수 있는 무료 음성 텍스트 변환.',
@@ -1105,6 +1109,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT와 VTT 중 무엇을 쓸까요? 두 자막 형식이 무엇인지, 어떻게 다른지, 각각 어디에서 쓰이는지, 동영상에서 파일을 무료로 만드는 방법을 설명합니다.',
   'label:/guides/srt-vs-vtt': 'SRT와 VTT의 차이',
+  'title:/guides/how-to-transcribe-video-to-text': '동영상 텍스트 변환 방법 5가지와 선택 기준',
+  'description:/guides/how-to-transcribe-video-to-text':
+    '동영상을 텍스트로 변환하는 다섯 가지 방법을 비교합니다. YouTube 스크립트, 음성 입력, 편집기 자막, 온라인 서비스, 내 기기 도구 중 내 동영상에 맞는 방법을 찾아보세요.',
+  'label:/guides/how-to-transcribe-video-to-text': '동영상 텍스트 변환 방법',
   'title:/guides/how-to-add-subtitles-to-a-video': '동영상에 자막을 무료로 추가하는 방법',
   'description:/guides/how-to-add-subtitles-to-a-video':
     '자막은 네 단계로 만들 수 있습니다. 동영상을 변환하고 텍스트를 고친 다음 SRT 또는 VTT로 내보내 YouTube, VLC, 편집기, 웹 플레이어에 추가하세요.',

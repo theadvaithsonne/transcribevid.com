@@ -1038,6 +1038,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT या VTT? हर सबटाइटल फ़ॉर्मैट क्या है, दोनों में क्या फ़र्क़ है, कौन कहाँ चलता है, और अपने वीडियो से कोई भी फ़ाइल मुफ़्त में कैसे पाएँ।',
   'label:/guides/srt-vs-vtt': 'SRT बनाम VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'वीडियो को टेक्स्ट में कैसे बदलें: 5 तरीके',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'वीडियो को टेक्स्ट में बदलने के पाँच तरीके: YouTube ट्रांसक्रिप्ट, वॉइस टाइपिंग, एडिटर के कैप्शन, ऑनलाइन सेवा और डिवाइस पर चलने वाला टूल। कब कौन-सा चुनें।',
+  'label:/guides/how-to-transcribe-video-to-text': 'वीडियो को टेक्स्ट में कैसे बदलें',
   'title:/guides/transcribe-video-without-uploading': 'वीडियो को अपलोड किए बिना ट्रांसक्राइब करें',
   'description:/guides/transcribe-video-without-uploading':
     'ब्राउज़र में ट्रांसक्रिप्शन कैसे काम करता है, क्या आपके डिवाइस पर रहता है, क्या एक बार डाउनलोड होता है, और ब्राउज़र के नेटवर्क पैनल में इसे खुद कैसे जाँचें।',
@@ -1102,6 +1106,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'वीडियो को मुफ़्त में टेक्स्ट में बदलें। 50+ भाषाओं में सटीक, टाइमस्टैम्प वाली ट्रांसक्रिप्ट पाएँ। बिना लॉगिन, रोज़ की कोई सीमा नहीं। SRT, VTT, TXT, PDF।',
   'label:/video-to-text': 'वीडियो से टेक्स्ट',
+  'title:/transcribe-video-to-text': 'वीडियो को टेक्स्ट में बदलें: हिंदी, मुफ़्त',
+  'description:/transcribe-video-to-text':
+    'वीडियो को टेक्स्ट में बदलें, हिंदी सहित कई भाषाओं में। बिना साइन-अप, रोज़ की कोई सीमा नहीं, हर लाइन के साथ समय। TXT, SRT, VTT, PDF डाउनलोड करें।',
+  'label:/transcribe-video-to-text': 'वीडियो को टेक्स्ट में बदलें',
   'title:/voice-recording-to-text': 'वॉइस रिकॉर्डिंग से टेक्स्ट: मुफ़्त',
   'description:/voice-recording-to-text':
     'ब्राउज़र में अपनी आवाज़ रिकॉर्ड करें या वॉइस मेमो अपलोड करें और उसे टेक्स्ट में पाएँ। मुफ़्त, बिना लॉगिन, 50+ भाषाएँ। TXT, PDF, SRT या Markdown डाउनलोड करें।',

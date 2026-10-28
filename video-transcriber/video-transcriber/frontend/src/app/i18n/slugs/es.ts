@@ -6,6 +6,7 @@
  */
 export const SLUGS: Readonly<Record<string, string>> = {
   '/video-to-text': 'video-a-texto',
+  '/transcribe-video-to-text': 'transcribir-video-a-texto',
   '/audio-to-text': 'audio-a-texto',
   '/mp4-to-text': 'mp4-a-texto',
   '/mp3-to-text': 'mp3-a-texto',
@@ -27,5 +28,6 @@ export const SLUGS: Readonly<Record<string, string>> = {
   '/guides/how-to-add-subtitles-to-a-video': 'guides/como-poner-subtitulos-a-un-video',
   '/guides/transcribe-video-without-uploading': 'guides/transcribir-video-sin-subirlo',
   '/guides/accurate-transcripts': 'guides/transcripcion-mas-precisa',
+  '/guides/how-to-transcribe-video-to-text': 'guides/como-transcribir-un-video-a-texto',
   '/guides/what-is-whisper': 'guides/que-es-whisper',
 };

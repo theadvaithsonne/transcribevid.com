@@ -1050,6 +1050,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'Converti un video in testo gratis. Trascrizione accurata con timestamp in oltre 50 lingue, senza registrazione né limiti. Scarica SRT, VTT, TXT o PDF.',
   'label:/video-to-text': 'Video in testo',
+  'title:/transcribe-video-to-text': 'Trascrivere video in testo gratis',
+  'description:/transcribe-video-to-text':
+    'Trascrivi un video in testo gratis, senza registrazione e senza limite giornaliero. Orario su ogni riga; scarica TXT, SRT, VTT, PDF, Markdown o JSON.',
+  'label:/transcribe-video-to-text': 'Trascrivere video in testo',
   'title:/audio-to-text': 'Audio in testo: convertitore gratuito',
   'description:/audio-to-text':
     'Trasforma podcast, interviste e lezioni in testo. Da audio a testo gratis, con timestamp, oltre 50 lingue, senza registrazione. Scarica TXT, SRT o PDF.',
@@ -1122,6 +1126,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT o VTT? Cosa sono i due formati di sottotitoli, come differiscono, dove funziona ciascuno e come ottenere il file dal tuo video gratis.',
   'label:/guides/srt-vs-vtt': 'SRT o VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'Come trascrivere un video in testo: 5 modi',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'Come trascrivere un video in testo in cinque modi: la trascrizione di YouTube, la dettatura vocale, un editor video, un servizio online o il tuo dispositivo.',
+  'label:/guides/how-to-transcribe-video-to-text': 'Come trascrivere un video',
   'title:/guides/how-to-add-subtitles-to-a-video': 'Come aggiungere sottotitoli a un video',
   'description:/guides/how-to-add-subtitles-to-a-video':
     'Crea i sottotitoli in quattro passaggi: trascrivi il video, correggi il testo, esporta SRT o VTT, poi aggiungi il file a YouTube, VLC, un editor o al web.',

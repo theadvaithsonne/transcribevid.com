@@ -6,6 +6,7 @@
  */
 export const SLUGS: Readonly<Record<string, string>> = {
   '/video-to-text': 'video-ke-teks',
+  '/transcribe-video-to-text': 'transkrip-video-ke-teks',
   '/audio-to-text': 'audio-ke-teks',
   '/mp4-to-text': 'mp4-ke-teks',
   '/mp3-to-text': 'mp3-ke-teks',
@@ -24,6 +25,7 @@ export const SLUGS: Readonly<Record<string, string>> = {
   '/youtube-subtitle-generator': 'pembuat-subtitle-youtube',
   '/translate-audio-to-english': 'terjemahkan-audio-ke-bahasa-inggris',
   '/guides/srt-vs-vtt': 'guides/srt-atau-vtt',
+  '/guides/how-to-transcribe-video-to-text': 'guides/cara-transkrip-video-ke-teks',
   '/guides/how-to-add-subtitles-to-a-video': 'guides/cara-menambahkan-subtitle-ke-video',
   '/guides/transcribe-video-without-uploading': 'guides/transkripsi-video-tanpa-mengunggah',
   '/guides/accurate-transcripts': 'guides/transkrip-lebih-akurat',

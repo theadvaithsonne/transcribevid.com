@@ -13,7 +13,7 @@ days, most useful first. Start on **Wednesday 28 October 2026** and tick each bo
 Already requested earlier (skip): `/`, `/video-to-text`, `/audio-to-text`, `/mp4-to-text`, `/mp3-to-text`, `/guides`, `/es`.
 If you requested other addresses that are not in the days below, simply skip them when you reach them.
 
-The 480 translated pages do not need requests: Google finds them through the sitemap and the language menu. Only the
+The 510 translated pages do not need requests: Google finds them through the sitemap and the language menu. Only the
 translated home pages are on the list, so each language gets a first page that Google has seen.
 
 ---
@@ -128,6 +128,7 @@ The new pages, then the three pages whose titles changed (request each of those 
 - [ ] https://transcribevid.com/mp4-to-text (new title)
 - [ ] https://transcribevid.com/audio-to-text (new description)
 - [ ] https://transcribevid.com/guides/how-to-transcribe-video-to-text (the guide added after that, once it is live too)
+- [ ] If quota is left: the Hindi versions first, because almost no Hindi page competes for them: https://transcribevid.com/hi/transcribe-video-to-text and https://transcribevid.com/hi/guides/how-to-transcribe-video-to-text, then the same two pages in /bn, /ur, /tr, /th and /vi
 
 ---
 

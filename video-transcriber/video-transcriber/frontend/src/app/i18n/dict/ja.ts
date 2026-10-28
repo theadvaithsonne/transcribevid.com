@@ -1045,6 +1045,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     '動画の文字起こしを無料で。50以上の言語で、タイムスタンプ付きの正確なテキストに変換します。ログイン不要、回数制限なし。SRT、VTT、TXT、PDFで書き出し。',
   'label:/video-to-text': '動画の文字起こし',
+  'title:/transcribe-video-to-text': '動画を文字起こし：無料・登録不要・回数制限なし',
+  'description:/transcribe-video-to-text':
+    '動画をテキストに変換します。無料でアカウント登録も回数制限もなく、話した内容が1行ごとにタイムスタンプ付きで手に入ります。TXT、SRT、VTT、PDFなどで書き出せます。',
+  'label:/transcribe-video-to-text': '動画をテキストに変換',
   'title:/audio-to-text': '音声を文字起こし：無料・無制限・登録不要',
   'description:/audio-to-text':
     'ポッドキャスト、インタビュー、講義の音声を文字起こしします。タイムスタンプ付き、50以上の言語、ログイン不要。TXT、SRT、VTT、PDFで書き出せます。',
@@ -1117,6 +1121,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRTとVTT、どちらを使う？それぞれの字幕形式とは何か、違い、使える場所、動画から無料で作る方法を解説します。',
   'label:/guides/srt-vs-vtt': 'SRTとVTTの違い',
+  'title:/guides/how-to-transcribe-video-to-text': '動画をテキストにする方法：5つのやり方を比較',
+  'description:/guides/how-to-transcribe-video-to-text':
+    '動画をテキストにする5つの方法を解説します。YouTubeの文字起こし、音声入力、編集ソフトの字幕、オンラインサービス、端末で動くツールを、費用や時刻の有無で比べます。',
+  'label:/guides/how-to-transcribe-video-to-text': '動画をテキストにする方法',
   'title:/guides/how-to-add-subtitles-to-a-video': '動画に字幕を付ける方法（無料）',
   'description:/guides/how-to-add-subtitles-to-a-video':
     '4つのステップで字幕を作ります。動画を文字起こしし、テキストを直し、SRTまたはVTTで書き出し、YouTube、VLC、編集ソフト、Webプレーヤーに追加します。',

@@ -28,4 +28,6 @@ export const SLUGS: Readonly<Record<string, string>> = {
   '/guides/transcribe-video-without-uploading': 'guides/trascrivere-video-senza-caricarlo',
   '/guides/accurate-transcripts': 'guides/trascrizione-piu-accurata',
   '/guides/what-is-whisper': 'guides/cos-e-whisper',
+  '/transcribe-video-to-text': 'trascrivere-video-in-testo',
+  '/guides/how-to-transcribe-video-to-text': 'guides/come-trascrivere-un-video-in-testo',
 };

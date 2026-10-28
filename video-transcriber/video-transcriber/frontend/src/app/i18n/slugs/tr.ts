@@ -28,4 +28,6 @@ export const SLUGS: Readonly<Record<string, string>> = {
   '/guides/transcribe-video-without-uploading': 'guides/videoyu-yuklemeden-yaziya-dokme',
   '/guides/accurate-transcripts': 'guides/daha-dogru-transkript',
   '/guides/what-is-whisper': 'guides/whisper-nedir',
+  '/transcribe-video-to-text': 'videoyu-yaziya-dokme',
+  '/guides/how-to-transcribe-video-to-text': 'guides/video-yaziya-nasil-cevrilir',
 };

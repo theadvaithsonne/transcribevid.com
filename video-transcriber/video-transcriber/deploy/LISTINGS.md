@@ -241,6 +241,38 @@ no follow-up spam):
 
 ---
 
+## 10b. Pages worth linking to, and who to offer them to (added 28 October 2026)
+
+Do not send every link to the home page. Three pages exist so that other people have something specific to link to:
+
+| Page | Offer it to |
+|---|---|
+| https://transcribevid.com/guides/free-video-to-text-tools-compared | Authors of "best free video to text" or "free transcription tools" lists, teachers' technology blogs, and anyone who has written that a tool is "free" without saying its limit. It is a dated table of 13 tools, each limit quoted from the tool's own page, with the link to every source. |
+| https://transcribevid.com/guides/how-to-transcribe-video-to-text | Forum and Q&A answers to "how do I get the text of a video" (answer the question first, then link the guide). |
+| https://transcribevid.com/transcribe-video-to-text | The "free, no sign-up, no cap" angle: Product Hunt, AlternativeTo and SaaSHub entries can use this address as the website. |
+
+Message for the comparison guide (send to the author of a list that already compares free tools; one message, no follow-up):
+
+> Subject: A sourced table of free video to text limits, for your "[article title]" article
+>
+> Hello [name],
+>
+> Your article on [topic] helped me while I was checking free video transcription tools. I ended up writing down each
+> tool's free limit from its own page (sign-up, minutes, file size, exports) on 28 October 2026: https://transcribevid.com/guides/free-video-to-text-tools-compared
+> It lists thirteen tools and links every source, and it says which ones I did not check. If a limit has changed, tell me and I will correct it.
+> I made one of the tools in it (TranscribeVid), so I am biased; the table quotes the others as they describe themselves.
+>
+> [your name]
+
+Hindi, Bengali, Urdu, Turkish, Thai and Vietnamese pages: the new /hi, /bn, /ur, /tr, /th and /vi versions of the
+transcribe-video-to-text page and the how-to guide have almost no local competition. Share each in one place where
+people of that language ask for tools and self-posts are allowed (a language subreddit, a Facebook or Telegram group,
+a local developer forum), as the maker, in that language, with the page address in that language. One post per place.
+
+Check the comparison table again every quarter and change the date, or the guide becomes a liability.
+
+---
+
 ## 11. After you post
 
 - Keep a list of the addresses where the site is listed; send it to me, and I will check that each link resolves to

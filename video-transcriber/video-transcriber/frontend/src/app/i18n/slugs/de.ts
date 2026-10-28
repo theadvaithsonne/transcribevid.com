@@ -23,6 +23,8 @@ export const SLUGS: Readonly<Record<string, string>> = {
   '/vtt-subtitle-generator': 'untertitel-generator-vtt',
   '/youtube-subtitle-generator': 'youtube-untertitel-generator',
   '/translate-audio-to-english': 'audio-ins-englische-uebersetzen',
+  '/transcribe-video-to-text': 'video-in-text-umwandeln',
+  '/guides/how-to-transcribe-video-to-text': 'guides/video-in-text-umwandeln-fuenf-wege',
   '/guides/srt-vs-vtt': 'guides/srt-oder-vtt',
   '/guides/how-to-add-subtitles-to-a-video': 'guides/untertitel-zu-einem-video-hinzufuegen',
   '/guides/transcribe-video-without-uploading': 'guides/video-transkribieren-ohne-hochladen',

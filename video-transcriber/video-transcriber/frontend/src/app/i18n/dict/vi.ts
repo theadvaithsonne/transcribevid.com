@@ -1046,6 +1046,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT hay VTT? Mỗi định dạng phụ đề là gì, khác nhau thế nào, dùng được ở đâu, và cách lấy tệp SRT hoặc VTT từ video của bạn hoàn toàn miễn phí.',
   'label:/guides/srt-vs-vtt': 'SRT hay VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'Cách chuyển video thành văn bản: 5 cách',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'Năm cách chuyển video thành văn bản: bản chép lời YouTube, nhập liệu bằng giọng nói, phần mềm biên tập, dịch vụ trực tuyến, công cụ trên thiết bị.',
+  'label:/guides/how-to-transcribe-video-to-text': 'Cách chuyển video thành văn bản',
   'title:/guides/transcribe-video-without-uploading':
     'Chuyển video thành văn bản không cần tải lên',
   'description:/guides/transcribe-video-without-uploading':
@@ -1111,6 +1115,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'Chuyển video thành văn bản miễn phí. Bản gỡ băng chính xác, có mốc thời gian, hơn 50 ngôn ngữ. Không cần đăng nhập, không giới hạn. Tải SRT, VTT, TXT, PDF.',
   'label:/video-to-text': 'Video thành văn bản',
+  'title:/transcribe-video-to-text': 'Gỡ băng video thành văn bản, miễn phí',
+  'description:/transcribe-video-to-text':
+    'Chuyển video thành văn bản miễn phí: không cần đăng ký, không giới hạn mỗi ngày, mỗi dòng có mốc thời gian. Tải về TXT, SRT, VTT, PDF, Markdown hoặc JSON.',
+  'label:/transcribe-video-to-text': 'Gỡ băng video',
   'title:/voice-recording-to-text': 'Chuyển file ghi âm thành văn bản miễn phí',
   'description:/voice-recording-to-text':
     'Ghi âm ngay trên trình duyệt hoặc tải lên ghi chú thoại để nhận văn bản. Miễn phí, không cần đăng nhập, hơn 50 ngôn ngữ. Tải TXT, PDF, SRT hoặc Markdown.',

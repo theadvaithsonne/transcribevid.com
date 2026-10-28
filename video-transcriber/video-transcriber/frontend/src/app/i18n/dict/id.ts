@@ -1046,6 +1046,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT atau VTT? Apa itu format subtitle tersebut, apa bedanya, di mana masing-masing berfungsi, dan cara mendapatkan keduanya dari video Anda secara gratis.',
   'label:/guides/srt-vs-vtt': 'SRT vs VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'Cara Transkrip Video ke Teks: 5 Metode',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'Lima cara mengubah video ke teks: transkrip YouTube, ketik suara, subtitle editor video, layanan online, atau alat di perangkat Anda. Mana yang cocok?',
+  'label:/guides/how-to-transcribe-video-to-text': 'Cara transkrip video ke teks',
   'title:/guides/transcribe-video-without-uploading': 'Transkripsi Video Tanpa Mengunggahnya',
   'description:/guides/transcribe-video-without-uploading':
     'Cara kerja transkripsi di browser, apa yang tetap di perangkat Anda, apa yang diunduh sekali, dan cara memeriksanya sendiri di panel jaringan browser Anda.',
@@ -1110,6 +1114,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'Ubah video ke teks gratis. Dapatkan transkrip akurat berpenanda waktu dalam 50+ bahasa, tanpa login dan tanpa batas harian. Unduh SRT, VTT, TXT, atau PDF.',
   'label:/video-to-text': 'Video ke teks',
+  'title:/transcribe-video-to-text': 'Transkrip Video ke Teks Gratis, Tanpa Daftar',
+  'description:/transcribe-video-to-text':
+    'Transkrip video ke teks gratis: tanpa daftar akun, tanpa batas harian. Dapatkan teks dengan penanda waktu, lalu unduh sebagai TXT, SRT, VTT, atau PDF.',
+  'label:/transcribe-video-to-text': 'Transkrip video ke teks',
   'title:/voice-recording-to-text': 'Rekaman Suara ke Teks: Gratis',
   'description:/voice-recording-to-text':
     'Rekam suara Anda di browser atau unggah memo suara dan dapatkan teksnya. Gratis, tanpa login, 50+ bahasa. Unduh TXT, PDF, SRT, atau Markdown.',

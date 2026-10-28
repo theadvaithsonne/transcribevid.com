@@ -6,6 +6,7 @@
  */
 export const SLUGS: Readonly<Record<string, string>> = {
   '/video-to-text': 'video-en-texte',
+  '/transcribe-video-to-text': 'transcrire-une-video-en-texte',
   '/audio-to-text': 'audio-en-texte',
   '/mp4-to-text': 'mp4-en-texte',
   '/mp3-to-text': 'mp3-en-texte',
@@ -24,6 +25,7 @@ export const SLUGS: Readonly<Record<string, string>> = {
   '/youtube-subtitle-generator': 'generateur-de-sous-titres-youtube',
   '/translate-audio-to-english': 'traduire-audio-en-anglais',
   '/guides/srt-vs-vtt': 'guides/srt-ou-vtt',
+  '/guides/how-to-transcribe-video-to-text': 'guides/comment-transcrire-une-video-en-texte',
   '/guides/how-to-add-subtitles-to-a-video': 'guides/ajouter-des-sous-titres-a-une-video',
   '/guides/transcribe-video-without-uploading': 'guides/transcrire-une-video-sans-l-envoyer',
   '/guides/accurate-transcripts': 'guides/transcription-plus-precise',

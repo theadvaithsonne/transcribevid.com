@@ -1040,6 +1040,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'Videoyu ücretsiz yazıya çevirin. 50’den fazla dilde doğru, zaman damgalı transkript alın. Giriş yok, günlük sınır yok. SRT, VTT, TXT veya PDF indirin.',
   'label:/video-to-text': 'Video yazıya çevirme',
+  'title:/transcribe-video-to-text': 'Videoyu Yazıya Dökme: Ücretsiz, Sınırsız',
+  'description:/transcribe-video-to-text':
+    'Videoyu ücretsiz yazıya dökün: hesap açmadan, günlük sınır olmadan. Her satırda zamanı olan metni TXT, SRT, VTT veya PDF olarak indirin.',
+  'label:/transcribe-video-to-text': 'Videoyu yazıya dökme',
   'title:/audio-to-text': 'Ses Yazıya Çevirme: Ücretsiz, Sınırsız',
   'description:/audio-to-text':
     'Podcast’leri, röportajları ve dersleri metne dönüştürün. Zaman damgalı, 50’den fazla dilde, girişsiz ücretsiz ses yazıya çevirme. TXT, SRT, VTT veya PDF.',
@@ -1112,6 +1116,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT mi VTT mi? Her altyazı biçiminin ne olduğu, nasıl farklılaştığı, nerede çalıştığı ve videonuzdan ücretsiz nasıl elde edeceğiniz.',
   'label:/guides/srt-vs-vtt': 'SRT mi VTT mi',
+  'title:/guides/how-to-transcribe-video-to-text': 'Video Yazıya Nasıl Çevrilir? 5 Yöntem',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'Videoyu yazıya çevirmenin beş yolu: YouTube transkripti, sesli yazma, editör altyazıları, çevrimiçi hizmetler ve cihazınızda çalışan araç. Hangisi uyar?',
+  'label:/guides/how-to-transcribe-video-to-text': 'Video yazıya nasıl çevrilir',
   'title:/guides/how-to-add-subtitles-to-a-video': 'Videoya Altyazı Ekleme (Ücretsiz)',
   'description:/guides/how-to-add-subtitles-to-a-video':
     'Altyazıyı dört adımda yapın: videoyu yazıya dökün, metni düzeltin, SRT veya VTT dışa aktarın, dosyayı YouTube’a, VLC’ye, editöre ya da oynatıcıya ekleyin.',

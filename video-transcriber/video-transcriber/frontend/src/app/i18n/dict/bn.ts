@@ -1037,6 +1037,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT না VTT? দুটি সাবটাইটেল ফরম্যাট কী, কীভাবে আলাদা, কোনটি কোথায় চলে, আর আপনার ভিডিও থেকে বিনামূল্যে যেকোনোটি পাবেন কীভাবে।',
   'label:/guides/srt-vs-vtt': 'SRT বনাম VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'ভিডিও থেকে টেক্সট বানানোর পাঁচ উপায়',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'ভিডিও থেকে টেক্সট বানানোর পাঁচটি উপায়: YouTube ট্রান্সক্রিপ্ট, ভয়েস টাইপিং, এডিটরের ক্যাপশন, অনলাইন সার্ভিস ও নিজের ডিভাইসে চলা টুল। কোনটি কখন ভালো, জানুন।',
+  'label:/guides/how-to-transcribe-video-to-text': 'ভিডিও থেকে টেক্সট বানানোর উপায়',
   'title:/guides/transcribe-video-without-uploading': 'আপলোড ছাড়াই ভিডিও ট্রান্সক্রাইব করুন',
   'description:/guides/transcribe-video-without-uploading':
     'ব্রাউজারে ট্রান্সক্রিপশন কীভাবে চলে, কী আপনার ডিভাইসে থাকে, কী একবার ডাউনলোড হয়, আর ব্রাউজারের নেটওয়ার্ক প্যানেলে নিজে যাচাই করবেন কীভাবে।',
@@ -1101,6 +1105,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'বিনামূল্যে ভিডিও থেকে টেক্সট। 50+ ভাষায় নির্ভুল, টাইমস্ট্যাম্পযুক্ত ট্রান্সক্রিপ্ট পান। লগইন নেই, দৈনিক সীমা নেই। SRT, VTT, TXT বা PDF নামান।',
   'label:/video-to-text': 'ভিডিও থেকে টেক্সট',
+  'title:/transcribe-video-to-text': 'ভিডিওকে টেক্সটে বদলান, সাইন-আপ ছাড়াই',
+  'description:/transcribe-video-to-text':
+    'ভিডিওর কথা বিনামূল্যে টেক্সটে বদলান: অ্যাকাউন্ট ও দৈনিক সীমা ছাড়া, প্রতিটি লাইনে সময় সহ। TXT, SRT, VTT, PDF, Markdown বা JSON নামিয়ে নিন।',
+  'label:/transcribe-video-to-text': 'ভিডিও ট্রান্সক্রাইব করুন',
   'title:/voice-recording-to-text': 'ভয়েস রেকর্ডিং থেকে টেক্সট',
   'description:/voice-recording-to-text':
     'ব্রাউজারে নিজের কণ্ঠ রেকর্ড করুন বা ভয়েস মেমো দিন, টেক্সটে পান। বিনামূল্যে, লগইন নেই, 50+ ভাষা। TXT, PDF, SRT বা Markdown।',

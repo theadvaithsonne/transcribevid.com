@@ -46,8 +46,8 @@ Arabic: https://transcribevid.com/ar/video-to-text
 
 | # | English | Arabic (العربية) |
 |---|---|---|
-| 1 | Convert video to text, free and with timestamps | تحويل الفيديو إلى نص مجانًا مع الطوابع الزمنية |
-| 2 | Upload a recorded video and watch its speech turn into text, line by line, each line with its time. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages. | يمكنك رفع فيديو مسجّل ومشاهدة كلامه يتحوّل إلى نص سطرًا بسطر، ولكل سطر وقته. تعمل الأداة مع المحاضرات والمقابلات والاجتماعات ومقاطع الهاتف وتسجيلات الشاشة، بأكثر من 50 لغة. |
+| 1 | Convert video to text in your browser: free, nothing uploaded | تحويل الفيديو إلى نص مجانًا مع الطوابع الزمنية |
+| 2 | Add a recorded video and watch its speech turn into text, line by line, each line with its time. It is free, needs no account, has no size limit, and the video stays on your device. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages. | يمكنك رفع فيديو مسجّل ومشاهدة كلامه يتحوّل إلى نص سطرًا بسطر، ولكل سطر وقته. تعمل الأداة مع المحاضرات والمقابلات والاجتماعات ومقاطع الهاتف وتسجيلات الشاشة، بأكثر من 50 لغة. |
 | 3 | Free | مجاني |
 | 4 | Unlimited | بلا حدود |
 | 5 | No login | بلا تسجيل دخول |
@@ -96,11 +96,150 @@ Arabic: https://transcribevid.com/ar/video-to-text
 | 48 | Can I transcribe a video without speech? | هل يمكن تفريغ فيديو لا يحتوي على كلام؟ |
 | 49 | Only speech becomes text. A silent video, or one with only music, gives an empty or very short result. Text shown on screen is not read. | الكلام وحده هو الذي يتحوّل إلى نص. الفيديو الصامت أو الذي فيه موسيقى فقط يعطي نتيجة فارغة أو قصيرة جدًّا. ولا تُقرأ النصوص المعروضة على الشاشة. |
 | 50 | Can I paste a YouTube link? | هل يمكنني لصق رابط يوتيوب؟ |
-| 51 | No. TranscribeVid works with files you upload or record, not web links. If the video is your own, upload the original file. | لا. يعمل TranscribeVid مع الملفات التي ترفعها أو تسجّلها، لا مع روابط الويب. وإذا كان الفيديو من إنتاجك فارفع الملف الأصلي. |
+| 51 | No. TranscribeVid works with files you add or record, not web links. If the video is your own, add the original file; nothing is uploaded. | لا. يعمل TranscribeVid مع الملفات التي ترفعها أو تسجّلها، لا مع روابط الويب. وإذا كان الفيديو من إنتاجك فارفع الملف الأصلي. |
 | 52 | Does it say who is speaking? | هل يحدّد من يتكلم؟ |
 | 53 | No. Speaker names or labels are not added. Every line has a timestamp, and you can type names into the text while you edit. | لا. لا تُضاف أسماء المتحدثين ولا وسوم لهم. لكل سطر طابع زمني، ويمكنك كتابة الأسماء في النص أثناء التحرير. |
 | 54 | How accurate is video to text? | ما مدى دقة تحويل الفيديو إلى نص؟ |
 | 55 | On clear speech in a supported language it is usually very accurate, but no speech recognition is perfect. Noise, accents, music and overlapping voices lower accuracy, so check important passages against the video. | مع الكلام الواضح بلغة مدعومة تكون الدقة عالية عادةً، لكن لا يوجد تعرّف على الكلام خالٍ من الأخطاء. يقلّل الضجيج واللهجات والموسيقى وتداخل الأصوات من الدقة، فقارن المقاطع المهمة بالفيديو. |
+
+## New tool page: transcribe video to text
+
+English: https://transcribevid.com/transcribe-video-to-text  
+Arabic: https://transcribevid.com/ar/transcribe-video-to-text
+
+| # | English | Arabic (العربية) |
+|---|---|---|
+| 1 | Transcribe video to text: free, no sign-up, no cap, nothing uploaded | تحويل الفيديو إلى نص مجانًا: بلا تسجيل وبلا حد، ولا يُرفع أي ملف |
+| 2 | Add a video and get its speech back as text, with a time on every line. There is no account to make, no daily cap and no file-size limit, and the video is never uploaded: your own device does the work. | أضف فيديو واحصل على كلامه نصًّا مكتوبًا، مع وقت على كل سطر. لا حاجة إلى إنشاء حساب ولا يوجد حد يومي ولا حد لحجم الملف، ولا يُرفع الفيديو أبدًا: جهازك هو الذي يؤدي العمل. |
+| 3 | Free | مجاني |
+| 4 | Unlimited | بلا حدود |
+| 5 | No login | بلا تسجيل دخول |
+| 6 | Drop your video here, or choose a file | أفلِت الفيديو هنا أو اختر ملفًا |
+| 7 | MP4, MOV, MKV, WEBM, AVI and more. Audio works too. There is no size or length limit set here. Your file never leaves your device. | MP4, MOV, MKV, WEBM, AVI and more. الصوت مدعوم أيضًا. لا يوجد هنا أي حد للحجم أو المدة. ملفك لا يغادر جهازك أبدًا. |
+| 8 | What "free" should mean when you transcribe a video | ماذا ينبغي أن يعني «مجاني» عند تفريغ الفيديو |
+| 9 | Many sites that say "free video transcription" give you a minute, or a few files, and then ask for an account or a card. Before you pick one, check four things: whether you must sign up, how many minutes or files you get, how large a file it takes, and whether you can download the result. | كثير من المواقع التي تعلن «تفريغ فيديو مجاني» تمنحك دقيقة واحدة أو بضعة ملفات ثم تطلب منك حسابًا أو بطاقة دفع. قبل أن تختار موقعًا، تحقّق من أربعة أمور: هل يجب التسجيل، وكم دقيقة أو ملفًا تحصل عليه، وما أكبر حجم ملف يقبله، وهل يمكنك تنزيل النتيجة. |
+| 10 | Here the answer to each is simple. You add the video, there is nothing to sign up for, there is no daily or monthly count and no size limit, and the transcript downloads as TXT, SRT, VTT, PDF, Markdown or JSON at no charge. Because your device does the work, its memory is the one real limit: a very long video can be too much for a phone, so cut it into parts first. The tool does not label speakers and does not take links: you add the file itself. | هنا جواب كل منها بسيط. تضيف الفيديو، ولا شيء تسجّل فيه، ولا يوجد حد يومي أو شهري ولا حد للحجم، وينزَّل التفريغ بصيغة TXT أو SRT أو VTT أو PDF أو Markdown أو JSON دون مقابل. ولأن جهازك هو الذي يؤدي العمل، فذاكرته هي الحد الحقيقي الوحيد: قد يكون الفيديو الطويل جدًّا فوق طاقة الهاتف، فقسّمه إلى أجزاء أولًا. لا تُسمّي الأداة المتحدثين ولا تقبل الروابط: أنت تضيف الملف نفسه. |
+| 11 | Free limits on other video transcription sites, checked October 2026 | الحدود المجانية في مواقع تفريغ الفيديو الأخرى، حسب الاطلاع في أكتوبر 2026 |
+| 12 | These are quotes from each tool's own page as it read on 28 October 2026. Plans change, so look at the page before you rely on a number. The guide linked at the end of this page has the full table with a link to every source. | هذه اقتباسات من صفحة كل أداة كما كانت في 28 أكتوبر 2026، وقد ترجمناها من صفحات الشركات بالإنجليزية. الخطط تتغير، فاطّلع على الصفحة نفسها قبل أن تعتمد على أي رقم. وفي الدليل المرتبط في نهاية هذه الصفحة جدول كامل برابط إلى كل مصدر. |
+| 13 | Riverside. "Unlimited transcriptions for free. No sign up required." The free tool takes MP3, WAV, MP4 and MOV files, and gives all the text of a multi-speaker recording to one speaker. | Riverside. «تفريغ غير محدود مجانًا. لا حاجة إلى التسجيل.» تقبل الأداة المجانية ملفات MP3 وWAV وMP4 وMOV، وتنسب كل نص تسجيل متعدد المتحدثين إلى متحدث واحد. |
+| 14 | VoiceCheap. "Free for files up to 60 minutes, with 1 transcription per day." | VoiceCheap. «مجاني للملفات حتى 60 دقيقة، بتفريغ واحد في اليوم.» |
+| 15 | RecCloud. "Our free plan allows videos up to 10 minutes in length." | RecCloud. «تتيح خطتنا المجانية مقاطع فيديو حتى 10 دقائق.» |
+| 16 | Caption-X. "The free plan covers 5 transcriptions in total, up to 5 minutes each." | Caption-X. «تشمل الخطة المجانية 5 عمليات تفريغ في المجموع، بحد أقصى 5 دقائق لكل منها.» |
+| 17 | Maestra. A "1-minute preview", and "Sign up to download or export your transcript." | Maestra. «معاينة لمدة دقيقة واحدة»، و«سجّل للتنزيل أو لتصدير تفريغك.» |
+| 18 | Any2Text. "First 15 minutes free", then $0.035 a minute. | Any2Text. «أول 15 دقيقة مجانًا»، ثم 0.035 دولار للدقيقة. |
+| 19 | Where your video goes while it is transcribed | أين يذهب الفيديو أثناء تفريغه |
+| 20 | The video stays on your device. Your browser reads it, pulls out the sound and runs the Whisper speech model on it, so no file is sent to us or to anyone else. | يبقى الفيديو على جهازك. يقرؤه متصفحك ويستخرج الصوت ويشغّل عليه نموذج Whisper للتعرّف على الكلام، فلا يُرسَل أي ملف إلينا ولا إلى أي جهة أخرى. |
+| 21 | Only the tools are downloaded: the page, the speech model and the engine that runs it. The model is between about 77 MB and a little over 1 GB, depending on the quality level and your device, and it is kept in your browser afterwards. To see it for yourself, open your browser's network panel while a video is transcribed. | الذي يُنزَّل هو الأدوات فقط: الصفحة ونموذج الكلام والمحرّك الذي يشغّله. يتراوح حجم النموذج بين نحو 77 ميغابايت وأكثر من 1 غيغابايت بقليل، بحسب مستوى الجودة وجهازك، ويبقى محفوظًا في متصفحك بعد ذلك. وللتأكد بنفسك، افتح لوحة الشبكة في متصفحك أثناء تفريغ فيديو. |
+| 22 | Four quality levels for different videos | أربعة مستويات جودة لأنواع مختلفة من الفيديو |
+| 23 | Fastest uses the small Base model and suits a quick draft of clear speech. Standard uses a larger one, and is the usual choice. High accuracy runs Large v3 Turbo and handles accents and noisy rooms better. Best accuracy runs the full Large v3 and makes the fewest mistakes, but takes the longest. | يستخدم «الأسرع» النموذج الصغير Base ويناسب مسودة سريعة لكلام واضح. ويستخدم «القياسي» نموذجًا أكبر، وهو الخيار المعتاد. ويشغّل «دقة عالية» النموذج Large v3 Turbo ويتعامل مع اللهجات والغرف الصاخبة بشكل أفضل. ويشغّل «أعلى دقة» النموذج Large v3 الكامل، فيقلّ فيه الخطأ أكثر من غيره، لكنه يستغرق أطول وقت. |
+| 24 | Your device does the work, so speed depends on it: a recent laptop is much quicker than an older phone, and on a phone Fastest is the level to use. Try Standard first on a laptop, and move up only if the text is not good enough. | جهازك هو الذي يؤدي العمل، فتعتمد السرعة عليه: الحاسوب المحمول الحديث أسرع بكثير من هاتف قديم، وعلى الهاتف يكون «الأسرع» هو المستوى المناسب. جرّب «القياسي» أولًا على الحاسوب المحمول، ولا ترتقِ إلى مستوى أعلى إلا إذا لم يكن النص جيدًا بما يكفي. |
+| 25 | Ads keep TranscribeVid free. Everything works without them. | الإعلانات تُبقي TranscribeVid مجانيًا. ويعمل كل شيء من دونها. |
+| 26 | How to transcribe a video in four steps | كيف تحوّل فيديو إلى نص في أربع خطوات |
+| 27 | 1 Add the video Drop the file in the box at the top of this page, or press Choose a file. A link to a web video is not accepted. | 1 إضافة الفيديو أفلِت الملف في المربع أعلى هذه الصفحة، أو اضغط «اختيار ملف». رابط فيديو على الويب غير مقبول. |
+| 28 | 2 Choose language and quality Name the spoken language if you know it, and pick a quality level. Standard is a good start; use High accuracy or Best accuracy for accents, noise or a language such as Hindi. | 2 اختيار اللغة والجودة حدّد لغة الكلام إن كنت تعرفها، واختر مستوى الجودة. «القياسي» بداية جيدة؛ واختر «دقة عالية» أو «أعلى دقة» للهجات أو الضوضاء أو لغة مثل الهندية. |
+| 29 | 3 Wait for the text Lines appear one by one with a progress bar and the time left. The first time you use a level, the model is downloaded once; later videos start straight away. | 3 انتظار النص تظهر الأسطر واحدًا تلو الآخر مع شريط تقدّم والوقت المتبقي. في أول مرة تستخدم فيها مستوى ما يُنزَّل النموذج مرة واحدة؛ وتبدأ الفيديوهات اللاحقة فورًا. |
+| 30 | 4 Edit and download Fix any line in the editor, then download TXT, SRT, VTT, PDF, Markdown or JSON. The transcript stays in this browser for a while, but download what you want to keep. | 4 التعديل والتنزيل صحّح أي سطر في المحرّر، ثم نزّل TXT أو SRT أو VTT أو PDF أو Markdown أو JSON. يبقى التفريغ في هذا المتصفح لبعض الوقت، لكن نزّل ما تريد الاحتفاظ به. |
+| 31 | Videos you can add and files you get back | مقاطع الفيديو التي يمكنك إضافتها والملفات التي تحصل عليها |
+| 32 | The sound track is what is read, so the picture can be any quality. Audio-only files work too. | المقروء هو المسار الصوتي، فيمكن أن تكون جودة الصورة أيًّا كانت. وتعمل الملفات الصوتية فقط أيضًا. |
+| 33 | Video files you can add | ملفات الفيديو التي يمكنك إضافتها |
+| 34 | MP4 | MP4 |
+| 35 | MOV | MOV |
+| 36 | MKV | MKV |
+| 37 | WEBM | WEBM |
+| 38 | AVI | AVI |
+| 39 | M4V | M4V |
+| 40 | 3GP | 3GP |
+| 41 | Download the transcript as | نزّل التفريغ بصيغة |
+| 42 | TXT plain text, or a time on each line | TXT نص عادي، أو مع وقت على كل سطر |
+| 43 | SRT subtitles for editors and players | SRT ترجمات لبرامج المونتاج والمشغّلات |
+| 44 | VTT captions for web video | VTT ترجمات لفيديو الويب |
+| 45 | PDF a transcript to print or share | PDF تفريغ للطباعة أو المشاركة |
+| 46 | Markdown notes with timestamps | Markdown ملاحظات بطوابع زمنية |
+| 47 | JSON words and times for developers | JSON كلمات وأوقات للمطوّرين |
+| 48 | A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more. | تفريغ نصي مكتمل. لكل سطر طابع زمني، ويحفظه زر تصدير بصيغ SRT وVTT وTXT وPDF وغيرها. |
+| 49 | Getting more from a free transcription | كيف تستفيد أكثر من التفريغ المجاني |
+| 50 | Test the first minute before the whole video. Cut or play a minute of the video and transcribe that. If the text is wrong, change the language or quality level before you spend time on the full file. | اختبر الدقيقة الأولى قبل الفيديو كله. اقتطع دقيقة من الفيديو أو شغّلها وفرّغها وحدها. إذا كان النص خاطئًا، فغيّر اللغة أو مستوى الجودة قبل أن تقضي وقتًا في الملف الكامل. |
+| 51 | Check what is on your screen as well as in your ears. Only the speech is written down. Names that appear on a slide but are never said will not be in the text. | راجع ما على الشاشة وليس ما تسمعه فقط. المكتوب هو الكلام وحده. الأسماء التي تظهر على شريحة عرض ولا تُنطق لن تكون في النص. |
+| 52 | Split a very long recording on a phone. There is no size limit, but a video of several hours needs a lot of memory. On a phone, parts of an hour or so each are much safer, and on a laptop you can usually go much longer. | قسّم التسجيل الطويل جدًّا على الهاتف. لا يوجد حد للحجم، لكن الفيديو الذي يمتد ساعات يحتاج إلى ذاكرة كبيرة. على الهاتف تكون الأجزاء من ساعة تقريبًا أكثر أمانًا بكثير، وعلى الحاسوب المحمول يمكنك عادةً أن تذهب أبعد من ذلك. |
+| 53 | Download the subtitle file as well as the text. The SRT file keeps the timing, so the same run gives you both a transcript to read and captions to add to the video. | نزّل ملف الترجمة مع النص. يحتفظ ملف SRT بالتوقيت، فتعطيك العملية نفسها تفريغًا للقراءة وترجمات تضيفها إلى الفيديو. |
+| 54 | Related reading | قراءات ذات صلة |
+| 55 | Free video to text tools compared Every limit in one table, quoted from each tool's own page. | مقارنة أدوات تحويل الفيديو إلى نص المجانية كل الحدود في جدول واحد، مقتبسة من صفحة كل أداة. |
+| 56 | Transcribe a video without uploading it How the work stays on your device and how to check it yourself. | تفريغ فيديو دون رفعه كيف يبقى العمل على جهازك وكيف تتحقق من ذلك بنفسك. |
+| 57 | How to transcribe a video to text Five ways to do it, and which one fits your video. | كيف تحوّل الفيديو إلى نص خمس طرق لإنجاز ذلك، وأيها يناسب فيديوك. |
+| 58 | How to get a more accurate transcript Habits and settings that reduce mistakes on any video. | كيف تحصل على تفريغ أدق عادات وإعدادات تقلّل الأخطاء في أي فيديو. |
+| 59 | Transcribe video to text: common questions | تفريغ الفيديو إلى نص: أسئلة شائعة |
+| 60 | Can I paste a YouTube, TikTok or Google Drive link instead of a file? | هل يمكنني لصق رابط من YouTube أو TikTok أو Google Drive بدل الملف؟ |
+| 61 | No. This tool works on a file you add or record. If you own the video, use the original file; for someone else's video you need the right to use it. | لا. تعمل هذه الأداة على ملف تضيفه أو تسجّله. إذا كنت تملك الفيديو فاستخدم الملف الأصلي؛ أما فيديو غيرك فيلزمك الحق في استخدامه. |
+| 62 | Will the transcript show who is speaking? | هل يُظهر التفريغ من يتحدث؟ |
+| 63 | No. Lines have times but no speaker names. You can type names into the text in the editor, which is quick for a two-person interview. | لا. للأسطر أوقات لكن بلا أسماء متحدثين. يمكنك كتابة الأسماء في النص داخل المحرّر، وهذا سريع في مقابلة بين شخصين. |
+| 64 | Is there really no limit on how many videos I can transcribe? | هل حقًّا لا يوجد حد لعدد الفيديوهات التي يمكنني تفريغها؟ |
+| 65 | There is no account, no plan and no daily or monthly count, and no size limit. The only limit is your device: a very long video takes longer and needs more memory, so a phone does better with parts of an hour or so. Ads keep the site free, and none is shown while a video is transcribed. | لا يوجد حساب ولا خطة ولا حد يومي أو شهري ولا حد للحجم. الحد الوحيد هو جهازك: الفيديو الطويل جدًّا يستغرق وقتًا أطول ويحتاج إلى ذاكرة أكبر، لذا يناسب الهاتفَ أن تقسّمه إلى أجزاء من ساعة تقريبًا. الإعلانات هي التي تُبقي الموقع مجانيًّا، ولا يظهر أي إعلان أثناء تفريغ الفيديو. |
+| 66 | Which quality level suits a long video? | ما مستوى الجودة المناسب لفيديو طويل؟ |
+| 67 | Standard is the usual choice. Fastest is quicker but makes more mistakes; High accuracy and Best accuracy cost more time and pay off on accents, noise and languages such as Hindi. | «القياسي» هو الخيار المعتاد. «الأسرع» أسرع لكنه يخطئ أكثر؛ أما «دقة عالية» و«أعلى دقة» فيكلّفان وقتًا أطول ويؤتيان ثمارهما مع اللهجات والضوضاء ولغات مثل الهندية. |
+| 68 | Does the video leave my computer? | هل يغادر الفيديو حاسوبي؟ |
+| 69 | No. Your browser transcribes the video on your own device, and no file is sent to us. Only the speech model and its engine are downloaded, once. | لا. يفرّغ متصفحك الفيديو على جهازك، ولا يُرسَل أي ملف إلينا. الذي يُنزَّل هو نموذج الكلام ومحرّكه فقط، مرة واحدة. |
+
+## New guide: how to transcribe a video to text
+
+English: https://transcribevid.com/guides/how-to-transcribe-video-to-text  
+Arabic: https://transcribevid.com/ar/guides/how-to-transcribe-video-to-text
+
+| # | English | Arabic (العربية) |
+|---|---|---|
+| 1 | How to transcribe a video to text: five ways, and which one fits your video | كيف تحوّل الفيديو إلى نص: خمس طرق، وأيها يناسب فيديوك |
+| 2 | By Advaith Bibhishan Sonne · Updated 28 October 2026 · 7 min read | بقلم Advaith Bibhishan Sonne · تم التحديث 28 أكتوبر 2026 · قراءة 7 د |
+| 3 | You can get the words of a video as text in five ways: the transcript YouTube already holds, voice typing, the captions of a video editor, an online service, or a tool that runs on your own device. They differ in cost, in whether you get times on every line, and in what they ask of you first. This guide says what each one does and when to pick it. | يمكنك الحصول على كلام الفيديو نصًّا بخمس طرق: التفريغ الذي يحتفظ به YouTube أصلًا، أو الكتابة الصوتية، أو ترجمات برنامج مونتاج الفيديو، أو خدمة على الإنترنت، أو أداة تعمل على جهازك. وتختلف في التكلفة، وفي ما إذا كنت تحصل على وقت لكل سطر، وفي ما تطلبه منك أولًا. يوضّح هذا الدليل ما تفعله كل طريقة ومتى تختارها. |
+| 4 | The short answer | الجواب المختصر |
+| 5 | The video is on YouTube and has captions: open its transcript on the video page. It costs nothing and takes a minute, but it only exists when the video has captions, and the text needs a careful read. | الفيديو على YouTube وله ترجمات: افتح تفريغه من صفحة الفيديو. لا يكلّف شيئًا ويستغرق دقيقة، لكنه لا يوجد إلا إذا كان للفيديو ترجمات، ويحتاج النص إلى قراءة متأنية. |
+| 6 | You have the video file and want text with times: use a tool that takes a file and gives you TXT and subtitle files. The last two ways below do this. | لديك ملف الفيديو وتريد نصًّا بأوقات: استخدم أداة تقبل ملفًا وتعطيك ملفات TXT وترجمات. وهذا ما تفعله الطريقتان الأخيرتان أدناه. |
+| 7 | You only need a few quotes: play the video and type, or use voice typing. For anything longer than a few minutes it is slower than letting software do the whole file. | تحتاج بضعة اقتباسات فقط: شغّل الفيديو واكتب، أو استخدم الكتابة الصوتية. وفيما يزيد على بضع دقائق، يكون ذلك أبطأ من ترك البرنامج يعالج الملف كله. |
+| 8 | You want subtitles for the same video: pick a way that exports SRT or VTT, so one run gives you both the transcript and the captions. | تريد ترجمات للفيديو نفسه: اختر طريقة تصدّر SRT أو VTT، فتعطيك عملية واحدة التفريغ والترجمات معًا. |
+| 9 | What a good transcript needs from your video | ماذا يحتاج التفريغ الجيد من فيديوك |
+| 10 | Every way below works from the sound track, so the quality of the sound decides the quality of the text far more than the picture does. Speech that is close to the microphone, one voice at a time, without music under it, comes out well. A room with echo, people talking over each other or a loud background comes out with mistakes in every method. | كل طريقة أدناه تعمل انطلاقًا من المسار الصوتي، فجودة الصوت تحدد جودة النص أكثر بكثير مما تفعل الصورة. الكلام القريب من الميكروفون، بصوت واحد في كل مرة ودون موسيقى تحته، يخرج جيدًا. أما الغرفة ذات الصدى، أو الناس الذين يتحدثون فوق بعضهم، أو الخلفية الصاخبة، فتخرج بأخطاء في كل الطرق. |
+| 11 | Before you start, find out three things: the language people speak in the video, whether you need a time on each line, and how long the video is. The second tells you which formats you must be able to download; the third tells you which free limits will stop you. | قبل أن تبدأ، حدّد ثلاثة أمور: اللغة التي يتحدث بها الناس في الفيديو، وهل تحتاج إلى وقت على كل سطر، وكم مدة الفيديو. الثاني يخبرك بالصيغ التي يجب أن تتمكن من تنزيلها، والثالث يخبرك بالحدود المجانية التي قد توقفك. |
+| 12 | Ads keep TranscribeVid free. Everything works without them. | الإعلانات تُبقي TranscribeVid مجانيًا. ويعمل كل شيء من دونها. |
+| 13 | Way 1: use the transcript YouTube already has | الطريقة 1: استخدم التفريغ الموجود أصلًا في YouTube |
+| 14 | Many YouTube videos carry captions, written by the owner or made automatically. On a video page, open the description: where captions exist, an option to show the transcript appears there, and it lists the text with times that you can copy. If the video is yours, YouTube Studio has a Subtitles section where you can review and download the captions. YouTube changes these screens from time to time, so the labels may differ a little. | كثير من فيديوهات YouTube لها ترجمات، كتبها صاحب الفيديو أو أُنشئت تلقائيًا. افتح الوصف في صفحة الفيديو: حيث توجد الترجمات يظهر خيار لعرض التفريغ، ويسرد النص بأوقاته ويمكنك نسخه. وإذا كان الفيديو لك، ففي YouTube Studio قسم للترجمات يمكنك فيه مراجعتها وتنزيلها. يغيّر YouTube هذه الشاشات من وقت لآخر، فقد تختلف التسميات قليلًا. |
+| 15 | This is the quickest way for a video that is already on YouTube. Its limits are that it only works with a link to a video that has captions, the automatic text can be rough on names and technical words, and it will not help with a file on your computer or phone. | هذه أسرع طريقة لفيديو موجود على YouTube أصلًا. وحدودها أنها لا تعمل إلا مع رابط فيديو له ترجمات، وأن النص التلقائي قد يكون ركيكًا في الأسماء والكلمات التقنية، ولا تفيدك مع ملف على حاسوبك أو هاتفك. |
+| 16 | Way 2: play the video and let voice typing listen | الطريقة 2: شغّل الفيديو ودع الكتابة الصوتية تستمع |
+| 17 | Voice typing in a word processor, such as the Voice typing option in the Tools menu of Google Docs, writes down what its microphone hears. You play the video through your speakers and it types. | تكتب الكتابة الصوتية في معالج النصوص، مثل خيار الكتابة الصوتية في قائمة «أدوات» في Google Docs، ما يسمعه ميكروفونها. تشغّل الفيديو عبر مكبّرات الصوت فيكتب هو. |
+| 18 | It costs nothing, but it hears the whole room, not only the video. It gives you no times, it runs in real time, so a one-hour video takes an hour, and anything the microphone misses is lost. It is fine for a quote or two and a poor choice for a lecture or an interview. | لا تكلّف شيئًا، لكنها تسمع الغرفة كلها، لا الفيديو وحده. ولا تعطيك أوقاتًا، وتعمل في الزمن الحقيقي، فالفيديو الذي مدته ساعة يستغرق ساعة، وكل ما يفوت الميكروفون يضيع. وهي مقبولة لاقتباس أو اثنين، وخيار ضعيف لمحاضرة أو مقابلة. |
+| 19 | Way 3: switch on automatic captions in a video editor | الطريقة 3: شغّل الترجمات التلقائية في برنامج مونتاج الفيديو |
+| 20 | Some video editors can transcribe the speech of a clip you place in them. Microsoft Clipchamp's own guide, for example, says to open the Captions tab, turn on automatic captions, and then download the captions as an SRT file; the video needs speech in its audio for this to work. | بعض برامج مونتاج الفيديو يمكنها تفريغ كلام المقطع الذي تضعه فيها. فدليل Microsoft Clipchamp نفسه، مثلًا، يقول افتح علامة تبويب الترجمات، وشغّل الترجمات التلقائية، ثم نزّلها بصيغة ملف SRT؛ ويلزم أن يحتوي صوت الفيديو على كلام حتى تعمل. |
+| 21 | This is useful when you are editing the video anyway, because the captions land on the timeline. For a plain transcript it is more work than it needs to be: you must load the video into the editor, and the text comes out as a subtitle file you then turn into a document. | هذا مفيد حين تعدّل الفيديو على أي حال، لأن الترجمات تقع على الخط الزمني. أما لتفريغ نصي عادي فهو جهد أكبر مما يلزم: عليك تحميل الفيديو في البرنامج، ويخرج النص في ملف ترجمة تحوّله بعد ذلك إلى مستند. |
+| 22 | Way 4: use an online transcription service | الطريقة 4: استخدم خدمة تفريغ على الإنترنت |
+| 23 | Dozens of sites will transcribe a file you give them. Most are free only up to a point: a few minutes, a few files, or a preview that asks you to pay before you can download. The differences that matter are whether you need an account, how many minutes you get, how large a file can be, and whether the result can be exported. | عشرات المواقع تفرّغ ملفًا تعطيه إياها. ومعظمها مجاني إلى حد معين فقط: بضع دقائق، أو بضعة ملفات، أو معاينة تطلب منك الدفع قبل أن تنزّل. والفروق المهمة هي: هل تحتاج إلى حساب، وكم دقيقة تحصل عليها، وما أكبر حجم لملف، وهل يمكن تصدير النتيجة. |
+| 24 | Services are the right choice when you need what simple tools do not do: names for each speaker, a bot that joins a meeting, or a link to a video you do not hold as a file. Our guide with the free limits of thirteen of them, each quoted from its own page, is linked below. | الخدمات هي الخيار الصحيح حين تحتاج إلى ما لا تفعله الأدوات البسيطة: اسم لكل متحدث، أو روبوتًا ينضم إلى اجتماع، أو رابطًا لفيديو لا تملكه ملفًّا. وفي الأسفل رابط إلى دليلنا الذي يضم الحدود المجانية لثلاث عشرة خدمة، كل منها مقتبس من صفحتها. |
+| 25 | Way 5: transcribe the file with TranscribeVid | الطريقة 5: فرّغ الملف باستخدام TranscribeVid |
+| 26 | TranscribeVid takes the video file itself, with no account, no daily count and no size limit. It runs Whisper, an open speech model, in your browser, so the video stays on your device, and the text comes back with a time on every line. | يقبل TranscribeVid ملف الفيديو نفسه، بلا حساب وبلا حد يومي ولا حد للحجم. يشغّل Whisper، وهو نموذج مفتوح للتعرّف على الكلام، داخل متصفحك، فيبقى الفيديو على جهازك، ويعود النص مع وقت على كل سطر. |
+| 27 | It does not take links, it does not label who is speaking, and it does not join meetings. For those jobs, use a service from Way 4. Because your own device does the work, a long video is slower on an old phone than on a recent laptop. | لا يقبل الروابط، ولا يحدد من يتحدث، ولا ينضم إلى الاجتماعات. وفي هذه المهام استخدم خدمة من الطريقة 4. ولأن جهازك هو الذي يؤدي العمل، فالفيديو الطويل أبطأ على هاتف قديم منه على حاسوب محمول حديث. |
+| 28 | Add the video Drop the file in the box on the tool page, or press Choose a file. MP4, MOV, MKV, WEBM and most other video files work, and so do audio files. | إضافة الفيديو أفلِت الملف في المربع في صفحة الأداة، أو اضغط «اختيار ملف». تعمل ملفات MP4 وMOV وMKV وWEBM ومعظم ملفات الفيديو الأخرى، وكذلك الملفات الصوتية. |
+| 29 | Choose the language and quality Name the spoken language if you know it. Standard suits most videos; choose High accuracy or Best accuracy for accents, noise or Hindi. | اختيار اللغة والجودة حدّد لغة الكلام إن كنت تعرفها. يناسب «القياسي» معظم مقاطع الفيديو؛ واختر «دقة عالية» أو «أعلى دقة» للهجات أو الضوضاء أو الهندية. |
+| 30 | Wait for the text Lines appear one by one, with a progress bar and the time left. | انتظار النص تظهر الأسطر واحدًا تلو الآخر، مع شريط تقدّم والوقت المتبقي. |
+| 31 | Edit and download Fix any line in the editor, then download TXT, SRT, VTT, PDF, Markdown or JSON. Download what you want to keep before you leave. | التعديل والتنزيل صحّح أي سطر في المحرّر، ثم نزّل TXT أو SRT أو VTT أو PDF أو Markdown أو JSON. نزّل ما تريد الاحتفاظ به قبل أن تغادر. |
+| 32 | Which way for which video | أي طريقة لأي فيديو |
+| 33 | Fix the text before you use it | صحّح النص قبل أن تستخدمه |
+| 34 | Whichever way you choose, read the result once with the video playing. Speech-to-text gets common words right and stumbles on the things that matter most to you: names, product words, numbers and anything said quickly. | أيًّا كانت الطريقة التي تختارها، اقرأ النتيجة مرة واحدة والفيديو يعمل. يصيب التحويل من الكلام إلى نص في الكلمات الشائعة ويتعثر في أكثر ما يهمك: الأسماء ومصطلحات المنتجات والأرقام وكل ما قيل بسرعة. |
+| 35 | Names and terms. Search the text for each name you know is in the video and correct every place it appears. | الأسماء والمصطلحات. ابحث في النص عن كل اسم تعرف أنه في الفيديو، وصحّح كل موضع يظهر فيه. |
+| 36 | Numbers and dates. Check each one against the video; a wrong digit is easy to miss. | الأرقام والتواريخ. قارن كلًّا منها بالفيديو؛ فالرقم الخاطئ يسهل أن يفوتك. |
+| 37 | Where the speaker changes. Add a line break and a name, because plain transcripts do not mark who is talking. | حيث يتغير المتحدث. أضف سطرًا جديدًا واسمًا، لأن التفريغ العادي لا يحدد من يتكلم. |
+| 38 | Subtitles. If you will use an SRT or VTT file, keep each line short enough to read in the time it is on screen. | الترجمات. إذا كنت ستستخدم ملف SRT أو VTT، فاجعل كل سطر قصيرًا بما يكفي ليُقرأ في المدة التي يبقى فيها على الشاشة. |
+| 39 | For a longer list of habits that reduce mistakes before you start, see the guide on getting a more accurate transcript. | للاطلاع على قائمة أطول من العادات التي تقلّل الأخطاء قبل أن تبدأ، راجع دليل الحصول على تفريغ أدق. |
+| 40 | Common questions | أسئلة شائعة |
+| 41 | Can I transcribe a video to text without installing anything? | هل يمكنني تحويل الفيديو إلى نص دون تثبيت أي شيء؟ |
+| 42 | Yes. The YouTube transcript, an online service and TranscribeVid all work in a web browser. Only a video editor or a desktop program needs an install. | نعم. يعمل تفريغ YouTube وخدمة على الإنترنت وTranscribeVid كلها في متصفح الويب. وحدها برامج مونتاج الفيديو أو برامج سطح المكتب تحتاج إلى تثبيت. |
+| 43 | What is the fastest way to transcribe a one-hour video? | ما أسرع طريقة لتفريغ فيديو مدته ساعة؟ |
+| 44 | If it is on YouTube with captions, the transcript there is immediate. For a file, software is far faster than typing or voice typing, which both take at least as long as the video lasts. How long software takes depends on the tool, the quality level and, where it runs on your device, how fast that device is. | إن كان على YouTube وله ترجمات، فالتفريغ هناك فوري. أما الملف، فالبرنامج أسرع بكثير من الكتابة أو الكتابة الصوتية، فكلتاهما تستغرق على الأقل مدة الفيديو نفسها. ويعتمد وقت البرنامج على الأداة ومستوى الجودة، وعلى سرعة جهازك إن كان يعمل عليه. |
+| 45 | Do I have to take the audio out of the video first? | هل يجب أن أستخرج الصوت من الفيديو أولًا؟ |
+| 46 | No. Tools that accept video files read the sound track themselves, so you can add an MP4 or MOV as it is. Taking the audio out first only helps when a tool refuses the video format. | لا. الأدوات التي تقبل ملفات الفيديو تقرأ المسار الصوتي بنفسها، فيمكنك إضافة ملف MP4 أو MOV كما هو. واستخراج الصوت أولًا لا يفيد إلا حين ترفض أداة صيغة الفيديو. |
+| 47 | How do I get the text with a time on every line? | كيف أحصل على النص مع وقت على كل سطر؟ |
+| 48 | Use a way that exports subtitles or a timed transcript: the YouTube transcript lists times, and a tool that downloads SRT or VTT gives each line a start and end time. Voice typing gives none. | استخدم طريقة تصدّر ترجمات أو تفريغًا موقّتًا: يسرد تفريغ YouTube الأوقات، والأداة التي تنزّل SRT أو VTT تعطي كل سطر وقت بداية ونهاية. أما الكتابة الصوتية فلا تعطي شيئًا منها. |
+| 49 | Keep reading | تابع القراءة |
+| 50 | Free video to text tools compared The free limits of thirteen online tools, each quoted from its own page. | مقارنة أدوات تحويل الفيديو إلى نص المجانية الحدود المجانية لثلاث عشرة أداة على الإنترنت، كل منها مقتبس من صفحتها. |
+| 51 | How to get a more accurate transcript Habits and settings that reduce mistakes on any video. | كيف تحصل على تفريغ أدق عادات وإعدادات تقلّل الأخطاء في أي فيديو. |
+| 52 | Make subtitles for your video Turn the same video into an SRT file for players and editors. | أنشئ ترجمات لفيديوك حوّل الفيديو نفسه إلى ملف SRT للمشغّلات والمحرّرات. |
+| 53 | Transcribe a video without uploading it How the work stays on your device and how to check it yourself. | تفريغ فيديو دون رفعه كيف يبقى العمل على جهازك وكيف تتحقق من ذلك بنفسك. |
+| 54 |  | تمت ترجمة هذه الصفحة بالذكاء الاصطناعي. وجدت خطأً؟ أخبرنا. |
 
 ## Privacy policy
 

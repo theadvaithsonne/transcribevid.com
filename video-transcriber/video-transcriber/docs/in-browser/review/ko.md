@@ -46,8 +46,8 @@ Korean: https://transcribevid.com/ko/video-to-text
 
 | # | English | Korean (한국어) |
 |---|---|---|
-| 1 | Convert video to text, free and with timestamps | 동영상 텍스트 변환: 무료, 타임스탬프 포함 |
-| 2 | Upload a recorded video and watch its speech turn into text, line by line, each line with its time. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages. | 녹화한 동영상을 추가하면 말한 내용이 한 줄씩, 각 줄에 시간이 붙은 텍스트로 바뀌는 모습을 바로 볼 수 있습니다. 강의, 인터뷰, 회의, 휴대폰으로 찍은 영상, 화면 녹화 모두 50개 이상의 언어로 변환할 수 있습니다. |
+| 1 | Convert video to text in your browser: free, nothing uploaded | 동영상 텍스트 변환: 무료, 타임스탬프 포함 |
+| 2 | Add a recorded video and watch its speech turn into text, line by line, each line with its time. It is free, needs no account, has no size limit, and the video stays on your device. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages. | 녹화한 동영상을 추가하면 말한 내용이 한 줄씩, 각 줄에 시간이 붙은 텍스트로 바뀌는 모습을 바로 볼 수 있습니다. 강의, 인터뷰, 회의, 휴대폰으로 찍은 영상, 화면 녹화 모두 50개 이상의 언어로 변환할 수 있습니다. |
 | 3 | Free | 무료 |
 | 4 | Unlimited | 무제한 |
 | 5 | No login | 로그인 불필요 |
@@ -96,11 +96,150 @@ Korean: https://transcribevid.com/ko/video-to-text
 | 48 | Can I transcribe a video without speech? | 말소리가 없는 동영상도 변환할 수 있나요? |
 | 49 | Only speech becomes text. A silent video, or one with only music, gives an empty or very short result. Text shown on screen is not read. | 말소리만 텍스트가 됩니다. 소리가 없는 동영상이나 음악만 있는 동영상은 결과가 비어 있거나 아주 짧게 나옵니다. 화면에 나온 글자는 읽지 않습니다. |
 | 50 | Can I paste a YouTube link? | YouTube 링크를 붙여 넣어도 되나요? |
-| 51 | No. TranscribeVid works with files you upload or record, not web links. If the video is your own, upload the original file. | 아니요. TranscribeVid는 웹 링크가 아니라 업로드하거나 녹음한 파일로만 작동합니다. 본인이 만든 동영상이라면 원본 파일을 업로드하세요. |
+| 51 | No. TranscribeVid works with files you add or record, not web links. If the video is your own, add the original file; nothing is uploaded. | 아니요. TranscribeVid는 웹 링크가 아니라 업로드하거나 녹음한 파일로만 작동합니다. 본인이 만든 동영상이라면 원본 파일을 업로드하세요. |
 | 52 | Does it say who is speaking? | 누가 말하는지도 알려 주나요? |
 | 53 | No. Speaker names or labels are not added. Every line has a timestamp, and you can type names into the text while you edit. | 아니요. 화자 이름이나 표시는 추가되지 않습니다. 모든 줄에 타임스탬프가 있으며, 편집하는 동안 텍스트에 이름을 직접 입력할 수 있습니다. |
 | 54 | How accurate is video to text? | 동영상 텍스트 변환은 얼마나 정확한가요? |
 | 55 | On clear speech in a supported language it is usually very accurate, but no speech recognition is perfect. Noise, accents, music and overlapping voices lower accuracy, so check important passages against the video. | 지원하는 언어로 또렷하게 말한 음성이라면 대체로 매우 정확하지만, 어떤 음성 인식도 완벽하지는 않습니다. 잡음, 억양, 음악, 겹치는 목소리는 정확도를 떨어뜨리므로 중요한 부분은 동영상과 대조해 확인하세요. |
+
+## New tool page: transcribe video to text
+
+English: https://transcribevid.com/transcribe-video-to-text  
+Korean: https://transcribevid.com/ko/transcribe-video-to-text
+
+| # | English | Korean (한국어) |
+|---|---|---|
+| 1 | Transcribe video to text: free, no sign-up, no cap, nothing uploaded | 동영상을 텍스트로 변환: 무료, 가입 불필요, 한도 없음, 업로드 없음 |
+| 2 | Add a video and get its speech back as text, with a time on every line. There is no account to make, no daily cap and no file-size limit, and the video is never uploaded: your own device does the work. | 동영상을 추가하면 말한 내용이 각 줄에 시간이 붙은 텍스트로 돌아옵니다. 만들어야 할 계정도, 일일 한도도, 파일 크기 제한도 없고 동영상은 업로드되지 않습니다. 작업은 사용 중인 기기가 직접 처리합니다. |
+| 3 | Free | 무료 |
+| 4 | Unlimited | 무제한 |
+| 5 | No login | 로그인 불필요 |
+| 6 | Drop your video here, or choose a file | 동영상 파일을 여기에 끌어다 놓거나 선택하세요 |
+| 7 | MP4, MOV, MKV, WEBM, AVI and more. Audio works too. There is no size or length limit set here. Your file never leaves your device. | MP4, MOV, MKV, WEBM, AVI and more. 오디오도 사용할 수 있습니다. 여기에는 크기나 길이 제한이 설정되어 있지 않습니다. 파일은 기기 밖으로 나가지 않습니다. |
+| 8 | What "free" should mean when you transcribe a video | 동영상을 텍스트로 변환할 때 "무료"가 뜻해야 하는 것 |
+| 9 | Many sites that say "free video transcription" give you a minute, or a few files, and then ask for an account or a card. Before you pick one, check four things: whether you must sign up, how many minutes or files you get, how large a file it takes, and whether you can download the result. | "무료 동영상 텍스트 변환"을 내세우는 많은 사이트는 1분이나 파일 몇 개만 제공한 뒤 계정이나 카드 등록을 요구합니다. 하나를 고르기 전에 네 가지를 확인하세요. 가입해야 하는지, 몇 분 또는 몇 개의 파일까지 쓸 수 있는지, 파일 크기는 얼마까지 받는지, 결과를 다운로드할 수 있는지입니다. |
+| 10 | Here the answer to each is simple. You add the video, there is nothing to sign up for, there is no daily or monthly count and no size limit, and the transcript downloads as TXT, SRT, VTT, PDF, Markdown or JSON at no charge. Because your device does the work, its memory is the one real limit: a very long video can be too much for a phone, so cut it into parts first. The tool does not label speakers and does not take links: you add the file itself. | 여기서는 각각의 답이 간단합니다. 동영상을 추가하면 되고, 가입할 것이 없으며, 일일 또는 월간 횟수 제한도 크기 제한도 없고, 변환 텍스트는 TXT, SRT, VTT, PDF, Markdown, JSON으로 무료 다운로드할 수 있습니다. 작업을 기기가 처리하므로 실질적인 한계는 기기의 메모리 하나뿐입니다. 아주 긴 동영상은 휴대폰에 부담이 될 수 있으니 먼저 여러 부분으로 나누세요. 이 도구는 화자를 구분해 표시하지 않고 링크도 받지 않습니다. 파일 자체를 추가해야 합니다. |
+| 11 | Free limits on other video transcription sites, checked October 2026 | 다른 동영상 텍스트 변환 사이트의 무료 한도(2026년 10월 확인) |
+| 12 | These are quotes from each tool's own page as it read on 28 October 2026. Plans change, so look at the page before you rely on a number. The guide linked at the end of this page has the full table with a link to every source. | 아래는 2026년 10월 28일 기준으로 각 도구의 자체 페이지에 적혀 있던 내용을 인용한 것입니다. 인용문은 각 업체의 영어 페이지를 번역했습니다. 요금제는 바뀔 수 있으니 숫자를 믿기 전에 해당 페이지를 직접 확인하세요. 이 페이지 끝에 링크된 가이드에는 모든 출처 링크가 달린 전체 표가 있습니다. |
+| 13 | Riverside. "Unlimited transcriptions for free. No sign up required." The free tool takes MP3, WAV, MP4 and MOV files, and gives all the text of a multi-speaker recording to one speaker. | Riverside. "무제한 변환 무료. 가입 불필요." 무료 도구는 MP3, WAV, MP4, MOV 파일을 받으며, 여러 사람이 말한 녹음의 모든 텍스트를 한 명의 화자로 처리합니다. |
+| 14 | VoiceCheap. "Free for files up to 60 minutes, with 1 transcription per day." | VoiceCheap. "60분 이하 파일은 하루 1회 무료." |
+| 15 | RecCloud. "Our free plan allows videos up to 10 minutes in length." | RecCloud. "무료 요금제에서는 최대 10분 길이의 동영상을 사용할 수 있습니다." |
+| 16 | Caption-X. "The free plan covers 5 transcriptions in total, up to 5 minutes each." | Caption-X. "무료 요금제는 총 5회, 회당 최대 5분까지 변환할 수 있습니다." |
+| 17 | Maestra. A "1-minute preview", and "Sign up to download or export your transcript." | Maestra. "1분 미리보기", 그리고 "변환 텍스트를 다운로드하거나 내보내려면 가입하세요." |
+| 18 | Any2Text. "First 15 minutes free", then $0.035 a minute. | Any2Text. "처음 15분 무료", 그 후에는 분당 $0.035. |
+| 19 | Where your video goes while it is transcribed | 변환되는 동안 동영상은 어디로 가나요 |
+| 20 | The video stays on your device. Your browser reads it, pulls out the sound and runs the Whisper speech model on it, so no file is sent to us or to anyone else. | 동영상은 사용 중인 기기에 그대로 남습니다. 브라우저가 동영상을 읽고 소리를 추출한 뒤 Whisper 음성 모델을 실행하므로 어떤 파일도 저희나 다른 누구에게도 전송되지 않습니다. |
+| 21 | Only the tools are downloaded: the page, the speech model and the engine that runs it. The model is between about 77 MB and a little over 1 GB, depending on the quality level and your device, and it is kept in your browser afterwards. To see it for yourself, open your browser's network panel while a video is transcribed. | 내려받는 것은 도구뿐입니다. 페이지, 음성 모델, 그리고 그것을 실행하는 엔진입니다. 모델은 품질 수준과 기기에 따라 약 77MB에서 1GB를 조금 넘는 크기이며, 이후에는 브라우저에 보관됩니다. 직접 확인하려면 동영상을 변환하는 동안 브라우저의 네트워크 패널을 열어 보세요. |
+| 22 | Four quality levels for different videos | 동영상에 맞게 고르는 네 가지 품질 수준 |
+| 23 | Fastest uses the small Base model and suits a quick draft of clear speech. Standard uses a larger one, and is the usual choice. High accuracy runs Large v3 Turbo and handles accents and noisy rooms better. Best accuracy runs the full Large v3 and makes the fewest mistakes, but takes the longest. | 가장 빠름은 작은 Base 모델을 사용하며 또렷한 음성의 빠른 초안에 알맞습니다. 표준은 더 큰 모델을 사용하며 보통 이것을 고릅니다. 높은 정확도는 Large v3 Turbo를 실행하며 억양과 시끄러운 공간을 더 잘 처리합니다. 최고 정확도는 전체 Large v3를 실행하며 실수가 가장 적지만 가장 오래 걸립니다. |
+| 24 | Your device does the work, so speed depends on it: a recent laptop is much quicker than an older phone, and on a phone Fastest is the level to use. Try Standard first on a laptop, and move up only if the text is not good enough. | 작업을 기기가 처리하므로 속도는 기기에 따라 달라집니다. 최신 노트북은 오래된 휴대폰보다 훨씬 빠르며, 휴대폰에서는 가장 빠름 수준을 쓰는 것이 좋습니다. 노트북에서는 먼저 표준을 써 보고, 텍스트가 충분히 좋지 않을 때만 한 단계 올리세요. |
+| 25 | Ads keep TranscribeVid free. Everything works without them. | 광고 덕분에 TranscribeVid를 무료로 쓸 수 있습니다. 광고가 없어도 모든 기능이 작동합니다. |
+| 26 | How to transcribe a video in four steps | 네 단계로 동영상을 텍스트로 변환하는 방법 |
+| 27 | 1 Add the video Drop the file in the box at the top of this page, or press Choose a file. A link to a web video is not accepted. | 1 동영상 추가 이 페이지 맨 위의 상자에 파일을 끌어다 놓거나 파일 선택을 누릅니다. 웹 동영상 링크는 받지 않습니다. |
+| 28 | 2 Choose language and quality Name the spoken language if you know it, and pick a quality level. Standard is a good start; use High accuracy or Best accuracy for accents, noise or a language such as Hindi. | 2 언어와 품질 선택 사용된 언어를 안다면 지정하고 품질 수준을 고릅니다. 표준으로 시작하는 것이 좋고, 억양이 있거나 잡음이 많거나 힌디어 같은 언어라면 높은 정확도나 최고 정확도를 쓰세요. |
+| 29 | 3 Wait for the text Lines appear one by one with a progress bar and the time left. The first time you use a level, the model is downloaded once; later videos start straight away. | 3 텍스트 기다리기 진행률 표시줄과 남은 시간과 함께 텍스트가 한 줄씩 나타납니다. 한 품질 수준을 처음 쓸 때는 모델을 한 번 내려받으며, 이후 동영상은 바로 시작됩니다. |
+| 30 | 4 Edit and download Fix any line in the editor, then download TXT, SRT, VTT, PDF, Markdown or JSON. The transcript stays in this browser for a while, but download what you want to keep. | 4 편집하고 다운로드 편집기에서 고칠 줄을 수정한 다음 TXT, SRT, VTT, PDF, Markdown, JSON 중 하나로 다운로드합니다. 변환 텍스트는 한동안 이 브라우저에 남아 있지만, 보관하려는 것은 다운로드해 두세요. |
+| 31 | Videos you can add and files you get back | 추가할 수 있는 동영상과 받을 수 있는 파일 |
+| 32 | The sound track is what is read, so the picture can be any quality. Audio-only files work too. | 읽는 것은 소리 트랙이므로 화질은 상관없습니다. 오디오만 있는 파일도 사용할 수 있습니다. |
+| 33 | Video files you can add | 추가할 수 있는 동영상 파일 |
+| 34 | MP4 | MP4 |
+| 35 | MOV | MOV |
+| 36 | MKV | MKV |
+| 37 | WEBM | WEBM |
+| 38 | AVI | AVI |
+| 39 | M4V | M4V |
+| 40 | 3GP | 3GP |
+| 41 | Download the transcript as | 변환 텍스트 다운로드 형식 |
+| 42 | TXT plain text, or a time on each line | TXT 일반 텍스트, 또는 줄마다 시간이 붙은 텍스트 |
+| 43 | SRT subtitles for editors and players | SRT 편집기와 플레이어용 자막 |
+| 44 | VTT captions for web video | VTT 웹 동영상용 자막 |
+| 45 | PDF a transcript to print or share | PDF 인쇄하거나 공유할 변환 텍스트 |
+| 46 | Markdown notes with timestamps | Markdown 타임스탬프가 들어간 노트 |
+| 47 | JSON words and times for developers | JSON 개발자용 단어와 시간 정보 |
+| 48 | A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more. | 완료된 변환 텍스트. 모든 줄에 타임스탬프가 있고, 내보내기로 SRT, VTT, TXT, PDF 등으로 저장할 수 있습니다. |
+| 49 | Getting more from a free transcription | 무료 변환에서 더 나은 결과를 얻는 요령 |
+| 50 | Test the first minute before the whole video. Cut or play a minute of the video and transcribe that. If the text is wrong, change the language or quality level before you spend time on the full file. | 전체 동영상보다 먼저 처음 1분을 시험해 보세요. 동영상의 1분 분량을 잘라 내거나 재생해서 그 부분만 변환해 보세요. 텍스트가 맞지 않으면 전체 파일에 시간을 쓰기 전에 언어나 품질 수준을 바꾸세요. |
+| 51 | Check what is on your screen as well as in your ears. Only the speech is written down. Names that appear on a slide but are never said will not be in the text. | 귀로 들리는 것뿐 아니라 화면에 보이는 것도 확인하세요. 적히는 것은 말소리뿐입니다. 슬라이드에 나오지만 말로는 나오지 않는 이름은 텍스트에 들어 있지 않습니다. |
+| 52 | Split a very long recording on a phone. There is no size limit, but a video of several hours needs a lot of memory. On a phone, parts of an hour or so each are much safer, and on a laptop you can usually go much longer. | 휴대폰에서는 아주 긴 녹화본을 나누세요. 크기 제한은 없지만 몇 시간짜리 동영상은 메모리가 많이 필요합니다. 휴대폰에서는 한 시간 정도씩 나누는 편이 훨씬 안전하고, 노트북에서는 보통 훨씬 더 길게 처리할 수 있습니다. |
+| 53 | Download the subtitle file as well as the text. The SRT file keeps the timing, so the same run gives you both a transcript to read and captions to add to the video. | 텍스트뿐 아니라 자막 파일도 다운로드하세요. SRT 파일에는 타이밍이 담겨 있으므로, 한 번 변환하면 읽을 변환 텍스트와 동영상에 넣을 자막을 모두 얻을 수 있습니다. |
+| 54 | Related reading | 관련 글 |
+| 55 | Free video to text tools compared Every limit in one table, quoted from each tool's own page. | 무료 동영상 텍스트 변환 도구 비교 모든 한도를 각 도구의 자체 페이지에서 인용해 한 표에 담았습니다. |
+| 56 | Transcribe a video without uploading it How the work stays on your device and how to check it yourself. | 업로드 없이 동영상 텍스트 변환하기 작업이 내 기기에 남는 방식과 직접 확인하는 방법. |
+| 57 | How to transcribe a video to text Five ways to do it, and which one fits your video. | 동영상을 텍스트로 변환하는 방법 다섯 가지 방법과 내 동영상에 맞는 방법. |
+| 58 | How to get a more accurate transcript Habits and settings that reduce mistakes on any video. | 더 정확한 변환 텍스트를 얻는 방법 어떤 동영상에서든 실수를 줄여 주는 습관과 설정. |
+| 59 | Transcribe video to text: common questions | 동영상을 텍스트로 변환: 자주 묻는 질문 |
+| 60 | Can I paste a YouTube, TikTok or Google Drive link instead of a file? | 파일 대신 YouTube, TikTok, Google Drive 링크를 붙여 넣어도 되나요? |
+| 61 | No. This tool works on a file you add or record. If you own the video, use the original file; for someone else's video you need the right to use it. | 아니요. 이 도구는 추가하거나 녹음한 파일로만 작동합니다. 본인이 만든 동영상이라면 원본 파일을 사용하세요. 다른 사람의 동영상은 이용할 권리가 있어야 합니다. |
+| 62 | Will the transcript show who is speaking? | 변환 텍스트에 누가 말하는지도 표시되나요? |
+| 63 | No. Lines have times but no speaker names. You can type names into the text in the editor, which is quick for a two-person interview. | 아니요. 줄마다 시간은 있지만 화자 이름은 없습니다. 편집기에서 텍스트에 이름을 직접 입력할 수 있으며, 두 사람의 인터뷰라면 금방 끝납니다. |
+| 64 | Is there really no limit on how many videos I can transcribe? | 변환할 수 있는 동영상 수에 정말 제한이 없나요? |
+| 65 | There is no account, no plan and no daily or monthly count, and no size limit. The only limit is your device: a very long video takes longer and needs more memory, so a phone does better with parts of an hour or so. Ads keep the site free, and none is shown while a video is transcribed. | 계정도, 요금제도, 일일 또는 월간 횟수 제한도, 크기 제한도 없습니다. 유일한 한계는 기기입니다. 아주 긴 동영상은 시간이 더 걸리고 메모리도 더 필요하므로 휴대폰에서는 한 시간 정도씩 나누는 편이 낫습니다. 광고가 사이트를 무료로 유지해 주며, 동영상을 변환하는 동안에는 광고가 표시되지 않습니다. |
+| 66 | Which quality level suits a long video? | 긴 동영상에는 어떤 품질 수준이 알맞나요? |
+| 67 | Standard is the usual choice. Fastest is quicker but makes more mistakes; High accuracy and Best accuracy cost more time and pay off on accents, noise and languages such as Hindi. | 보통은 표준을 고릅니다. 가장 빠름은 더 빠르지만 실수가 더 많습니다. 높은 정확도와 최고 정확도는 시간이 더 걸리는 대신 억양, 잡음, 힌디어 같은 언어에서 효과가 있습니다. |
+| 68 | Does the video leave my computer? | 동영상이 내 컴퓨터 밖으로 나가나요? |
+| 69 | No. Your browser transcribes the video on your own device, and no file is sent to us. Only the speech model and its engine are downloaded, once. | 아니요. 브라우저가 사용 중인 기기에서 동영상을 변환하며, 어떤 파일도 저희에게 전송되지 않습니다. 음성 모델과 그 엔진만 한 번 내려받습니다. |
+
+## New guide: how to transcribe a video to text
+
+English: https://transcribevid.com/guides/how-to-transcribe-video-to-text  
+Korean: https://transcribevid.com/ko/guides/how-to-transcribe-video-to-text
+
+| # | English | Korean (한국어) |
+|---|---|---|
+| 1 | How to transcribe a video to text: five ways, and which one fits your video | 동영상을 텍스트로 변환하는 방법: 다섯 가지 방법과 내 동영상에 맞는 선택 |
+| 2 | By Advaith Bibhishan Sonne · Updated 28 October 2026 · 7 min read | 작성자: Advaith Bibhishan Sonne · 2026년 10월 28일 업데이트 · 읽는 시간 7분 |
+| 3 | You can get the words of a video as text in five ways: the transcript YouTube already holds, voice typing, the captions of a video editor, an online service, or a tool that runs on your own device. They differ in cost, in whether you get times on every line, and in what they ask of you first. This guide says what each one does and when to pick it. | 동영상의 말을 텍스트로 얻는 방법은 다섯 가지입니다. YouTube에 이미 있는 스크립트, 음성 입력, 동영상 편집기의 자막, 온라인 서비스, 그리고 내 기기에서 실행되는 도구입니다. 비용, 모든 줄에 시간이 붙는지, 먼저 무엇을 요구하는지가 서로 다릅니다. 이 가이드는 각 방법이 무엇을 하는지, 언제 고르면 좋은지 설명합니다. |
+| 4 | The short answer | 짧은 답 |
+| 5 | The video is on YouTube and has captions: open its transcript on the video page. It costs nothing and takes a minute, but it only exists when the video has captions, and the text needs a careful read. | 동영상이 YouTube에 있고 자막이 있을 때: 동영상 페이지에서 스크립트를 엽니다. 비용이 들지 않고 1분이면 되지만, 동영상에 자막이 있을 때만 존재하며 텍스트는 꼼꼼히 읽어 봐야 합니다. |
+| 6 | You have the video file and want text with times: use a tool that takes a file and gives you TXT and subtitle files. The last two ways below do this. | 동영상 파일이 있고 시간이 붙은 텍스트를 원할 때: 파일을 받아 TXT와 자막 파일을 주는 도구를 사용하세요. 아래의 마지막 두 가지 방법이 이에 해당합니다. |
+| 7 | You only need a few quotes: play the video and type, or use voice typing. For anything longer than a few minutes it is slower than letting software do the whole file. | 인용문 몇 개만 필요할 때: 동영상을 재생하며 직접 입력하거나 음성 입력을 쓰세요. 몇 분보다 긴 분량은 소프트웨어가 파일 전체를 처리하는 편이 더 빠릅니다. |
+| 8 | You want subtitles for the same video: pick a way that exports SRT or VTT, so one run gives you both the transcript and the captions. | 같은 동영상의 자막도 필요할 때: SRT나 VTT로 내보낼 수 있는 방법을 고르세요. 한 번 변환하면 변환 텍스트와 자막을 모두 얻습니다. |
+| 9 | What a good transcript needs from your video | 좋은 변환 텍스트를 위해 동영상에 필요한 것 |
+| 10 | Every way below works from the sound track, so the quality of the sound decides the quality of the text far more than the picture does. Speech that is close to the microphone, one voice at a time, without music under it, comes out well. A room with echo, people talking over each other or a loud background comes out with mistakes in every method. | 아래의 모든 방법은 소리 트랙을 바탕으로 하므로, 텍스트의 품질은 화면보다 소리의 품질이 훨씬 크게 좌우합니다. 마이크와 가깝고, 한 번에 한 사람씩 말하고, 배경에 음악이 없는 음성은 잘 나옵니다. 울림이 있는 공간, 서로 겹쳐 말하는 사람들, 시끄러운 배경은 어떤 방법에서든 실수가 생깁니다. |
+| 11 | Before you start, find out three things: the language people speak in the video, whether you need a time on each line, and how long the video is. The second tells you which formats you must be able to download; the third tells you which free limits will stop you. | 시작하기 전에 세 가지를 확인하세요. 동영상에서 사용된 언어, 줄마다 시간이 필요한지, 동영상의 길이입니다. 두 번째는 어떤 형식을 다운로드할 수 있어야 하는지, 세 번째는 어떤 무료 한도에 걸리는지를 알려 줍니다. |
+| 12 | Ads keep TranscribeVid free. Everything works without them. | 광고 덕분에 TranscribeVid를 무료로 쓸 수 있습니다. 광고가 없어도 모든 기능이 작동합니다. |
+| 13 | Way 1: use the transcript YouTube already has | 방법 1: YouTube에 이미 있는 스크립트 사용 |
+| 14 | Many YouTube videos carry captions, written by the owner or made automatically. On a video page, open the description: where captions exist, an option to show the transcript appears there, and it lists the text with times that you can copy. If the video is yours, YouTube Studio has a Subtitles section where you can review and download the captions. YouTube changes these screens from time to time, so the labels may differ a little. | 많은 YouTube 동영상에는 올린 사람이 쓰거나 자동으로 만들어진 자막이 있습니다. 동영상 페이지에서 설명란을 열면 자막이 있는 경우 스크립트를 표시하는 옵션이 나타나며, 시간과 함께 텍스트가 나열되어 복사할 수 있습니다. 본인의 동영상이라면 YouTube Studio의 자막 섹션에서 자막을 검토하고 다운로드할 수 있습니다. YouTube는 이런 화면을 때때로 바꾸므로 항목 이름이 조금 다를 수 있습니다. |
+| 15 | This is the quickest way for a video that is already on YouTube. Its limits are that it only works with a link to a video that has captions, the automatic text can be rough on names and technical words, and it will not help with a file on your computer or phone. | 이미 YouTube에 올라와 있는 동영상이라면 가장 빠른 방법입니다. 한계는 자막이 있는 동영상의 링크에서만 쓸 수 있다는 점, 자동으로 만들어진 텍스트는 이름과 전문 용어에서 거칠 수 있다는 점, 그리고 컴퓨터나 휴대폰에 있는 파일에는 도움이 되지 않는다는 점입니다. |
+| 16 | Way 2: play the video and let voice typing listen | 방법 2: 동영상을 재생하고 음성 입력이 듣게 하기 |
+| 17 | Voice typing in a word processor, such as the Voice typing option in the Tools menu of Google Docs, writes down what its microphone hears. You play the video through your speakers and it types. | Google Docs의 도구 메뉴에 있는 음성 입력 옵션처럼 워드 프로세서의 음성 입력은 마이크가 듣는 것을 받아 적습니다. 동영상을 스피커로 재생하면 그것이 입력해 줍니다. |
+| 18 | It costs nothing, but it hears the whole room, not only the video. It gives you no times, it runs in real time, so a one-hour video takes an hour, and anything the microphone misses is lost. It is fine for a quote or two and a poor choice for a lecture or an interview. | 비용은 들지 않지만 동영상뿐 아니라 방 안의 모든 소리를 듣습니다. 시간 정보는 얻을 수 없고, 실시간으로 작동하므로 1시간짜리 동영상에는 1시간이 걸리며, 마이크가 놓친 것은 사라집니다. 인용문 한두 개에는 괜찮지만 강의나 인터뷰에는 좋은 선택이 아닙니다. |
+| 19 | Way 3: switch on automatic captions in a video editor | 방법 3: 동영상 편집기에서 자동 자막 켜기 |
+| 20 | Some video editors can transcribe the speech of a clip you place in them. Microsoft Clipchamp's own guide, for example, says to open the Captions tab, turn on automatic captions, and then download the captions as an SRT file; the video needs speech in its audio for this to work. | 일부 동영상 편집기는 그 안에 넣은 클립의 말을 텍스트로 변환할 수 있습니다. 예를 들어 Microsoft Clipchamp의 자체 안내에는 자막 탭을 열고 자동 자막을 켠 다음 자막을 SRT 파일로 다운로드하라고 되어 있으며, 이것이 작동하려면 동영상 오디오에 말소리가 있어야 합니다. |
+| 21 | This is useful when you are editing the video anyway, because the captions land on the timeline. For a plain transcript it is more work than it needs to be: you must load the video into the editor, and the text comes out as a subtitle file you then turn into a document. | 어차피 동영상을 편집하는 중이라면 자막이 타임라인에 바로 들어가므로 유용합니다. 단순한 변환 텍스트가 목적이라면 필요 이상으로 번거롭습니다. 동영상을 편집기에 불러와야 하고, 텍스트가 자막 파일로 나오기 때문에 다시 문서로 바꿔야 합니다. |
+| 22 | Way 4: use an online transcription service | 방법 4: 온라인 변환 서비스 사용 |
+| 23 | Dozens of sites will transcribe a file you give them. Most are free only up to a point: a few minutes, a few files, or a preview that asks you to pay before you can download. The differences that matter are whether you need an account, how many minutes you get, how large a file can be, and whether the result can be exported. | 수십 개의 사이트가 올린 파일을 변환해 줍니다. 대부분은 어느 정도까지만 무료입니다. 몇 분, 파일 몇 개, 또는 다운로드하기 전에 결제를 요구하는 미리보기입니다. 중요한 차이는 계정이 필요한지, 몇 분까지 쓸 수 있는지, 파일 크기는 얼마까지 가능한지, 결과를 내보낼 수 있는지입니다. |
+| 24 | Services are the right choice when you need what simple tools do not do: names for each speaker, a bot that joins a meeting, or a link to a video you do not hold as a file. Our guide with the free limits of thirteen of them, each quoted from its own page, is linked below. | 서비스는 단순한 도구가 하지 못하는 일이 필요할 때 알맞은 선택입니다. 화자별 이름, 회의에 참여하는 봇, 파일로 가지고 있지 않은 동영상의 링크 같은 것입니다. 13개 서비스의 무료 한도를 각 서비스의 자체 페이지에서 인용해 정리한 가이드가 아래에 링크되어 있습니다. |
+| 25 | Way 5: transcribe the file with TranscribeVid | 방법 5: TranscribeVid로 파일 변환 |
+| 26 | TranscribeVid takes the video file itself, with no account, no daily count and no size limit. It runs Whisper, an open speech model, in your browser, so the video stays on your device, and the text comes back with a time on every line. | TranscribeVid는 동영상 파일 자체를 받으며 계정도 일일 횟수 제한도 크기 제한도 없습니다. 오픈 음성 모델인 Whisper를 브라우저에서 실행하므로 동영상은 내 기기에 그대로 남고, 텍스트는 모든 줄에 시간이 붙어 돌아옵니다. |
+| 27 | It does not take links, it does not label who is speaking, and it does not join meetings. For those jobs, use a service from Way 4. Because your own device does the work, a long video is slower on an old phone than on a recent laptop. | 링크는 받지 않고, 누가 말하는지 표시하지 않으며, 회의에 참여하지도 않습니다. 그런 작업에는 방법 4의 서비스를 사용하세요. 내 기기가 직접 작업을 처리하므로 긴 동영상은 오래된 휴대폰에서 최신 노트북보다 느립니다. |
+| 28 | Add the video Drop the file in the box on the tool page, or press Choose a file. MP4, MOV, MKV, WEBM and most other video files work, and so do audio files. | 동영상 추가 도구 페이지의 상자에 파일을 끌어다 놓거나 파일 선택을 누릅니다. MP4, MOV, MKV, WEBM과 대부분의 다른 동영상 파일을 쓸 수 있고 오디오 파일도 됩니다. |
+| 29 | Choose the language and quality Name the spoken language if you know it. Standard suits most videos; choose High accuracy or Best accuracy for accents, noise or Hindi. | 언어와 품질 선택 사용된 언어를 안다면 지정하세요. 대부분의 동영상에는 표준이 알맞고, 억양이 있거나 잡음이 많거나 힌디어라면 높은 정확도나 최고 정확도를 고르세요. |
+| 30 | Wait for the text Lines appear one by one, with a progress bar and the time left. | 텍스트 기다리기 진행률 표시줄과 남은 시간과 함께 텍스트가 한 줄씩 나타납니다. |
+| 31 | Edit and download Fix any line in the editor, then download TXT, SRT, VTT, PDF, Markdown or JSON. Download what you want to keep before you leave. | 편집하고 다운로드 편집기에서 고칠 줄을 수정한 다음 TXT, SRT, VTT, PDF, Markdown, JSON 중 하나로 다운로드합니다. 보관하려는 것은 떠나기 전에 다운로드하세요. |
+| 32 | Which way for which video | 어떤 동영상에 어떤 방법이 맞을까요 |
+| 33 | Fix the text before you use it | 사용하기 전에 텍스트 고치기 |
+| 34 | Whichever way you choose, read the result once with the video playing. Speech-to-text gets common words right and stumbles on the things that matter most to you: names, product words, numbers and anything said quickly. | 어떤 방법을 고르든 동영상을 재생하면서 결과를 한 번 읽어 보세요. 음성 텍스트 변환은 흔한 단어는 잘 맞히지만, 이름, 제품 용어, 숫자, 빠르게 말한 부분처럼 가장 중요한 것에서 걸려 넘어집니다. |
+| 35 | Names and terms. Search the text for each name you know is in the video and correct every place it appears. | 이름과 용어. 동영상에 나오는 것을 아는 이름마다 텍스트를 검색해서 나타나는 곳을 모두 고치세요. |
+| 36 | Numbers and dates. Check each one against the video; a wrong digit is easy to miss. | 숫자와 날짜. 하나하나 동영상과 대조하세요. 틀린 숫자는 놓치기 쉽습니다. |
+| 37 | Where the speaker changes. Add a line break and a name, because plain transcripts do not mark who is talking. | 화자가 바뀌는 곳. 일반 변환 텍스트에는 누가 말하는지 표시되지 않으므로 줄을 바꾸고 이름을 추가하세요. |
+| 38 | Subtitles. If you will use an SRT or VTT file, keep each line short enough to read in the time it is on screen. | 자막. SRT나 VTT 파일을 쓸 거라면 화면에 나오는 시간 안에 읽을 수 있도록 각 줄을 짧게 유지하세요. |
+| 39 | For a longer list of habits that reduce mistakes before you start, see the guide on getting a more accurate transcript. | 시작하기 전에 실수를 줄이는 습관을 더 자세히 알고 싶다면 더 정확한 변환 텍스트를 얻는 방법 가이드를 참고하세요. |
+| 40 | Common questions | 자주 묻는 질문 |
+| 41 | Can I transcribe a video to text without installing anything? | 아무것도 설치하지 않고 동영상을 텍스트로 변환할 수 있나요? |
+| 42 | Yes. The YouTube transcript, an online service and TranscribeVid all work in a web browser. Only a video editor or a desktop program needs an install. | 네. YouTube 스크립트, 온라인 서비스, TranscribeVid는 모두 웹 브라우저에서 작동합니다. 설치가 필요한 것은 동영상 편집기나 데스크톱 프로그램뿐입니다. |
+| 43 | What is the fastest way to transcribe a one-hour video? | 1시간짜리 동영상을 변환하는 가장 빠른 방법은 무엇인가요? |
+| 44 | If it is on YouTube with captions, the transcript there is immediate. For a file, software is far faster than typing or voice typing, which both take at least as long as the video lasts. How long software takes depends on the tool, the quality level and, where it runs on your device, how fast that device is. | YouTube에 자막과 함께 올라와 있다면 거기 있는 스크립트를 바로 쓸 수 있습니다. 파일이라면 소프트웨어가 직접 입력이나 음성 입력보다 훨씬 빠릅니다. 두 방법은 적어도 동영상 길이만큼 걸리기 때문입니다. 소프트웨어가 얼마나 걸리는지는 도구, 품질 수준, 그리고 내 기기에서 실행되는 경우 기기의 속도에 따라 다릅니다. |
+| 45 | Do I have to take the audio out of the video first? | 먼저 동영상에서 오디오를 추출해야 하나요? |
+| 46 | No. Tools that accept video files read the sound track themselves, so you can add an MP4 or MOV as it is. Taking the audio out first only helps when a tool refuses the video format. | 아니요. 동영상 파일을 받는 도구는 소리 트랙을 직접 읽으므로 MP4나 MOV를 그대로 추가할 수 있습니다. 오디오를 먼저 추출하는 것은 도구가 그 동영상 형식을 거부할 때만 도움이 됩니다. |
+| 47 | How do I get the text with a time on every line? | 줄마다 시간이 붙은 텍스트는 어떻게 얻나요? |
+| 48 | Use a way that exports subtitles or a timed transcript: the YouTube transcript lists times, and a tool that downloads SRT or VTT gives each line a start and end time. Voice typing gives none. | 자막이나 시간이 붙은 변환 텍스트를 내보내는 방법을 쓰세요. YouTube 스크립트에는 시간이 나열되고, SRT나 VTT를 다운로드하는 도구는 각 줄에 시작과 끝 시간을 붙여 줍니다. 음성 입력은 시간을 주지 않습니다. |
+| 49 | Keep reading | 계속 읽기 |
+| 50 | Free video to text tools compared The free limits of thirteen online tools, each quoted from its own page. | 무료 동영상 텍스트 변환 도구 비교 온라인 도구 13개의 무료 한도를 각 도구의 자체 페이지에서 인용했습니다. |
+| 51 | How to get a more accurate transcript Habits and settings that reduce mistakes on any video. | 더 정확한 변환 텍스트를 얻는 방법 어떤 동영상에서든 실수를 줄여 주는 습관과 설정. |
+| 52 | Make subtitles for your video Turn the same video into an SRT file for players and editors. | 내 동영상에 자막 만들기 같은 동영상을 플레이어와 편집기용 SRT 파일로 바꿉니다. |
+| 53 | Transcribe a video without uploading it How the work stays on your device and how to check it yourself. | 업로드 없이 동영상 텍스트 변환하기 작업이 내 기기에 남는 방식과 직접 확인하는 방법. |
+| 54 |  | 이 페이지는 AI로 번역되었습니다. 오류를 발견하셨나요? 알려 주세요. |
 
 ## Privacy policy
 

@@ -1025,6 +1025,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT أم VTT؟ ما هي كل صيغة ترجمة، وكيف تختلفان، وأين تعمل كل منهما، وكيف تحصل على أي من الملفين من الفيديو مجانًا.',
   'label:/guides/srt-vs-vtt': 'SRT أم VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'كيف تحوّل الفيديو إلى نص: خمس طرق',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'خمس طرق لتحويل الفيديو إلى نص: تفريغ يوتيوب والكتابة الصوتية وبرنامج مونتاج وخدمة على الإنترنت وأداة على جهازك، ومتى تناسبك كل طريقة.',
+  'label:/guides/how-to-transcribe-video-to-text': 'كيف تحوّل الفيديو إلى نص',
   'title:/guides/transcribe-video-without-uploading': 'تفريغ فيديو دون رفعه',
   'description:/guides/transcribe-video-without-uploading':
     'كيف يعمل التفريغ داخل المتصفح، وما الذي يبقى على جهازك، وما الذي يُنزَّل مرة واحدة، وكيف تتحقق بنفسك من لوحة الشبكة في متصفحك.',
@@ -1089,6 +1093,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'حوّل الفيديو إلى نص مجانًا. احصل على تفريغ دقيق بطوابع زمنية بأكثر من 50 لغة. بلا تسجيل دخول ولا حد يومي. نزّل SRT أو VTT أو TXT أو PDF.',
   'label:/video-to-text': 'الفيديو إلى نص',
+  'title:/transcribe-video-to-text': 'تفريغ الفيديو إلى نص مجانًا بلا حد يومي',
+  'description:/transcribe-video-to-text':
+    'فرّغ الفيديو إلى نص مجانًا بلا حساب ولا حد يومي، مع وقت على كل سطر. قارن حدود المواقع الأخرى ونزّل TXT أو SRT أو VTT أو PDF.',
+  'label:/transcribe-video-to-text': 'تفريغ الفيديو إلى نص',
   'title:/voice-recording-to-text': 'التسجيل الصوتي إلى نص: مفرّغ مجاني',
   'description:/voice-recording-to-text':
     'سجّل صوتك في المتصفح أو ارفع مذكرة صوتية واحصل عليها نصًا. مجانًا وبلا تسجيل دخول وبأكثر من 50 لغة. نزّل TXT أو PDF أو SRT أو Markdown.',

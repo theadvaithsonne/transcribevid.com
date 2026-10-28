@@ -1057,6 +1057,10 @@ const dict: Record<string, string> = {
   'description:/video-to-text':
     'Convertissez une vidéo en texte gratuitement : transcription précise et horodatée en plus de 50 langues, sans connexion. Export SRT, VTT, TXT ou PDF.',
   'label:/video-to-text': 'Vidéo en texte',
+  'title:/transcribe-video-to-text': 'Transcrire une vidéo en texte, gratuit',
+  'description:/transcribe-video-to-text':
+    'Transcrivez une vidéo en texte gratuitement, sans compte ni quota quotidien. Ajoutez le fichier, obtenez un texte horodaté et exportez en TXT, SRT ou VTT.',
+  'label:/transcribe-video-to-text': 'Transcrire une vidéo en texte',
   'title:/audio-to-text': 'Audio en texte gratuit et illimité',
   'description:/audio-to-text':
     'Transformez podcasts, entretiens et cours en texte. Audio en texte gratuit avec horodatages, plus de 50 langues, sans connexion. Export TXT, SRT, VTT ou PDF.',
@@ -1129,6 +1133,10 @@ const dict: Record<string, string> = {
   'description:/guides/srt-vs-vtt':
     'SRT ou VTT ? Ce qu’est chaque format de sous-titres, leurs différences, où chacun fonctionne et comment obtenir l’un ou l’autre gratuitement.',
   'label:/guides/srt-vs-vtt': 'SRT ou VTT',
+  'title:/guides/how-to-transcribe-video-to-text': 'Transcrire une vidéo en texte : 5 méthodes',
+  'description:/guides/how-to-transcribe-video-to-text':
+    'Cinq façons de transcrire une vidéo en texte : transcription YouTube, dictée vocale, logiciel de montage, service en ligne ou outil local. Laquelle choisir ?',
+  'label:/guides/how-to-transcribe-video-to-text': 'Comment transcrire une vidéo',
   'title:/guides/how-to-add-subtitles-to-a-video': 'Ajouter des sous-titres à une vidéo',
   'description:/guides/how-to-add-subtitles-to-a-video':
     'Créez des sous-titres en quatre étapes : transcrivez, corrigez, exportez en SRT ou VTT, puis ajoutez le fichier à YouTube, VLC ou votre lecteur web.',

@@ -46,8 +46,8 @@ Japanese: https://transcribevid.com/ja/video-to-text
 
 | # | English | Japanese (日本語) |
 |---|---|---|
-| 1 | Convert video to text, free and with timestamps | 動画を文字起こし：無料でタイムスタンプ付き |
-| 2 | Upload a recorded video and watch its speech turn into text, line by line, each line with its time. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages. | 録画した動画を追加すると、話した内容が1行ずつ時刻付きのテキストに変わっていきます。講義、インタビュー、会議、スマートフォンで撮った動画、画面録画など、50以上の言語に対応しています。 |
+| 1 | Convert video to text in your browser: free, nothing uploaded | 動画を文字起こし：無料でタイムスタンプ付き |
+| 2 | Add a recorded video and watch its speech turn into text, line by line, each line with its time. It is free, needs no account, has no size limit, and the video stays on your device. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages. | 録画した動画を追加すると、話した内容が1行ずつ時刻付きのテキストに変わっていきます。講義、インタビュー、会議、スマートフォンで撮った動画、画面録画など、50以上の言語に対応しています。 |
 | 3 | Free | 無料 |
 | 4 | Unlimited | 無制限 |
 | 5 | No login | ログイン不要 |
@@ -96,11 +96,150 @@ Japanese: https://transcribevid.com/ja/video-to-text
 | 48 | Can I transcribe a video without speech? | 話し声のない動画も文字起こしできますか？ |
 | 49 | Only speech becomes text. A silent video, or one with only music, gives an empty or very short result. Text shown on screen is not read. | 文字になるのは話し声だけです。無音の動画や音楽だけの動画では、結果は空になるか、ごく短くなります。画面に表示された文字は読み取りません。 |
 | 50 | Can I paste a YouTube link? | YouTubeのリンクを貼り付けられますか？ |
-| 51 | No. TranscribeVid works with files you upload or record, not web links. If the video is your own, upload the original file. | いいえ。TranscribeVidで扱えるのは、アップロードまたは録音したファイルで、Webリンクには対応していません。ご自身の動画であれば、元のファイルを追加してください。 |
+| 51 | No. TranscribeVid works with files you add or record, not web links. If the video is your own, add the original file; nothing is uploaded. | いいえ。TranscribeVidで扱えるのは、アップロードまたは録音したファイルで、Webリンクには対応していません。ご自身の動画であれば、元のファイルを追加してください。 |
 | 52 | Does it say who is speaking? | 誰が話しているかも表示されますか？ |
 | 53 | No. Speaker names or labels are not added. Every line has a timestamp, and you can type names into the text while you edit. | いいえ。話者の名前やラベルは付きません。各行にはタイムスタンプが付くので、編集しながらテキストに名前を書き込めます。 |
 | 54 | How accurate is video to text? | 動画の文字起こしはどのくらい正確ですか？ |
 | 55 | On clear speech in a supported language it is usually very accurate, but no speech recognition is perfect. Noise, accents, music and overlapping voices lower accuracy, so check important passages against the video. | 対応している言語で明瞭に話されていれば、たいていはとても正確です。ただし、完璧な音声認識はありません。ノイズ、なまり、音楽、声の重なりがあると精度が下がるため、重要な部分は動画と照らし合わせて確認してください。 |
+
+## New tool page: transcribe video to text
+
+English: https://transcribevid.com/transcribe-video-to-text  
+Japanese: https://transcribevid.com/ja/transcribe-video-to-text
+
+| # | English | Japanese (日本語) |
+|---|---|---|
+| 1 | Transcribe video to text: free, no sign-up, no cap, nothing uploaded | 動画を文字起こし：無料・登録不要・制限なし、アップロードもなし |
+| 2 | Add a video and get its speech back as text, with a time on every line. There is no account to make, no daily cap and no file-size limit, and the video is never uploaded: your own device does the work. | 動画を追加すると、話した内容が1行ごとに時刻付きのテキストになって返ってきます。アカウントの作成も、1日の回数制限も、ファイルサイズの上限もありません。動画はアップロードされず、処理はお使いの端末の中で行われます。 |
+| 3 | Free | 無料 |
+| 4 | Unlimited | 無制限 |
+| 5 | No login | ログイン不要 |
+| 6 | Drop your video here, or choose a file | 動画をここにドロップするか、ファイルを選択してください |
+| 7 | MP4, MOV, MKV, WEBM, AVI and more. Audio works too. There is no size or length limit set here. Your file never leaves your device. | MP4, MOV, MKV, WEBM, AVI and more. 音声ファイルも使えます。 ここではサイズや長さの上限を設けていません。 ファイルがお使いの端末から出ることはありません。 |
+| 8 | What "free" should mean when you transcribe a video | 動画の文字起こしで「無料」が意味するべきこと |
+| 9 | Many sites that say "free video transcription" give you a minute, or a few files, and then ask for an account or a card. Before you pick one, check four things: whether you must sign up, how many minutes or files you get, how large a file it takes, and whether you can download the result. | 「動画の文字起こしが無料」とうたうサイトの多くは、1分ほど、あるいは数ファイルまでしか使えず、そのあとアカウント登録やカードの入力を求めてきます。選ぶ前に、次の4点を確認しましょう。登録が必要かどうか、何分・何ファイルまで使えるか、どのくらい大きなファイルまで受け付けるか、結果をダウンロードできるかどうかです。 |
+| 10 | Here the answer to each is simple. You add the video, there is nothing to sign up for, there is no daily or monthly count and no size limit, and the transcript downloads as TXT, SRT, VTT, PDF, Markdown or JSON at no charge. Because your device does the work, its memory is the one real limit: a very long video can be too much for a phone, so cut it into parts first. The tool does not label speakers and does not take links: you add the file itself. | ここでは、どれも答えは簡単です。動画を追加するだけで、登録は要りません。1日や1か月あたりの回数制限もサイズの上限もなく、文字起こしの結果はTXT、SRT、VTT、PDF、Markdown、JSONで無料でダウンロードできます。処理はお使いの端末で行うため、実際の制約は端末のメモリだけです。非常に長い動画はスマートフォンには負担が大きいことがあるので、先に分割してください。話者のラベル付けには対応しておらず、リンクも受け付けません。追加するのはファイルそのものです。 |
+| 11 | Free limits on other video transcription sites, checked October 2026 | 他の動画文字起こしサイトの無料の上限（2026年10月確認） |
+| 12 | These are quotes from each tool's own page as it read on 28 October 2026. Plans change, so look at the page before you rely on a number. The guide linked at the end of this page has the full table with a link to every source. | 以下は、2026年10月28日時点で各ツール自身のページに書かれていた内容の引用です。引用は各社の英語のページから日本語に訳したものです。プランは変わることがあるため、数字を当てにする前に必ず各ページをご確認ください。このページの最後にリンクしたガイドに、出典へのリンク付きの完全な表があります。 |
+| 13 | Riverside. "Unlimited transcriptions for free. No sign up required." The free tool takes MP3, WAV, MP4 and MOV files, and gives all the text of a multi-speaker recording to one speaker. | Riverside。 「無料で文字起こし無制限。サインアップ不要。」無料ツールが受け付けるのはMP3、WAV、MP4、MOVのファイルで、複数の話者の録音でも、すべてのテキストが1人の話者のものとして出力されます。 |
+| 14 | VoiceCheap. "Free for files up to 60 minutes, with 1 transcription per day." | VoiceCheap。 「60分までのファイルは無料、1日1回の文字起こし。」 |
+| 15 | RecCloud. "Our free plan allows videos up to 10 minutes in length." | RecCloud。 「無料プランでは、長さ10分までの動画を利用できます。」 |
+| 16 | Caption-X. "The free plan covers 5 transcriptions in total, up to 5 minutes each." | Caption-X。 「無料プランでは、合計5回まで、1回につき最大5分の文字起こしができます。」 |
+| 17 | Maestra. A "1-minute preview", and "Sign up to download or export your transcript." | Maestra。 「1分間のプレビュー」と、「文字起こしをダウンロードまたはエクスポートするにはサインアップしてください。」 |
+| 18 | Any2Text. "First 15 minutes free", then $0.035 a minute. | Any2Text。 「最初の15分は無料」、そのあとは1分あたり$0.035です。 |
+| 19 | Where your video goes while it is transcribed | 文字起こし中、動画はどこに送られるか |
+| 20 | The video stays on your device. Your browser reads it, pulls out the sound and runs the Whisper speech model on it, so no file is sent to us or to anyone else. | 動画はお使いの端末の中にとどまります。ブラウザーが動画を読み込み、音声を取り出して、Whisperの音声認識モデルを実行するため、ファイルが当方やほかの誰かに送られることはありません。 |
+| 21 | Only the tools are downloaded: the page, the speech model and the engine that runs it. The model is between about 77 MB and a little over 1 GB, depending on the quality level and your device, and it is kept in your browser afterwards. To see it for yourself, open your browser's network panel while a video is transcribed. | ダウンロードされるのは道具だけです。ページ、音声認識モデル、それを動かすエンジンです。モデルの大きさは、品質レベルや端末によって、約77 MBから1 GBを少し超える程度までで、一度ダウンロードしたあとはブラウザーに保存されます。ご自身で確かめるには、動画の文字起こし中にブラウザーのネットワークパネルを開いてみてください。 |
+| 22 | Four quality levels for different videos | 動画に合わせて選べる4つの品質レベル |
+| 23 | Fastest uses the small Base model and suits a quick draft of clear speech. Standard uses a larger one, and is the usual choice. High accuracy runs Large v3 Turbo and handles accents and noisy rooms better. Best accuracy runs the full Large v3 and makes the fewest mistakes, but takes the longest. | 「最速」は小さなBaseモデルを使い、聞き取りやすい音声のざっとした下書きに向いています。「標準」はより大きなモデルを使い、ふだんはこれを選ぶのがおすすめです。「高精度」はLarge v3 Turboを使い、なまりや騒がしい部屋の音声に強くなります。「最高精度」は完全版のLarge v3を使い、間違いが最も少なくなりますが、時間は最もかかります。 |
+| 24 | Your device does the work, so speed depends on it: a recent laptop is much quicker than an older phone, and on a phone Fastest is the level to use. Try Standard first on a laptop, and move up only if the text is not good enough. | 処理はお使いの端末で行うため、速さは端末次第です。新しいノートパソコンは古いスマートフォンよりずっと速く、スマートフォンでは「最速」を使うのがおすすめです。ノートパソコンではまず「標準」を試し、テキストの出来が足りないときだけ上のレベルに進んでください。 |
+| 25 | Ads keep TranscribeVid free. Everything works without them. | 広告のおかげでTranscribeVidは無料です。広告がなくても、すべて問題なく使えます。 |
+| 26 | How to transcribe a video in four steps | 動画を文字起こしする4つのステップ |
+| 27 | 1 Add the video Drop the file in the box at the top of this page, or press Choose a file. A link to a web video is not accepted. | 1 動画を追加する このページの上部にあるボックスにファイルをドロップするか、「ファイルを選択」を押します。Web上の動画のリンクは受け付けません。 |
+| 28 | 2 Choose language and quality Name the spoken language if you know it, and pick a quality level. Standard is a good start; use High accuracy or Best accuracy for accents, noise or a language such as Hindi. | 2 言語と品質を選ぶ 話されている言語がわかるなら指定し、品質レベルを選びます。まずは「標準」がおすすめです。なまりやノイズがある場合や、ヒンディー語などの言語では、「高精度」または「最高精度」を使ってください。 |
+| 29 | 3 Wait for the text Lines appear one by one with a progress bar and the time left. The first time you use a level, the model is downloaded once; later videos start straight away. | 3 テキストが表示されるのを待つ 進行状況バーと残り時間とともに、テキストが1行ずつ表示されます。あるレベルを初めて使うときは、モデルが一度だけダウンロードされ、2本目以降はすぐに始まります。 |
+| 30 | 4 Edit and download Fix any line in the editor, then download TXT, SRT, VTT, PDF, Markdown or JSON. The transcript stays in this browser for a while, but download what you want to keep. | 4 編集してダウンロードする エディターで気になる行を直してから、TXT、SRT、VTT、PDF、Markdown、JSONのいずれかをダウンロードします。文字起こしはしばらくこのブラウザーに残りますが、残したいものはダウンロードしておいてください。 |
+| 31 | Videos you can add and files you get back | 追加できる動画と、受け取れるファイル |
+| 32 | The sound track is what is read, so the picture can be any quality. Audio-only files work too. | 読み取るのは音声トラックなので、映像の画質は問いません。音声だけのファイルも使えます。 |
+| 33 | Video files you can add | 追加できる動画ファイル |
+| 34 | MP4 | MP4 |
+| 35 | MOV | MOV |
+| 36 | MKV | MKV |
+| 37 | WEBM | WEBM |
+| 38 | AVI | AVI |
+| 39 | M4V | M4V |
+| 40 | 3GP | 3GP |
+| 41 | Download the transcript as | 文字起こしを次の形式でダウンロード |
+| 42 | TXT plain text, or a time on each line | TXT プレーンテキスト、または各行に時刻付き |
+| 43 | SRT subtitles for editors and players | SRT 編集ソフトやプレーヤー用の字幕 |
+| 44 | VTT captions for web video | VTT Web動画用の字幕 |
+| 45 | PDF a transcript to print or share | PDF 印刷や共有のための文字起こし |
+| 46 | Markdown notes with timestamps | Markdown タイムスタンプ付きのメモ |
+| 47 | JSON words and times for developers | JSON 開発者向けの単語と時刻のデータ |
+| 48 | A finished transcript. Every line has a timestamp, and Export saves it as SRT, VTT, TXT, PDF and more. | 完成した文字起こし。すべての行にタイムスタンプが付き、「書き出し」でSRT、VTT、TXT、PDFなどの形式で保存できます。 |
+| 49 | Getting more from a free transcription | 無料の文字起こしをうまく使うコツ |
+| 50 | Test the first minute before the whole video. Cut or play a minute of the video and transcribe that. If the text is wrong, change the language or quality level before you spend time on the full file. | 動画全体の前に、最初の1分を試す。 動画の1分ほどを切り出すか再生して、そこを文字起こししてみます。テキストがおかしければ、全体に時間をかける前に、言語や品質レベルを変えましょう。 |
+| 51 | Check what is on your screen as well as in your ears. Only the speech is written down. Names that appear on a slide but are never said will not be in the text. | 耳に入る音だけでなく、画面に出ているものも確認する。 書き起こされるのは話し声だけです。スライドに出ているだけで、口に出されない名前は、テキストに入りません。 |
+| 52 | Split a very long recording on a phone. There is no size limit, but a video of several hours needs a lot of memory. On a phone, parts of an hour or so each are much safer, and on a laptop you can usually go much longer. | スマートフォンでは、非常に長い録画を分割する。 サイズの上限はありませんが、数時間にわたる動画はたくさんのメモリを必要とします。スマートフォンでは、1時間ほどずつの部分に分けるほうがずっと安全で、ノートパソコンなら、たいていもっと長くても大丈夫です。 |
+| 53 | Download the subtitle file as well as the text. The SRT file keeps the timing, so the same run gives you both a transcript to read and captions to add to the video. | テキストだけでなく、字幕ファイルもダウンロードする。 SRTファイルにはタイミングが残っているので、1回の処理で、読むための文字起こしと、動画に付ける字幕の両方が手に入ります。 |
+| 54 | Related reading | 関連記事 |
+| 55 | Free video to text tools compared Every limit in one table, quoted from each tool's own page. | 無料の動画文字起こしツールを比較 各ツール自身のページから引用した、すべての上限を1つの表にまとめました。 |
+| 56 | Transcribe a video without uploading it How the work stays on your device and how to check it yourself. | アップロードせずに動画を文字起こしする 処理がお使いの端末の中にとどまる仕組みと、ご自身で確かめる方法です。 |
+| 57 | How to transcribe a video to text Five ways to do it, and which one fits your video. | 動画をテキストにする方法 5つのやり方と、あなたの動画に合うものの選び方です。 |
+| 58 | How to get a more accurate transcript Habits and settings that reduce mistakes on any video. | 文字起こしの精度を上げる方法 どんな動画でも間違いを減らせる習慣と設定です。 |
+| 59 | Transcribe video to text: common questions | 動画をテキストに変換：よくある質問 |
+| 60 | Can I paste a YouTube, TikTok or Google Drive link instead of a file? | ファイルの代わりに、YouTube、TikTok、Google Driveのリンクを貼り付けられますか？ |
+| 61 | No. This tool works on a file you add or record. If you own the video, use the original file; for someone else's video you need the right to use it. | いいえ。このツールで扱えるのは、追加または録音したファイルです。ご自身の動画であれば元のファイルを使ってください。他の人の動画については、利用する権利が必要です。 |
+| 62 | Will the transcript show who is speaking? | 文字起こしに、誰が話しているかは表示されますか？ |
+| 63 | No. Lines have times but no speaker names. You can type names into the text in the editor, which is quick for a two-person interview. | いいえ。各行に時刻は付きますが、話者の名前は付きません。エディターでテキストに名前を入力できるので、2人のインタビューならすぐ済みます。 |
+| 64 | Is there really no limit on how many videos I can transcribe? | 文字起こしできる動画の本数に、本当に制限はないのですか？ |
+| 65 | There is no account, no plan and no daily or monthly count, and no size limit. The only limit is your device: a very long video takes longer and needs more memory, so a phone does better with parts of an hour or so. Ads keep the site free, and none is shown while a video is transcribed. | アカウントもプランもなく、1日や1か月あたりの回数制限も、サイズの上限もありません。制約になるのはお使いの端末だけです。非常に長い動画は時間がかかり、より多くのメモリが必要になるため、スマートフォンでは1時間ほどずつに分けるのが向いています。サイトは広告によって無料で提供しており、動画の文字起こし中に広告が表示されることはありません。 |
+| 66 | Which quality level suits a long video? | 長い動画には、どの品質レベルが向いていますか？ |
+| 67 | Standard is the usual choice. Fastest is quicker but makes more mistakes; High accuracy and Best accuracy cost more time and pay off on accents, noise and languages such as Hindi. | ふだんは「標準」がおすすめです。「最速」は速い反面、間違いが増えます。「高精度」と「最高精度」は時間がかかりますが、なまり、ノイズ、ヒンディー語などの言語で効果があります。 |
+| 68 | Does the video leave my computer? | 動画はパソコンの外に出ますか？ |
+| 69 | No. Your browser transcribes the video on your own device, and no file is sent to us. Only the speech model and its engine are downloaded, once. | いいえ。ブラウザーがお使いの端末の上で動画を文字起こしするため、ファイルが当方に送られることはありません。ダウンロードされるのは、音声認識モデルとそのエンジンだけで、それも一度きりです。 |
+
+## New guide: how to transcribe a video to text
+
+English: https://transcribevid.com/guides/how-to-transcribe-video-to-text  
+Japanese: https://transcribevid.com/ja/guides/how-to-transcribe-video-to-text
+
+| # | English | Japanese (日本語) |
+|---|---|---|
+| 1 | How to transcribe a video to text: five ways, and which one fits your video | 動画をテキストにする方法：5つのやり方と、あなたの動画に合うもの |
+| 2 | By Advaith Bibhishan Sonne · Updated 28 October 2026 · 7 min read | 著者：Advaith Bibhishan Sonne · 更新日 2026年10月28日 · 読了目安7分 |
+| 3 | You can get the words of a video as text in five ways: the transcript YouTube already holds, voice typing, the captions of a video editor, an online service, or a tool that runs on your own device. They differ in cost, in whether you get times on every line, and in what they ask of you first. This guide says what each one does and when to pick it. | 動画の内容をテキストにするには、5つの方法があります。YouTubeがすでに持っている文字起こし、音声入力、動画編集ソフトの字幕、オンラインサービス、そしてお使いの端末の中で動くツールです。費用、各行に時刻が付くかどうか、最初に何を求められるかが、それぞれ違います。このガイドでは、それぞれが何をするか、どんなときに選ぶとよいかを説明します。 |
+| 4 | The short answer | 先に結論 |
+| 5 | The video is on YouTube and has captions: open its transcript on the video page. It costs nothing and takes a minute, but it only exists when the video has captions, and the text needs a careful read. | 動画がYouTubeにあり、字幕が付いている場合： 動画ページで文字起こしを開きます。費用はかからず1分で済みますが、字幕がある動画にしか存在せず、テキストは注意して読み直す必要があります。 |
+| 6 | You have the video file and want text with times: use a tool that takes a file and gives you TXT and subtitle files. The last two ways below do this. | 動画ファイルがあり、時刻付きのテキストがほしい場合： ファイルを受け付けて、TXTと字幕ファイルを出力してくれるツールを使います。下の最後の2つの方法がこれに当たります。 |
+| 7 | You only need a few quotes: play the video and type, or use voice typing. For anything longer than a few minutes it is slower than letting software do the whole file. | 引用が数か所だけ必要な場合： 動画を再生しながら自分で入力するか、音声入力を使います。数分より長いものは、ソフトウェアにファイル全体を任せるほうが速くなります。 |
+| 8 | You want subtitles for the same video: pick a way that exports SRT or VTT, so one run gives you both the transcript and the captions. | 同じ動画の字幕もほしい場合： SRTやVTTを書き出せる方法を選びましょう。1回の処理で、文字起こしと字幕の両方が手に入ります。 |
+| 9 | What a good transcript needs from your video | 良い文字起こしに、動画に求められること |
+| 10 | Every way below works from the sound track, so the quality of the sound decides the quality of the text far more than the picture does. Speech that is close to the microphone, one voice at a time, without music under it, comes out well. A room with echo, people talking over each other or a loud background comes out with mistakes in every method. | 以下のどの方法も音声トラックから処理するため、テキストの質を決めるのは、映像よりもずっと音の質です。マイクの近くで、1人ずつ、下に音楽が流れていない状態で話した音声は、うまくいきます。反響のある部屋、人の話が重なる場面、騒がしい背景では、どの方法でも間違いが出ます。 |
+| 11 | Before you start, find out three things: the language people speak in the video, whether you need a time on each line, and how long the video is. The second tells you which formats you must be able to download; the third tells you which free limits will stop you. | 始める前に、3つのことを確認しておきましょう。動画の中で話されている言語、各行に時刻が必要かどうか、そして動画の長さです。2つ目から、ダウンロードできなければならない形式がわかり、3つ目から、無料の上限のうちどれが障害になるかがわかります。 |
+| 12 | Ads keep TranscribeVid free. Everything works without them. | 広告のおかげでTranscribeVidは無料です。広告がなくても、すべて問題なく使えます。 |
+| 13 | Way 1: use the transcript YouTube already has | 方法1：YouTubeがすでに持っている文字起こしを使う |
+| 14 | Many YouTube videos carry captions, written by the owner or made automatically. On a video page, open the description: where captions exist, an option to show the transcript appears there, and it lists the text with times that you can copy. If the video is yours, YouTube Studio has a Subtitles section where you can review and download the captions. YouTube changes these screens from time to time, so the labels may differ a little. | YouTubeの動画の多くには、投稿者が書いた、または自動で作られた字幕が付いています。動画ページで概要欄を開くと、字幕がある場合は、文字起こしを表示するオプションがそこに現れ、時刻付きのテキストが一覧になって、コピーできます。ご自身の動画なら、YouTube Studioに字幕のセクションがあり、字幕を確認してダウンロードできます。YouTubeはこれらの画面を折に触れて変更するため、表示名は少し違うことがあります。 |
+| 15 | This is the quickest way for a video that is already on YouTube. Its limits are that it only works with a link to a video that has captions, the automatic text can be rough on names and technical words, and it will not help with a file on your computer or phone. | すでにYouTubeにある動画なら、これが最も手早い方法です。限界は、字幕が付いた動画のリンクにしか使えないこと、自動で作られたテキストは名前や専門用語が粗いことがあること、そしてパソコンやスマートフォンの中にあるファイルには役立たないことです。 |
+| 16 | Way 2: play the video and let voice typing listen | 方法2：動画を再生して、音声入力に聞かせる |
+| 17 | Voice typing in a word processor, such as the Voice typing option in the Tools menu of Google Docs, writes down what its microphone hears. You play the video through your speakers and it types. | ワープロの音声入力、たとえばGoogleドキュメントの［ツール］メニューにある［音声入力］のような機能は、マイクが聞き取ったものを書き出します。動画をスピーカーから再生すると、それを文字にしてくれます。 |
+| 18 | It costs nothing, but it hears the whole room, not only the video. It gives you no times, it runs in real time, so a one-hour video takes an hour, and anything the microphone misses is lost. It is fine for a quote or two and a poor choice for a lecture or an interview. | 費用はかかりませんが、聞こえるのは動画だけでなく部屋全体の音です。時刻は付かず、リアルタイムで動くため、1時間の動画には1時間かかり、マイクが拾えなかったものは失われます。引用が1つ2つなら十分ですが、講義やインタビューには向きません。 |
+| 19 | Way 3: switch on automatic captions in a video editor | 方法3：動画編集ソフトで自動字幕をオンにする |
+| 20 | Some video editors can transcribe the speech of a clip you place in them. Microsoft Clipchamp's own guide, for example, says to open the Captions tab, turn on automatic captions, and then download the captions as an SRT file; the video needs speech in its audio for this to work. | 動画編集ソフトの中には、読み込んだクリップの話し声を文字にできるものがあります。たとえばMicrosoft Clipchampの公式ガイドでは、［字幕］タブを開いて自動字幕をオンにし、そのあと字幕をSRTファイルとしてダウンロードする、と説明されています。これが働くには、動画の音声に話し声が入っている必要があります。 |
+| 21 | This is useful when you are editing the video anyway, because the captions land on the timeline. For a plain transcript it is more work than it needs to be: you must load the video into the editor, and the text comes out as a subtitle file you then turn into a document. | どのみち動画を編集するなら、字幕がタイムラインに入るので便利です。ただ、単なる文字起こしがほしいだけなら、必要以上に手間がかかります。動画をエディターに読み込まなければならず、テキストは字幕ファイルとして出てくるので、それをさらにドキュメントに直す必要があるからです。 |
+| 22 | Way 4: use an online transcription service | 方法4：オンラインの文字起こしサービスを使う |
+| 23 | Dozens of sites will transcribe a file you give them. Most are free only up to a point: a few minutes, a few files, or a preview that asks you to pay before you can download. The differences that matter are whether you need an account, how many minutes you get, how large a file can be, and whether the result can be exported. | ファイルを渡せば文字起こししてくれるサイトは、数十もあります。たいていは、ある程度までしか無料ではありません。数分、数ファイル、あるいはダウンロードの前に支払いを求めるプレビューまでです。大事な違いは、アカウントが必要かどうか、何分使えるか、ファイルの大きさはどこまでか、結果を書き出せるかどうかです。 |
+| 24 | Services are the right choice when you need what simple tools do not do: names for each speaker, a bot that joins a meeting, or a link to a video you do not hold as a file. Our guide with the free limits of thirteen of them, each quoted from its own page, is linked below. | サービスが正解なのは、シンプルなツールにできないことが必要なときです。話者ごとの名前、会議に参加するボット、ファイルとしては手元にない動画へのリンクなどです。そのうち13のサービスの無料の上限を、各ページから引用してまとめたガイドを、下にリンクしてあります。 |
+| 25 | Way 5: transcribe the file with TranscribeVid | 方法5：TranscribeVidでファイルを文字起こしする |
+| 26 | TranscribeVid takes the video file itself, with no account, no daily count and no size limit. It runs Whisper, an open speech model, in your browser, so the video stays on your device, and the text comes back with a time on every line. | TranscribeVidは、動画ファイルそのものを受け付けます。アカウントも、1日の回数制限も、サイズの上限もありません。オープンな音声認識モデルであるWhisperをブラウザーの中で動かすので、動画はお使いの端末にとどまり、1行ごとに時刻を付けたテキストが返ってきます。 |
+| 27 | It does not take links, it does not label who is speaking, and it does not join meetings. For those jobs, use a service from Way 4. Because your own device does the work, a long video is slower on an old phone than on a recent laptop. | リンクは受け付けず、誰が話しているかのラベル付けもせず、会議への参加もしません。そうした用途には、方法4のサービスを使ってください。処理はお使いの端末で行うため、長い動画は、新しいノートパソコンより古いスマートフォンのほうが遅くなります。 |
+| 28 | Add the video Drop the file in the box on the tool page, or press Choose a file. MP4, MOV, MKV, WEBM and most other video files work, and so do audio files. | 動画を追加する ツールのページのボックスにファイルをドロップするか、「ファイルを選択」を押します。MP4、MOV、MKV、WEBMなど、ほとんどの動画ファイルが使え、音声ファイルも使えます。 |
+| 29 | Choose the language and quality Name the spoken language if you know it. Standard suits most videos; choose High accuracy or Best accuracy for accents, noise or Hindi. | 言語と品質を選ぶ 話されている言語がわかるなら指定します。ほとんどの動画には「標準」が向いています。なまりやノイズがある場合や、ヒンディー語では、「高精度」または「最高精度」を選んでください。 |
+| 30 | Wait for the text Lines appear one by one, with a progress bar and the time left. | テキストが表示されるのを待つ 進行状況バーと残り時間とともに、テキストが1行ずつ表示されます。 |
+| 31 | Edit and download Fix any line in the editor, then download TXT, SRT, VTT, PDF, Markdown or JSON. Download what you want to keep before you leave. | 編集してダウンロードする エディターで気になる行を直してから、TXT、SRT、VTT、PDF、Markdown、JSONのいずれかをダウンロードします。残したいものは、ページを離れる前にダウンロードしてください。 |
+| 32 | Which way for which video | どの動画にどの方法か |
+| 33 | Fix the text before you use it | 使う前にテキストを直す |
+| 34 | Whichever way you choose, read the result once with the video playing. Speech-to-text gets common words right and stumbles on the things that matter most to you: names, product words, numbers and anything said quickly. | どの方法を選んでも、動画を再生しながら、結果を一度は読み通してください。音声認識は、ありふれた言葉は正しく書けても、あなたにとっていちばん大事なところでつまずきます。名前、製品に関する言葉、数字、早口で言われたことなどです。 |
+| 35 | Names and terms. Search the text for each name you know is in the video and correct every place it appears. | 名前と用語。 動画に出てくるとわかっている名前をテキストの中で検索し、出てくるすべての箇所を直します。 |
+| 36 | Numbers and dates. Check each one against the video; a wrong digit is easy to miss. | 数字と日付。 ひとつずつ動画と照らし合わせます。数字の1桁の間違いは見落としやすいものです。 |
+| 37 | Where the speaker changes. Add a line break and a name, because plain transcripts do not mark who is talking. | 話者が替わるところ。 改行と名前を加えます。ふつうの文字起こしには、誰が話しているかの印が付かないためです。 |
+| 38 | Subtitles. If you will use an SRT or VTT file, keep each line short enough to read in the time it is on screen. | 字幕。 SRTやVTTのファイルを使うなら、各行は、画面に出ている時間で読み切れる短さにします。 |
+| 39 | For a longer list of habits that reduce mistakes before you start, see the guide on getting a more accurate transcript. | 始める前に間違いを減らすための習慣をもっと知りたい方は、文字起こしの精度を上げる方法のガイドをご覧ください。 |
+| 40 | Common questions | よくある質問 |
+| 41 | Can I transcribe a video to text without installing anything? | 何もインストールせずに、動画をテキストにできますか？ |
+| 42 | Yes. The YouTube transcript, an online service and TranscribeVid all work in a web browser. Only a video editor or a desktop program needs an install. | はい。YouTubeの文字起こし、オンラインサービス、TranscribeVidは、どれもWebブラウザーで使えます。インストールが必要なのは、動画編集ソフトやデスクトップ用のプログラムだけです。 |
+| 43 | What is the fastest way to transcribe a one-hour video? | 1時間の動画を文字起こしする、いちばん速い方法は？ |
+| 44 | If it is on YouTube with captions, the transcript there is immediate. For a file, software is far faster than typing or voice typing, which both take at least as long as the video lasts. How long software takes depends on the tool, the quality level and, where it runs on your device, how fast that device is. | 字幕付きでYouTubeにある動画なら、そこの文字起こしがすぐに使えます。ファイルの場合は、ソフトウェアのほうが、手で入力するのや音声入力よりずっと速く済みます。後者は、どちらも少なくとも動画の長さと同じ時間がかかるからです。ソフトウェアにかかる時間は、ツール、品質レベル、そして端末の中で動くものなら、その端末の速さによります。 |
+| 45 | Do I have to take the audio out of the video first? | 先に動画から音声を取り出す必要はありますか？ |
+| 46 | No. Tools that accept video files read the sound track themselves, so you can add an MP4 or MOV as it is. Taking the audio out first only helps when a tool refuses the video format. | いいえ。動画ファイルを受け付けるツールは、自分で音声トラックを読み取るので、MP4やMOVをそのまま追加できます。先に音声を取り出すのが役立つのは、ツールがその動画形式を受け付けないときだけです。 |
+| 47 | How do I get the text with a time on every line? | 各行に時刻が付いたテキストを得るには？ |
+| 48 | Use a way that exports subtitles or a timed transcript: the YouTube transcript lists times, and a tool that downloads SRT or VTT gives each line a start and end time. Voice typing gives none. | 字幕または時刻付きの文字起こしを書き出せる方法を使います。YouTubeの文字起こしには時刻が一覧になっていますし、SRTやVTTをダウンロードできるツールなら、各行に開始と終了の時刻が付きます。音声入力では付きません。 |
+| 49 | Keep reading | あわせて読む |
+| 50 | Free video to text tools compared The free limits of thirteen online tools, each quoted from its own page. | 無料の動画文字起こしツールを比較 13のオンラインツールの無料の上限を、各ツール自身のページから引用してまとめました。 |
+| 51 | How to get a more accurate transcript Habits and settings that reduce mistakes on any video. | 文字起こしの精度を上げる方法 どんな動画でも間違いを減らせる習慣と設定です。 |
+| 52 | Make subtitles for your video Turn the same video into an SRT file for players and editors. | 動画の字幕を作る 同じ動画を、プレーヤーや編集ソフト用のSRTファイルにします。 |
+| 53 | Transcribe a video without uploading it How the work stays on your device and how to check it yourself. | アップロードせずに動画を文字起こしする 処理がお使いの端末の中にとどまる仕組みと、ご自身で確かめる方法です。 |
+| 54 |  | このページはAIで翻訳されています。 誤りを見つけたらお知らせください。 |
 
 ## Privacy policy
 
