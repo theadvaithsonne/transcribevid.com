@@ -201,6 +201,11 @@ export const CONTENT: GuideContent = {
       path: '/guides/transcribe-video-without-uploading',
       note: 'How a transcription that stays on your device works.',
     },
+    {
+      label: 'How to transcribe a video to text',
+      path: '/guides/how-to-transcribe-video-to-text',
+      note: 'Five ways to do it, from the YouTube transcript to your own device.',
+    },
   ],
 
   sources: [

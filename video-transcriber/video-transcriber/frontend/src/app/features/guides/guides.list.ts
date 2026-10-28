@@ -93,6 +93,16 @@ export const GUIDES: readonly GuideLink[] = [
     published: '2026-10-28',
     updated: '2026-10-28',
   },
+  {
+    slug: 'how-to-transcribe-video-to-text',
+    path: '/guides/how-to-transcribe-video-to-text',
+    label: 'How to transcribe a video to text',
+    title: 'How to Transcribe a Video to Text (Free)',
+    description:
+      'Five ways to transcribe a video to text: a YouTube transcript, voice typing, editor captions, an online service or your device. What each costs and gives you.',
+    published: '2026-10-28',
+    updated: '2026-10-28',
+  },
 ];
 
 export const guideRoutePath = (g: GuideLink) => g.path.replace(/^\//, '');

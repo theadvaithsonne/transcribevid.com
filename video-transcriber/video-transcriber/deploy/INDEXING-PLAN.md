@@ -127,6 +127,7 @@ The new pages, then the three pages whose titles changed (request each of those 
 - [ ] https://transcribevid.com/video-to-text (new title)
 - [ ] https://transcribevid.com/mp4-to-text (new title)
 - [ ] https://transcribevid.com/audio-to-text (new description)
+- [ ] https://transcribevid.com/guides/how-to-transcribe-video-to-text (the guide added after that, once it is live too)
 
 ---
 

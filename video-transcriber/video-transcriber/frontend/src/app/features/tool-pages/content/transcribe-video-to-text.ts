@@ -174,9 +174,9 @@ export const CONTENT: ToolPageContent = {
       note: 'How the work stays on your device and how to check it yourself.',
     },
     {
-      label: 'What is Whisper',
-      path: '/guides/what-is-whisper',
-      note: 'The open speech model behind the four quality levels.',
+      label: 'How to transcribe a video to text',
+      path: '/guides/how-to-transcribe-video-to-text',
+      note: 'Five ways to do it, and which one fits your video.',
     },
     {
       label: 'How to get a more accurate transcript',

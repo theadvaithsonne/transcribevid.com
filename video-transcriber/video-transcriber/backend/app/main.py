@@ -71,7 +71,7 @@ APP_PAGES = (
     "tools", "guides",
     "guides/srt-vs-vtt", "guides/how-to-add-subtitles-to-a-video",
     "guides/transcribe-video-without-uploading", "guides/accurate-transcripts", "guides/what-is-whisper",
-    "guides/whisper-accuracy-by-language", "guides/free-video-to-text-tools-compared",
+    "guides/whisper-accuracy-by-language", "guides/free-video-to-text-tools-compared", "guides/how-to-transcribe-video-to-text",
 )
 # Old addresses of pages that moved: one permanent redirect (301) to the new address, so links and search engines move
 # along at once. Empty since /about became a page of its own again (it used to point at /how-it-works).

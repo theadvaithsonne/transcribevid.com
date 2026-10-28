@@ -33,9 +33,9 @@ minutes or need an upload).
 | Guides | `/guides/srt-vs-vtt`, `/guides/how-to-add-subtitles-to-a-video`, `/guides/transcribe-video-without-uploading`, `/guides/accurate-transcripts`, `/guides/what-is-whisper` |
 | Information | `/how-it-works`, `/faq`, `/about`, `/contact`, `/privacy`, `/terms` |
 
-57 English addresses, and the same pages in 15 languages (32 each: the home page, the six information pages, the two lists, 18 tool
+58 English addresses, and the same pages in 15 languages (32 each: the home page, the six information pages, the two lists, 18 tool
 pages and the 5 guides; 23 tool pages exist in English only: the six "by language" pages, because a Spanish page about Spanish would only
-repeat the generic page, and the three alternatives pages and fourteen more, and the new guide, that have not been translated yet): 537
+repeat the generic page, and the three alternatives pages and fourteen more, and the new guide, that have not been translated yet): 538
 addresses in all, all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
 chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
 
@@ -54,7 +54,7 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    "backend setting" methods do not exist on the static site; the DNS record is the one to use.)
 
 3. **Submit the sitemap.** In Search Console open *Sitemaps*, type `sitemap.xml`, press *Submit*. Within a day or two it
-   should say *Success* with 537 pages discovered (57 English + 480 translated).
+   should say *Success* with 538 pages discovered (58 English + 480 translated).
 
 4. **Ask Google to look now.** *URL inspection* (search bar at the top) > *Request indexing*, about 10 a day are allowed.
    Day 1: `/`, `/video-to-text`, `/audio-to-text`, `/mp4-to-text`, `/mp3-to-text`, `/srt-subtitle-generator`,
@@ -92,7 +92,7 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    WebApplication, FAQ). There are no star ratings anywhere, on purpose: never add made-up ones.
 
 8. **Wait, then check monthly (15 minutes).** In Search Console:
-   - **Pages** (page indexing): the 57 English pages should move to *Indexed* over 1 to 6 weeks, the translated ones over 2 to 10
+   - **Pages** (page indexing): the 58 English pages should move to *Indexed* over 1 to 6 weeks, the translated ones over 2 to 10
      (a large batch of new pages on a new site is crawled slowly; that is normal). Normal and nothing to fix: *Page with
      redirect* (http and www addresses), *Not found (404)* (mistyped addresses), *Excluded by 'noindex' tag* and *Blocked by
      robots.txt* (private transcript pages `/jobs/...`, `/logs`, `/api/...`). Worth attention: *Crawled - currently not
