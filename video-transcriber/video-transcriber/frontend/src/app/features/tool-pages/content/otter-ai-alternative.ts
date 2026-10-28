@@ -154,6 +154,7 @@ export const CONTENT: ToolPageContent = {
     '/interview-transcription',
     '/private-transcription',
     '/audio-to-text',
+    '/notta-alternative',
   ],
 
   links: [

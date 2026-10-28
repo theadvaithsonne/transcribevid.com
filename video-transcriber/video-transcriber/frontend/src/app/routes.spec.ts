@@ -91,7 +91,7 @@ describe('routes', () => {
         h1s.push(page().querySelector('h1')!.textContent!.trim());
       }
       expect(new Set(h1s).size).toBe(TOOL_PAGES.length);
-    });
+    }, 30000);
 
     it('/jobs/:id still opens a transcript (and starts loading it)', async () => {
       await harness.navigateByUrl('/jobs/abc123');

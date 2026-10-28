@@ -790,6 +790,11 @@
       "description": "Practical ways to improve speech-to-text accuracy: cleaner audio, the right language and model, a vocabulary hint, and how to check and correct the result.",
       "label": "How to get a more accurate transcript"
     },
+    "/guides/free-video-to-text-tools-compared": {
+      "title": "Free Video to Text Tools Compared (2026)",
+      "description": "The free limits of thirteen video to text tools in one table: sign-up, minutes, file size and exports, each quoted from its own page on 28 October 2026.",
+      "label": "Free video to text tools compared"
+    },
     "/guides/how-to-add-subtitles-to-a-video": {
       "title": "How to Add Subtitles to a Video (Free)",
       "description": "Make subtitles in four steps: transcribe the video, fix the text, export SRT or VTT, then add the file to YouTube, VLC, an editor or your web player.",
@@ -869,6 +874,11 @@
       "description": "Convert an MP4 video to text with timestamps. Free, no login, no daily limit, 50+ languages. Download TXT, SRT, VTT, Markdown, JSON or PDF.",
       "label": "MP4 to text"
     },
+    "/notta-alternative": {
+      "title": "Free Notta Alternative, No Monthly Minutes",
+      "description": "Notta's free plan stops at 3 minutes per recording. A free alternative with no account and no monthly minutes, compared fairly with Notta's own pages.",
+      "label": "Notta alternative"
+    },
     "/ogg-to-text": {
       "title": "OGG and Opus to Text: Free, No Login",
       "description": "Convert OGG and Opus audio, including voice notes, to text for free. No login, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.",
@@ -935,6 +945,11 @@
     "/tools": {
       "title": "All free tools",
       "description": "Every free video and audio to text tool in one list: by file type, by use, subtitle files and languages. No login, no daily limit, 50+ languages."
+    },
+    "/transcribe-video-to-text": {
+      "title": "Transcribe Video to Text Free, No Sign-Up",
+      "description": "Transcribe a video to text for free: no sign-up, no daily limit, 50+ languages. A timestamp on every line. Download TXT, SRT, VTT, PDF, Markdown or JSON.",
+      "label": "Transcribe video to text"
     },
     "/translate-audio-to-english": {
       "title": "Translate Speech to English Text, Free",

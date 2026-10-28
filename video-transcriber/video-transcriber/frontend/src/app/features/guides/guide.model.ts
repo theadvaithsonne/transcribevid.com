@@ -1,4 +1,4 @@
-import { ToolFaq, ToolLink } from '../tool-pages/tool-page.model';
+import { ToolFaq, ToolLink, ToolSource } from '../tool-pages/tool-page.model';
 
 /**
  * The text of one guide. Plain strings only: the same text is shown on the page and (the questions) put in the FAQPage
@@ -57,4 +57,8 @@ export interface GuideContent {
   faqs: ToolFaq[];
   /** "Keep reading": three to five links to tool pages and other guides, each with a sentence saying what is there */
   links: ToolLink[];
+  /** the public pages a comparison guide quotes (English only): shown as a "Sources" list of outbound links, with the date they were read */
+  sources?: ToolSource[];
+  /** when the sources were read, as shown ("28 October 2026") */
+  checked?: string;
 }

@@ -83,6 +83,16 @@ export const GUIDES: readonly GuideLink[] = [
     published: '2026-10-28',
     updated: '2026-10-28',
   },
+  {
+    slug: 'free-video-to-text-tools-compared',
+    path: '/guides/free-video-to-text-tools-compared',
+    label: 'Free video to text tools compared',
+    title: 'Free Video to Text Tools Compared (2026)',
+    description:
+      'The free limits of thirteen video to text tools in one table: sign-up, minutes, file size and exports, each quoted from its own page on 28 October 2026.',
+    published: '2026-10-28',
+    updated: '2026-10-28',
+  },
 ];
 
 export const guideRoutePath = (g: GuideLink) => g.path.replace(/^\//, '');

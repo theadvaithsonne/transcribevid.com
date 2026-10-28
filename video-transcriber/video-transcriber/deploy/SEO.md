@@ -33,9 +33,9 @@ minutes or need an upload).
 | Guides | `/guides/srt-vs-vtt`, `/guides/how-to-add-subtitles-to-a-video`, `/guides/transcribe-video-without-uploading`, `/guides/accurate-transcripts`, `/guides/what-is-whisper` |
 | Information | `/how-it-works`, `/faq`, `/about`, `/contact`, `/privacy`, `/terms` |
 
-54 English addresses, and the same pages in 15 languages (32 each: the home page, the six information pages, the two lists, 18 tool
-pages and the 5 guides; 21 tool pages exist in English only: the six "by language" pages, because a Spanish page about Spanish would only
-repeat the generic page, and the two alternatives pages and thirteen more that have not been translated yet): 534
+57 English addresses, and the same pages in 15 languages (32 each: the home page, the six information pages, the two lists, 18 tool
+pages and the 5 guides; 23 tool pages exist in English only: the six "by language" pages, because a Spanish page about Spanish would only
+repeat the generic page, and the three alternatives pages and fourteen more, and the new guide, that have not been translated yet): 537
 addresses in all, all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
 chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
 
@@ -54,7 +54,7 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    "backend setting" methods do not exist on the static site; the DNS record is the one to use.)
 
 3. **Submit the sitemap.** In Search Console open *Sitemaps*, type `sitemap.xml`, press *Submit*. Within a day or two it
-   should say *Success* with 534 pages discovered (54 English + 480 translated).
+   should say *Success* with 537 pages discovered (57 English + 480 translated).
 
 4. **Ask Google to look now.** *URL inspection* (search bar at the top) > *Request indexing*, about 10 a day are allowed.
    Day 1: `/`, `/video-to-text`, `/audio-to-text`, `/mp4-to-text`, `/mp3-to-text`, `/srt-subtitle-generator`,
@@ -66,7 +66,11 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
 5. **Bing and the others (10 minutes).** At https://www.bing.com/webmasters sign in and choose *Import from Google Search
    Console*: it copies the site and the sitemap. Bing also feeds DuckDuckGo, Ecosia, Yahoo and several AI assistants. In
    Cloudflare turn on **Crawler Hints** (Caching > Configuration): it tells Bing and others about changed pages for you
-   (this replaces the IndexNow script for this setup).
+   (a second, direct way is IndexNow, below).
+   **IndexNow.** The key file `frontend/public/18e4d9821ce04f0329fceb62f7dca39c.txt` is part of every build and answers at
+   `https://transcribevid.com/18e4d9821ce04f0329fceb62f7dca39c.txt` (a key is public by design: it only proves the site is yours).
+   After a deploy that added or changed pages run `node scripts/indexnow.mjs --key 18e4d9821ce04f0329fceb62f7dca39c` (add `--dry-run` to
+   see the list first): it sends the sitemap's addresses to Bing, Yandex, Seznam and Naver. Google does not use IndexNow.
 
 6. **Three Cloudflare settings that affect search (your dashboard; the deploy login cannot change them).**
    - **Managed robots.txt** (Security > Settings > search "robots", or Bots > AI crawlers). Cloudflare adds a block to the
@@ -88,7 +92,7 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    WebApplication, FAQ). There are no star ratings anywhere, on purpose: never add made-up ones.
 
 8. **Wait, then check monthly (15 minutes).** In Search Console:
-   - **Pages** (page indexing): the 54 English pages should move to *Indexed* over 1 to 6 weeks, the translated ones over 2 to 10
+   - **Pages** (page indexing): the 57 English pages should move to *Indexed* over 1 to 6 weeks, the translated ones over 2 to 10
      (a large batch of new pages on a new site is crawled slowly; that is normal). Normal and nothing to fix: *Page with
      redirect* (http and www addresses), *Not found (404)* (mistyped addresses), *Excluded by 'noindex' tag* and *Blocked by
      robots.txt* (private transcript pages `/jobs/...`, `/logs`, `/api/...`). Worth attention: *Crawled - currently not

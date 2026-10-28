@@ -96,7 +96,7 @@ translated home pages are on the list, so each language gets a first page that G
 - [ ] https://transcribevid.com/ur
 - [ ] https://transcribevid.com/contact
 
-All 54 English addresses are now covered except `/privacy` and `/terms`, which Google finds by itself from the footer of every
+All 54 English addresses of the first list are now covered except `/privacy` and `/terms`, which Google finds by itself from the footer of every
 page: request them only if you have spare quota.
 
 ## Day 7, Tuesday 3 November, only if needed: the biggest translated tool pages
@@ -114,6 +114,19 @@ indexed** or **Crawled - currently not indexed**. These are the translated pages
 - [ ] https://transcribevid.com/pt/audio-em-texto
 - [ ] https://transcribevid.com/hi/audio-to-text
 - [ ] https://transcribevid.com/id/audio-ke-teks
+
+---
+
+## Added after the third release (request these once it is live; spare quota on any day)
+
+The new pages, then the three pages whose titles changed (request each of those ONE more time so Google reads the new title):
+
+- [ ] https://transcribevid.com/transcribe-video-to-text
+- [ ] https://transcribevid.com/notta-alternative
+- [ ] https://transcribevid.com/guides/free-video-to-text-tools-compared
+- [ ] https://transcribevid.com/video-to-text (new title)
+- [ ] https://transcribevid.com/mp4-to-text (new title)
+- [ ] https://transcribevid.com/audio-to-text (new description)
 
 ---
 

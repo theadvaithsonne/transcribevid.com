@@ -89,6 +89,18 @@
       }
     }
 
+    @if (c().sources?.length) {
+      <section class="sources" aria-labelledby="g-sources-title">
+        <h2 id="g-sources-title">Sources</h2>
+        <p class="checked">Every quote above was read on {{ c().checked }} from the page linked here. Plans and limits change, so check the tool's own page before you rely on a number.</p>
+        <ul>
+          @for (s of c().sources; track s.url) {
+            <li><a [href]="s.url" target="_blank" rel="nofollow noopener noreferrer">{{ s.label }}</a></li>
+          }
+        </ul>
+      </section>
+    }
+
     <section class="faq" aria-labelledby="g-faq-title">
       <h2 id="g-faq-title">{{ 'Common questions' | t }}</h2>
       <div class="qas">

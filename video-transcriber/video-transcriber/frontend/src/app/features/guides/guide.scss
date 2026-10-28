@@ -141,6 +141,22 @@ table {
   }
 }
 
+/* the pages a comparison quotes */
+.sources {
+  .checked {
+    max-width: 70ch;
+    font-size: var(--fs-sm);
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  ul {
+    margin: 0;
+    padding-left: 20px;
+    font-size: var(--fs-sm);
+    line-height: 1.9;
+  }
+}
+
 /* related links: a link and why */
 .link-list {
   margin: 0;

@@ -51,6 +51,11 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Convert video to text for free. Get an accurate, timestamped transcript in 50+ languages. No login, no daily limit. Download SRT, VTT, TXT or PDF.',
     footer: true,
+    browser: {
+      title: 'Video to Text: Free, No Upload, No Login',
+      description:
+        'Convert video to text for free in your browser: nothing is uploaded, no size limit, no login, 50+ languages. Timestamps, and TXT, SRT, VTT or PDF downloads.',
+    },
   },
   {
     path: '/audio-to-text',
@@ -60,6 +65,10 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Turn podcasts, interviews and lectures into text. Free audio to text converter with timestamps, 50+ languages and no login. Download TXT, SRT, VTT or PDF.',
     footer: true,
+    browser: {
+      description:
+        'Turn podcasts, interviews and lectures into text. Free audio to text converter with timestamps, 50+ languages, no login, no upload. Download TXT, SRT, VTT, PDF.',
+    },
   },
   {
     path: '/mp4-to-text',
@@ -69,6 +78,11 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Convert an MP4 video to text with timestamps. Free, no login, no daily limit, 50+ languages. Download TXT, SRT, VTT, Markdown, JSON or PDF.',
     footer: true,
+    browser: {
+      title: 'MP4 to Text: Free, No Upload, No Size Limit',
+      description:
+        'Convert an MP4 video to text with timestamps. Free, no login, no upload, no size limit, 50+ languages. Download TXT, SRT, VTT, Markdown, JSON or PDF.',
+    },
   },
   {
     path: '/mp3-to-text',
@@ -122,6 +136,19 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
         'Run the open Whisper speech model in your browser: add audio or video, get a timestamped transcript in 50+ languages. Free, no login, no upload. TXT, SRT, PDF.',
     },
   },
+  {
+    path: '/transcribe-video-to-text',
+    group: 'core',
+    label: 'Transcribe video to text',
+    title: 'Transcribe Video to Text Free, No Sign-Up',
+    description:
+      'Transcribe a video to text for free: no sign-up, no daily limit, 50+ languages. A timestamp on every line. Download TXT, SRT, VTT, PDF, Markdown or JSON.',
+    browser: {
+      title: 'Transcribe Video to Text: Free, No Upload',
+      description:
+        'Transcribe a video to text for free: no sign-up, no upload, no size limit, 50+ languages. A timestamp on every line. Download TXT, SRT, VTT, PDF or JSON.',
+    },
+  },
   // ---------------------------------------------------------------- by file type
   {
     path: '/wav-to-text',
@@ -130,6 +157,9 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Convert a WAV recording to text with timestamps. Free, no login, no daily limit, 50+ languages. Edit the transcript and download TXT, SRT, VTT or PDF.',
     group: 'format',
+    browser: {
+      title: 'WAV to Text: Free, Nothing Uploaded',
+    },
   },
   {
     path: '/m4a-to-text',
@@ -150,6 +180,9 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     title: 'WebM to Text: Free Transcription, No Login',
     description:
       'Convert a WebM video or audio file to text for free. Works with screen and browser recordings, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      title: 'WebM to Text: Free, Stays on Your Device',
+    },
   },
   {
     path: '/mov-to-text',
@@ -167,6 +200,7 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Convert an AVI video to text for free. Timestamped transcript in 50+ languages, no login, no daily limit. Edit it and download TXT, SRT, VTT or PDF.',
     browser: {
+      title: 'AVI to Text Converter: Free, No Upload',
       description:
         'Convert an AVI video to text for free. Timestamped transcript in 50+ languages, no login, no upload. Edit it and download TXT, SRT, VTT or PDF.',
     },
@@ -191,6 +225,7 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Convert FLAC audio to text for free. Lossless archive and studio recordings, 50+ languages, timestamps, no login. Download TXT, SRT, VTT or PDF.',
     browser: {
+      title: 'FLAC to Text Converter: Free, No Upload',
       description:
         'Convert FLAC audio to text for free. Lossless archive and studio recordings, 50+ languages, timestamps, no login, no upload. Download TXT, SRT or PDF.',
     },
@@ -203,6 +238,7 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Convert OGG and Opus audio, including voice notes, to text for free. No login, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.',
     browser: {
+      title: 'OGG and Opus to Text: Free, No Upload',
       description:
         'Convert OGG and Opus audio, including voice notes, to text for free. No login, no upload, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.',
     },
@@ -450,6 +486,19 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     browser: {
       description:
         "Need to transcribe a recording without Otter's monthly minutes or import limits? A free alternative with no account and no upload, compared fairly.",
+    },
+  },
+  {
+    path: '/notta-alternative',
+    group: 'compare',
+    label: 'Notta alternative',
+    title: 'Free Notta Alternative, No Monthly Minutes',
+    description:
+      "Notta's free plan stops at 3 minutes per recording. A free alternative with no account and no monthly minutes, compared fairly with Notta's own pages.",
+    browser: {
+      title: 'Free Notta Alternative: No 3-Minute Cap',
+      description:
+        "Notta's free plan stops at 3 minutes per recording. A free alternative with no account, no upload and no cap, compared fairly with Notta's own pages.",
     },
   },
 ];

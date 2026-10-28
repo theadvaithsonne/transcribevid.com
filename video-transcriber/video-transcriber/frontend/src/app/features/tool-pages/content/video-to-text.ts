@@ -3,7 +3,10 @@ import { ToolPageContent } from '../tool-page.model';
 export const CONTENT: ToolPageContent = {
   eyebrow: 'Video to text',
   h1: 'Convert video to text, free and with timestamps',
+  browserH1: 'Convert video to text in your browser: free, nothing uploaded',
   lead: 'Upload a recorded video and watch its speech turn into text, line by line, each line with its time. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages.',
+  browserLead:
+    'Add a recorded video and watch its speech turn into text, line by line, each line with its time. It is free, needs no account, has no size limit, and the video stays on your device. Lectures, interviews, meetings, phone clips and screen recordings all work, in more than 50 languages.',
   dropKind: 'video',
   dropNoun: 'video',
 
@@ -95,6 +98,9 @@ export const CONTENT: ToolPageContent = {
       question: 'Can I paste a YouTube link?',
       answer:
         'No. TranscribeVid works with files you upload or record, not web links. If the video is your own, upload the original file.',
+      browser: {
+        answer: 'No. TranscribeVid works with files you add or record, not web links. If the video is your own, add the original file; nothing is uploaded.',
+      },
     },
     {
       question: 'Does it say who is speaking?',
@@ -111,7 +117,7 @@ export const CONTENT: ToolPageContent = {
   related: [
     '/mp4-to-text',
     '/meeting-recording-to-text',
-    '/lecture-to-text',
+    '/transcribe-video-to-text',
     '/srt-subtitle-generator',
     '/hindi-audio-to-text',
     '/private-transcription',

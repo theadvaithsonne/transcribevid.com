@@ -2255,6 +2255,9 @@
     <loc>https://transcribevid.com/whisper-online</loc>
   </url>
   <url>
+    <loc>https://transcribevid.com/transcribe-video-to-text</loc>
+  </url>
+  <url>
     <loc>https://transcribevid.com/wav-to-text</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://transcribevid.com/wav-to-text"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://transcribevid.com/es/wav-a-texto"/>
@@ -6152,6 +6155,9 @@
     <loc>https://transcribevid.com/otter-ai-alternative</loc>
   </url>
   <url>
+    <loc>https://transcribevid.com/notta-alternative</loc>
+  </url>
+  <url>
     <loc>https://transcribevid.com/tools</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://transcribevid.com/tools"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://transcribevid.com/es/tools"/>
@@ -8393,6 +8399,9 @@
   </url>
   <url>
     <loc>https://transcribevid.com/guides/whisper-accuracy-by-language</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides/free-video-to-text-tools-compared</loc>
   </url>
   <url>
     <loc>https://transcribevid.com/how-it-works</loc>

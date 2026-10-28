@@ -3,7 +3,7 @@ import { ToolPageContent } from '../tool-page.model';
 export const CONTENT: ToolPageContent = {
   eyebrow: 'Audio to text',
   h1: 'Turn audio into text without signing up',
-  lead: 'Drop in a podcast, interview, lecture or voice note and get a timestamped transcript you can search, edit and download. Free, unlimited and in more than 50 languages.',
+  lead: 'Drop in a podcast, interview, lecture or voice note and get a timestamped transcript you can search, edit and download. Free, unlimited and in more than 50 languages. It takes files, not links, and does not label speakers.',
   dropKind: 'audio',
   dropNoun: 'audio',
   record: true,

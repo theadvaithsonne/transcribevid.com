@@ -46,9 +46,11 @@ export const TOOL_CONTENT_LOADERS: Readonly<Record<string, Loader>> = {
   'ogg-to-text': () => import('./ogg-to-text'),
   'call-recording-to-text': () => import('./call-recording-to-text'),
   'research-interview-transcription': () => import('./research-interview-transcription'),
+  'transcribe-video-to-text': () => import('./transcribe-video-to-text'),
   'private-transcription': () => import('./private-transcription'),
   'turboscribe-alternative': () => import('./turboscribe-alternative'),
   'otter-ai-alternative': () => import('./otter-ai-alternative'),
+  'notta-alternative': () => import('./notta-alternative'),
 };
 
 /**

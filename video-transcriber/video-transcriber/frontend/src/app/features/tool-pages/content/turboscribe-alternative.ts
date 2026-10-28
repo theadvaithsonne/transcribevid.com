@@ -176,7 +176,7 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  related: ['/otter-ai-alternative', '/private-transcription', '/video-to-text', '/hindi-audio-to-text', '/srt-subtitle-generator'],
+  related: ['/otter-ai-alternative', '/private-transcription', '/video-to-text', '/hindi-audio-to-text', '/srt-subtitle-generator', '/notta-alternative'],
 
   links: [
     {
