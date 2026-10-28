@@ -116,6 +116,7 @@ export const CONTENT: ToolPageContent = {
     '/hindi-audio-to-text',
     '/m4a-to-text',
     '/private-transcription',
+    '/ogg-to-text',
   ],
 
   links: [

@@ -159,9 +159,9 @@ export const CONTENT: ToolPageContent = {
       note: 'Transcribe interviews for research or journalism.',
     },
     {
-      label: 'How to get a more accurate transcript',
-      path: '/guides/accurate-transcripts',
-      note: 'Fix the recording, the settings and the text when the first result is rough.',
+      label: 'Whisper accuracy by language',
+      path: '/guides/whisper-accuracy-by-language',
+      note: 'French measured on 30 test clips: 12 wrong words in 100 on Standard, 6.5 on High accuracy, and 22 against 8 on voice-note audio.',
     },
   ],
 };

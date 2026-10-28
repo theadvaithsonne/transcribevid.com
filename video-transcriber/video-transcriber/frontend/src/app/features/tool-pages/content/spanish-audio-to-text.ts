@@ -169,9 +169,9 @@ export const CONTENT: ToolPageContent = {
       note: 'Portuguese sounds close to Spanish, but it is a separate language setting.',
     },
     {
-      label: 'How to get a more accurate transcript',
-      path: '/guides/accurate-transcripts',
-      note: 'What to change when a recording with strong accents comes out rough.',
+      label: 'Whisper accuracy by language',
+      path: '/guides/whisper-accuracy-by-language',
+      note: 'Spanish measured on 30 test clips: 5 wrong words in 100 on Standard, under 4 on High accuracy, and what phone-quality audio does to that.',
     },
   ],
 };

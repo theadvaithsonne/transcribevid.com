@@ -561,8 +561,8 @@ const dict: Record<string, string> = {
   Output: 'Kết quả',
   'Page {page} of {pages}': 'Trang {page}/{pages}',
   'Page not found': 'Không tìm thấy trang',
-  'Pages for the file you already have: WAV, M4A, WebM and MOV.':
-    'Các trang cho loại tệp bạn đang có: WAV, M4A, WebM và MOV.',
+  'Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.':
+    'Các trang cho loại tệp bạn đang có: WAV, M4A, FLAC, OGG, WebM, MOV, AVI và MKV.',
   'PDF document (.pdf)': 'Tài liệu PDF (.pdf)',
   'PDF is made by your browser: choose "Save as PDF" in the print dialog.':
     'Trình duyệt của bạn tạo PDF: hãy chọn “Lưu dưới dạng PDF” trong hộp thoại in.',

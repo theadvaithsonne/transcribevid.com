@@ -154,9 +154,9 @@ export const CONTENT: ToolPageContent = {
       note: 'Transcribe interviews for research or journalism.',
     },
     {
-      label: 'Lecture to text',
-      path: '/lecture-to-text',
-      note: 'Turn a recorded Vorlesung into searchable text with timestamps.',
+      label: 'Whisper accuracy by language',
+      path: '/guides/whisper-accuracy-by-language',
+      note: 'German measured on 30 test clips: 12 wrong words in 100 on Standard, 7 on High accuracy, and 17 against 10 at phone quality.',
     },
     {
       label: 'Transcribe a video without uploading it',

@@ -144,7 +144,7 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  related: ['/private-transcription', '/audio-to-text', '/meeting-recording-to-text', '/podcast-to-text', '/wav-to-text'],
+  related: ['/private-transcription', '/audio-to-text', '/meeting-recording-to-text', '/podcast-to-text', '/wav-to-text', '/research-interview-transcription'],
   links: [
     {
       label: 'Meeting recording to text',

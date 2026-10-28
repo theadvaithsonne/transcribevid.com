@@ -557,8 +557,8 @@ const dict: Record<string, string> = {
   Output: 'Çıktı',
   'Page {page} of {pages}': 'Sayfa {page} / {pages}',
   'Page not found': 'Sayfa bulunamadı',
-  'Pages for the file you already have: WAV, M4A, WebM and MOV.':
-    'Elinizdeki dosya için sayfalar: WAV, M4A, WebM ve MOV.',
+  'Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.':
+    'Elinizdeki dosya için sayfalar: WAV, M4A, FLAC, OGG, WebM, MOV, AVI ve MKV.',
   'PDF document (.pdf)': 'PDF belgesi (.pdf)',
   'PDF is made by your browser: choose "Save as PDF" in the print dialog.':
     'PDF’yi tarayıcınız oluşturur: yazdırma penceresinde “PDF olarak kaydet” seçeneğini seçin.',

@@ -117,5 +117,6 @@ export const CONTENT: ToolPageContent = {
     '/meeting-recording-to-text',
     '/subtitle-generator-for-reels',
     '/mp3-to-text',
+    '/mkv-to-text',
   ],
 };

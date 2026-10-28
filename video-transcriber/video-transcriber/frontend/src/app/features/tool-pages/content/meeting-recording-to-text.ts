@@ -142,7 +142,7 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  related: ['/mp4-to-text', '/m4a-to-text', '/interview-transcription', '/private-transcription', '/otter-ai-alternative'],
+  related: ['/mp4-to-text', '/m4a-to-text', '/interview-transcription', '/private-transcription', '/otter-ai-alternative', '/call-recording-to-text'],
   links: [
     {
       label: 'MP4 to text',

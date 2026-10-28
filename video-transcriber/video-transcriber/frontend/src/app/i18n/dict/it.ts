@@ -562,8 +562,8 @@ const dict: Record<string, string> = {
   Output: 'Risultato',
   'Page {page} of {pages}': 'Pagina {page} di {pages}',
   'Page not found': 'Pagina non trovata',
-  'Pages for the file you already have: WAV, M4A, WebM and MOV.':
-    'Pagine per il file che hai già: WAV, M4A, WebM e MOV.',
+  'Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.':
+    'Pagine per il file che hai già: WAV, M4A, FLAC, OGG, WebM, MOV, AVI e MKV.',
   'PDF document (.pdf)': 'Documento PDF (.pdf)',
   'PDF is made by your browser: choose "Save as PDF" in the print dialog.':
     'Il PDF lo crea il tuo browser: nella finestra di stampa scegli «Salva come PDF».',

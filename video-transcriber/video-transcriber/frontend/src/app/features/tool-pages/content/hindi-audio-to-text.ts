@@ -180,9 +180,9 @@ Hinglish (Roman Hindi)
       note: 'Save a Hindi voice note from a chat and read it as text.',
     },
     {
-      label: 'How to get a more accurate transcript',
-      path: '/guides/accurate-transcripts',
-      note: 'Audio, language and model choices that reduce mistakes.',
+      label: 'Whisper accuracy by language',
+      path: '/guides/whisper-accuracy-by-language',
+      note: 'What we measured on 30 Hindi test clips: Standard gets 55 words in 100 wrong, High accuracy 30; the table covers 16 languages.',
     },
   ],
 };

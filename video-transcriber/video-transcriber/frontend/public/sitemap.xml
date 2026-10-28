@@ -2249,6 +2249,12 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://transcribevid.com/voice-recording-to-text"/>
   </url>
   <url>
+    <loc>https://transcribevid.com/speech-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/whisper-online</loc>
+  </url>
+  <url>
     <loc>https://transcribevid.com/wav-to-text</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://transcribevid.com/wav-to-text"/>
     <xhtml:link rel="alternate" hreflang="es" href="https://transcribevid.com/es/wav-a-texto"/>
@@ -3527,6 +3533,18 @@
     <xhtml:link rel="alternate" hreflang="ar" href="https://transcribevid.com/ar/mov-to-text"/>
     <xhtml:link rel="alternate" hreflang="ur" href="https://transcribevid.com/ur/mov-to-text"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://transcribevid.com/mov-to-text"/>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/avi-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/mkv-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/flac-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/ogg-to-text</loc>
   </url>
   <url>
     <loc>https://transcribevid.com/whatsapp-voice-message-to-text</loc>
@@ -5136,6 +5154,12 @@
   </url>
   <url>
     <loc>https://transcribevid.com/private-transcription</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/call-recording-to-text</loc>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/research-interview-transcription</loc>
   </url>
   <url>
     <loc>https://transcribevid.com/vtt-subtitle-generator</loc>
@@ -8366,6 +8390,9 @@
     <xhtml:link rel="alternate" hreflang="ar" href="https://transcribevid.com/ar/guides/what-is-whisper"/>
     <xhtml:link rel="alternate" hreflang="ur" href="https://transcribevid.com/ur/guides/what-is-whisper"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://transcribevid.com/guides/what-is-whisper"/>
+  </url>
+  <url>
+    <loc>https://transcribevid.com/guides/whisper-accuracy-by-language</loc>
   </url>
   <url>
     <loc>https://transcribevid.com/how-it-works</loc>

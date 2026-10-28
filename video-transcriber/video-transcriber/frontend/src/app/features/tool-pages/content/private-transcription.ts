@@ -146,6 +146,7 @@ export const CONTENT: ToolPageContent = {
     '/voice-recording-to-text',
     '/turboscribe-alternative',
     '/otter-ai-alternative',
+    '/whisper-online',
   ],
 
   links: [

@@ -555,8 +555,8 @@ const dict: Record<string, string> = {
   Output: '출력',
   'Page {page} of {pages}': '{pages}페이지 중 {page}페이지',
   'Page not found': '페이지를 찾을 수 없음',
-  'Pages for the file you already have: WAV, M4A, WebM and MOV.':
-    '이미 가지고 있는 파일용 페이지: WAV, M4A, WebM, MOV.',
+  'Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.':
+    '이미 가지고 있는 파일용 페이지: WAV, M4A, FLAC, OGG, WebM, MOV, AVI, MKV.',
   'PDF document (.pdf)': 'PDF 문서(.pdf)',
   'PDF is made by your browser: choose "Save as PDF" in the print dialog.':
     'PDF는 브라우저가 만듭니다. 인쇄 대화상자에서 ‘PDF로 저장’을 선택하세요.',

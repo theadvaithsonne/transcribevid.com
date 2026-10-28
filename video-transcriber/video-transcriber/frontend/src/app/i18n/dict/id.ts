@@ -561,8 +561,8 @@ const dict: Record<string, string> = {
   Output: 'Output',
   'Page {page} of {pages}': 'Halaman {page} dari {pages}',
   'Page not found': 'Halaman tidak ditemukan',
-  'Pages for the file you already have: WAV, M4A, WebM and MOV.':
-    'Halaman untuk file yang sudah Anda miliki: WAV, M4A, WebM, dan MOV.',
+  'Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.':
+    'Halaman untuk file yang sudah Anda miliki: WAV, M4A, FLAC, OGG, WebM, MOV, AVI, dan MKV.',
   'PDF document (.pdf)': 'Dokumen PDF (.pdf)',
   'PDF is made by your browser: choose "Save as PDF" in the print dialog.':
     'PDF dibuat oleh browser Anda: pilih "Simpan sebagai PDF" di dialog cetak.',

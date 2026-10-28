@@ -157,9 +157,9 @@ export const CONTENT: ToolPageContent = {
       note: 'Understand a Portuguese recording in English before you decide what to do with it.',
     },
     {
-      label: 'Podcast transcript generator',
-      path: '/podcast-transcript-generator',
-      note: 'Turn a Portuguese podcast episode into show notes and subtitles.',
+      label: 'Whisper accuracy by language',
+      path: '/guides/whisper-accuracy-by-language',
+      note: 'Portuguese measured on 30 test clips: 7 wrong words in 100 on Standard, 3 on High accuracy; the full table for 16 languages.',
     },
   ],
 };

@@ -431,7 +431,7 @@
     "Output",
     "Page {page} of {pages}",
     "Page not found",
-    "Pages for the file you already have: WAV, M4A, WebM and MOV.",
+    "Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.",
     "PDF document (.pdf)",
     "PDF is made by your browser: choose \"Save as PDF\" in the print dialog.",
     "Pick quality",
@@ -748,6 +748,16 @@
       "description": "Turn podcasts, interviews and lectures into text. Free audio to text converter with timestamps, 50+ languages and no login. Download TXT, SRT, VTT or PDF.",
       "label": "Audio to text"
     },
+    "/avi-to-text": {
+      "title": "AVI to Text Converter: Free, No Login",
+      "description": "Convert an AVI video to text for free. Timestamped transcript in 50+ languages, no login, no daily limit. Edit it and download TXT, SRT, VTT or PDF.",
+      "label": "AVI to text"
+    },
+    "/call-recording-to-text": {
+      "title": "Phone Call Recording to Text: Free, Private",
+      "description": "Turn a recorded phone call into text for free. Timestamped transcript in 50+ languages, no login, no daily limit. Edit it and download TXT, PDF or SRT.",
+      "label": "Call recording to text"
+    },
     "/contact": {
       "title": "Contact",
       "description": "How to reach TranscribeVid: e-mail for questions, bug reports, feature ideas and privacy requests, and who runs the website."
@@ -755,6 +765,11 @@
     "/faq": {
       "title": "Frequently asked questions",
       "description": "Answers to common questions about TranscribeVid: accuracy, languages, supported files and limits, speed, privacy and editing."
+    },
+    "/flac-to-text": {
+      "title": "FLAC to Text Converter: Free, No Login",
+      "description": "Convert FLAC audio to text for free. Lossless archive and studio recordings, 50+ languages, timestamps, no login. Download TXT, SRT, VTT or PDF.",
+      "label": "FLAC to text"
     },
     "/french-audio-to-text": {
       "title": "French Audio to Text: Free Transcriber",
@@ -795,6 +810,11 @@
       "description": "What OpenAI Whisper is, what it was trained on, how accurate it is and where it struggles, and how it runs inside your browser on TranscribeVid.",
       "label": "What is Whisper?"
     },
+    "/guides/whisper-accuracy-by-language": {
+      "title": "Whisper Accuracy by Language, Measured",
+      "description": "Whisper's measured error rate in 16 languages on 480 test clips, clean and phone-quality: which languages are fine on Standard and which need High accuracy.",
+      "label": "Whisper accuracy by language"
+    },
     "/hindi-audio-to-text": {
       "title": "Hindi Audio to Text: Free, No Login",
       "description": "Convert Hindi audio or video to text for free. Get Devanagari or Hinglish (Roman) output with timestamps. No login, no daily limit. Export TXT, SRT, PDF.",
@@ -829,6 +849,11 @@
       "description": "Turn a Zoom, Google Meet or Teams recording into text. No bot joins your call. Free, no login, no daily limit, 50+ languages. Download TXT, PDF or SRT.",
       "label": "Meeting recording to text"
     },
+    "/mkv-to-text": {
+      "title": "MKV to Text: Transcribe MKV Videos Free",
+      "description": "Transcribe an MKV video for free: screen recordings, talks and films. No login, 50+ languages, a timestamp on every line. Download TXT, SRT, VTT or PDF.",
+      "label": "MKV to text"
+    },
     "/mov-to-text": {
       "title": "MOV to Text: Transcribe iPhone Videos Free",
       "description": "Transcribe a MOV video from your iPhone or QuickTime for free. No login, 50+ languages, a timestamp on every line. Download TXT, SRT, VTT or PDF.",
@@ -843,6 +868,11 @@
       "title": "MP4 to Text: Transcribe MP4 Videos Free",
       "description": "Convert an MP4 video to text with timestamps. Free, no login, no daily limit, 50+ languages. Download TXT, SRT, VTT, Markdown, JSON or PDF.",
       "label": "MP4 to text"
+    },
+    "/ogg-to-text": {
+      "title": "OGG and Opus to Text: Free, No Login",
+      "description": "Convert OGG and Opus audio, including voice notes, to text for free. No login, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.",
+      "label": "OGG to text"
     },
     "/otter-ai-alternative": {
       "title": "Free Otter.ai Alternative for Recordings",
@@ -873,10 +903,20 @@
       "description": "Transcribe confidential audio and video with no account. Your file is used only for your transcript and deleted when your session ends. Free, no login.",
       "label": "Private transcription"
     },
+    "/research-interview-transcription": {
+      "title": "Research Interview Transcription, Free",
+      "description": "Transcribe research interviews and focus groups for free. Timestamps, 50+ languages, no per-hour fee, no login. Edit and download TXT, Markdown or SRT.",
+      "label": "Research interview transcription"
+    },
     "/spanish-audio-to-text": {
       "title": "Spanish Audio to Text: Free Transcriber",
       "description": "Transcribe Spanish audio and video to text for free: Spain, Mexico and Latin America. Timestamps, no login. Download TXT, SRT, VTT or PDF.",
       "label": "Spanish audio to text"
+    },
+    "/speech-to-text": {
+      "title": "Speech to Text Converter: Free, No Login",
+      "description": "Convert speech to text from any recording or video. Free, no login, no daily limit, 50+ languages. Timestamps, editing, and TXT, SRT, VTT or PDF downloads.",
+      "label": "Speech to text"
     },
     "/srt-subtitle-generator": {
       "title": "Free SRT Subtitle Generator from Video",
@@ -945,6 +985,11 @@
       "title": "WhatsApp Voice Note to Text: Free, No Login",
       "description": "Turn a WhatsApp voice note (OPUS) or any voice message into text. Works in Hindi, Hinglish, English and 50+ languages. Free, no login, no daily limit.",
       "label": "WhatsApp voice note to text"
+    },
+    "/whisper-online": {
+      "title": "Whisper Online: Free Transcription, No Login",
+      "description": "Use the open Whisper speech model online: add audio or video, get a timestamped transcript in 50+ languages. Free, no login, no install. TXT, SRT, VTT, PDF.",
+      "label": "Whisper online"
     },
     "/youtube-subtitle-generator": {
       "title": "YouTube Subtitle Generator: Free SRT File",

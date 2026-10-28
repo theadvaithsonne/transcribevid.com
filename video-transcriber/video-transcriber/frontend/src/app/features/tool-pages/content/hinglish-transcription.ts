@@ -173,9 +173,9 @@ yeh video Hindi mein hai, but some English words bhi hain.`,
       note: 'Save a voice note from a chat and read it as Hinglish.',
     },
     {
-      label: 'How to get a more accurate transcript',
-      path: '/guides/accurate-transcripts',
-      note: 'How to cut down mistakes before the first run and after it.',
+      label: 'Whisper accuracy by language',
+      path: '/guides/whisper-accuracy-by-language',
+      note: 'Hindi measured on 30 test clips: 55 wrong words in 100 on Standard, 30 on High accuracy, so pick High accuracy before converting to Hinglish.',
     },
   ],
 };

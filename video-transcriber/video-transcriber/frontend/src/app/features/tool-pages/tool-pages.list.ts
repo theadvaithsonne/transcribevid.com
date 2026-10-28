@@ -97,6 +97,31 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
       'Record your voice in the browser or upload a voice memo and get it as text. Free, no login, 50+ languages. Download TXT, PDF, SRT or Markdown.',
     footer: true,
   },
+  {
+    path: '/speech-to-text',
+    group: 'core',
+    label: 'Speech to text',
+    title: 'Speech to Text Converter: Free, No Login',
+    description:
+      'Convert speech to text from any recording or video. Free, no login, no daily limit, 50+ languages. Timestamps, editing, and TXT, SRT, VTT or PDF downloads.',
+    browser: {
+      title: 'Speech to Text Converter: Free, No Limit',
+      description:
+        'Convert speech to text from any recording or video. Free, no login, no upload, 50+ languages. Timestamps, editing, and TXT, SRT, VTT or PDF downloads.',
+    },
+  },
+  {
+    path: '/whisper-online',
+    group: 'core',
+    label: 'Whisper online',
+    title: 'Whisper Online: Free Transcription, No Login',
+    description:
+      'Use the open Whisper speech model online: add audio or video, get a timestamped transcript in 50+ languages. Free, no login, no install. TXT, SRT, VTT, PDF.',
+    browser: {
+      description:
+        'Run the open Whisper speech model in your browser: add audio or video, get a timestamped transcript in 50+ languages. Free, no login, no upload. TXT, SRT, PDF.',
+    },
+  },
   // ---------------------------------------------------------------- by file type
   {
     path: '/wav-to-text',
@@ -133,6 +158,54 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     title: 'MOV to Text: Transcribe iPhone Videos Free',
     description:
       'Transcribe a MOV video from your iPhone or QuickTime for free. No login, 50+ languages, a timestamp on every line. Download TXT, SRT, VTT or PDF.',
+  },
+  {
+    path: '/avi-to-text',
+    group: 'format',
+    label: 'AVI to text',
+    title: 'AVI to Text Converter: Free, No Login',
+    description:
+      'Convert an AVI video to text for free. Timestamped transcript in 50+ languages, no login, no daily limit. Edit it and download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert an AVI video to text for free. Timestamped transcript in 50+ languages, no login, no upload. Edit it and download TXT, SRT, VTT or PDF.',
+    },
+  },
+  {
+    path: '/mkv-to-text',
+    group: 'format',
+    label: 'MKV to text',
+    title: 'MKV to Text: Transcribe MKV Videos Free',
+    description:
+      'Transcribe an MKV video for free: screen recordings, talks and films. No login, 50+ languages, a timestamp on every line. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Transcribe an MKV video for free: screen recordings, talks and films. No login, no upload, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.',
+    },
+  },
+  {
+    path: '/flac-to-text',
+    group: 'format',
+    label: 'FLAC to text',
+    title: 'FLAC to Text Converter: Free, No Login',
+    description:
+      'Convert FLAC audio to text for free. Lossless archive and studio recordings, 50+ languages, timestamps, no login. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert FLAC audio to text for free. Lossless archive and studio recordings, 50+ languages, timestamps, no login, no upload. Download TXT, SRT or PDF.',
+    },
+  },
+  {
+    path: '/ogg-to-text',
+    group: 'format',
+    label: 'OGG to text',
+    title: 'OGG and Opus to Text: Free, No Login',
+    description:
+      'Convert OGG and Opus audio, including voice notes, to text for free. No login, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert OGG and Opus audio, including voice notes, to text for free. No login, no upload, 50+ languages, timestamps. Download TXT, SRT, VTT or PDF.',
+    },
   },
   // ---------------------------------------------------------------- by use
   {
@@ -216,6 +289,30 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
       title: 'Private Transcription: Files Never Uploaded',
       description:
         'Transcribe confidential audio and video without uploading it. Speech recognition runs on your own device, so files never reach a server. Free, no login.',
+    },
+  },
+  {
+    path: '/call-recording-to-text',
+    group: 'use-case',
+    label: 'Call recording to text',
+    title: 'Phone Call Recording to Text: Free, Private',
+    description:
+      'Turn a recorded phone call into text for free. Timestamped transcript in 50+ languages, no login, no daily limit. Edit it and download TXT, PDF or SRT.',
+    browser: {
+      description:
+        'Turn a recorded phone call into text for free. Timestamped transcript in 50+ languages, no login, no upload. Edit it and download TXT, PDF or SRT.',
+    },
+  },
+  {
+    path: '/research-interview-transcription',
+    group: 'use-case',
+    label: 'Research interview transcription',
+    title: 'Research Interview Transcription, Free',
+    description:
+      'Transcribe research interviews and focus groups for free. Timestamps, 50+ languages, no per-hour fee, no login. Edit and download TXT, Markdown or SRT.',
+    browser: {
+      description:
+        'Transcribe research interviews on your own device, free. Timestamps, 50+ languages, no per-hour fee, no login. Edit and download TXT, Markdown or SRT.',
     },
   },
   // ---------------------------------------------------------------- subtitle files
@@ -379,7 +476,7 @@ export const FOOTER_TOOLS: readonly ToolPageLink[] = TOOL_PAGES.filter((t) => t.
 /** Headings of the groups on the "All free tools" page and in the "More free tools" lists, in the order they are shown. */
 export const TOOL_GROUPS: readonly { id: ToolGroup; title: string; intro: string }[] = [
   { id: 'core', title: _t('Video and audio to text'), intro: _t('The main tools: turn any video or audio file into a timestamped transcript.') },
-  { id: 'format', title: _t('By file type'), intro: _t('Pages for the file you already have: WAV, M4A, WebM and MOV.') },
+  { id: 'format', title: _t('By file type'), intro: _t('Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.') },
   { id: 'use-case', title: _t('By use'), intro: _t('Voice notes, meetings, lectures, podcasts and interviews.') },
   { id: 'subtitles', title: _t('Subtitle files'), intro: _t('Make a subtitle file (SRT or VTT) from your video.') },
   { id: 'language', title: _t('By language'), intro: _t('Transcribe or translate speech in the language you need.') },

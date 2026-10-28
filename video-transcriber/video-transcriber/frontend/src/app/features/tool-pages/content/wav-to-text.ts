@@ -150,7 +150,7 @@ export const CONTENT: ToolPageContent = {
     },
   ],
 
-  related: ['/audio-to-text', '/mp3-to-text', '/m4a-to-text', '/interview-transcription', '/podcast-to-text'],
+  related: ['/audio-to-text', '/mp3-to-text', '/m4a-to-text', '/interview-transcription', '/podcast-to-text', '/flac-to-text'],
   links: [
     {
       label: 'MP3 to text',

@@ -549,8 +549,8 @@ const dict: Record<string, string> = {
   Output: 'ผลลัพธ์',
   'Page {page} of {pages}': 'หน้า {page} จาก {pages}',
   'Page not found': 'ไม่พบหน้านี้',
-  'Pages for the file you already have: WAV, M4A, WebM and MOV.':
-    'หน้าสำหรับไฟล์ที่คุณมีอยู่แล้ว: WAV, M4A, WebM และ MOV',
+  'Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.':
+    'หน้าสำหรับไฟล์ที่คุณมีอยู่แล้ว: WAV, M4A, FLAC, OGG, WebM, MOV, AVI และ MKV',
   'PDF document (.pdf)': 'เอกสาร PDF (.pdf)',
   'PDF is made by your browser: choose "Save as PDF" in the print dialog.':
     'เบราว์เซอร์ของคุณเป็นผู้สร้าง PDF: เลือก “บันทึกเป็น PDF” ในกล่องโต้ตอบการพิมพ์',

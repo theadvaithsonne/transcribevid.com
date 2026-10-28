@@ -114,5 +114,6 @@ export const CONTENT: ToolPageContent = {
     '/audio-to-text',
     '/lecture-to-text',
     '/private-transcription',
+    '/call-recording-to-text',
   ],
 };

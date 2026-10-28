@@ -73,6 +73,16 @@ export const GUIDES: readonly GuideLink[] = [
     published: '2026-10-27',
     updated: '2026-10-27',
   },
+  {
+    slug: 'whisper-accuracy-by-language',
+    path: '/guides/whisper-accuracy-by-language',
+    label: 'Whisper accuracy by language',
+    title: 'Whisper Accuracy by Language, Measured',
+    description:
+      "Whisper's measured error rate in 16 languages on 480 test clips, clean and phone-quality: which languages are fine on Standard and which need High accuracy.",
+    published: '2026-10-28',
+    updated: '2026-10-28',
+  },
 ];
 
 export const guideRoutePath = (g: GuideLink) => g.path.replace(/^\//, '');

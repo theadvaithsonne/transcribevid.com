@@ -558,8 +558,8 @@ const dict: Record<string, string> = {
   Output: 'آؤٹ پٹ',
   'Page {page} of {pages}': 'صفحہ {page} از {pages}',
   'Page not found': 'صفحہ نہیں ملا',
-  'Pages for the file you already have: WAV, M4A, WebM and MOV.':
-    'ان فائلوں کے صفحات جو آپ کے پاس پہلے سے ہیں: WAV، M4A، WebM اور MOV۔',
+  'Pages for the file you already have: WAV, M4A, FLAC, OGG, WebM, MOV, AVI and MKV.':
+    'ان فائلوں کے صفحات جو آپ کے پاس پہلے سے ہیں: WAV، M4A، FLAC، OGG، WebM، MOV، AVI اور MKV۔',
   'PDF document (.pdf)': 'PDF دستاویز (.pdf)',
   'PDF is made by your browser: choose "Save as PDF" in the print dialog.':
     'PDF آپ کا براؤزر بناتا ہے: پرنٹ ڈائیلاگ میں “PDF کے طور پر محفوظ کریں” (Save as PDF) منتخب کریں۔',

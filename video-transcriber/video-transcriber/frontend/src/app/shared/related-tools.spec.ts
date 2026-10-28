@@ -93,7 +93,7 @@ describe('RelatedTools', () => {
 
   it('a main page lists the other main tools first (the four after it, wrapping round)', () => {
     setup('/mp3-to-text');
-    expect(toolHrefs().slice(0, 4)).toEqual(['/srt-subtitle-generator', '/voice-recording-to-text', '/video-to-text', '/audio-to-text']);
+    expect(toolHrefs().slice(0, 4)).toEqual(['/srt-subtitle-generator', '/voice-recording-to-text', '/speech-to-text', '/whisper-online']);
     for (const p of CORE_TOOLS.map((t) => t.path).filter((p) => p !== '/mp3-to-text')) expect(toolHrefs()).toContain(p);
   });
 
