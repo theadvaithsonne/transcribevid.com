@@ -103,6 +103,16 @@ export const GUIDES: readonly GuideLink[] = [
     published: '2026-10-28',
     updated: '2026-10-28',
   },
+  {
+    slug: 'is-transcribevid-safe',
+    path: '/guides/is-transcribevid-safe',
+    label: 'Is TranscribeVid safe?',
+    title: 'Is TranscribeVid Safe and Legit?',
+    description:
+      'Is TranscribeVid safe? Who runs it, what happens to your video, what is stored, how the site pays for itself and five checks you can make yourself.',
+    published: '2026-10-29',
+    updated: '2026-10-29',
+  },
 ];
 
 export const guideRoutePath = (g: GuideLink) => g.path.replace(/^\//, '');

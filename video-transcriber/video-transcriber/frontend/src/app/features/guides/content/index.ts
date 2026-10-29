@@ -18,6 +18,7 @@ export const GUIDE_CONTENT_LOADERS: Readonly<Record<string, Loader>> = {
   'whisper-accuracy-by-language': () => import('./whisper-accuracy-by-language'),
   'free-video-to-text-tools-compared': () => import('./free-video-to-text-tools-compared'),
   'how-to-transcribe-video-to-text': () => import('./how-to-transcribe-video-to-text'),
+  'is-transcribevid-safe': () => import('./is-transcribevid-safe'),
 };
 
 /** The text of one guide in a language (English by default; English text is the safety net for a missing translation). */

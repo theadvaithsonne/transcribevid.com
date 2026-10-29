@@ -164,6 +164,11 @@ export const CONTENT: ToolPageContent = {
       label: 'Interview transcription',
       path: '/interview-transcription',
       note: 'Confidential interviews, with timestamps and confidence marks you can review.',
+    },
+    {
+      label: 'Is TranscribeVid safe?',
+      path: '/guides/is-transcribevid-safe',
+      note: 'Who runs it, what is stored, what it cannot promise, and checks you can make.',
     },
   ],
 };

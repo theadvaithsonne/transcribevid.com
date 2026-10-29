@@ -805,6 +805,11 @@
       "description": "Five ways to transcribe a video to text: a YouTube transcript, voice typing, editor captions, an online service or your device. What each costs and gives you.",
       "label": "How to transcribe a video to text"
     },
+    "/guides/is-transcribevid-safe": {
+      "title": "Is TranscribeVid Safe and Legit?",
+      "description": "Is TranscribeVid safe? Who runs it, what happens to your video, what is stored, how the site pays for itself and five checks you can make yourself.",
+      "label": "Is TranscribeVid safe?"
+    },
     "/guides/srt-vs-vtt": {
       "title": "SRT vs VTT: Which Subtitle Format to Use",
       "description": "SRT or VTT? What each subtitle format is, how they differ, where each one works, and how to get either file from your video for free.",

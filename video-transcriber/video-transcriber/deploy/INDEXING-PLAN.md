@@ -128,6 +128,7 @@ The new pages, then the three pages whose titles changed (request each of those 
 - [ ] https://transcribevid.com/mp4-to-text (new title)
 - [ ] https://transcribevid.com/audio-to-text (new description)
 - [ ] https://transcribevid.com/guides/how-to-transcribe-video-to-text (the guide added after that, once it is live too)
+- [ ] https://transcribevid.com/guides/is-transcribevid-safe (people search "is TranscribeVid safe" before they try a site)
 - [ ] If quota is left: the Hindi versions first, because almost no Hindi page competes for them: https://transcribevid.com/hi/transcribe-video-to-text and https://transcribevid.com/hi/guides/how-to-transcribe-video-to-text, then the same two pages in /bn, /ur, /tr, /th and /vi
 
 ---

@@ -33,9 +33,9 @@ minutes or need an upload).
 | Guides | `/guides/srt-vs-vtt`, `/guides/how-to-add-subtitles-to-a-video`, `/guides/transcribe-video-without-uploading`, `/guides/accurate-transcripts`, `/guides/what-is-whisper` |
 | Information | `/how-it-works`, `/faq`, `/about`, `/contact`, `/privacy`, `/terms` |
 
-58 English addresses, and the same pages in 15 languages (34 each: the home page, the six information pages, the two lists, 19 tool
+59 English addresses, and the same pages in 15 languages (34 each: the home page, the six information pages, the two lists, 19 tool
 pages and the 6 guides; 22 tool pages exist in English only: the six "by language" pages, because a Spanish page about Spanish would only
-repeat the generic page, and the three alternatives pages and fourteen more, and the comparison guide, that have not been translated yet): 568
+repeat the generic page, and the three alternatives pages and fourteen more, and the comparison and safety guides, that have not been translated yet): 569
 addresses in all, all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
 chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
 
@@ -54,7 +54,7 @@ chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
    "backend setting" methods do not exist on the static site; the DNS record is the one to use.)
 
 3. **Submit the sitemap.** In Search Console open *Sitemaps*, type `sitemap.xml`, press *Submit*. Within a day or two it
-   should say *Success* with 568 pages discovered (58 English + 510 translated).
+   should say *Success* with 569 pages discovered (59 English + 510 translated).
 
 4. **Ask Google to look now.** *URL inspection* (search bar at the top) > *Request indexing*, about 10 a day are allowed.
    Day 1: `/`, `/video-to-text`, `/audio-to-text`, `/mp4-to-text`, `/mp3-to-text`, `/srt-subtitle-generator`,
