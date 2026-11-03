@@ -59,3 +59,9 @@ lifts the site in Google. Say that you made it, every time.
 
 Rules for all of it: only real mentions by real people; no fake reviews or accounts; say you are the maker; one post
 per place. If a form or rule on these sites has changed since I wrote this, follow the on-screen labels and use the same text.
+
+---
+
+## Renew the security contact file (once a year)
+- [ ] By 30 September 2027: open `frontend/public/.well-known/security.txt`, move `Expires:` about a year ahead (it must be under a year from today) and ask for a deploy.
+      Researchers' tools treat an expired file as no file.

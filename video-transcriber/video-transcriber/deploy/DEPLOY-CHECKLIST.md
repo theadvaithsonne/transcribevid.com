@@ -43,7 +43,7 @@ Git push never deploys. A deploy happens only when the owner says "deploy" for t
 
 ## After
 
-9. Check: `ads.txt` (publisher id), `robots.txt`, `sitemap.xml` (569 addresses), the AdSense meta tag, 15 or so pages answer 200,
+9. Check: `ads.txt` (publisher id), `/.well-known/security.txt` (200, plain text, Expires still ahead), `robots.txt`, `sitemap.xml` (569 addresses), the AdSense meta tag, 15 or so pages answer 200,
    the new text is in the HTML, `curl https://transcribevid.com/api/stats` still answers, and `wrangler pages deployment list`
    shows the new commit as production.
 10. `node ../scripts/indexnow.mjs --key 18e4d9821ce04f0329fceb62f7dca39c` (from `video-transcriber/video-transcriber`).
@@ -59,3 +59,8 @@ workers.dev name on the account (not set). Roll a Worker back with `npx wrangler
 
 Cloudflare Pages keeps every deployment. In the dashboard (Workers & Pages, transcribevid, Deployments) pick the earlier one and
 choose "Rollback to this deployment".
+
+## Once a year
+
+`frontend/public/.well-known/security.txt` expires on 2027-10-31 (RFC 9116 wants an expiry under a year ahead). Move `Expires:` forward before then and deploy;
+`scripts/security-txt.test.mjs` fails once it is in the past and warns 45 days before.

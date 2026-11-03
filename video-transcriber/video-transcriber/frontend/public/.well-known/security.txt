@@ -1,0 +1,9 @@
+# How to report a security problem with transcribevid.com (RFC 9116).
+# TranscribeVid is run by one person, so please write in plain English and give the address of the page and what you saw.
+# We read and answer every report. Please do not test with other people's data, and do not run automated scans that put
+# load on the site.
+
+Contact: mailto:theadvaithsonne@gmail.com
+Expires: 2027-10-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://transcribevid.com/.well-known/security.txt
