@@ -149,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Cherchez ce qui sort',
-          text: 'Saisissez method:POST dans la zone de filtre (Chrome et Edge ; Firefox accepte le même filtre). Les requêtes POST vers transcribevid.com doivent être une requête vide vers /api/count après la fin de la transcription et, environ une fois par minute tant que la page est ouverte, une petite requête /api/ping dont le seul contenu est un code aléatoire dans son adresse. Ouvrez-les et vérifiez : aucune n’a de corps de requête. Si la page affiche des publicités, les scripts de Google font leurs propres requêtes vers Google, et aucune ne transporte votre fichier ni votre transcription. Rien qui approche la taille de votre fichier ne quitte votre appareil.',
+          text: 'Saisissez method:POST dans la zone de filtre (Chrome et Edge ; Firefox accepte le même filtre). Les requêtes POST vers transcribevid.com doivent être une requête vide vers /api/count après la fin de la transcription et, environ une fois par minute tant que la page est ouverte, une petite requête /_live/ping dont le seul contenu est un code aléatoire dans son adresse. Ouvrez-les et vérifiez : aucune n’a de corps de requête. Si la page affiche des publicités, les scripts de Google font leurs propres requêtes vers Google, et aucune ne transporte votre fichier ni votre transcription. Rien qui approche la taille de votre fichier ne quitte votre appareil.',
         },
       ],
     },

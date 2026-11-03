@@ -149,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Cari apa yang keluar',
-          text: 'Ketik method:POST ke kotak filter (Chrome dan Edge; Firefox menerima filter yang sama). Permintaan POST ke transcribevid.com seharusnya berupa satu permintaan kosong ke /api/count setelah transkrip selesai dan, sekitar satu kali per menit selama halaman terbuka, satu permintaan /api/ping kecil yang satu-satunya isinya adalah kode acak di alamatnya. Buka permintaan-permintaan itu dan periksa: keduanya tidak memiliki isi permintaan. Jika halaman menampilkan iklan, skrip Google sendiri membuat permintaannya sendiri ke Google, dan tidak satu pun membawa file atau transkrip Anda. Tidak ada yang mendekati ukuran file Anda yang meninggalkan perangkat Anda.',
+          text: 'Ketik method:POST ke kotak filter (Chrome dan Edge; Firefox menerima filter yang sama). Permintaan POST ke transcribevid.com seharusnya berupa satu permintaan kosong ke /api/count setelah transkrip selesai dan, sekitar satu kali per menit selama halaman terbuka, satu permintaan /_live/ping kecil yang satu-satunya isinya adalah kode acak di alamatnya. Buka permintaan-permintaan itu dan periksa: keduanya tidak memiliki isi permintaan. Jika halaman menampilkan iklan, skrip Google sendiri membuat permintaannya sendiri ke Google, dan tidak satu pun membawa file atau transkrip Anda. Tidak ada yang mendekati ukuran file Anda yang meninggalkan perangkat Anda.',
         },
       ],
     },

@@ -147,7 +147,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Çıkanlara bakın',
-          text: 'Filtre kutusuna method:POST yazın (Chrome ve Edge; Firefox aynı filtreyi kabul eder). transcribevid.com’a giden POST istekleri, transkript bittikten sonra /api/count adresine giden boş bir istek ve sayfa açıkken yaklaşık dakikada bir, tek içeriği adresindeki rastgele bir kod olan küçük bir /api/ping isteği olmalıdır. Bunları açın ve kontrol edin: hiçbirinin istek gövdesi yoktur. Sayfa reklam gösteriyorsa Google’ın kendi betikleri Google’a kendi isteklerini yapar ve hiçbiri dosyanızı ya da transkriptinizi taşımaz. Dosyanızın boyutuna yakın hiçbir şey cihazınızdan çıkmaz.',
+          text: 'Filtre kutusuna method:POST yazın (Chrome ve Edge; Firefox aynı filtreyi kabul eder). transcribevid.com’a giden POST istekleri, transkript bittikten sonra /api/count adresine giden boş bir istek ve sayfa açıkken yaklaşık dakikada bir, tek içeriği adresindeki rastgele bir kod olan küçük bir /_live/ping isteği olmalıdır. Bunları açın ve kontrol edin: hiçbirinin istek gövdesi yoktur. Sayfa reklam gösteriyorsa Google’ın kendi betikleri Google’a kendi isteklerini yapar ve hiçbiri dosyanızı ya da transkriptinizi taşımaz. Dosyanızın boyutuna yakın hiçbir şey cihazınızdan çıkmaz.',
         },
       ],
     },

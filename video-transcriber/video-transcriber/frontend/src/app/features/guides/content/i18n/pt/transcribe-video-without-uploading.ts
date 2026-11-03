@@ -149,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Procure o que sai',
-          text: 'Digite method:POST na caixa de filtro (Chrome e Edge; o Firefox aceita o mesmo filtro). As requisições POST ao transcribevid.com devem ser uma requisição vazia a /api/count depois que a transcrição termina e, cerca de uma vez por minuto enquanto a página está aberta, uma pequena requisição a /api/ping cujo único conteúdo é um código aleatório no endereço. Abra-as e confira: nenhuma tem corpo de requisição. Se a página mostrar anúncios, os scripts do próprio Google fazem requisições próprias ao Google, e nenhuma delas leva o seu arquivo nem a sua transcrição. Nada perto do tamanho do seu arquivo sai do seu dispositivo.',
+          text: 'Digite method:POST na caixa de filtro (Chrome e Edge; o Firefox aceita o mesmo filtro). As requisições POST ao transcribevid.com devem ser uma requisição vazia a /api/count depois que a transcrição termina e, cerca de uma vez por minuto enquanto a página está aberta, uma pequena requisição a /_live/ping cujo único conteúdo é um código aleatório no endereço. Abra-as e confira: nenhuma tem corpo de requisição. Se a página mostrar anúncios, os scripts do próprio Google fazem requisições próprias ao Google, e nenhuma delas leva o seu arquivo nem a sua transcrição. Nada perto do tamanho do seu arquivo sai do seu dispositivo.',
         },
       ],
     },

@@ -147,7 +147,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Look for what goes out',
-          text: "Type method:POST into the filter box (Chrome and Edge; Firefox accepts the same filter). The POST requests to transcribevid.com should be one empty request to /api/count after the transcript finishes and, about once a minute while the page is open, a small /api/ping request whose only content is a random code in its address. Open them and check: neither has a request body. If the page shows ads, Google's own scripts make requests of their own to Google, and none of them carries your file or your transcript. Nothing close to the size of your file leaves your device.",
+          text: "Type method:POST into the filter box (Chrome and Edge; Firefox accepts the same filter). The POST requests to transcribevid.com should be one empty request to /api/count after the transcript finishes and, about once a minute while the page is open, a small /_live/ping request whose only content is a random code in its address. Open them and check: neither has a request body. If the page shows ads, Google's own scripts make requests of their own to Google, and none of them carries your file or your transcript. Nothing close to the size of your file leaves your device.",
         },
       ],
     },

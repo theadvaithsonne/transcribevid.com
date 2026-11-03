@@ -149,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Nach dem suchen, was hinausgeht',
-          text: 'Tippen Sie method:POST in das Filterfeld (Chrome und Edge; Firefox akzeptiert denselben Filter). Die POST-Anfragen an transcribevid.com sollten eine leere Anfrage an /api/count nach Abschluss des Transkripts sein und, etwa einmal pro Minute, solange die Seite geöffnet ist, eine kleine /api/ping-Anfrage, deren einziger Inhalt ein Zufallscode in ihrer Adresse ist. Öffnen Sie sie und prüfen Sie: Keine von beiden hat einen Anfragetext. Zeigt die Seite Werbung, stellen die Skripte von Google eigene Anfragen an Google, und keine davon trägt Ihre Datei oder Ihr Transkript. Nichts annähernd in der Größe Ihrer Datei verlässt Ihr Gerät.',
+          text: 'Tippen Sie method:POST in das Filterfeld (Chrome und Edge; Firefox akzeptiert denselben Filter). Die POST-Anfragen an transcribevid.com sollten eine leere Anfrage an /api/count nach Abschluss des Transkripts sein und, etwa einmal pro Minute, solange die Seite geöffnet ist, eine kleine /_live/ping-Anfrage, deren einziger Inhalt ein Zufallscode in ihrer Adresse ist. Öffnen Sie sie und prüfen Sie: Keine von beiden hat einen Anfragetext. Zeigt die Seite Werbung, stellen die Skripte von Google eigene Anfragen an Google, und keine davon trägt Ihre Datei oder Ihr Transkript. Nichts annähernd in der Größe Ihrer Datei verlässt Ihr Gerät.',
         },
       ],
     },

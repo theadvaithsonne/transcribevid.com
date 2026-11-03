@@ -149,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Tìm những gì đi ra',
-          text: 'Gõ method:POST vào ô lọc (Chrome và Edge; Firefox chấp nhận cùng bộ lọc đó). Các yêu cầu POST đến transcribevid.com phải là một yêu cầu trống đến /api/count sau khi bản gỡ băng hoàn tất và, khoảng mỗi phút một lần khi trang đang mở, một yêu cầu /api/ping nhỏ mà nội dung duy nhất là một mã ngẫu nhiên nằm trong địa chỉ của nó. Hãy mở chúng và kiểm tra: không yêu cầu nào có phần thân yêu cầu. Nếu trang hiển thị quảng cáo, các đoạn mã riêng của Google tự gửi yêu cầu đến Google, và không yêu cầu nào mang tệp hay bản gỡ băng của bạn. Không có gì có dung lượng gần bằng tệp của bạn rời khỏi thiết bị của bạn.',
+          text: 'Gõ method:POST vào ô lọc (Chrome và Edge; Firefox chấp nhận cùng bộ lọc đó). Các yêu cầu POST đến transcribevid.com phải là một yêu cầu trống đến /api/count sau khi bản gỡ băng hoàn tất và, khoảng mỗi phút một lần khi trang đang mở, một yêu cầu /_live/ping nhỏ mà nội dung duy nhất là một mã ngẫu nhiên nằm trong địa chỉ của nó. Hãy mở chúng và kiểm tra: không yêu cầu nào có phần thân yêu cầu. Nếu trang hiển thị quảng cáo, các đoạn mã riêng của Google tự gửi yêu cầu đến Google, và không yêu cầu nào mang tệp hay bản gỡ băng của bạn. Không có gì có dung lượng gần bằng tệp của bạn rời khỏi thiết bị của bạn.',
         },
       ],
     },

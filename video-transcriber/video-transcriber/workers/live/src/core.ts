@@ -1,58 +1,46 @@
 /**
  * TranscribeVid live-visitor Worker (rules): how many people have the website open right now, for the owner.
  *
- *   POST /api/ping?t=<code>        -> 204   a page that is open says "I am here" (about once a minute)
+ *   POST /_live/ping?t=<code>        -> 204   a page that is open says "I am here" (about once a minute)
  *                                    403 when the Origin is not the website, 429 past the per-IP limit,
  *                                    204 and nothing recorded when the browser sends Do Not Track / Global Privacy Control
- *   GET  /api/live?key=<secret>    -> an HTML page with the number (refreshes itself); 404 without the right key
- *   GET  /api/live?key=...&json=1  -> {"active": n}
+ *   GET  /_live/now?key=<secret>    -> an HTML page with the number (refreshes itself); 404 without the right key
+ *   GET  /_live/now?key=...&json=1  -> {"active": n}
  *
- * What is kept: the random code a page made up when it opened (never stored in a cookie or the browser's storage), and
- * the time of its last ping, in one Durable Object, for a few minutes: a code that has not pinged for 2.5 minutes is not
- * counted and is deleted by the next alarm (within about a minute more). The IP address is used in memory to limit abuse
- * and is never written anywhere. Nothing else is kept: no history, no page, no country. Only the current number is shown.
+ * What is kept: the random code a page made up when it opened (never stored in a cookie or the browser's storage), and the
+ * time of its last ping, in one small D1 table: a code that has not pinged for 2.5 minutes is not counted,
+ * and is deleted by the next ping or read of the owner page, and at once when the page is closed (a "bye" ping). The IP address is used in memory to limit abuse and is never written
+ * anywhere. Nothing else is kept: no history, no page, no country. Only the current number is shown, and only to the owner.
  *
- * A separate Worker from the "videos transcribed" counter (workers/counter) on purpose: its own, more specific routes, so
- * deploying or breaking this one cannot touch the counter.
+ * A separate Worker and a separate D1 database from the "videos transcribed" counter (workers/counter) on purpose: its own,
+ * more specific routes, so deploying or breaking this one cannot touch the counter.
  */
 
 // The few Workers runtime types this file uses (no @cloudflare/workers-types dependency; wrangler bundles without it).
+interface D1PreparedStatement {
+  bind(...values: unknown[]): D1PreparedStatement;
+  run(): Promise<unknown>;
+  first<T = Record<string, unknown>>(): Promise<T | null>;
+}
+interface D1Database {
+  prepare(sql: string): D1PreparedStatement;
+}
 interface RateLimit {
   limit(options: { key: string }): Promise<{ success: boolean }>;
 }
-interface PresenceStub {
-  fetch(url: string, init?: { method?: string }): Promise<Response>;
-}
-interface PresenceNamespace {
-  idFromName(name: string): unknown;
-  get(id: unknown): PresenceStub;
-}
-interface SqlCursor {
-  one(): Record<string, unknown>;
-  toArray(): Record<string, unknown>[];
-}
-interface DurableObjectState {
-  storage: {
-    sql: { exec(query: string, ...bindings: unknown[]): SqlCursor };
-    getAlarm(): Promise<number | null>;
-    setAlarm(time: number): Promise<void>;
-  };
-}
 
 export interface Env {
-  PRESENCE: PresenceNamespace;
+  DB: D1Database;
   /** the Workers Rate Limiting binding (wrangler.toml [[ratelimits]]); optional */
   PING_LIMITER?: RateLimit;
   /** comma-separated page origins allowed to ping, e.g. "https://transcribevid.com" */
   ALLOWED_ORIGINS?: string;
-  /** the secret in the owner's bookmark (`wrangler secret put LIVE_KEY`); without it /api/live does not exist */
+  /** the secret in the owner's bookmark (`wrangler secret put LIVE_KEY`); without it /_live/now does not exist */
   LIVE_KEY?: string;
 }
 
 /** a page counts as active while its last ping is this young (the page pings every 60 s, so one missed ping is forgiven) */
 export const ACTIVE_MS = 150_000;
-/** how often the Durable Object deletes codes that have gone quiet, while it holds any */
-const PURGE_MS = 60_000;
 const DEFAULT_ORIGINS = ['https://transcribevid.com'];
 /** the codes the page makes: 16 to 40 URL-safe characters */
 export const CODE = /^[A-Za-z0-9_-]{16,40}$/;
@@ -103,6 +91,30 @@ async function underLimit(env: Env, ip: string): Promise<boolean> {
   return entry.count <= FALLBACK_LIMIT;
 }
 
+/** Records (or refreshes) one page's code: one row written. */
+export async function touch(env: Env, code: string, now: number): Promise<void> {
+  await env.DB.prepare('INSERT INTO seen (code, t) VALUES (?, ?) ON CONFLICT(code) DO UPDATE SET t = excluded.t').bind(code, now).run();
+}
+
+/** How many pages pinged within the active window. */
+export async function countActive(env: Env, now: number): Promise<number> {
+  const row = await env.DB.prepare('SELECT COUNT(*) AS n FROM seen WHERE t >= ?').bind(now - ACTIVE_MS).first<{ n: number }>();
+  return Number(row?.n) || 0;
+}
+
+/** Deletes one page's code (the page was closed). */
+export async function forget(env: Env, code: string): Promise<void> {
+  await env.DB.prepare('DELETE FROM seen WHERE code = ?').bind(code).run();
+}
+
+/**
+ * Deletes the codes that have been quiet for longer than the active window. Runs on every ping and every read of the owner's
+ * page (and from the scheduled job in src/index.ts where the account allows cron triggers).
+ */
+export async function purge(env: Env, now: number): Promise<void> {
+  await env.DB.prepare('DELETE FROM seen WHERE t < ?').bind(now - ACTIVE_MS).run();
+}
+
 /** The owner's page: the number, big, refreshing itself every 10 seconds. No cookies, no storage, not indexable. */
 const PAGE = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -126,13 +138,11 @@ function go(){fetch('?json=1&key='+encodeURIComponent(key),{cache:'no-store'}).t
 go();setInterval(go,10000);
 </script></body></html>`;
 
-/** Everything except the Durable Object, so it can be tested with a stand-in for it. */
 export async function handle(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '') || '/';
-  const stub = () => env.PRESENCE.get(env.PRESENCE.idFromName('site'));
 
-  if (path === '/api/ping') {
+  if (path === '/_live/ping') {
     if (request.method !== 'POST') return plain('method not allowed', 405, { Allow: 'POST' });
     const origin = request.headers.get('Origin') ?? '';
     if (!allowedOrigins(env).includes(origin)) return plain('forbidden', 403);
@@ -143,15 +153,19 @@ export async function handle(request: Request, env: Env): Promise<Response> {
     const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
     if (!(await underLimit(env, ip))) return plain('too many requests', 429, { 'Retry-After': '60' });
     try {
-      await stub().fetch(`https://presence/ping?t=${code}`, { method: 'POST' });
+      // "bye": the page was closed, so its code is deleted at once; otherwise it is recorded. Either way every code that
+      // has gone quiet is deleted too, so a code never outlives the next visit by more than that visit's ping.
+      if (url.searchParams.get('bye') === '1') await forget(env, code);
+      else await touch(env, code, Date.now());
+      await purge(env, Date.now());
     } catch {
-      // the Durable Object is unavailable or over its free limit: the page ignores any answer
+      // the database is unavailable or over its free limit: the page ignores any answer
       return plain('unavailable', 503);
     }
     return new Response(null, { status: 204, headers: { 'Cache-Control': 'no-store' } });
   }
 
-  if (path === '/api/live') {
+  if (path === '/_live/now') {
     if (request.method !== 'GET' && request.method !== 'HEAD') return plain('method not allowed', 405, { Allow: 'GET, HEAD' });
     // no key configured, or the wrong one: the page does not exist
     if (!env.LIVE_KEY || !sameKey(url.searchParams.get('key') ?? '', env.LIVE_KEY)) return plain('not found', 404);
@@ -159,8 +173,8 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       return new Response(PAGE, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow', 'Referrer-Policy': 'no-referrer' } });
     }
     try {
-      const answer = (await (await stub().fetch('https://presence/count')).json()) as { active?: number };
-      return new Response(JSON.stringify({ active: answer.active ?? 0 }), {
+      await purge(env, Date.now());
+      return new Response(JSON.stringify({ active: await countActive(env, Date.now()) }), {
         status: 200,
         headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow', 'X-Content-Type-Options': 'nosniff' },
       });
@@ -170,40 +184,4 @@ export async function handle(request: Request, env: Env): Promise<Response> {
   }
 
   return plain('not found', 404);
-}
-
-/**
- * The one Durable Object ("site"): a table of {code, last ping time}. SQLite-backed, which the free plan allows. A ping is
- * one row written; an alarm deletes the rows that have gone quiet, so nothing stays long after the visitors have left.
- */
-export class Presence {
-  private ctx: DurableObjectState;
-
-  constructor(ctx: DurableObjectState) {
-    this.ctx = ctx;
-    ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS seen (code TEXT PRIMARY KEY, t INTEGER NOT NULL)');
-  }
-
-  async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
-    const now = Date.now();
-    const sql = this.ctx.storage.sql;
-    if (url.pathname === '/ping') {
-      const code = url.searchParams.get('t') ?? '';
-      if (CODE.test(code)) {
-        sql.exec('INSERT INTO seen (code, t) VALUES (?, ?) ON CONFLICT(code) DO UPDATE SET t = excluded.t', code, now);
-        if ((await this.ctx.storage.getAlarm()) === null) await this.ctx.storage.setAlarm(now + PURGE_MS);
-      }
-      return new Response(null, { status: 204 });
-    }
-    const n = Number(sql.exec('SELECT COUNT(*) AS n FROM seen WHERE t >= ?', now - ACTIVE_MS).one().n) || 0;
-    return new Response(JSON.stringify({ active: n }), { headers: { 'Content-Type': 'application/json' } });
-  }
-
-  /** Deletes the codes that have been quiet for longer than the active window; runs again while any are left. */
-  async alarm(): Promise<void> {
-    const sql = this.ctx.storage.sql;
-    sql.exec('DELETE FROM seen WHERE t < ?', Date.now() - ACTIVE_MS);
-    if (Number(sql.exec('SELECT COUNT(*) AS n FROM seen').one().n) > 0) await this.ctx.storage.setAlarm(Date.now() + PURGE_MS);
-  }
 }

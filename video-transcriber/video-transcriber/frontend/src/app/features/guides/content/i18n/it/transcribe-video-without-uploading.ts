@@ -147,7 +147,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Cerca ciò che esce',
-          text: "Scrivi method:POST nella casella del filtro (Chrome ed Edge; Firefox accetta lo stesso filtro). Le richieste POST a transcribevid.com dovrebbero essere una richiesta vuota a /api/count dopo la fine della trascrizione e, circa una volta al minuto mentre la pagina è aperta, una piccola richiesta /api/ping il cui unico contenuto è un codice casuale nel suo indirizzo. Aprile e controlla: nessuna delle due ha un corpo della richiesta. Se la pagina mostra annunci, gli script di Google fanno richieste proprie a Google, e nessuna porta il tuo file o la tua trascrizione. Nulla di vicino alla dimensione del tuo file lascia il tuo dispositivo.",
+          text: "Scrivi method:POST nella casella del filtro (Chrome ed Edge; Firefox accetta lo stesso filtro). Le richieste POST a transcribevid.com dovrebbero essere una richiesta vuota a /api/count dopo la fine della trascrizione e, circa una volta al minuto mentre la pagina è aperta, una piccola richiesta /_live/ping il cui unico contenuto è un codice casuale nel suo indirizzo. Aprile e controlla: nessuna delle due ha un corpo della richiesta. Se la pagina mostra annunci, gli script di Google fanno richieste proprie a Google, e nessuna porta il tuo file o la tua trascrizione. Nulla di vicino alla dimensione del tuo file lascia il tuo dispositivo.",
         },
       ],
     },
