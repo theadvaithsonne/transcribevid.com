@@ -105,7 +105,8 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const args = process.argv.slice(2);
   const ki = args.indexOf('--keep');
   const keep = ki >= 0 ? Number(args[ki + 1]) : 2;
-  const pos = args.filter((a, i) => !a.startsWith('--') && i !== ki + 1);
+  // the three positional arguments: everything except "--keep" and the number after it (when it is there)
+  const pos = args.filter((a, i) => !a.startsWith('--') && !(ki >= 0 && i === ki + 1));
   const [dist, archive, label] = pos;
   if (!dist || !archive || !label || !Number.isInteger(keep) || keep < 0) {
     console.error('usage: node scripts/pages-keep-previous.mjs <dist> <archive-dir> <label> [--keep N]');

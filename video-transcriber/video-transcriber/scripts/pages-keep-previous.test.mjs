@@ -5,7 +5,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { hashedFiles, keepPrevious } from './pages-keep-previous.mjs';
+
+const SCRIPT = fileURLToPath(new URL('./pages-keep-previous.mjs', import.meta.url));
+const cli = (...args) => spawnSync(process.execPath, [SCRIPT, ...args], { encoding: 'utf8' });
 
 function tmp() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'keepprev-'));
@@ -128,4 +133,30 @@ test('reports the number of files, and warns before the Pages limit', () => {
   assert.equal(r.total, 4);
   assert.equal(r.overLimit, false);
   assert.equal(r.warn, false);
+});
+
+test('the command line works with and without --keep (the way a deploy runs it)', async () => {
+  const root = tmp();
+  const arch = path.join(root, 'arch');
+  const d1 = build(path.join(root, 'd1'), ['main-AAAA1111.js', 'chunk-BBBB2222.js']);
+  const first = cli(d1, arch, 'v1', '--keep', '0');
+  assert.equal(first.status, 0, first.stderr);
+  assert.match(first.stdout, /archived 2 hashed files/);
+  await new Promise((r) => setTimeout(r, 10));
+  const d2 = build(path.join(root, 'd2'), ['main-NEW33333.js']);
+  const second = cli(d2, arch, 'v2'); // no --keep: the default of 2
+  assert.equal(second.status, 0, second.stderr);
+  assert.match(second.stdout, /added 2 files of the earlier build "v1"/);
+  assert.equal(fs.existsSync(path.join(d2, 'main-AAAA1111.js')), true);
+  const third = cli('--keep', '1', build(path.join(root, 'd3'), ['main-THIRD333.js']), arch, 'v3'); // --keep first
+  assert.equal(third.status, 0, third.stderr);
+});
+
+test('the command line refuses a missing argument and a bad --keep, and a bad label', () => {
+  const root = tmp();
+  const d = build(path.join(root, 'd'), ['main-AAAA1111.js']);
+  assert.equal(cli(d).status, 2);
+  assert.equal(cli(d, path.join(root, 'a'), 'v1', '--keep', 'many').status, 2);
+  assert.equal(cli(d, path.join(root, 'a'), '../evil').status, 1);
+  assert.equal(cli(path.join(root, 'nothing'), path.join(root, 'a'), 'v1').status, 1);
 });
