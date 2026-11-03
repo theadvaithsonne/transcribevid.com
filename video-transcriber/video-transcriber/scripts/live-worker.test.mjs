@@ -163,6 +163,42 @@ test('the owner page is HTML, not cached, not indexable; the JSON is too', async
   assert.match(json.headers.get('x-robots-tag'), /noindex/);
 });
 
+const count = (env, init = {}) => handle(new Request(`${ORIGIN}/_live/count`, init), env);
+
+test('the public count needs no key and is the same number as the owner sees', async () => {
+  const { env } = setup();
+  await ping(env, CODE_A);
+  await ping(env, CODE_B);
+  const res = await count(env, { headers: { Origin: ORIGIN } });
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { active: 2 });
+  assert.equal(res.headers.get('cache-control'), 'public, max-age=20');
+  assert.equal(res.headers.get('access-control-allow-origin'), ORIGIN);
+});
+
+test('the public count shows nothing but the number, and does not send CORS to other websites', async () => {
+  const { env } = setup();
+  await ping(env, CODE_A);
+  const res = await count(env, { headers: { Origin: 'https://evil.example' } });
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('access-control-allow-origin'), null);
+  assert.deepEqual(Object.keys(await res.json()), ['active']);
+});
+
+test('the public count does not count pages that went quiet, and answers a preflight and refuses writes', async () => {
+  const { env, rows } = setup();
+  rows.set(CODE_A, Date.now() - ACTIVE_MS - 1000);
+  assert.deepEqual(await (await count(env)).json(), { active: 0 });
+  assert.equal((await count(env, { method: 'OPTIONS', headers: { Origin: ORIGIN } })).status, 204);
+  assert.equal((await count(env, { method: 'POST' })).status, 405);
+});
+
+test('a broken database makes the public count answer 503', async () => {
+  const { env } = setup();
+  env.DB = { prepare: () => { throw new Error('down'); } };
+  assert.equal((await count(env)).status, 503);
+});
+
 test('other paths are not handled', async () => {
   const { env } = setup();
   assert.equal((await handle(new Request(`${ORIGIN}/api/other`), env)).status, 404);

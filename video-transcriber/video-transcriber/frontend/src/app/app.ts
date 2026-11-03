@@ -8,6 +8,7 @@ import { ApiService } from './core/api.service';
 import { Translate, fmtEta, fmtTime, timeAgo } from './core/format';
 import { errorDetail } from './core/http-error';
 import { JobsStore } from './core/jobs.store';
+import { LiveCount } from './core/live-count';
 import { JobSummary } from './core/models';
 import { SessionService } from './core/session.service';
 import { SiteService, TAGLINE } from './core/site.service';
@@ -47,6 +48,17 @@ export class App {
   private i18n = inject(I18nService);
   private counterUrl = inject(COUNTER_URL);
   private browser = inject(IS_BROWSER);
+  private live = inject(LiveCount);
+  /** pages open right now, for the header ("3 online now"): shown only when the Worker said at least 1 */
+  readonly liveN = computed(() => {
+    const n = this.live.active();
+    return n !== null && n > 0 ? n : 0;
+  });
+  private readonly liveNf = computed(() => new Intl.NumberFormat(this.i18n.locale() === 'en' ? undefined : this.i18n.locale()));
+  readonly liveNum = computed(() => this.liveNf().format(this.liveN()));
+  /** "3 online now": the accessible name; the tooltip adds that visitors' browsers report it */
+  readonly liveLabel = computed(() => `${this.liveNum()} ${this.i18n.t('online now')}`);
+  readonly liveTitle = computed(() => this.i18n.t("{label}, as reported by visitors' browsers", { label: this.liveLabel() }));
   /** the language service's translate, for the helpers that take one (fmtEta, timeAgo, errorDetail) */
   private readonly tr: Translate = (key, params) => this.i18n.t(key, params);
 
@@ -121,7 +133,9 @@ export class App {
     // The live-visitor signal (core/presence.ts): its own small download a few seconds after the page is up, so it never
     // delays the first paint. Only the public website has a counter address; the local / self-hosted edition and the
     // prerender have none, so nothing starts there.
-    if (this.browser && this.counterUrl) setTimeout(() => import('./core/presence').then((m) => m.startPresence(this.counterUrl)).catch(() => undefined), 3000);
+    if (this.browser && this.counterUrl) {
+      setTimeout(() => import('./core/presence').then((m) => m.startPresence(this.counterUrl, window, (n) => this.live.active.set(n))).catch(() => undefined), 3000);
+    }
   }
 
   /**

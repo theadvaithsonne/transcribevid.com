@@ -1,6 +1,8 @@
 /**
- * TranscribeVid live-visitor Worker (rules): how many people have the website open right now, for the owner.
+ * TranscribeVid live-visitor Worker (rules): how many people have the website open right now. The number is shown in the page
+ * header to every visitor and, with more detail, on the owner's page.
  *
+ *   GET  /_live/count              -> {"active": n}   public, the number the header shows (browser-cached for 20 seconds)
  *   POST /_live/ping?t=<code>        -> 204   a page that is open says "I am here" (about once a minute)
  *                                    403 when the Origin is not the website, 429 past the per-IP limit,
  *                                    204 and nothing recorded when the browser sends Do Not Track / Global Privacy Control
@@ -10,7 +12,7 @@
  * What is kept: the random code a page made up when it opened (never stored in a cookie or the browser's storage), and the
  * time of its last ping, in one small D1 table: a code that has not pinged for 2.5 minutes is not counted,
  * and is deleted by the next ping or read of the owner page, and at once when the page is closed (a "bye" ping). The IP address is used in memory to limit abuse and is never written
- * anywhere. Nothing else is kept: no history, no page, no country. Only the current number is shown, and only to the owner.
+ * anywhere. Nothing else is kept: no history, no page, no country. Only the current number is shown.
  *
  * A separate Worker and a separate D1 database from the "videos transcribed" counter (workers/counter) on purpose: its own,
  * more specific routes, so deploying or breaking this one cannot touch the counter.
@@ -163,6 +165,22 @@ export async function handle(request: Request, env: Env): Promise<Response> {
       return plain('unavailable', 503);
     }
     return new Response(null, { status: 204, headers: { 'Cache-Control': 'no-store' } });
+  }
+
+  if (path === '/_live/count') {
+    if (request.method !== 'GET' && request.method !== 'HEAD' && request.method !== 'OPTIONS') return plain('method not allowed', 405, { Allow: 'GET, HEAD, OPTIONS' });
+    // the website reads it from its own address; another website may not (no CORS for it), but a plain request still works
+    const origin = request.headers.get('Origin') ?? '';
+    const cors: Record<string, string> = allowedOrigins(env).includes(origin) ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : { Vary: 'Origin' };
+    if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { ...cors, 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS', 'Access-Control-Max-Age': '86400' } });
+    try {
+      return new Response(JSON.stringify({ active: await countActive(env, Date.now()) }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=20', 'X-Content-Type-Options': 'nosniff', ...cors },
+      });
+    } catch {
+      return plain('unavailable', 503, cors);
+    }
   }
 
   if (path === '/_live/now') {

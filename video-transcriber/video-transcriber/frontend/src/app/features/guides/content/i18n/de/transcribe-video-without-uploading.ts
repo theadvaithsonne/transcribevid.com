@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Ein Zähler für aktuelle Besucher.',
-          text: 'Solange eine Seite geöffnet und sichtbar ist, sendet Ihr Browser etwa einmal pro Minute ein kleines Signal, damit der Betreiber sehen kann, wie viele Menschen gerade auf der Seite sind. Es enthält einen beim Öffnen der Seite erzeugten Zufallscode und sonst nichts, nichts wird in Ihrem Browser gespeichert, und es wird nichts gesendet, wenn Ihr Browser darum bittet, nicht verfolgt zu werden.',
+          text: 'Solange eine Seite geöffnet und sichtbar ist, sendet Ihr Browser etwa einmal pro Minute ein kleines Signal, damit die Seite zählen kann, wie viele Menschen gerade auf ihr sind, und diese Zahl im Header anzeigt. Es enthält einen beim Öffnen der Seite erzeugten Zufallscode und sonst nichts, nichts wird in Ihrem Browser gespeichert, und es wird nichts gesendet, wenn Ihr Browser darum bittet, nicht verfolgt zu werden.',
         },
         {
           title: 'Werbung.',

@@ -112,7 +112,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'A live visitor count.',
-          text: 'While a page is open and in view, your browser sends a small signal about once a minute so that the owner can see how many people are on the site right now. It carries a random code made up when the page opened and nothing else, nothing is saved in your browser, and nothing is sent if your browser asks not to be tracked.',
+          text: 'While a page is open and in view, your browser sends a small signal about once a minute so that the site can count how many people are on it right now and show that number in the header. It carries a random code made up when the page opened and nothing else, nothing is saved in your browser, and nothing is sent if your browser asks not to be tracked.',
         },
         {
           title: 'Advertising.',

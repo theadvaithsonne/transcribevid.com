@@ -1151,10 +1151,12 @@ const dict: Record<string, string> = {
     '**Canlı ziyaretçi sayısı.** Bu web sitesinin bir sayfası açık ve görünür durumdayken tarayıcınız, sayacımıza (bir Cloudflare Worker) yaklaşık dakikada bir küçük, anonim bir “buradayım” sinyali gönderir; böylece şu anda sitenin kaç kişi tarafından kullanıldığını görebiliriz. Sinyal, sayfa açıldığında üretilen rastgele bir kod (bir çerezde ya da tarayıcı depolamasında asla saklanmaz ve her ziyarette yenidir) dışında hiçbir şey taşımaz: dosya, transkript veya başka bir ayrıntı yoktur. Tarayıcınız izlenmek istemediğini bildiriyorsa (Do Not Track veya Global Privacy Control) hiçbir şey gönderilmez. Cloudflare, IP adresinizi iletim sırasında görür ve kötüye kullanımı sınırlamak için kısa süreliğine kullanır (hız sınırı).',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'Canlı ziyaretçi sayısı da aynı şekilde çalışır: bir sayfa açıkken, ayrıldıktan kısa süre sonra silinen rastgele bir kod gönderir; asla bir dosya ya da transkript göndermez ve tarayıcınız Do Not Track gönderiyorsa hiçbir şey göndermez. Ayrıntılar [Gizlilik politikası](/privacy) sayfasındadır.',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'Canlı ziyaretçi sayısındaki rastgele kodlar yalnızca burada kimlerin olduğunu saymak için tutulur: her biri sayfa kapatıldıktan kısa süre sonra, en geç de bir sonraki ziyaret sayıldığında silinir. Yalnızca o anki sayı gösterilir ve yalnızca bize gösterilir.',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'Canlı ziyaretçi sayısındaki rastgele kodlar yalnızca burada kimlerin olduğunu saymak için tutulur: her biri sayfa kapatıldıktan kısa süre sonra, en geç de bir sonraki ziyaret sayıldığında silinir. Yalnızca o anki sayı gösterilir, sayfa başlığında.',
   'Want to place your ad here? Contact us:':
     'Reklamınızı buraya yerleştirmek ister misiniz? Bize ulaşın:',
+  'online now':
+    'şu an çevrimiçi',
 };
 
 export default dict;

@@ -1142,10 +1142,12 @@ const dict: Record<string, string> = {
     '**실시간 방문자 수.** 이 웹사이트의 페이지가 열려 있고 화면에 보이는 동안, 브라우저는 약 1분에 한 번 익명의 “여기 있어요” 신호를 당사의 카운터(Cloudflare Worker)에 보내며, 지금 몇 명이 사이트를 이용하고 있는지 확인하는 데 쓰입니다. 이 신호에는 페이지가 열릴 때 만들어진 무작위 코드(쿠키나 브라우저 저장소에 저장되지 않으며 방문할 때마다 새로 만들어집니다)만 들어 있고, 파일, 변환 텍스트, 그 밖의 정보는 일절 없습니다. 브라우저가 추적하지 않도록 요청하면(Do Not Track 또는 Global Privacy Control) 아무것도 전송되지 않습니다. Cloudflare는 전송 중에 IP 주소를 보게 되며, 남용을 막기 위해 잠시 사용합니다(요청 횟수 제한).',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     '실시간 방문자 수도 같은 방식으로 작동합니다. 페이지가 열려 있는 동안 페이지를 떠난 뒤 곧 삭제되는 무작위 코드를 보내며, 파일이나 변환 텍스트는 절대 보내지 않고, 브라우저가 Do Not Track을 보내면 아무것도 보내지 않습니다. 자세한 내용은 [개인정보 처리방침](/privacy)에 있습니다.',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    '실시간 방문자 수의 무작위 코드는 지금 여기 있는 사람을 세기 위해서만 보관되며, 각 코드는 페이지를 닫은 뒤 곧, 늦어도 다음 방문이 집계될 때 삭제됩니다. 현재 숫자만 표시되며, 당사에만 보입니다.',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    '실시간 방문자 수의 무작위 코드는 지금 여기 있는 사람을 세기 위해서만 보관되며, 각 코드는 페이지를 닫은 뒤 곧, 늦어도 다음 방문이 집계될 때 삭제됩니다. 현재 숫자만 표시되며, 페이지 헤더에 나타납니다.',
   'Want to place your ad here? Contact us:':
     '여기에 광고를 게재하고 싶으신가요? 문의하세요:',
+  'online now':
+    '명 접속 중',
 };
 
 export default dict;

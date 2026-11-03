@@ -112,7 +112,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Canlı ziyaretçi sayısı.',
-          text: 'Bir sayfa açık ve görünür durumdayken tarayıcınız, sitenin sahibi şu anda sitede kaç kişi olduğunu görebilsin diye yaklaşık dakikada bir küçük bir sinyal gönderir. Sinyal, sayfa açıldığında üretilen rastgele bir kod dışında hiçbir şey taşımaz, tarayıcınızda hiçbir şey saklanmaz ve tarayıcınız izlenmek istemediğini bildiriyorsa hiçbir şey gönderilmez.',
+          text: 'Bir sayfa açık ve görünür durumdayken tarayıcınız, site şu anda sitede kaç kişi olduğunu sayıp bu sayıyı üstbilgide gösterebilsin diye yaklaşık dakikada bir küçük bir sinyal gönderir. Sinyal, sayfa açıldığında üretilen rastgele bir kod dışında hiçbir şey taşımaz, tarayıcınızda hiçbir şey saklanmaz ve tarayıcınız izlenmek istemediğini bildiriyorsa hiçbir şey gönderilmez.',
         },
         {
           title: 'Reklamcılık.',

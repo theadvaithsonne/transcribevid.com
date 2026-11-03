@@ -112,7 +112,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Un conteggio dei visitatori in tempo reale.',
-          text: "Finché una pagina è aperta e in primo piano, il tuo browser invia un piccolo segnale circa una volta al minuto, così il titolare può vedere quante persone sono sul sito in questo momento. Contiene un codice casuale generato all'apertura della pagina e nient'altro, nulla viene salvato nel tuo browser e nulla viene inviato se il tuo browser chiede di non essere tracciato.",
+          text: "Finché una pagina è aperta e in primo piano, il tuo browser invia un piccolo segnale circa una volta al minuto, così il sito può contare quante persone ci sono in questo momento e mostrare quel numero nell'intestazione. Contiene un codice casuale generato all'apertura della pagina e nient'altro, nulla viene salvato nel tuo browser e nulla viene inviato se il tuo browser chiede di non essere tracciato.",
         },
         {
           title: 'La pubblicità.',

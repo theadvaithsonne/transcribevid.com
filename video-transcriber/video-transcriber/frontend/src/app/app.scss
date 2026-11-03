@@ -198,6 +198,31 @@ summary:focus-visible {
     opacity: 0;
   }
 }
+/* "N online now": the same quiet text as the counter, with a small green dot that breathes (still when motion is reduced) */
+.live .ldot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-inline: 5px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: live-dot 2.4s ease-in-out infinite;
+}
+@keyframes live-dot {
+  50% {
+    box-shadow: 0 0 0 5px transparent;
+    opacity: 0.55;
+  }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--ok);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .live .ldot {
+    animation: none;
+  }
+}
 
 /* the two pill buttons on the right: plain outlined boxes with a text label */
 .theme-btn,
@@ -727,6 +752,10 @@ summary:focus-visible {
       font-size: 22px;
     }
   }
+  /* "online now" sits right under the counter in the sheet, not 14 px lower */
+  .sheet-counter.live {
+    margin-top: 0;
+  }
   .sheet-title {
     padding: 18px 16px 8px;
     font-size: var(--fs-sm);
@@ -752,6 +781,12 @@ summary:focus-visible {
 /* on a phone the header counter makes room: it is the first row of the menu instead */
 @media (max-width: 560px) {
   .counter {
+    display: none;
+  }
+}
+/* two pills do not fit beside the menu button on a narrow window (measured: the header overflows at 561 px): "online now" is a row of the menu there */
+@media (max-width: 700px) {
+  .counter.live {
     display: none;
   }
 }

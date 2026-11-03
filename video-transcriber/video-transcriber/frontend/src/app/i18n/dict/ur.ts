@@ -1146,10 +1146,12 @@ const dict: Record<string, string> = {
     '**لائیو وزیٹر کاؤنٹ۔** جب اس ویب سائٹ کا کوئی صفحہ کھلا ہو اور نظر کے سامنے ہو، تو آپ کا براؤزر تقریباً ہر منٹ میں ہمارے کاؤنٹر (ایک Cloudflare Worker) کو ایک چھوٹا گمنام “میں یہاں ہوں” اشارہ بھیجتا ہے، تاکہ ہم دیکھ سکیں کہ اس وقت کتنے لوگ سائٹ استعمال کر رہے ہیں۔ اس میں صفحہ کھلنے پر بنایا گیا ایک بے ترتیب کوڈ ہوتا ہے (جو کبھی کوکی یا براؤزر اسٹوریج میں محفوظ نہیں ہوتا اور ہر وزٹ پر نیا ہوتا ہے) اور اس کے سوا کچھ نہیں: نہ کوئی فائل، نہ ٹرانسکرپٹ، نہ کوئی اور تفصیل۔ اگر آپ کا براؤزر ٹریک نہ کیے جانے کی درخواست کرے (Do Not Track یا Global Privacy Control) تو کچھ بھی نہیں بھیجا جاتا۔ Cloudflare کو ترسیل کے دوران آپ کا IP پتہ نظر آتا ہے اور وہ اسے غلط استعمال روکنے (ریٹ لمٹ) کے لیے مختصر طور پر استعمال کرتا ہے۔',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'لائیو وزیٹر کاؤنٹ بھی اسی طرح کام کرتا ہے: صفحہ کھلا ہو تو یہ ایک بے ترتیب کوڈ بھیجتا ہے جو آپ کے جانے کے تھوڑی دیر بعد حذف کر دیا جاتا ہے، کبھی کوئی فائل یا ٹرانسکرپٹ نہیں، اور اگر آپ کا براؤزر Do Not Track بھیجے تو کچھ بھی نہیں۔ تفصیلات [رازداری کی پالیسی](/privacy) میں ہیں۔',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'لائیو وزیٹر کاؤنٹ کے بے ترتیب کوڈ صرف یہ گننے کے لیے رکھے جاتے ہیں کہ یہاں کون ہے: ہر کوڈ صفحہ بند ہونے کے تھوڑی دیر بعد، اور زیادہ سے زیادہ اگلی وزٹ گنے جانے پر، حذف کر دیا جاتا ہے۔ صرف موجودہ تعداد دکھائی جاتی ہے، اور صرف ہمیں۔',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'لائیو وزیٹر کاؤنٹ کے بے ترتیب کوڈ صرف یہ گننے کے لیے رکھے جاتے ہیں کہ یہاں کون ہے: ہر کوڈ صفحہ بند ہونے کے تھوڑی دیر بعد، اور زیادہ سے زیادہ اگلی وزٹ گنے جانے پر، حذف کر دیا جاتا ہے۔ صرف موجودہ تعداد دکھائی جاتی ہے، صفحے کے ہیڈر میں۔',
   'Want to place your ad here? Contact us:':
     'اپنا اشتہار یہاں لگانا چاہتے ہیں؟ ہم سے رابطہ کریں:',
+  'online now':
+    'اس وقت آن لائن',
 };
 
 export default dict;

@@ -1137,9 +1137,11 @@ const dict: Record<string, string> = {
     '**จำนวนผู้เข้าชมแบบสด** ขณะที่หน้าใดหน้าหนึ่งของเว็บไซต์นี้เปิดอยู่และอยู่ในมุมมอง เบราว์เซอร์ของคุณจะส่งสัญญาณ “ฉันอยู่ที่นี่” แบบไม่ระบุตัวตนขนาดเล็กไปยังตัวนับของเรา (Cloudflare Worker) ประมาณนาทีละครั้ง เพื่อให้เรามองเห็นว่าขณะนี้มีคนใช้ไซต์อยู่กี่คน สัญญาณนี้มีเพียงรหัสสุ่มที่สร้างขึ้นเมื่อเปิดหน้า (ไม่เคยบันทึกในคุกกี้หรือที่เก็บข้อมูลของเบราว์เซอร์ และสร้างใหม่ทุกครั้งที่เข้าชม) และไม่มีอย่างอื่นอีก ไม่มีไฟล์ ไม่มีข้อความถอดเสียง ไม่มีรายละเอียดอื่นใด จะไม่มีการส่งอะไรเลยหากเบราว์เซอร์ของคุณขอไม่ให้ถูกติดตาม (Do Not Track หรือ Global Privacy Control) Cloudflare เห็นที่อยู่ IP ของคุณระหว่างการส่งผ่านและใช้ชั่วคราวเพื่อจำกัดการใช้งานในทางที่ผิด (การจำกัดอัตรา)',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'จำนวนผู้เข้าชมแบบสดทำงานในแบบเดียวกัน ขณะที่หน้าเปิดอยู่ จะส่งรหัสสุ่มที่ถูกลบไม่นานหลังจากคุณออกไป ไม่เคยส่งไฟล์หรือข้อความถอดเสียง และไม่ส่งอะไรเลยหากเบราว์เซอร์ของคุณส่ง Do Not Track รายละเอียดอยู่ใน [นโยบายความเป็นส่วนตัว](/privacy)',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'รหัสสุ่มของจำนวนผู้เข้าชมแบบสดจะถูกเก็บไว้เพียงเพื่อนับว่าใครอยู่ที่นี่ โดยแต่ละรหัสจะถูกลบไม่นานหลังจากปิดหน้า และอย่างช้าที่สุดเมื่อมีการนับการเข้าชมครั้งถัดไป แสดงเฉพาะตัวเลขปัจจุบัน และแสดงให้เราเห็นเท่านั้น',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'รหัสสุ่มของจำนวนผู้เข้าชมแบบสดจะถูกเก็บไว้เพียงเพื่อนับว่าใครอยู่ที่นี่ โดยแต่ละรหัสจะถูกลบไม่นานหลังจากปิดหน้า และอย่างช้าที่สุดเมื่อมีการนับการเข้าชมครั้งถัดไป แสดงเฉพาะตัวเลขปัจจุบัน ในส่วนหัวของหน้า',
   'Want to place your ad here? Contact us:':
     'ต้องการวางโฆษณาของคุณที่นี่ไหม ติดต่อเรา:',
+  'online now':
+    'ออนไลน์ตอนนี้',
 };
 export default dict;

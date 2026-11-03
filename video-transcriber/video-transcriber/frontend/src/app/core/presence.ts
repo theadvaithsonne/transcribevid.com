@@ -1,12 +1,14 @@
 /**
  * The live-visitor signal: while a page of the public website is open and in view, the browser tells the live-visitor
- * Worker (workers/live) "I am here" once a minute, so the owner can see how many people are using the site right now.
+ * Worker (workers/live) "I am here" once a minute, and reads back how many pages are open right now, which the page header
+ * shows (core/live-count.ts).
  *
  * What is sent: one POST to `/_live/ping?t=<code>` on the site's own address (the counter's origin) with no body, where the
  * code is 16 random characters made up when the page opened. The code is kept in memory only: no cookie, no localStorage,
  * no sessionStorage, and a reload makes a new one. When the page is closed one more POST (`&bye=1`) asks for the code to be
  * deleted at once. Nothing is sent when the browser says Do Not Track or Global Privacy Control, while the tab is hidden, or
- * after three hours on one page. Any failure is silent. The privacy policy, the FAQ and the guides describe this.
+ * after three hours on one page. The number is read with a plain GET `/_live/count`, which sends nothing and is also read
+ * by a visitor who opted out. Any failure is silent. The privacy policy, the FAQ and the guides describe this.
  *
  * Loaded on its own, a few seconds after the page is up (see App), so it is not part of the first download.
  */
@@ -15,6 +17,10 @@ const PING_MS = 60_000;
 const MAX_PINGS = 180;
 /** coming back to a tab sooner than this after its last ping does not send another */
 const MIN_GAP_MS = 30_000;
+/** the number is read this long after the ping, so the visitor's own page is already in it */
+const READ_AFTER_MS = 1_500;
+/** after this many failed reads in a row the number is hidden again */
+const MAX_FAILS = 3;
 
 /** true when the browser asks not to be tracked */
 function optedOut(win: Window): boolean {
@@ -33,34 +39,65 @@ export function makeCode(win: Window = window): string {
   return win.btoa(bin).replace(/\+/g, '-').replace(/\//g, '_');
 }
 
-/** The live-visitor Worker's address: on the same site as the counter, outside its /api path (see workers/live). */
-function pingAddress(counterUrl: string): string {
+/** The live-visitor Worker's origin: the same site as the counter, outside its /api path (see workers/live). */
+function siteOrigin(counterUrl: string): string {
   try {
-    return counterUrl ? `${new URL(counterUrl).origin}/_live/ping` : '';
+    return counterUrl ? new URL(counterUrl).origin : '';
   } catch {
     return '';
   }
 }
 
-/** Starts pinging. `counterUrl` is the counter's address (only its site is used). Returns a function that stops it. */
-export function startPresence(counterUrl: string, win: Window = window): () => void {
+/**
+ * Starts pinging, and (when `onCount` is given) reading the number of pages open now. `counterUrl` is the counter's
+ * address (only its site is used). Returns a function that stops everything.
+ */
+export function startPresence(counterUrl: string, win: Window = window, onCount?: (active: number | null) => void): () => void {
   const none = () => undefined;
-  const code = makeCode(win);
-  const base = pingAddress(counterUrl);
-  if (!base || !code || optedOut(win) || typeof win.fetch !== 'function') return none;
+  const origin = siteOrigin(counterUrl);
+  if (!origin || typeof win.fetch !== 'function') return none;
+  // a visitor who asks not to be tracked sends no ping (no code is even made), but may still see the number
+  const code = optedOut(win) ? '' : makeCode(win);
+  if (!code && !onCount) return none;
 
   const doc = win.document;
+  const base = `${origin}/_live/ping`;
+  let ticks = 0;
   let sent = 0;
   let last = 0;
+  let fails = 0;
+  const visible = () => doc.visibilityState !== 'hidden';
+
   const send = () => {
-    if (doc.visibilityState === 'hidden' || sent >= MAX_PINGS) return;
+    if (!code || !visible()) return;
     sent++;
     last = Date.now();
     // keepalive: the request may outlive the page; no cookies are sent or accepted; the answer is ignored
-    win
-      .fetch(`${base}?t=${code}`, { method: 'POST', keepalive: true, cache: 'no-store', credentials: 'omit' })
-      .catch(none);
+    win.fetch(`${base}?t=${code}`, { method: 'POST', keepalive: true, cache: 'no-store', credentials: 'omit' }).catch(none);
   };
+  const read = () => {
+    if (!onCount || !visible()) return;
+    win
+      .fetch(`${origin}/_live/count`, { credentials: 'omit' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { active?: unknown } | null) => {
+        const n = j?.active;
+        if (typeof n === 'number' && Number.isFinite(n) && n >= 0) {
+          fails = 0;
+          onCount(Math.floor(n));
+        } else if (++fails >= MAX_FAILS) onCount(null);
+      })
+      .catch(() => {
+        if (++fails >= MAX_FAILS) onCount(null);
+      });
+  };
+  const tick = () => {
+    if (ticks >= MAX_PINGS || !visible()) return;
+    ticks++;
+    send();
+    if (onCount) win.setTimeout(read, READ_AFTER_MS);
+  };
+
   // the page is being closed or left: ask for this code to be deleted now (a beacon survives the page; fetch is the fallback)
   const onLeave = () => {
     if (sent === 0) return;
@@ -68,13 +105,13 @@ export function startPresence(counterUrl: string, win: Window = window): () => v
     if (typeof win.navigator.sendBeacon === 'function') win.navigator.sendBeacon(url);
     else win.fetch(url, { method: 'POST', keepalive: true, cache: 'no-store', credentials: 'omit' }).catch(none);
   };
-  const timer = win.setInterval(send, PING_MS);
+  const timer = win.setInterval(tick, PING_MS);
   const onVisible = () => {
-    if (doc.visibilityState === 'visible' && Date.now() - last >= MIN_GAP_MS) send();
+    if (visible() && Date.now() - last >= MIN_GAP_MS) tick();
   };
   doc.addEventListener('visibilitychange', onVisible);
   win.addEventListener('pagehide', onLeave);
-  send();
+  tick();
   return () => {
     win.clearInterval(timer);
     doc.removeEventListener('visibilitychange', onVisible);

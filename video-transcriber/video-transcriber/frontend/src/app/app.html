@@ -57,6 +57,13 @@
   <span class="clabel">{{ stats.count() === 1 ? ('video transcribed' | t) : ('videos transcribed' | t) }}</span>
 </ng-template>
 
+<!-- "N online now": how many pages are open right now, as reported by visitors' browsers (core/presence.ts); only shown at 1 or more. -->
+<ng-template #liveBody>
+  <span class="ldot" aria-hidden="true"></span>
+  <b class="cnum">{{ liveNum() }}</b>
+  <span class="clabel">{{ 'online now' | t }}</span>
+</ng-template>
+
 <div class="shell" [class.has-rail]="ads.reserved()">
   <header class="topbar">
     <a [routerLink]="'/' | lp" class="brand" [attr.aria-label]="'{name} home' | t: { name: site.brand().name }" (click)="closeAll()">
@@ -80,6 +87,11 @@
     @if (stats.visible()) {
       <span class="counter" role="img" [attr.aria-label]="stats.ariaLabel()" [attr.title]="stats.title()">
         <ng-container *ngTemplateOutlet="counterBody" />
+      </span>
+    }
+    @if (liveN() > 0) {
+      <span class="counter live" role="img" [attr.aria-label]="liveLabel()" [attr.title]="liveTitle()">
+        <ng-container *ngTemplateOutlet="liveBody" />
       </span>
     }
 
@@ -199,6 +211,11 @@
       @if (stats.visible()) {
         <div class="sheet-counter" role="img" [attr.aria-label]="stats.ariaLabel()" [attr.title]="stats.title()">
           <ng-container *ngTemplateOutlet="counterBody" />
+        </div>
+      }
+      @if (liveN() > 0) {
+        <div class="sheet-counter live" role="img" [attr.aria-label]="liveLabel()" [attr.title]="liveTitle()">
+          <ng-container *ngTemplateOutlet="liveBody" />
         </div>
       }
       <div class="sheet-lang"><app-language-switcher variant="list" /></div>

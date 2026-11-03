@@ -1161,9 +1161,11 @@ const dict: Record<string, string> = {
     "**Conteggio dei visitatori in tempo reale.** Finché una pagina di questo sito è aperta e in primo piano, il tuo browser invia circa una volta al minuto un piccolo segnale anonimo «sono qui» al nostro contatore (un Cloudflare Worker), così possiamo vedere quante persone stanno usando il sito in questo momento. Contiene un codice casuale generato all'apertura della pagina (mai salvato in un cookie né nella memoria del browser, e nuovo a ogni visita) e nient'altro: nessun file, nessuna trascrizione, nessun altro dettaglio. Non viene inviato nulla se il tuo browser chiede di non essere tracciato (Do Not Track o Global Privacy Control). Cloudflare vede il tuo indirizzo IP durante il transito e lo usa brevemente per limitare gli abusi (un limite di frequenza).",
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     "Il conteggio dei visitatori in tempo reale funziona allo stesso modo: finché una pagina è aperta invia un codice casuale che viene eliminato poco dopo che te ne vai, mai un file o una trascrizione, e non invia assolutamente nulla se il tuo browser invia Do Not Track. I dettagli sono nell'[Informativa sulla privacy](/privacy).",
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'I codici casuali del conteggio dei visitatori in tempo reale vengono conservati solo per contare chi è presente: ciascun codice viene eliminato poco dopo la chiusura della pagina e, al più tardi, quando viene conteggiata la visita successiva. Viene mostrato solo il numero attuale, e solo a noi.',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'I codici casuali del conteggio dei visitatori in tempo reale vengono conservati solo per contare chi è presente: ciascun codice viene eliminato poco dopo la chiusura della pagina e, al più tardi, quando viene conteggiata la visita successiva. Viene mostrato solo il numero attuale, nell\'intestazione della pagina.',
   'Want to place your ad here? Contact us:':
     'Vuoi mettere qui il tuo annuncio? Contattaci:',
+  'online now':
+    'online ora',
 };
 export default dict;

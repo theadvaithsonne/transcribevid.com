@@ -1146,9 +1146,10 @@ const dict: Record<string, string> = {
     '**লাইভ ভিজিটর সংখ্যা।** এই ওয়েবসাইটের কোনো পৃষ্ঠা খোলা থাকলে এবং দৃশ্যমান থাকলে আপনার ব্রাউজার প্রায় প্রতি মিনিটে আমাদের কাউন্টারে (একটি Cloudflare Worker) একটি ছোট নামহীন "আমি এখানে আছি" সংকেত পাঠায়, যাতে আমরা দেখতে পারি এখন কতজন সাইটটি ব্যবহার করছেন। এতে থাকে পৃষ্ঠা খোলার সময় তৈরি একটি এলোমেলো কোড (কুকিতে বা ব্রাউজারের স্টোরেজে কখনো সংরক্ষিত হয় না, আর প্রতিটি ভিজিটে নতুন) এবং আর কিছুই নয়: কোনো ফাইল নেই, কোনো ট্রান্সক্রিপ্ট নেই, অন্য কোনো তথ্য নেই। আপনার ব্রাউজার ট্র্যাক না করার অনুরোধ জানালে (Do Not Track বা Global Privacy Control) কিছুই পাঠানো হয় না। Cloudflare পথে আপনার IP ঠিকানা দেখতে পায় এবং অপব্যবহার ঠেকাতে অল্প সময়ের জন্য তা ব্যবহার করে (রেট লিমিট)।',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'লাইভ ভিজিটর সংখ্যাও একই ভাবে কাজ করে: পৃষ্ঠা খোলা থাকলে এটি একটি এলোমেলো কোড পাঠায়, যা আপনি চলে যাওয়ার কিছুক্ষণের মধ্যেই মুছে ফেলা হয়, কখনো কোনো ফাইল বা ট্রান্সক্রিপ্ট নয়, আর আপনার ব্রাউজার Do Not Track পাঠালে কিছুই পাঠায় না। বিস্তারিত আছে [গোপনীয়তা নীতি](/privacy) পৃষ্ঠায়।',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'লাইভ ভিজিটর সংখ্যার এলোমেলো কোডগুলো শুধু কে এখানে আছে তা গণনার জন্য রাখা হয়: প্রতিটি কোড পৃষ্ঠা বন্ধ করার কিছুক্ষণের মধ্যেই মুছে ফেলা হয়, আর সবচেয়ে দেরিতে হলে পরবর্তী ভিজিট গণনার সময় মুছে ফেলা হয়। শুধু বর্তমান সংখ্যাটি দেখানো হয়, এবং কেবল আমাদের কাছে।',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'লাইভ ভিজিটর সংখ্যার এলোমেলো কোডগুলো শুধু কে এখানে আছে তা গণনার জন্য রাখা হয়: প্রতিটি কোড পৃষ্ঠা বন্ধ করার কিছুক্ষণের মধ্যেই মুছে ফেলা হয়, আর সবচেয়ে দেরিতে হলে পরবর্তী ভিজিট গণনার সময় মুছে ফেলা হয়। শুধু বর্তমান সংখ্যাটি দেখানো হয়, পৃষ্ঠার হেডারে।',
   'Want to place your ad here? Contact us:':
     'আপনার বিজ্ঞাপন এখানে দিতে চান? যোগাযোগ করুন:',
+  'online now': 'এখন অনলাইনে',
 };
 export default dict;

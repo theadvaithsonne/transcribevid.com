@@ -1153,10 +1153,12 @@ const dict: Record<string, string> = {
     '**Contagem de visitantes ao vivo.** Enquanto uma página deste site está aberta e visível, seu navegador envia cerca de uma vez por minuto um pequeno sinal anônimo de “estou aqui” ao nosso contador (um Cloudflare Worker), para que possamos ver quantas pessoas estão usando o site agora. Ele leva um código aleatório criado quando a página foi aberta (nunca salvo em cookie nem no armazenamento do navegador, e novo a cada visita) e nada mais: nenhum arquivo, nenhuma transcrição, nenhum outro dado. Nada é enviado se o seu navegador pedir para não ser rastreado (Do Not Track ou Global Privacy Control). A Cloudflare vê seu endereço IP em trânsito e o usa por pouco tempo para limitar abusos (um limite de requisições).',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'A contagem de visitantes ao vivo funciona da mesma forma: enquanto uma página está aberta, ela envia um código aleatório apagado logo depois que você sai, nunca um arquivo nem uma transcrição, e nada se o seu navegador enviar Do Not Track. Os detalhes estão na [Política de privacidade](/privacy).',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'Os códigos aleatórios da contagem de visitantes ao vivo são guardados só para contar quem está aqui: cada um é apagado logo depois que a página é fechada e, no máximo, quando a próxima visita é contada. Apenas o número atual é mostrado, e só para nós.',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'Os códigos aleatórios da contagem de visitantes ao vivo são guardados só para contar quem está aqui: cada um é apagado logo depois que a página é fechada e, no máximo, quando a próxima visita é contada. Apenas o número atual é mostrado, no cabeçalho da página.',
   'Want to place your ad here? Contact us:':
     'Quer colocar seu anúncio aqui? Fale conosco:',
+  'online now':
+    'online agora',
 };
 
 export default dict;

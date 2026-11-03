@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Un compteur de visiteurs en direct.',
-          text: 'Tant qu’une page est ouverte et visible, votre navigateur envoie un petit signal environ une fois par minute afin que le propriétaire puisse voir combien de personnes se trouvent sur le site en ce moment. Il contient un code aléatoire créé à l’ouverture de la page et rien d’autre, rien n’est enregistré dans votre navigateur, et rien n’est envoyé si votre navigateur demande à ne pas être suivi.',
+          text: 'Tant qu’une page est ouverte et visible, votre navigateur envoie un petit signal environ une fois par minute afin que le site puisse compter combien de personnes s’y trouvent en ce moment et afficher ce nombre dans l’en-tête. Il contient un code aléatoire créé à l’ouverture de la page et rien d’autre, rien n’est enregistré dans votre navigateur, et rien n’est envoyé si votre navigateur demande à ne pas être suivi.',
         },
         {
           title: 'La publicité.',

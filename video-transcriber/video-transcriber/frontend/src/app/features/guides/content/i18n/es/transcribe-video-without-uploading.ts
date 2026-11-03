@@ -112,7 +112,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Un contador de visitantes en vivo.',
-          text: 'Mientras una página está abierta y a la vista, tu navegador envía una pequeña señal aproximadamente una vez por minuto para que el propietario pueda ver cuántas personas hay en el sitio ahora mismo. Lleva un código aleatorio generado al abrirse la página y nada más, no se guarda nada en tu navegador y no se envía nada si tu navegador pide que no se le rastree.',
+          text: 'Mientras una página está abierta y a la vista, tu navegador envía una pequeña señal aproximadamente una vez por minuto para que el sitio pueda contar cuántas personas hay en él ahora mismo y mostrar ese número en el encabezado. Lleva un código aleatorio generado al abrirse la página y nada más, no se guarda nada en tu navegador y no se envía nada si tu navegador pide que no se le rastree.',
         },
         {
           title: 'Publicidad.',

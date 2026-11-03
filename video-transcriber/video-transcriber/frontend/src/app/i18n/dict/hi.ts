@@ -1147,9 +1147,11 @@ const dict: Record<string, string> = {
     '**लाइव विज़िटर काउंट।** जब तक इस वेबसाइट का कोई पेज खुला है और स्क्रीन पर दिख रहा है, आपका ब्राउज़र लगभग हर मिनट हमारे काउंटर (एक Cloudflare Worker) को एक छोटा गुमनाम "मैं यहाँ हूँ" संकेत भेजता है, ताकि हम देख सकें कि अभी कितने लोग साइट इस्तेमाल कर रहे हैं। उसमें पेज खुलते समय बना एक रैंडम कोड होता है (जो कभी कुकी या ब्राउज़र स्टोरेज में सेव नहीं होता, और हर विज़िट पर नया होता है) और उसके अलावा कुछ नहीं: कोई फ़ाइल नहीं, कोई ट्रांसक्रिप्ट नहीं, कोई और जानकारी नहीं। अगर आपका ब्राउज़र ट्रैक न किए जाने को कहता है (Do Not Track या Global Privacy Control), तो कुछ भी नहीं भेजा जाता। Cloudflare रास्ते में आपका IP पता देखता है और दुरुपयोग रोकने के लिए उसे थोड़े समय के लिए इस्तेमाल करता है (रेट लिमिट)।',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'लाइव विज़िटर काउंट भी इसी तरह काम करता है: पेज खुला रहने पर वह एक रैंडम कोड भेजता है जिसे आपके जाने के कुछ ही देर बाद हटा दिया जाता है, कभी कोई फ़ाइल या ट्रांसक्रिप्ट नहीं, और अगर आपका ब्राउज़र Do Not Track भेजता है तो कुछ भी नहीं। विवरण [प्राइवेसी पॉलिसी](/privacy) में हैं।',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'लाइव विज़िटर काउंट के रैंडम कोड सिर्फ़ यह गिनने के लिए रखे जाते हैं कि कौन यहाँ है: हर कोड पेज बंद होने के कुछ ही देर बाद हटा दिया जाता है, और ज़्यादा से ज़्यादा तब जब अगली विज़िट गिनी जाती है। सिर्फ़ मौजूदा संख्या दिखती है, और सिर्फ़ हमें।',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'लाइव विज़िटर काउंट के रैंडम कोड सिर्फ़ यह गिनने के लिए रखे जाते हैं कि कौन यहाँ है: हर कोड पेज बंद होने के कुछ ही देर बाद हटा दिया जाता है, और ज़्यादा से ज़्यादा तब जब अगली विज़िट गिनी जाती है। सिर्फ़ मौजूदा संख्या दिखती है, पेज के हेडर में।',
   'Want to place your ad here? Contact us:':
     'अपना विज्ञापन यहाँ लगाना चाहते हैं? हमसे संपर्क करें:',
+  'online now':
+    'अभी ऑनलाइन',
 };
 export default dict;

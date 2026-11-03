@@ -22,6 +22,7 @@ function fakeWindow(opts: { dnt?: string; gpc?: boolean; visible?: boolean; cryp
     btoa: (s: string) => btoa(s),
     fetch,
     setInterval: (fn: () => void, ms: number) => setInterval(fn, ms),
+    setTimeout: (fn: () => void, ms: number) => setTimeout(fn, ms),
     clearInterval: (id: number) => clearInterval(id),
   };
   return { win: win as unknown as Window, doc, fetch, listeners, sendBeacon, winListeners };
@@ -146,5 +147,81 @@ describe('presence (the live-visitor signal)', () => {
     expect(w['localStorage']).toBeUndefined();
     expect(w['sessionStorage']).toBeUndefined();
     expect((w['document'] as Record<string, unknown>)['cookie']).toBeUndefined();
+  });
+
+  describe('reading the number for the header', () => {
+    /** a window whose fetch answers /_live/count with `body` (a number, or a function of the call number) and everything else with 204 */
+    function withCount(body: unknown | ((n: number) => unknown), opts: Parameters<typeof fakeWindow>[0] = {}) {
+      const f = fakeWindow(opts);
+      let reads = 0;
+      f.fetch.mockImplementation(((url: string) => {
+        if (String(url).endsWith('/_live/count')) {
+          const b = typeof body === 'function' ? (body as (n: number) => unknown)(++reads) : body;
+          return b === 'fail' ? Promise.reject(new Error('down')) : Promise.resolve(new Response(JSON.stringify(b), { status: 200 }));
+        }
+        return Promise.resolve(new Response(null, { status: 204 }));
+      }) as never);
+      return f;
+    }
+    const flush = async () => {
+      for (let i = 0; i < 6; i++) await Promise.resolve();
+    };
+
+    it('reads the number a moment after the first ping, then once a minute, with a plain GET that sends nothing', async () => {
+      const { win, fetch } = withCount({ active: 7 });
+      const seen: (number | null)[] = [];
+      startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
+      expect(seen).toEqual([]);
+      await vi.advanceTimersByTimeAsync(1_600);
+      expect(seen).toEqual([7]);
+      await vi.advanceTimersByTimeAsync(MINUTE);
+      expect(seen).toEqual([7, 7]);
+      const calls = fetch.mock.calls as unknown as [string, RequestInit | undefined][];
+      const reads = calls.filter((c) => c[0].endsWith('/_live/count'));
+      expect(reads[0][0]).toBe('https://transcribevid.com/_live/count');
+      expect(reads[0][1]?.method).toBeUndefined();
+      expect(reads[0][1]?.credentials).toBe('omit');
+      expect(reads[0][1]?.body).toBeUndefined();
+    });
+
+    it('a visitor who opted out of tracking sends no ping and no code, but still sees the number', async () => {
+      const { win, fetch } = withCount({ active: 3 }, { dnt: '1' });
+      const seen: (number | null)[] = [];
+      startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
+      await vi.advanceTimersByTimeAsync(1_600);
+      expect(seen).toEqual([3]);
+      const urls = (fetch.mock.calls as unknown as [string][]).map((c) => c[0]);
+      expect(urls.every((u) => u.endsWith('/_live/count'))).toBe(true);
+      expect(urls.some((u) => u.includes('t='))).toBe(false);
+    });
+
+    it('does not read while the tab is hidden', async () => {
+      const { win, fetch } = withCount({ active: 3 }, { visible: false });
+      startPresence('https://transcribevid.com/api', win, () => undefined);
+      await vi.advanceTimersByTimeAsync(3 * MINUTE);
+      expect(fetch).not.toHaveBeenCalled();
+    });
+
+    it('ignores nonsense answers and hides the number after three failures in a row', async () => {
+      const { win } = withCount((n: number) => (n === 1 ? { active: 4 } : n === 2 ? { active: -1 } : n === 3 ? { active: 'many' } : 'fail'));
+      const seen: (number | null)[] = [];
+      startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
+      for (let i = 0; i < 4; i++) {
+        await vi.advanceTimersByTimeAsync(i === 0 ? 1_600 : MINUTE);
+        await flush();
+      }
+      expect(seen).toEqual([4, null]); // 4 shown; then -1, "many" and an error are three failures: hidden
+    });
+
+    it('rounds down, and a success resets the failure count', async () => {
+      const { win } = withCount((n: number) => (n === 1 ? 'fail' : n === 2 ? 'fail' : n === 3 ? { active: 2.9 } : 'fail'));
+      const seen: (number | null)[] = [];
+      startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
+      for (let i = 0; i < 4; i++) {
+        await vi.advanceTimersByTimeAsync(i === 0 ? 1_600 : MINUTE);
+        await flush();
+      }
+      expect(seen).toEqual([2]);
+    });
   });
 });

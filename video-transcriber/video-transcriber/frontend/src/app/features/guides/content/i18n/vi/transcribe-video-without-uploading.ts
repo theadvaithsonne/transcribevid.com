@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Số người truy cập trực tiếp.',
-          text: 'Khi một trang đang mở và hiển thị, trình duyệt của bạn gửi một tín hiệu nhỏ khoảng mỗi phút một lần để chủ trang web biết hiện có bao nhiêu người đang ở trên trang. Tín hiệu chỉ mang một mã ngẫu nhiên được tạo ra khi trang mở và không có gì khác, không có gì được lưu trong trình duyệt của bạn, và sẽ không có gì được gửi nếu trình duyệt của bạn yêu cầu không bị theo dõi.',
+          text: 'Khi một trang đang mở và hiển thị, trình duyệt của bạn gửi một tín hiệu nhỏ khoảng mỗi phút một lần để trang web đếm được hiện có bao nhiêu người đang ở trên trang và hiển thị con số đó ở phần đầu trang. Tín hiệu chỉ mang một mã ngẫu nhiên được tạo ra khi trang mở và không có gì khác, không có gì được lưu trong trình duyệt của bạn, và sẽ không có gì được gửi nếu trình duyệt của bạn yêu cầu không bị theo dõi.',
         },
         {
           title: 'Quảng cáo.',

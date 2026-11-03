@@ -1134,10 +1134,11 @@ const dict: Record<string, string> = {
     '**عدّاد الزوّار المباشر.** ما دامت صفحة من هذا الموقع مفتوحة ومرئية، يرسل متصفحك إشارة صغيرة مجهولة «أنا هنا» إلى عدّادنا (Cloudflare Worker) مرة كل دقيقة تقريبًا، لكي نرى كم شخصًا يستخدم الموقع الآن. وتحمل رمزًا عشوائيًا أُنشئ عند فتح الصفحة (لا يُحفظ أبدًا في ملف تعريف ارتباط ولا في تخزين المتصفح، ويتجدد في كل زيارة) ولا شيء غيره: لا ملف ولا تفريغ ولا أي تفصيل آخر. ولا يُرسل شيء إذا طلب متصفحك عدم التتبع (Do Not Track أو Global Privacy Control). ترى Cloudflare عنوان IP الخاص بك أثناء العبور وتستخدمه لفترة وجيزة للحدّ من إساءة الاستخدام (حد للمعدّل).',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'يعمل عدّاد الزوّار المباشر بالطريقة نفسها: ما دامت الصفحة مفتوحة يرسل رمزًا عشوائيًا يُحذف بعد وقت قصير من مغادرتك، ولا يرسل أبدًا ملفًا ولا تفريغًا، ولا يرسل شيئًا على الإطلاق إذا كان متصفحك يرسل Do Not Track. التفاصيل في [سياسة الخصوصية](/privacy).',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'تُحفظ الرموز العشوائية لعدّاد الزوّار المباشر فقط لإحصاء من هو هنا: يُحذف كل رمز بعد وقت قصير من إغلاق الصفحة، وعلى أبعد تقدير عند احتساب الزيارة التالية. ولا يُعرض سوى الرقم الحالي، ولنا وحدنا.',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'تُحفظ الرموز العشوائية لعدّاد الزوّار المباشر فقط لإحصاء من هو هنا: يُحذف كل رمز بعد وقت قصير من إغلاق الصفحة، وعلى أبعد تقدير عند احتساب الزيارة التالية. ولا يُعرض سوى الرقم الحالي، في ترويسة الصفحة.',
   'Want to place your ad here? Contact us:':
     'هل تريد وضع إعلانك هنا؟ تواصل معنا:',
+  'online now': 'متصل الآن',
 };
 
 export default dict;

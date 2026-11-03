@@ -3,7 +3,8 @@
 # "videos transcribed" counter.
 #
 #   POST /_live/ping?t=<random code>        a page that is open says "I am here" (about once a minute)
-#   GET  /_live/now?key=<LIVE_KEY>         the owner's page with the number (&json=1 for {"active": n})
+#   GET  /_live/count                     the number the page header shows to every visitor
+#   GET  /_live/now?key=<LIVE_KEY>         the owner page with the number (&json=1 for {"active": n})
 #
 # Deploy (from this folder):  npx wrangler d1 create tv-live                           -> paste the database_id below
 #                             npx wrangler d1 execute tv-live --remote --file schema.sql
@@ -18,6 +19,7 @@ workers_dev = false
 routes = [
   { pattern = "transcribevid.com/_live/ping*", zone_name = "transcribevid.com" },
   { pattern = "transcribevid.com/_live/now*", zone_name = "transcribevid.com" },
+  { pattern = "transcribevid.com/_live/count*", zone_name = "transcribevid.com" },
 ]
 
 # Optional clean-up job every 5 minutes (src/index.ts scheduled). Cloudflare only accepts cron triggers once the account has a

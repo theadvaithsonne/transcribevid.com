@@ -1157,10 +1157,12 @@ const dict: Record<string, string> = {
     '**Jumlah pengunjung langsung.** Selama halaman situs ini terbuka dan terlihat, browser Anda mengirim sinyal anonim kecil "saya di sini" ke penghitung kami (Cloudflare Worker) sekitar satu kali per menit, sehingga kami bisa melihat berapa banyak orang yang sedang memakai situs saat ini. Sinyal itu membawa kode acak yang dibuat saat halaman dibuka (tidak pernah disimpan di cookie atau penyimpanan browser, dan baru di setiap kunjungan) dan tidak ada yang lain: tidak ada file, transkrip, atau detail lain. Tidak ada yang dikirim jika browser Anda meminta agar tidak dilacak (Do Not Track atau Global Privacy Control). Cloudflare melihat alamat IP Anda saat transit dan menggunakannya sebentar untuk membatasi penyalahgunaan (pembatasan laju).',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'Hitungan pengunjung langsung bekerja dengan cara yang sama: selama halaman terbuka, browser mengirim kode acak yang dihapus tidak lama setelah Anda pergi, tidak pernah file atau transkrip, dan sama sekali tidak ada yang dikirim jika browser Anda mengirim Do Not Track. Rinciannya ada di [Kebijakan privasi](/privacy).',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'Kode acak untuk hitungan pengunjung langsung disimpan hanya untuk menghitung siapa yang sedang ada di sini: setiap kode dihapus tidak lama setelah halaman ditutup, dan paling lambat saat kunjungan berikutnya dihitung. Hanya angka saat ini yang ditampilkan, dan hanya kepada kami.',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'Kode acak untuk hitungan pengunjung langsung disimpan hanya untuk menghitung siapa yang sedang ada di sini: setiap kode dihapus tidak lama setelah halaman ditutup, dan paling lambat saat kunjungan berikutnya dihitung. Hanya angka saat ini yang ditampilkan, di header halaman.',
   'Want to place your ad here? Contact us:':
     'Ingin memasang iklan Anda di sini? Hubungi kami:',
+  'online now':
+    'online sekarang',
 };
 
 export default dict;

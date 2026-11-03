@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Hitungan pengunjung langsung.',
-          text: 'Selama halaman terbuka dan terlihat, browser Anda mengirim sinyal kecil sekitar satu kali per menit agar pemilik situs bisa melihat berapa banyak orang yang sedang berada di situs saat ini. Sinyal itu membawa kode acak yang dibuat saat halaman dibuka dan tidak ada yang lain, tidak ada yang disimpan di browser Anda, dan tidak ada yang dikirim jika browser Anda meminta agar tidak dilacak.',
+          text: 'Selama halaman terbuka dan terlihat, browser Anda mengirim sinyal kecil sekitar satu kali per menit agar situs bisa menghitung berapa banyak orang yang sedang berada di situs saat ini dan menampilkan angka itu di header. Sinyal itu membawa kode acak yang dibuat saat halaman dibuka dan tidak ada yang lain, tidak ada yang disimpan di browser Anda, dan tidak ada yang dikirim jika browser Anda meminta agar tidak dilacak.',
         },
         {
           title: 'Iklan.',

@@ -1156,10 +1156,12 @@ const dict: Record<string, string> = {
     '**Số người truy cập trực tiếp.** Khi một trang của website này đang mở và hiển thị, trình duyệt của bạn gửi một tín hiệu ẩn danh nhỏ kiểu “tôi đang ở đây” đến bộ đếm của chúng tôi (một Cloudflare Worker) khoảng mỗi phút một lần, để chúng tôi biết hiện có bao nhiêu người đang dùng trang. Tín hiệu chỉ mang một mã ngẫu nhiên được tạo ra khi trang mở (không bao giờ lưu trong cookie hay bộ nhớ trình duyệt, và mới trong mỗi lượt truy cập) và không có gì khác: không tệp, không bản gỡ băng, không chi tiết nào khác. Sẽ không có gì được gửi nếu trình duyệt của bạn yêu cầu không bị theo dõi (Do Not Track hoặc Global Privacy Control). Cloudflare thấy địa chỉ IP của bạn khi truyền và dùng nó trong thời gian ngắn để hạn chế lạm dụng (giới hạn tốc độ).',
   'The live visitor count works the same way: while a page is open it sends a random code that is deleted soon after you leave, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
     'Số người truy cập trực tiếp hoạt động theo cách tương tự: khi một trang đang mở, nó gửi một mã ngẫu nhiên sẽ bị xóa ngay sau khi bạn rời đi, không bao giờ gửi tệp hay bản gỡ băng, và hoàn toàn không gửi gì nếu trình duyệt của bạn gửi Do Not Track. Chi tiết có trong [Chính sách quyền riêng tư](/privacy).',
-  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, and only to us.':
-    'Các mã ngẫu nhiên của số người truy cập trực tiếp chỉ được giữ để đếm xem ai đang ở đây: mỗi mã bị xóa ngay sau khi đóng trang, và chậm nhất là khi lượt truy cập tiếp theo được đếm. Chỉ con số hiện tại được hiển thị, và chỉ hiển thị cho chúng tôi.',
+  'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
+    'Các mã ngẫu nhiên của số người truy cập trực tiếp chỉ được giữ để đếm xem ai đang ở đây: mỗi mã bị xóa ngay sau khi đóng trang, và chậm nhất là khi lượt truy cập tiếp theo được đếm. Chỉ con số hiện tại được hiển thị, trong phần đầu trang.',
   'Want to place your ad here? Contact us:':
     'Muốn đặt quảng cáo của bạn ở đây? Hãy liên hệ chúng tôi:',
+  'online now':
+    'đang trực tuyến',
 };
 
 export default dict;

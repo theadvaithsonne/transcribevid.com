@@ -114,7 +114,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Uma contagem de visitantes ao vivo.',
-          text: 'Enquanto uma página está aberta e visível, o seu navegador envia um pequeno sinal cerca de uma vez por minuto, para que o dono do site veja quantas pessoas estão nele agora. O sinal leva um código aleatório criado quando a página foi aberta e nada mais, nada é salvo no seu navegador, e nada é enviado se o seu navegador pedir para não ser rastreado.',
+          text: 'Enquanto uma página está aberta e visível, o seu navegador envia um pequeno sinal cerca de uma vez por minuto, para que o site conte quantas pessoas estão nele agora e mostre esse número no cabeçalho. O sinal leva um código aleatório criado quando a página foi aberta e nada mais, nada é salvo no seu navegador, e nada é enviado se o seu navegador pedir para não ser rastreado.',
         },
         {
           title: 'Publicidade.',
