@@ -100,7 +100,7 @@ export const CONTENT: GuideContent = {
     },
     {
       title: 'Yine de neler gönderiliyor, dürüstçe',
-      paragraphs: ['Üç şey bir sunucuya ulaşır ve hiçbiri sizin dosyanız ya da metniniz değildir.'],
+      paragraphs: ['Dört şey bir sunucuya ulaşır ve hiçbiri sizin dosyanız ya da metniniz değildir.'],
       bullets: [
         {
           title: 'Barındırma.',
@@ -109,6 +109,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'Bir toplam sayaç.',
           text: 'Bir yazıya dökme bittiğinde tarayıcınız sitenin sayacına, üstbilgide gösterilen sayıya bir ekleyen tek bir boş istek gönderir. Dosya, transkript ya da tanımlayıcı taşımaz. Sayaç ziyaretçilerin tarayıcıları tarafından bildirilir ve bağımsız olarak doğrulanmaz.',
+        },
+        {
+          title: 'Canlı ziyaretçi sayısı.',
+          text: 'Bir sayfa açık ve görünür durumdayken tarayıcınız, sitenin sahibi şu anda sitede kaç kişi olduğunu görebilsin diye yaklaşık dakikada bir küçük bir sinyal gönderir. Sinyal, sayfa açıldığında üretilen rastgele bir kod dışında hiçbir şey taşımaz, tarayıcınızda hiçbir şey saklanmaz ve tarayıcınız izlenmek istemediğini bildiriyorsa hiçbir şey gönderilmez.',
         },
         {
           title: 'Reklamcılık.',
@@ -143,7 +147,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Çıkanlara bakın',
-          text: 'Filtre kutusuna method:POST yazın (Chrome ve Edge; Firefox aynı filtreyi kabul eder). transcribevid.com’a giden tek POST isteği, transkript bittikten sonra /api/count adresine giden boş bir istek olmalıdır. Onu açın ve istek gövdesini kontrol edin: boştur. Sayfa reklam gösteriyorsa Google’ın kendi betikleri Google’a kendi isteklerini yapar ve hiçbiri dosyanızı ya da transkriptinizi taşımaz. Dosyanızın boyutuna yakın hiçbir şey cihazınızdan çıkmaz.',
+          text: 'Filtre kutusuna method:POST yazın (Chrome ve Edge; Firefox aynı filtreyi kabul eder). transcribevid.com’a giden POST istekleri, transkript bittikten sonra /api/count adresine giden boş bir istek ve sayfa açıkken yaklaşık dakikada bir, tek içeriği adresindeki rastgele bir kod olan küçük bir /api/ping isteği olmalıdır. Bunları açın ve kontrol edin: hiçbirinin istek gövdesi yoktur. Sayfa reklam gösteriyorsa Google’ın kendi betikleri Google’a kendi isteklerini yapar ve hiçbiri dosyanızı ya da transkriptinizi taşımaz. Dosyanızın boyutuna yakın hiçbir şey cihazınızdan çıkmaz.',
         },
       ],
     },
@@ -215,7 +219,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'Dosyamın asla yüklenmediği gerçekten doğru mu?',
       answer:
-        'Evet, transcribevid.com’da. Tanıma tarayıcınızda çalışır ve dosyanız sayfa tarafından kendi diskinizden okunur. Bunu tarayıcınızın geliştirici araçlarındaki Network sekmesinde doğrulayabilirsiniz: transcribevid.com’a bir şey gönderen tek istek, transkript bittikten sonraki boş bir sayma isteğidir ve Google’ın reklam betikleri Google’a, dosyanızı asla taşımayan kendi isteklerini yapar.',
+        'Evet, transcribevid.com’da. Tanıma tarayıcınızda çalışır ve dosyanız sayfa tarafından kendi diskinizden okunur. Bunu tarayıcınızın geliştirici araçlarındaki Network sekmesinde doğrulayabilirsiniz: transcribevid.com’a bir şey gönderen tek istekler, transkript bittikten sonraki boş bir sayma isteği ile rastgele bir kod taşıyan, dakikada bir gönderilen küçük bir sinyaldir ve Google’ın reklam betikleri Google’a, dosyanızı asla taşımayan kendi isteklerini yapar.',
     },
     {
       question: 'Bağlantım yavaşsa yazıya dökme yine de çalışır mı?',

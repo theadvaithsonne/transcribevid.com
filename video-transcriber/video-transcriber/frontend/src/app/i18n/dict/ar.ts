@@ -1130,6 +1130,14 @@ const dict: Record<string, string> = {
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**إحصاءات الزيارات.** يحسب Cloudflare Web Analytics الزيارات إلى صفحاتنا: أي صفحة فُتحت، ومن أي موقع جئت، وبلدك، ومتصفحك ونوع جهازك، ومدى سرعة تحميل الصفحة. وتذكر Cloudflare أنها لا تضع ملفات تعريف ارتباط، ولا تحتفظ بأي معرّف على جهازك، ولا تستخدم البيانات لتتبعك من موقع إلى آخر.',
   'By {name}': 'بقلم {name}',
+  '**Live visitor count.** While a page of this website is open and in view, your browser sends a small anonymous "I am here" signal to our counter (a Cloudflare Worker) about once a minute, so we can see how many people are using the site right now. It carries a random code made up when the page opened (never saved in a cookie or in browser storage, and new on every visit) and nothing else: no file, no transcript, no other detail. Nothing is sent if your browser asks not to be tracked (Do Not Track or Global Privacy Control). Cloudflare sees your IP address in transit and uses it briefly to limit abuse (a rate limit).':
+    '**عدّاد الزوّار المباشر.** ما دامت صفحة من هذا الموقع مفتوحة ومرئية، يرسل متصفحك إشارة صغيرة مجهولة «أنا هنا» إلى عدّادنا (Cloudflare Worker) مرة كل دقيقة تقريبًا، لكي نرى كم شخصًا يستخدم الموقع الآن. وتحمل رمزًا عشوائيًا أُنشئ عند فتح الصفحة (لا يُحفظ أبدًا في ملف تعريف ارتباط ولا في تخزين المتصفح، ويتجدد في كل زيارة) ولا شيء غيره: لا ملف ولا تفريغ ولا أي تفصيل آخر. ولا يُرسل شيء إذا طلب متصفحك عدم التتبع (Do Not Track أو Global Privacy Control). ترى Cloudflare عنوان IP الخاص بك أثناء العبور وتستخدمه لفترة وجيزة للحدّ من إساءة الاستخدام (حد للمعدّل).',
+  'The live visitor count works the same way: while a page is open it sends a random code that is held for a few minutes only, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
+    'يعمل عدّاد الزوّار المباشر بالطريقة نفسها: ما دامت الصفحة مفتوحة يرسل رمزًا عشوائيًا يُحتفظ به بضع دقائق فقط، ولا يرسل أبدًا ملفًا ولا تفريغًا، ولا يرسل شيئًا على الإطلاق إذا كان متصفحك يرسل Do Not Track. التفاصيل في [سياسة الخصوصية](/privacy).',
+  'The random codes of the live visitor count are held for a few minutes only, to count who is here, and are then deleted. Only the current number is shown, and only to us.':
+    'تُحفظ الرموز العشوائية لعدّاد الزوّار المباشر بضع دقائق فقط، لإحصاء من هو هنا، ثم تُحذف. ولا يُعرض سوى الرقم الحالي، ولنا وحدنا.',
+  'Want to place your ad here? Contact us:':
+    'هل تريد وضع إعلانك هنا؟ تواصل معنا:',
 };
 
 export default dict;

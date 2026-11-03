@@ -101,7 +101,7 @@ export const CONTENT: GuideContent = {
     {
       title: 'Những gì vẫn được gửi đi, nói thật lòng',
       paragraphs: [
-        'Có ba thứ thực sự đến được một máy chủ, và không thứ nào là tệp hay văn bản của bạn.',
+        'Có bốn thứ thực sự đến được một máy chủ, và không thứ nào là tệp hay văn bản của bạn.',
       ],
       bullets: [
         {
@@ -111,6 +111,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'Một con số tổng đang chạy.',
           text: 'Khi một lần chuyển thành văn bản hoàn tất, trình duyệt của bạn gửi một yêu cầu trống đến bộ đếm của trang, bộ đếm này cộng thêm một vào con số hiển thị ở phần đầu trang. Yêu cầu đó không mang tệp, không mang bản gỡ băng và không mang mã định danh nào. Bộ đếm được báo cáo từ trình duyệt của người truy cập và không được kiểm chứng độc lập.',
+        },
+        {
+          title: 'Số người truy cập trực tiếp.',
+          text: 'Khi một trang đang mở và hiển thị, trình duyệt của bạn gửi một tín hiệu nhỏ khoảng mỗi phút một lần để chủ trang web biết hiện có bao nhiêu người đang ở trên trang. Tín hiệu chỉ mang một mã ngẫu nhiên được tạo ra khi trang mở và không có gì khác, không có gì được lưu trong trình duyệt của bạn, và sẽ không có gì được gửi nếu trình duyệt của bạn yêu cầu không bị theo dõi.',
         },
         {
           title: 'Quảng cáo.',
@@ -145,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Tìm những gì đi ra',
-          text: 'Gõ method:POST vào ô lọc (Chrome và Edge; Firefox chấp nhận cùng bộ lọc đó). Yêu cầu POST duy nhất đến transcribevid.com phải là một yêu cầu trống đến /api/count sau khi bản gỡ băng hoàn tất. Hãy mở nó và kiểm tra phần thân yêu cầu: nó trống. Nếu trang hiển thị quảng cáo, các đoạn mã riêng của Google tự gửi yêu cầu đến Google, và không yêu cầu nào mang tệp hay bản gỡ băng của bạn. Không có gì có dung lượng gần bằng tệp của bạn rời khỏi thiết bị của bạn.',
+          text: 'Gõ method:POST vào ô lọc (Chrome và Edge; Firefox chấp nhận cùng bộ lọc đó). Các yêu cầu POST đến transcribevid.com phải là một yêu cầu trống đến /api/count sau khi bản gỡ băng hoàn tất và, khoảng mỗi phút một lần khi trang đang mở, một yêu cầu /api/ping nhỏ mà nội dung duy nhất là một mã ngẫu nhiên nằm trong địa chỉ của nó. Hãy mở chúng và kiểm tra: không yêu cầu nào có phần thân yêu cầu. Nếu trang hiển thị quảng cáo, các đoạn mã riêng của Google tự gửi yêu cầu đến Google, và không yêu cầu nào mang tệp hay bản gỡ băng của bạn. Không có gì có dung lượng gần bằng tệp của bạn rời khỏi thiết bị của bạn.',
         },
       ],
     },
@@ -217,7 +221,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'Có thật là tệp của tôi không bao giờ bị tải lên không?',
       answer:
-        'Có, trên transcribevid.com. Việc nhận dạng chạy trong trình duyệt của bạn, và tệp của bạn được trang đọc từ chính ổ đĩa của bạn. Bạn có thể xác nhận điều đó trong tab Network của công cụ dành cho nhà phát triển: yêu cầu duy nhất gửi bất cứ thứ gì đến transcribevid.com là một yêu cầu đếm trống sau khi bản gỡ băng hoàn tất, và các đoạn mã quảng cáo của Google tự gửi các yêu cầu riêng đến Google mà không bao giờ mang tệp của bạn.',
+        'Có, trên transcribevid.com. Việc nhận dạng chạy trong trình duyệt của bạn, và tệp của bạn được trang đọc từ chính ổ đĩa của bạn. Bạn có thể xác nhận điều đó trong tab Network của công cụ dành cho nhà phát triển: các yêu cầu duy nhất gửi bất cứ thứ gì đến transcribevid.com là một yêu cầu đếm trống sau khi bản gỡ băng hoàn tất và một tín hiệu nhỏ mỗi phút một lần kèm mã ngẫu nhiên, và các đoạn mã quảng cáo của Google tự gửi các yêu cầu riêng đến Google mà không bao giờ mang tệp của bạn.',
     },
     {
       question: 'Việc chuyển thành văn bản có còn hoạt động nếu kết nối của tôi chậm không?',

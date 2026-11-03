@@ -1,0 +1,38 @@
+# TranscribeVid live-visitor count: one Cloudflare Worker + one Durable Object (SQLite-backed, free plan).
+# Separate from workers/counter on purpose: its own routes, so this one cannot break the "videos transcribed" counter.
+#
+#   POST /api/ping?t=<random code>        a page that is open says "I am here" (about once a minute)
+#   GET  /api/live?key=<LIVE_KEY>         the owner's page with the number (&json=1 for {"active": n})
+#
+# Deploy (from this folder):  npx wrangler deploy
+#                             npx wrangler secret put LIVE_KEY      -> a long random string; it is the owner's bookmark key
+# The more specific routes below win over workers/counter's "transcribevid.com/api/*".
+name = "tv-live"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+workers_dev = false
+routes = [
+  { pattern = "transcribevid.com/api/ping", zone_name = "transcribevid.com" },
+  { pattern = "transcribevid.com/api/live", zone_name = "transcribevid.com" },
+]
+
+[vars]
+# Comma-separated list of page origins allowed to ping.
+ALLOWED_ORIGINS = "https://transcribevid.com"
+
+[[durable_objects.bindings]]
+name = "PRESENCE"
+class_name = "Presence"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Presence"]
+
+# Per-IP limit on POST /api/ping: Cloudflare's Workers Rate Limiting binding (free). A page pings once a minute; 20 leaves
+# room for several people behind one address. If this wrangler version rejects the block, delete it: src/index.ts then
+# falls back to a per-isolate in-memory limit with the same numbers.
+[[ratelimits]]
+name = "PING_LIMITER"
+namespace_id = "1002"
+simple = { limit = 20, period = 60 }

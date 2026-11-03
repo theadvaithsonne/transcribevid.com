@@ -100,7 +100,7 @@ export const CONTENT: GuideContent = {
     },
     {
       title: 'What is still sent, honestly',
-      paragraphs: ['Three things do reach a server, and none of them is your file or your text.'],
+      paragraphs: ['Four things do reach a server, and none of them is your file or your text.'],
       bullets: [
         {
           title: 'The hosting.',
@@ -109,6 +109,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'A running total.',
           text: "When a transcription finishes, your browser sends one empty request to the site's counter, which adds one to the number shown in the header. It carries no file, no transcript and no identifier. The counter is reported by visitors' browsers and is not independently verified.",
+        },
+        {
+          title: 'A live visitor count.',
+          text: 'While a page is open and in view, your browser sends a small signal about once a minute so that the owner can see how many people are on the site right now. It carries a random code made up when the page opened and nothing else, nothing is saved in your browser, and nothing is sent if your browser asks not to be tracked.',
         },
         {
           title: 'Advertising.',
@@ -143,7 +147,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Look for what goes out',
-          text: "Type method:POST into the filter box (Chrome and Edge; Firefox accepts the same filter). The only POST request to transcribevid.com should be one empty request to /api/count after the transcript finishes. Open it and check its request body: it is empty. If the page shows ads, Google's own scripts make requests of their own to Google, and none of them carries your file or your transcript. Nothing close to the size of your file leaves your device.",
+          text: "Type method:POST into the filter box (Chrome and Edge; Firefox accepts the same filter). The POST requests to transcribevid.com should be one empty request to /api/count after the transcript finishes and, about once a minute while the page is open, a small /api/ping request whose only content is a random code in its address. Open them and check: neither has a request body. If the page shows ads, Google's own scripts make requests of their own to Google, and none of them carries your file or your transcript. Nothing close to the size of your file leaves your device.",
         },
       ],
     },
@@ -215,7 +219,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'Is it really true that my file is never uploaded?',
       answer:
-        "Yes, on transcribevid.com. The recognition runs in your browser, and your file is read from your own disk by the page. You can confirm it in the Network tab of your browser's developer tools: the only request that sends anything to transcribevid.com is one empty count request after the transcript finishes, and Google's ad scripts make requests of their own to Google that never carry your file.",
+        "Yes, on transcribevid.com. The recognition runs in your browser, and your file is read from your own disk by the page. You can confirm it in the Network tab of your browser's developer tools: the only requests that send anything to transcribevid.com are one empty count request after the transcript finishes and a small once-a-minute signal with a random code, and Google's ad scripts make requests of their own to Google that never carry your file.",
     },
     {
       question: 'Does the transcription still work if my connection is slow?',

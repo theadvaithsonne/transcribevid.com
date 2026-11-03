@@ -66,5 +66,9 @@ export class PrivacyPage {
     counter: _t(
       `**One running total.** When a transcription finishes, your browser sends one anonymous "+1" to our counter (a Cloudflare Worker). It carries no file, transcript or identifier. Cloudflare sees your IP address in transit and uses it briefly to limit abuse (a rate limit); we store only the total. The number shown in the page header is reported by visitors' browsers and is not verified.`,
     ),
+    live: _t(
+      `**Live visitor count.** While a page of this website is open and in view, your browser sends a small anonymous "I am here" signal to our counter (a Cloudflare Worker) about once a minute, so we can see how many people are using the site right now. It carries a random code made up when the page opened (never saved in a cookie or in browser storage, and new on every visit) and nothing else: no file, no transcript, no other detail. Nothing is sent if your browser asks not to be tracked (Do Not Track or Global Privacy Control). Cloudflare sees your IP address in transit and uses it briefly to limit abuse (a rate limit).`,
+    ),
+    liveKept: _t(`The random codes of the live visitor count are held for a few minutes only, to count who is here, and are then deleted. Only the current number is shown, and only to us.`),
   };
 }

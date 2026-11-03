@@ -11,7 +11,8 @@ import { JobsStore } from './core/jobs.store';
 import { JobSummary } from './core/models';
 import { SessionService } from './core/session.service';
 import { SiteService, TAGLINE } from './core/site.service';
-import { StatsService } from './core/stats.service';
+import { IS_BROWSER } from './core/platform';
+import { COUNTER_URL, StatsService } from './core/stats.service';
 import { ThemeService } from './core/theme.service';
 import { FOOTER_TOOLS } from './features/tool-pages/tool-pages.list';
 import { AdRail } from './shared/ad-rail';
@@ -44,6 +45,8 @@ export class App {
   private api = inject(ApiService);
   private router = inject(Router);
   private i18n = inject(I18nService);
+  private counterUrl = inject(COUNTER_URL);
+  private browser = inject(IS_BROWSER);
   /** the language service's translate, for the helpers that take one (fmtEta, timeAgo, errorDetail) */
   private readonly tr: Translate = (key, params) => this.i18n.t(key, params);
 
@@ -115,6 +118,10 @@ export class App {
         this.onJobPage.set(/^\/(?:[a-z]{2}\/)?jobs\//.test((e as NavigationEnd).urlAfterRedirects));
         this.closeAll();
       });
+    // The live-visitor signal (core/presence.ts): its own small download a few seconds after the page is up, so it never
+    // delays the first paint. Only the public website has a counter address; the local / self-hosted edition and the
+    // prerender have none, so nothing starts there.
+    if (this.browser && this.counterUrl) setTimeout(() => import('./core/presence').then((m) => m.startPresence(this.counterUrl)).catch(() => undefined), 3000);
   }
 
   /**

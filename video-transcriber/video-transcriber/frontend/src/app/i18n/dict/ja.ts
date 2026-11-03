@@ -1152,5 +1152,13 @@ const dict: Record<string, string> = {
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**アクセス統計。** Cloudflare Web Analyticsは、当サイトのページへの訪問数を集計します。どのページが開かれたか、どのサイトから来たか、お住まいの国、ブラウザーと端末の種類、ページの読み込みの速さが対象です。Cloudflareによると、Cookieは設定せず、お使いの端末に識別子も残さず、データを使って他のウェブサイトまであなたを追跡することもありません。',
   'By {name}': '著者：{name}',
+  '**Live visitor count.** While a page of this website is open and in view, your browser sends a small anonymous "I am here" signal to our counter (a Cloudflare Worker) about once a minute, so we can see how many people are using the site right now. It carries a random code made up when the page opened (never saved in a cookie or in browser storage, and new on every visit) and nothing else: no file, no transcript, no other detail. Nothing is sent if your browser asks not to be tracked (Do Not Track or Global Privacy Control). Cloudflare sees your IP address in transit and uses it briefly to limit abuse (a rate limit).':
+    '**リアルタイムの訪問者数。** 当サイトのページが開かれていて表示されている間、お使いのブラウザーは約1分に1回、「ここにいます」という匿名の小さな信号を当社のカウンター（Cloudflare Worker）に送ります。いま何人がサイトを使っているかを把握するためです。信号に含まれるのは、ページを開いたときに作られるランダムなコード（Cookieにもブラウザーの保存領域にも保存されず、訪問のたびに新しくなります）だけで、ファイル、文字起こし、その他の情報は一切含まれません。ブラウザーが追跡しないよう求めている場合（Do Not Track（トラッキング拒否）またはGlobal Privacy Control（グローバル・プライバシー・コントロール））は、何も送信されません。Cloudflareは通信中にお客様のIPアドレスを確認し、不正利用を制限するために（レート制限として）一時的に使用します。',
+  'The live visitor count works the same way: while a page is open it sends a random code that is held for a few minutes only, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
+    'リアルタイムの訪問者数も同じ仕組みです。ページが開いている間、数分間だけ保持されるランダムなコードを送りますが、ファイルや文字起こしを送ることはなく、ブラウザーがDo Not Trackを送っている場合は何も送りません。詳しくは[プライバシーポリシー](/privacy)をご覧ください。',
+  'The random codes of the live visitor count are held for a few minutes only, to count who is here, and are then deleted. Only the current number is shown, and only to us.':
+    'リアルタイムの訪問者数のランダムなコードは、いまここにいる人を数えるために数分間だけ保持され、その後削除されます。表示されるのは現在の数だけで、当社だけが見られます。',
+  'Want to place your ad here? Contact us:':
+    '広告をここに掲載しませんか？お問い合わせはこちら：',
 };
 export default dict;

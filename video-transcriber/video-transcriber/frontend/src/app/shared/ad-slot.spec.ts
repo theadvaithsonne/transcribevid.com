@@ -132,6 +132,20 @@ describe('AdSlot', () => {
       expect(label().classList).not.toContain('on');
     });
 
+    it('the empty box says who to write to for a direct ad, above the note, with a mailto link to the operator only', async () => {
+      await setup({ config: INERT });
+      const msg = fixture.nativeElement.querySelector('.ad-msg') as HTMLElement;
+      expect(msg.querySelector('.ad-sell')?.textContent).toContain('Want to place your ad here? Contact us:');
+      const link = msg.querySelector('a.ad-mail') as HTMLAnchorElement;
+      expect(link.getAttribute('href')).toBe('mailto:theadvaithsonne@gmail.com?subject=Advertising%20on%20TranscribeVid');
+      expect(link.textContent).toBe('theadvaithsonne@gmail.com');
+      expect(msg.querySelectorAll('a').length).toBe(1);
+      // the contact line comes before the house note, and neither is inside the element Google fills
+      expect(msg.firstElementChild?.classList).toContain('ad-sell');
+      expect(msg.lastElementChild?.classList).toContain('ad-note');
+      expect(fixture.nativeElement.querySelector('.ad-ins')?.contains(msg)).toBe(false);
+    });
+
     it('an edition without ads: nothing at all (hidden, no note for screen readers)', async () => {
       await setup({ edition: false });
       expect(host()!.classList).toContain('off');

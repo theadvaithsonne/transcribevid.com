@@ -100,7 +100,7 @@ export const CONTENT: GuideContent = {
     },
     {
       title: 'Cosa viene comunque inviato, onestamente',
-      paragraphs: ['Tre cose raggiungono un server, e nessuna è il tuo file o il tuo testo.'],
+      paragraphs: ['Quattro cose raggiungono un server, e nessuna è il tuo file o il tuo testo.'],
       bullets: [
         {
           title: "L'hosting.",
@@ -109,6 +109,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'Un totale progressivo.',
           text: "Quando una trascrizione finisce, il tuo browser invia una richiesta vuota al contatore del sito, che aggiunge uno al numero mostrato nell'intestazione. Non contiene alcun file, alcuna trascrizione né alcun identificativo. Il contatore è riportato dai browser dei visitatori e non è verificato in modo indipendente.",
+        },
+        {
+          title: 'Un conteggio dei visitatori in tempo reale.',
+          text: "Finché una pagina è aperta e in primo piano, il tuo browser invia un piccolo segnale circa una volta al minuto, così il titolare può vedere quante persone sono sul sito in questo momento. Contiene un codice casuale generato all'apertura della pagina e nient'altro, nulla viene salvato nel tuo browser e nulla viene inviato se il tuo browser chiede di non essere tracciato.",
         },
         {
           title: 'La pubblicità.',
@@ -143,7 +147,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Cerca ciò che esce',
-          text: "Scrivi method:POST nella casella del filtro (Chrome ed Edge; Firefox accetta lo stesso filtro). L'unica richiesta POST a transcribevid.com dovrebbe essere una richiesta vuota a /api/count dopo la fine della trascrizione. Aprila e controlla il suo corpo: è vuoto. Se la pagina mostra annunci, gli script di Google fanno richieste proprie a Google, e nessuna porta il tuo file o la tua trascrizione. Nulla di vicino alla dimensione del tuo file lascia il tuo dispositivo.",
+          text: "Scrivi method:POST nella casella del filtro (Chrome ed Edge; Firefox accetta lo stesso filtro). Le richieste POST a transcribevid.com dovrebbero essere una richiesta vuota a /api/count dopo la fine della trascrizione e, circa una volta al minuto mentre la pagina è aperta, una piccola richiesta /api/ping il cui unico contenuto è un codice casuale nel suo indirizzo. Aprile e controlla: nessuna delle due ha un corpo della richiesta. Se la pagina mostra annunci, gli script di Google fanno richieste proprie a Google, e nessuna porta il tuo file o la tua trascrizione. Nulla di vicino alla dimensione del tuo file lascia il tuo dispositivo.",
         },
       ],
     },
@@ -215,7 +219,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'È proprio vero che il mio file non viene mai caricato?',
       answer:
-        "Sì, su transcribevid.com. Il riconoscimento gira nel tuo browser, e il tuo file viene letto dal tuo disco dalla pagina. Puoi confermarlo nella scheda Rete degli strumenti per sviluppatori del browser: l'unica richiesta che invia qualcosa a transcribevid.com è una richiesta di conteggio vuota dopo la fine della trascrizione, e gli script pubblicitari di Google fanno richieste proprie a Google che non portano mai il tuo file.",
+        "Sì, su transcribevid.com. Il riconoscimento gira nel tuo browser, e il tuo file viene letto dal tuo disco dalla pagina. Puoi confermarlo nella scheda Rete degli strumenti per sviluppatori del browser: le uniche richieste che inviano qualcosa a transcribevid.com sono una richiesta di conteggio vuota dopo la fine della trascrizione e un piccolo segnale al minuto con un codice casuale, e gli script pubblicitari di Google fanno richieste proprie a Google che non portano mai il tuo file.",
     },
     {
       question: 'La trascrizione funziona ancora se la mia connessione è lenta?',

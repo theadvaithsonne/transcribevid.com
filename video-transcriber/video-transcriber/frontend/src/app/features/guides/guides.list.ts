@@ -51,7 +51,7 @@ export const GUIDES: readonly GuideLink[] = [
     description:
       'How in-browser transcription works, what stays on your device, what is downloaded once, and how to check it yourself in your browser network panel.',
     published: '2026-10-27',
-    updated: '2026-10-27',
+    updated: '2026-11-03',
   },
   {
     slug: 'accurate-transcripts',
@@ -111,7 +111,7 @@ export const GUIDES: readonly GuideLink[] = [
     description:
       'Is TranscribeVid safe? Who runs it, what happens to your video, what is stored, how the site pays for itself and five checks you can make yourself.',
     published: '2026-10-29',
-    updated: '2026-10-29',
+    updated: '2026-11-03',
   },
 ];
 

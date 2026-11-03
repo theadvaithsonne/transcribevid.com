@@ -1,6 +1,6 @@
 import { GuideContent } from '../guide.model';
 
-/** Every statement here is one the site's own privacy policy and code make (checked 29 October 2026). No audit, certificate, user count or review is claimed because none exists. */
+/** Every statement here is one the site's own privacy policy and code make (checked 3 November 2026). No audit, certificate, user count or review is claimed because none exists. */
 export const CONTENT: GuideContent = {
   h1: 'Is TranscribeVid safe? Who runs it, what it does with your video, and how to check',
   lead: 'TranscribeVid is a small website run by one named developer. Your video or audio is transcribed inside your own browser and is not sent to the site, there is no account, and no payment is ever asked for. It has not been independently audited and has no security certificate, so this page says exactly what it does and shows you how to check the main claim yourself.',
@@ -63,6 +63,10 @@ export const CONTENT: GuideContent = {
           text: 'When a transcription finishes, your browser sends one empty request that adds one to the number shown in the header. It carries no file, no text and no identifier.',
         },
         {
+          title: 'A live visitor count.',
+          text: 'While a page is open and in view, your browser sends a small signal about once a minute so the owner can see how many people are on the site right now. It carries a random code made up when the page opened, never saved in a cookie or in your browser, and nothing else. The code is held for a few minutes and then deleted. Nothing is sent if your browser asks not to be tracked (Do Not Track or Global Privacy Control).',
+        },
+        {
           title: 'Advertising.',
           text: 'See the next section.',
         },
@@ -94,7 +98,7 @@ export const CONTENT: GuideContent = {
         { title: 'Read the address', text: 'It must be exactly transcribevid.com, with a closed padlock beside it. Sites with similar spellings exist and have no connection to this one.' },
         { title: 'Look for a payment or sign-in prompt', text: 'There is none, anywhere on the site. If a page claiming to be TranscribeVid asks for a card number or a password, it is not this site.' },
         { title: 'Open the Privacy page', text: 'Link at the bottom of every page. It names the operator and says what is stored and for how long.' },
-        { title: 'Watch the Network tab', text: 'Press F12, choose Network, start a transcription and look for what goes out. The only request that reaches transcribevid.com with a body is one empty request after the transcript is done.' },
+        { title: 'Watch the Network tab', text: 'Press F12, choose Network, start a transcription and look for what goes out. Besides the page and its downloads, the only requests to transcribevid.com are one empty count after the transcript is done and a small signal about once a minute while the page is open. Neither carries your file or your text.' },
         { title: 'Try a short, harmless file first', text: 'Use a recording with nothing private in it, see how the site behaves, and then decide about the rest.' },
       ],
     },

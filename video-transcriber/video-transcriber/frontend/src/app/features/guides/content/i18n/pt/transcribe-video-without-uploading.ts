@@ -101,7 +101,7 @@ export const CONTENT: GuideContent = {
     {
       title: 'O que ainda é enviado, com franqueza',
       paragraphs: [
-        'Três coisas chegam, sim, a um servidor, e nenhuma delas é o seu arquivo nem o seu texto.',
+        'Quatro coisas chegam, sim, a um servidor, e nenhuma delas é o seu arquivo nem o seu texto.',
       ],
       bullets: [
         {
@@ -111,6 +111,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'Um total corrente.',
           text: 'Quando uma transcrição termina, o seu navegador envia uma requisição vazia ao contador do site, que soma um ao número mostrado no cabeçalho. Ela não leva arquivo, transcrição nem identificador. O contador é informado pelos navegadores dos visitantes e não é verificado de forma independente.',
+        },
+        {
+          title: 'Uma contagem de visitantes ao vivo.',
+          text: 'Enquanto uma página está aberta e visível, o seu navegador envia um pequeno sinal cerca de uma vez por minuto, para que o dono do site veja quantas pessoas estão nele agora. O sinal leva um código aleatório criado quando a página foi aberta e nada mais, nada é salvo no seu navegador, e nada é enviado se o seu navegador pedir para não ser rastreado.',
         },
         {
           title: 'Publicidade.',
@@ -145,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Procure o que sai',
-          text: 'Digite method:POST na caixa de filtro (Chrome e Edge; o Firefox aceita o mesmo filtro). A única requisição POST ao transcribevid.com deve ser uma requisição vazia a /api/count depois que a transcrição termina. Abra-a e confira o corpo da requisição: ele está vazio. Se a página mostrar anúncios, os scripts do próprio Google fazem requisições próprias ao Google, e nenhuma delas leva o seu arquivo nem a sua transcrição. Nada perto do tamanho do seu arquivo sai do seu dispositivo.',
+          text: 'Digite method:POST na caixa de filtro (Chrome e Edge; o Firefox aceita o mesmo filtro). As requisições POST ao transcribevid.com devem ser uma requisição vazia a /api/count depois que a transcrição termina e, cerca de uma vez por minuto enquanto a página está aberta, uma pequena requisição a /api/ping cujo único conteúdo é um código aleatório no endereço. Abra-as e confira: nenhuma tem corpo de requisição. Se a página mostrar anúncios, os scripts do próprio Google fazem requisições próprias ao Google, e nenhuma delas leva o seu arquivo nem a sua transcrição. Nada perto do tamanho do seu arquivo sai do seu dispositivo.',
         },
       ],
     },
@@ -217,7 +221,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'É mesmo verdade que o meu arquivo nunca é enviado?',
       answer:
-        'Sim, no transcribevid.com. O reconhecimento roda no seu navegador, e o seu arquivo é lido do seu próprio disco pela página. Você pode confirmar na aba Rede das ferramentas do desenvolvedor do navegador: a única requisição que envia algo ao transcribevid.com é uma requisição de contagem vazia depois que a transcrição termina, e os scripts de anúncios do Google fazem requisições próprias ao Google que nunca levam o seu arquivo.',
+        'Sim, no transcribevid.com. O reconhecimento roda no seu navegador, e o seu arquivo é lido do seu próprio disco pela página. Você pode confirmar na aba Rede das ferramentas do desenvolvedor do navegador: as únicas requisições que enviam algo ao transcribevid.com são uma requisição de contagem vazia depois que a transcrição termina e um pequeno sinal uma vez por minuto com um código aleatório, e os scripts de anúncios do Google fazem requisições próprias ao Google que nunca levam o seu arquivo.',
     },
     {
       question: 'A transcrição ainda funciona se a minha conexão for lenta?',

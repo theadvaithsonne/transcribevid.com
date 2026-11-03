@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 import { AdSenseConfig } from '../core/ads.config';
 import { AdsService } from '../core/ads.service';
+import { OPERATOR } from '../core/operator';
 import { LogService } from '../core/log.service';
 import { IS_BROWSER } from '../core/platform';
 import { I18nService } from '../i18n/i18n.service';
@@ -71,7 +72,13 @@ export const HOUSE_NOTE = _t('Ads keep TranscribeVid free. Everything works with
     <div class="ad-box" [class.has-ins]="state() === 'pending' || state() === 'filled'">
       <div class="ad-ins" #insHost></div>
       @if (noteShown()) {
-        <p class="ad-note">{{ note | t }}</p>
+        <div class="ad-msg">
+          <p class="ad-sell">
+            {{ 'Want to place your ad here? Contact us:' | t }}
+            <a class="ad-mail" [href]="mailto">{{ mailUser }}@<wbr />{{ mailHost }}</a>
+          </p>
+          <p class="ad-note">{{ note | t }}</p>
+        </div>
       }
     </div>
   `,
@@ -144,18 +151,31 @@ export const HOUSE_NOTE = _t('Ads keep TranscribeVid free. Everything works with
       width: 100%;
       line-height: 0;
     }
-    .ad-note {
+    /* the empty box: who to write to for a direct ad, above the plain note. Only the e-mail is a link; nothing is dressed as an ad */
+    .ad-msg {
       position: absolute;
       inset: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      margin: 0;
+      gap: 20px;
       padding: 16px;
       text-align: center;
       font-size: var(--fs-sm);
       line-height: 1.5;
       color: var(--muted);
+    }
+    .ad-sell,
+    .ad-note {
+      margin: 0;
+    }
+    .ad-mail {
+      display: inline-block;
+      font-weight: 600;
+      color: inherit;
+      text-decoration: underline;
+      overflow-wrap: anywhere;
     }
     /* "Use less data": no ad request (the box has no width), the note stays */
     @media (prefers-reduced-data: reduce) {
@@ -192,6 +212,10 @@ export class AdSlot {
 
   private i18n = inject(I18nService);
   readonly note = HOUSE_NOTE;
+  /** where a business writes to place a direct ad: shown in the empty box only, never beside a real ad */
+  readonly mailUser = OPERATOR.email.split('@')[0];
+  readonly mailHost = OPERATOR.email.split('@')[1];
+  readonly mailto = `mailto:${OPERATOR.email}?subject=Advertising%20on%20TranscribeVid`;
   /** the unit's accessible name, in the page's language */
   readonly adLabel = computed(() => this.i18n.t('Advertisement'));
   readonly state = signal<AdSlotState>('reserved');

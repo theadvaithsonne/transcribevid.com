@@ -101,7 +101,7 @@ export const CONTENT: GuideContent = {
     {
       title: 'Was weiterhin gesendet wird, ehrlich gesagt',
       paragraphs: [
-        'Drei Dinge erreichen tatsächlich einen Server, und keines davon ist Ihre Datei oder Ihr Text.',
+        'Vier Dinge erreichen tatsächlich einen Server, und keines davon ist Ihre Datei oder Ihr Text.',
       ],
       bullets: [
         {
@@ -111,6 +111,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'Eine laufende Gesamtzahl.',
           text: 'Wenn eine Transkription abgeschlossen ist, sendet Ihr Browser eine leere Anfrage an den Zähler der Seite, der die im Header angezeigte Zahl um eins erhöht. Sie enthält keine Datei, kein Transkript und keine Kennung. Der Zähler wird von den Browsern der Besucher gemeldet und ist nicht unabhängig geprüft.',
+        },
+        {
+          title: 'Ein Zähler für aktuelle Besucher.',
+          text: 'Solange eine Seite geöffnet und sichtbar ist, sendet Ihr Browser etwa einmal pro Minute ein kleines Signal, damit der Betreiber sehen kann, wie viele Menschen gerade auf der Seite sind. Es enthält einen beim Öffnen der Seite erzeugten Zufallscode und sonst nichts, nichts wird in Ihrem Browser gespeichert, und es wird nichts gesendet, wenn Ihr Browser darum bittet, nicht verfolgt zu werden.',
         },
         {
           title: 'Werbung.',
@@ -145,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Nach dem suchen, was hinausgeht',
-          text: 'Tippen Sie method:POST in das Filterfeld (Chrome und Edge; Firefox akzeptiert denselben Filter). Die einzige POST-Anfrage an transcribevid.com sollte eine leere Anfrage an /api/count nach Abschluss des Transkripts sein. Öffnen Sie sie und prüfen Sie ihren Anfragetext: Er ist leer. Zeigt die Seite Werbung, stellen die Skripte von Google eigene Anfragen an Google, und keine davon trägt Ihre Datei oder Ihr Transkript. Nichts annähernd in der Größe Ihrer Datei verlässt Ihr Gerät.',
+          text: 'Tippen Sie method:POST in das Filterfeld (Chrome und Edge; Firefox akzeptiert denselben Filter). Die POST-Anfragen an transcribevid.com sollten eine leere Anfrage an /api/count nach Abschluss des Transkripts sein und, etwa einmal pro Minute, solange die Seite geöffnet ist, eine kleine /api/ping-Anfrage, deren einziger Inhalt ein Zufallscode in ihrer Adresse ist. Öffnen Sie sie und prüfen Sie: Keine von beiden hat einen Anfragetext. Zeigt die Seite Werbung, stellen die Skripte von Google eigene Anfragen an Google, und keine davon trägt Ihre Datei oder Ihr Transkript. Nichts annähernd in der Größe Ihrer Datei verlässt Ihr Gerät.',
         },
       ],
     },
@@ -217,7 +221,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'Stimmt es wirklich, dass meine Datei nie hochgeladen wird?',
       answer:
-        'Ja, auf transcribevid.com. Die Erkennung läuft in Ihrem Browser, und Ihre Datei wird von der Seite von Ihrer eigenen Festplatte gelesen. Sie können es im Tab „Netzwerk“ der Entwicklerwerkzeuge Ihres Browsers bestätigen: Die einzige Anfrage, die etwas an transcribevid.com sendet, ist eine leere Zähl-Anfrage nach Abschluss des Transkripts, und die Werbeskripte von Google stellen eigene Anfragen an Google, die nie Ihre Datei tragen.',
+        'Ja, auf transcribevid.com. Die Erkennung läuft in Ihrem Browser, und Ihre Datei wird von der Seite von Ihrer eigenen Festplatte gelesen. Sie können es im Tab „Netzwerk“ der Entwicklerwerkzeuge Ihres Browsers bestätigen: Die einzigen Anfragen, die etwas an transcribevid.com senden, sind eine leere Zähl-Anfrage nach Abschluss des Transkripts und ein kleines Signal pro Minute mit einem Zufallscode, und die Werbeskripte von Google stellen eigene Anfragen an Google, die nie Ihre Datei tragen.',
     },
     {
       question: 'Funktioniert die Transkription auch bei langsamer Verbindung?',

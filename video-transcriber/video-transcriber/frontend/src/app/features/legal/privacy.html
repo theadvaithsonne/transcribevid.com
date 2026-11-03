@@ -44,6 +44,9 @@
         <app-rich [text]="T.counter | t" />
       </li>
       <li>
+        <app-rich [text]="T.live | t" />
+      </li>
+      <li>
         <app-rich [text]="'**A technical log in this tab.** The Logs page shows this tab\'s own technical log. It stays in your browser and is never sent anywhere.' | t" />
       </li>
     </ul>
@@ -63,6 +66,7 @@
         <app-rich [text]="'**Speech models stay in your browser\'s cache** (Cache Storage), so the next transcription starts faster, until you delete them (**Delete my data now** can delete them too) or your browser clears its storage. They are program files, not your data.' | t" />
       </li>
       <li>{{ 'We keep nothing of yours on our side: apart from the single running total, nothing about your use is stored by us.' | t }}</li>
+      <li>{{ T.liveKept | t }}</li>
     </ul>
     <p>{{ 'Because your transcripts exist only in this browser, export what you need before you leave. Deleted data cannot be recovered.' | t }}</p>
 

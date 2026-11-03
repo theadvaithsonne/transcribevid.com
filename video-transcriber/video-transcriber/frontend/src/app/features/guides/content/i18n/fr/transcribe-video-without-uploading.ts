@@ -101,7 +101,7 @@ export const CONTENT: GuideContent = {
     {
       title: 'Ce qui est tout de même envoyé, en toute honnêteté',
       paragraphs: [
-        'Trois choses atteignent bien un serveur, et aucune n’est votre fichier ni votre texte.',
+        'Quatre choses atteignent bien un serveur, et aucune n’est votre fichier ni votre texte.',
       ],
       bullets: [
         {
@@ -111,6 +111,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'Un total cumulé.',
           text: 'Quand une transcription se termine, votre navigateur envoie une requête vide au compteur du site, qui ajoute un au nombre affiché dans l’en-tête. Elle ne contient ni fichier, ni transcription, ni identifiant. Le compteur est alimenté par les navigateurs des visiteurs et n’est pas vérifié de façon indépendante.',
+        },
+        {
+          title: 'Un compteur de visiteurs en direct.',
+          text: 'Tant qu’une page est ouverte et visible, votre navigateur envoie un petit signal environ une fois par minute afin que le propriétaire puisse voir combien de personnes se trouvent sur le site en ce moment. Il contient un code aléatoire créé à l’ouverture de la page et rien d’autre, rien n’est enregistré dans votre navigateur, et rien n’est envoyé si votre navigateur demande à ne pas être suivi.',
         },
         {
           title: 'La publicité.',
@@ -145,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Cherchez ce qui sort',
-          text: 'Saisissez method:POST dans la zone de filtre (Chrome et Edge ; Firefox accepte le même filtre). La seule requête POST vers transcribevid.com doit être une requête vide vers /api/count après la fin de la transcription. Ouvrez-la et vérifiez son corps : il est vide. Si la page affiche des publicités, les scripts de Google font leurs propres requêtes vers Google, et aucune ne transporte votre fichier ni votre transcription. Rien qui approche la taille de votre fichier ne quitte votre appareil.',
+          text: 'Saisissez method:POST dans la zone de filtre (Chrome et Edge ; Firefox accepte le même filtre). Les requêtes POST vers transcribevid.com doivent être une requête vide vers /api/count après la fin de la transcription et, environ une fois par minute tant que la page est ouverte, une petite requête /api/ping dont le seul contenu est un code aléatoire dans son adresse. Ouvrez-les et vérifiez : aucune n’a de corps de requête. Si la page affiche des publicités, les scripts de Google font leurs propres requêtes vers Google, et aucune ne transporte votre fichier ni votre transcription. Rien qui approche la taille de votre fichier ne quitte votre appareil.',
         },
       ],
     },
@@ -217,7 +221,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'Est-il vraiment vrai que mon fichier n’est jamais envoyé ?',
       answer:
-        'Oui, sur transcribevid.com. La reconnaissance s’exécute dans votre navigateur, et votre fichier est lu depuis votre propre disque par la page. Vous pouvez le confirmer dans l’onglet Réseau des outils de développement de votre navigateur : la seule requête qui envoie quelque chose à transcribevid.com est une requête vide de comptage après la fin de la transcription, et les scripts publicitaires de Google font leurs propres requêtes vers Google, qui ne transportent jamais votre fichier.',
+        'Oui, sur transcribevid.com. La reconnaissance s’exécute dans votre navigateur, et votre fichier est lu depuis votre propre disque par la page. Vous pouvez le confirmer dans l’onglet Réseau des outils de développement de votre navigateur : les seules requêtes qui envoient quelque chose à transcribevid.com sont une requête vide de comptage après la fin de la transcription et un petit signal une fois par minute avec un code aléatoire, et les scripts publicitaires de Google font leurs propres requêtes vers Google, qui ne transportent jamais votre fichier.',
     },
     {
       question: 'La transcription fonctionne-t-elle encore si ma connexion est lente ?',

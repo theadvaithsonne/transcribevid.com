@@ -105,6 +105,7 @@
               }
             </p>
             <p><app-rich [text]="'Files and transcripts exist only for your session. Export what you need before you leave. The only thing we keep is one anonymous running total of how many files have been transcribed on the site (a single number, shown in the page header); it is not linked to you, your files or your session. Details are in the [Privacy policy](/privacy).' | t" /></p>
+            <p><app-rich [text]="'The live visitor count works the same way: while a page is open it sends a random code that is held for a few minutes only, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).' | t" /></p>
           }
           @case ('local') {
             <p><app-rich [text]="'This copy of {brand} runs on your own computer. Your files are processed on this machine and nothing leaves it. Nothing is saved permanently: transcripts exist only for this session, so export what you need. The [Privacy policy](/privacy) describes the hosted website.' | t: { brand: site.brand().name }" /></p>

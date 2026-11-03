@@ -1138,6 +1138,14 @@ const dict: Record<string, string> = {
   '**Visit statistics.** Cloudflare Web Analytics counts visits to our pages: which page was opened, which site you came from, your country, your browser and device type, and how fast the page loaded. Cloudflare says it sets no cookies, keeps no identifier on your device and does not use the data to follow you from one website to another.':
     '**방문 통계.** Cloudflare Web Analytics는 당사 페이지의 방문 수를 집계합니다. 어떤 페이지가 열렸는지, 어느 사이트에서 왔는지, 이용자의 국가, 브라우저와 기기 종류, 페이지가 얼마나 빨리 로드되었는지가 대상입니다. Cloudflare는 쿠키를 설정하지 않고, 이용자의 기기에 식별자를 남기지 않으며, 데이터를 이용해 다른 웹사이트까지 이용자를 추적하지 않는다고 밝히고 있습니다.',
   'By {name}': '작성자: {name}',
+  '**Live visitor count.** While a page of this website is open and in view, your browser sends a small anonymous "I am here" signal to our counter (a Cloudflare Worker) about once a minute, so we can see how many people are using the site right now. It carries a random code made up when the page opened (never saved in a cookie or in browser storage, and new on every visit) and nothing else: no file, no transcript, no other detail. Nothing is sent if your browser asks not to be tracked (Do Not Track or Global Privacy Control). Cloudflare sees your IP address in transit and uses it briefly to limit abuse (a rate limit).':
+    '**실시간 방문자 수.** 이 웹사이트의 페이지가 열려 있고 화면에 보이는 동안, 브라우저는 약 1분에 한 번 익명의 “여기 있어요” 신호를 당사의 카운터(Cloudflare Worker)에 보내며, 지금 몇 명이 사이트를 이용하고 있는지 확인하는 데 쓰입니다. 이 신호에는 페이지가 열릴 때 만들어진 무작위 코드(쿠키나 브라우저 저장소에 저장되지 않으며 방문할 때마다 새로 만들어집니다)만 들어 있고, 파일, 변환 텍스트, 그 밖의 정보는 일절 없습니다. 브라우저가 추적하지 않도록 요청하면(Do Not Track 또는 Global Privacy Control) 아무것도 전송되지 않습니다. Cloudflare는 전송 중에 IP 주소를 보게 되며, 남용을 막기 위해 잠시 사용합니다(요청 횟수 제한).',
+  'The live visitor count works the same way: while a page is open it sends a random code that is held for a few minutes only, never a file or a transcript, and nothing at all if your browser sends Do Not Track. Details are in the [Privacy policy](/privacy).':
+    '실시간 방문자 수도 같은 방식으로 작동합니다. 페이지가 열려 있는 동안 몇 분 동안만 보관되는 무작위 코드를 보내며, 파일이나 변환 텍스트는 절대 보내지 않고, 브라우저가 Do Not Track을 보내면 아무것도 보내지 않습니다. 자세한 내용은 [개인정보 처리방침](/privacy)에 있습니다.',
+  'The random codes of the live visitor count are held for a few minutes only, to count who is here, and are then deleted. Only the current number is shown, and only to us.':
+    '실시간 방문자 수의 무작위 코드는 지금 여기 있는 사람을 세기 위해 몇 분 동안만 보관된 뒤 삭제됩니다. 현재 숫자만 표시되며, 당사에만 보입니다.',
+  'Want to place your ad here? Contact us:':
+    '여기에 광고를 게재하고 싶으신가요? 문의하세요:',
 };
 
 export default dict;

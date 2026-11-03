@@ -101,7 +101,7 @@ export const CONTENT: GuideContent = {
     {
       title: 'Apa yang tetap dikirim, secara jujur',
       paragraphs: [
-        'Tiga hal memang sampai ke server, dan tidak satu pun adalah file atau teks Anda.',
+        'Empat hal memang sampai ke server, dan tidak satu pun adalah file atau teks Anda.',
       ],
       bullets: [
         {
@@ -111,6 +111,10 @@ export const CONTENT: GuideContent = {
         {
           title: 'Hitungan total.',
           text: 'Saat sebuah transkripsi selesai, browser Anda mengirim satu permintaan kosong ke penghitung situs, yang menambahkan satu pada angka yang ditampilkan di header. Permintaan itu tidak membawa file, transkrip, atau pengenal. Penghitung itu dilaporkan oleh browser pengunjung dan tidak diverifikasi secara independen.',
+        },
+        {
+          title: 'Hitungan pengunjung langsung.',
+          text: 'Selama halaman terbuka dan terlihat, browser Anda mengirim sinyal kecil sekitar satu kali per menit agar pemilik situs bisa melihat berapa banyak orang yang sedang berada di situs saat ini. Sinyal itu membawa kode acak yang dibuat saat halaman dibuka dan tidak ada yang lain, tidak ada yang disimpan di browser Anda, dan tidak ada yang dikirim jika browser Anda meminta agar tidak dilacak.',
         },
         {
           title: 'Iklan.',
@@ -145,7 +149,7 @@ export const CONTENT: GuideContent = {
         },
         {
           title: 'Cari apa yang keluar',
-          text: 'Ketik method:POST ke kotak filter (Chrome dan Edge; Firefox menerima filter yang sama). Satu-satunya permintaan POST ke transcribevid.com seharusnya satu permintaan kosong ke /api/count setelah transkrip selesai. Buka permintaan itu dan periksa isi permintaannya: kosong. Jika halaman menampilkan iklan, skrip Google sendiri membuat permintaannya sendiri ke Google, dan tidak satu pun membawa file atau transkrip Anda. Tidak ada yang mendekati ukuran file Anda yang meninggalkan perangkat Anda.',
+          text: 'Ketik method:POST ke kotak filter (Chrome dan Edge; Firefox menerima filter yang sama). Permintaan POST ke transcribevid.com seharusnya berupa satu permintaan kosong ke /api/count setelah transkrip selesai dan, sekitar satu kali per menit selama halaman terbuka, satu permintaan /api/ping kecil yang satu-satunya isinya adalah kode acak di alamatnya. Buka permintaan-permintaan itu dan periksa: keduanya tidak memiliki isi permintaan. Jika halaman menampilkan iklan, skrip Google sendiri membuat permintaannya sendiri ke Google, dan tidak satu pun membawa file atau transkrip Anda. Tidak ada yang mendekati ukuran file Anda yang meninggalkan perangkat Anda.',
         },
       ],
     },
@@ -217,7 +221,7 @@ export const CONTENT: GuideContent = {
     {
       question: 'Benarkah file saya tidak pernah diunggah?',
       answer:
-        'Benar, di transcribevid.com. Pengenalan berjalan di browser Anda, dan file Anda dibaca dari disk Anda sendiri oleh halaman. Anda bisa memastikannya di tab Network pada alat pengembang browser Anda: satu-satunya permintaan yang mengirim sesuatu ke transcribevid.com adalah satu permintaan hitung yang kosong setelah transkrip selesai, dan skrip iklan Google membuat permintaannya sendiri ke Google yang tidak pernah membawa file Anda.',
+        'Benar, di transcribevid.com. Pengenalan berjalan di browser Anda, dan file Anda dibaca dari disk Anda sendiri oleh halaman. Anda bisa memastikannya di tab Network pada alat pengembang browser Anda: satu-satunya permintaan yang mengirim sesuatu ke transcribevid.com adalah satu permintaan hitung yang kosong setelah transkrip selesai dan satu sinyal kecil setiap menit dengan kode acak, dan skrip iklan Google membuat permintaannya sendiri ke Google yang tidak pernah membawa file Anda.',
     },
     {
       question: 'Apakah transkripsi tetap berjalan jika koneksi saya lambat?',
