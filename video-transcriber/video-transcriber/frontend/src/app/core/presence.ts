@@ -10,17 +10,17 @@
  * after three hours on one page. The number is read with a plain GET `/_live/count`, which sends nothing and is also read
  * by a visitor who opted out. Any failure is silent. The privacy policy, the FAQ and the guides describe this.
  *
- * Loaded on its own, a few seconds after the page is up (see App), so it is not part of the first download.
+ * Loaded on its own, right after the page is up (see App), so it is not part of the first download.
  */
 const PING_MS = 60_000;
 /** three hours of one page: a tab left open overnight stops pinging (and stops counting as a visitor) */
 const MAX_PINGS = 180;
 /** coming back to a tab sooner than this after its last ping does not send another */
 const MIN_GAP_MS = 30_000;
-/** the number is read this long after the ping, so the visitor's own page is already in it */
-const READ_AFTER_MS = 1_500;
 /** after this many failed reads in a row the number is hidden again */
 const MAX_FAILS = 3;
+/** a failed read is tried again after this long, so "…" never stays for minutes */
+const RETRY_MS = 4_000;
 
 /** true when the browser asks not to be tracked */
 function optedOut(win: Window): boolean {
@@ -50,9 +50,11 @@ function siteOrigin(counterUrl: string): string {
 
 /**
  * Starts pinging, and (when `onCount` is given) reading the number of pages open now. `counterUrl` is the counter's
- * address (only its site is used). Returns a function that stops everything.
+ * address (only its site is used). `onCount` gets the number, or undefined after three failed reads in a row (the header then
+ * hides it). The number is read right after the ping has been answered, so the visitor's own page is already in it. Returns a
+ * function that stops everything.
  */
-export function startPresence(counterUrl: string, win: Window = window, onCount?: (active: number | null) => void): () => void {
+export function startPresence(counterUrl: string, win: Window = window, onCount?: (active: number | undefined) => void): () => void {
   const none = () => undefined;
   const origin = siteOrigin(counterUrl);
   if (!origin || typeof win.fetch !== 'function') return none;
@@ -66,17 +68,23 @@ export function startPresence(counterUrl: string, win: Window = window, onCount?
   let sent = 0;
   let last = 0;
   let fails = 0;
+  let stopped = false;
   const visible = () => doc.visibilityState !== 'hidden';
 
-  const send = () => {
-    if (!code || !visible()) return;
+  const send = (): Promise<unknown> => {
+    if (!code || !visible()) return Promise.resolve();
     sent++;
     last = Date.now();
     // keepalive: the request may outlive the page; no cookies are sent or accepted; the answer is ignored
-    win.fetch(`${base}?t=${code}`, { method: 'POST', keepalive: true, cache: 'no-store', credentials: 'omit' }).catch(none);
+    return win.fetch(`${base}?t=${code}`, { method: 'POST', keepalive: true, cache: 'no-store', credentials: 'omit' }).catch(none);
+  };
+  // a failed read is tried again soon (not at the next minute), and after three in a row the header drops the pill
+  const failed = () => {
+    if (++fails >= MAX_FAILS) onCount?.(undefined);
+    else win.setTimeout(read, RETRY_MS);
   };
   const read = () => {
-    if (!onCount || !visible()) return;
+    if (!onCount || stopped || !visible()) return;
     win
       .fetch(`${origin}/_live/count`, { credentials: 'omit' })
       .then((r) => (r.ok ? r.json() : null))
@@ -85,17 +93,15 @@ export function startPresence(counterUrl: string, win: Window = window, onCount?
         if (typeof n === 'number' && Number.isFinite(n) && n >= 0) {
           fails = 0;
           onCount(Math.floor(n));
-        } else if (++fails >= MAX_FAILS) onCount(null);
+        } else failed();
       })
-      .catch(() => {
-        if (++fails >= MAX_FAILS) onCount(null);
-      });
+      .catch(failed);
   };
   const tick = () => {
     if (ticks >= MAX_PINGS || !visible()) return;
     ticks++;
-    send();
-    if (onCount) win.setTimeout(read, READ_AFTER_MS);
+    const pinged = send();
+    if (onCount) void pinged.then(read);
   };
 
   // the page is being closed or left: ask for this code to be deleted now (a beacon survives the page; fetch is the fallback)
@@ -113,6 +119,7 @@ export function startPresence(counterUrl: string, win: Window = window, onCount?
   win.addEventListener('pagehide', onLeave);
   tick();
   return () => {
+    stopped = true;
     win.clearInterval(timer);
     doc.removeEventListener('visibilitychange', onVisible);
     win.removeEventListener('pagehide', onLeave);

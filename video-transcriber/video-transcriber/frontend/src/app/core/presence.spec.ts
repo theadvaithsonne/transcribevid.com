@@ -167,12 +167,12 @@ describe('presence (the live-visitor signal)', () => {
       for (let i = 0; i < 6; i++) await Promise.resolve();
     };
 
-    it('reads the number a moment after the first ping, then once a minute, with a plain GET that sends nothing', async () => {
+    it('reads the number right after the first ping has been answered (no fixed wait), then once a minute, with a plain GET that sends nothing', async () => {
       const { win, fetch } = withCount({ active: 7 });
-      const seen: (number | null)[] = [];
+      const seen: (number | undefined)[] = [];
       startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
-      expect(seen).toEqual([]);
-      await vi.advanceTimersByTimeAsync(1_600);
+      expect(seen).toEqual([]); // nothing synchronously: the read waits for the ping's answer, not for a timer
+      await flush();
       expect(seen).toEqual([7]);
       await vi.advanceTimersByTimeAsync(MINUTE);
       expect(seen).toEqual([7, 7]);
@@ -186,13 +186,22 @@ describe('presence (the live-visitor signal)', () => {
 
     it('a visitor who opted out of tracking sends no ping and no code, but still sees the number', async () => {
       const { win, fetch } = withCount({ active: 3 }, { dnt: '1' });
-      const seen: (number | null)[] = [];
+      const seen: (number | undefined)[] = [];
       startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
-      await vi.advanceTimersByTimeAsync(1_600);
+      await flush();
       expect(seen).toEqual([3]);
       const urls = (fetch.mock.calls as unknown as [string][]).map((c) => c[0]);
       expect(urls.every((u) => u.endsWith('/_live/count'))).toBe(true);
       expect(urls.some((u) => u.includes('t='))).toBe(false);
+    });
+
+    it('the read happens after the ping even when the ping fails', async () => {
+      const f = fakeWindow();
+      f.fetch.mockImplementation(((url: string) => (String(url).endsWith('/_live/count') ? Promise.resolve(new Response(JSON.stringify({ active: 5 }), { status: 200 })) : Promise.reject(new Error('offline')))) as never);
+      const seen: (number | undefined)[] = [];
+      startPresence('https://transcribevid.com/api', f.win, (n) => seen.push(n));
+      await flush();
+      expect(seen).toEqual([5]);
     });
 
     it('does not read while the tab is hidden', async () => {
@@ -202,26 +211,48 @@ describe('presence (the live-visitor signal)', () => {
       expect(fetch).not.toHaveBeenCalled();
     });
 
-    it('ignores nonsense answers and hides the number after three failures in a row', async () => {
-      const { win } = withCount((n: number) => (n === 1 ? { active: 4 } : n === 2 ? { active: -1 } : n === 3 ? { active: 'many' } : 'fail'));
-      const seen: (number | null)[] = [];
+    it('ignores nonsense answers, retries soon, and hides the number after three failures in a row', async () => {
+      // first read: 4. A minute later: -1, then "many", then an error, each retried 4 seconds after the one before
+      const { win, fetch } = withCount((n: number) => (n === 1 ? { active: 4 } : n === 2 ? { active: -1 } : n === 3 ? { active: 'many' } : 'fail'));
+      const seen: (number | undefined)[] = [];
       startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
-      for (let i = 0; i < 4; i++) {
-        await vi.advanceTimersByTimeAsync(i === 0 ? 1_600 : MINUTE);
-        await flush();
-      }
-      expect(seen).toEqual([4, null]); // 4 shown; then -1, "many" and an error are three failures: hidden
+      await flush();
+      expect(seen).toEqual([4]);
+      await vi.advanceTimersByTimeAsync(MINUTE); // the next ping and read: -1 is failure 1
+      await flush();
+      expect(seen).toEqual([4]);
+      await vi.advanceTimersByTimeAsync(4_000); // retry: "many" is failure 2
+      await flush();
+      expect(seen).toEqual([4]);
+      await vi.advanceTimersByTimeAsync(4_000); // retry: an error is failure 3: the header drops the pill
+      await flush();
+      expect(seen).toEqual([4, undefined]);
+      const reads = (fetch.mock.calls as unknown as [string][]).filter((c) => c[0].endsWith('/_live/count')).length;
+      await vi.advanceTimersByTimeAsync(20_000); // no further retries after giving up (the next read is the next minute's)
+      expect((fetch.mock.calls as unknown as [string][]).filter((c) => c[0].endsWith('/_live/count')).length).toBe(reads);
     });
 
     it('rounds down, and a success resets the failure count', async () => {
+      // two quick failures, then 2.9 (shown as 2); the count of failures starts again
       const { win } = withCount((n: number) => (n === 1 ? 'fail' : n === 2 ? 'fail' : n === 3 ? { active: 2.9 } : 'fail'));
-      const seen: (number | null)[] = [];
+      const seen: (number | undefined)[] = [];
       startPresence('https://transcribevid.com/api', win, (n) => seen.push(n));
-      for (let i = 0; i < 4; i++) {
-        await vi.advanceTimersByTimeAsync(i === 0 ? 1_600 : MINUTE);
-        await flush();
-      }
+      await flush();
+      await vi.advanceTimersByTimeAsync(4_000);
+      await flush();
+      await vi.advanceTimersByTimeAsync(4_000);
+      await flush();
       expect(seen).toEqual([2]);
+    });
+
+    it('stopping also stops a pending retry', async () => {
+      const { win, fetch } = withCount('fail');
+      const stop = startPresence('https://transcribevid.com/api', win, () => undefined);
+      await flush();
+      stop();
+      const before = fetch.mock.calls.length;
+      await vi.advanceTimersByTimeAsync(10_000);
+      expect(fetch.mock.calls.length).toBe(before);
     });
   });
 });

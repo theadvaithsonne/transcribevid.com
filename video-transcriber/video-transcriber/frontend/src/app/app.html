@@ -57,7 +57,7 @@
   <span class="clabel">{{ stats.count() === 1 ? ('video transcribed' | t) : ('videos transcribed' | t) }}</span>
 </ng-template>
 
-<!-- "N online now": how many pages are open right now, as reported by visitors' browsers (core/presence.ts); only shown at 1 or more. -->
+<!-- "N online now": how many pages are open right now, as reported by visitors' browsers (core/presence.ts); "…" until the first answer, gone if it cannot be read. -->
 <ng-template #liveBody>
   <span class="ldot" aria-hidden="true"></span>
   <b class="cnum">{{ liveNum() }}</b>
@@ -89,8 +89,8 @@
         <ng-container *ngTemplateOutlet="counterBody" />
       </span>
     }
-    @if (liveN() > 0) {
-      <span class="counter live" role="img" [attr.aria-label]="liveLabel()" [attr.title]="liveTitle()">
+    @if (liveOn()) {
+      <span class="counter live" [class.loading]="liveLoading()" role="img" [attr.aria-label]="liveLabel()" [attr.title]="liveTitle()">
         <ng-container *ngTemplateOutlet="liveBody" />
       </span>
     }
@@ -213,8 +213,8 @@
           <ng-container *ngTemplateOutlet="counterBody" />
         </div>
       }
-      @if (liveN() > 0) {
-        <div class="sheet-counter live" role="img" [attr.aria-label]="liveLabel()" [attr.title]="liveTitle()">
+      @if (liveOn()) {
+        <div class="sheet-counter live" [class.loading]="liveLoading()" role="img" [attr.aria-label]="liveLabel()" [attr.title]="liveTitle()">
           <ng-container *ngTemplateOutlet="liveBody" />
         </div>
       }

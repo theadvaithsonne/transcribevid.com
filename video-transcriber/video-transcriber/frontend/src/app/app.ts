@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, ElementRef, HostListener, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
@@ -49,13 +49,13 @@ export class App {
   private counterUrl = inject(COUNTER_URL);
   private browser = inject(IS_BROWSER);
   private live = inject(LiveCount);
-  /** pages open right now, for the header ("3 online now"): shown only when the Worker said at least 1 */
-  readonly liveN = computed(() => {
+  /** pages open right now, for the header ("3 online now"): the pill exists once the page is up, shows "…" until the first answer, and is gone if the Worker cannot be read */
+  readonly liveOn = computed(() => this.live.active() !== undefined);
+  readonly liveLoading = computed(() => this.live.active() === null);
+  readonly liveNum = computed(() => {
     const n = this.live.active();
-    return n !== null && n > 0 ? n : 0;
+    return typeof n === 'number' ? this.stats.format(n) : '…';
   });
-  private readonly liveNf = computed(() => new Intl.NumberFormat(this.i18n.locale() === 'en' ? undefined : this.i18n.locale()));
-  readonly liveNum = computed(() => this.liveNf().format(this.liveN()));
   /** "3 online now": the accessible name; the tooltip adds that visitors' browsers report it */
   readonly liveLabel = computed(() => `${this.liveNum()} ${this.i18n.t('online now')}`);
   readonly liveTitle = computed(() => this.i18n.t("{label}, as reported by visitors' browsers", { label: this.liveLabel() }));
@@ -130,11 +130,14 @@ export class App {
         this.onJobPage.set(/^\/(?:[a-z]{2}\/)?jobs\//.test((e as NavigationEnd).urlAfterRedirects));
         this.closeAll();
       });
-    // The live-visitor signal (core/presence.ts): its own small download a few seconds after the page is up, so it never
-    // delays the first paint. Only the public website has a counter address; the local / self-hosted edition and the
-    // prerender have none, so nothing starts there.
+    // The live-visitor signal (core/presence.ts): its own small download right after the first render, so it never delays the
+    // first paint. The header pill appears at once with "…" and the number follows as soon as the Worker has answered. Only the
+    // public website has a counter address; the local / self-hosted edition and the prerender have none, so nothing starts there.
     if (this.browser && this.counterUrl) {
-      setTimeout(() => import('./core/presence').then((m) => m.startPresence(this.counterUrl, window, (n) => this.live.active.set(n))).catch(() => undefined), 3000);
+      afterNextRender(() => {
+        this.live.active.set(null);
+        setTimeout(() => import('./core/presence').then((m) => m.startPresence(this.counterUrl, window, (n) => this.live.active.set(n))).catch(() => this.live.active.set(undefined)), 300);
+      });
     }
   }
 

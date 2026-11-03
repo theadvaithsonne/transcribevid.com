@@ -73,10 +73,12 @@ export class StatsService {
   /** the browser's own number style: used on English pages, exactly as before there were languages */
   private readonly nf = new Intl.NumberFormat();
   /** "12,345" (thousands separators): the browser's style on English pages, the page's own language elsewhere */
-  readonly formatted = computed(() => {
+  readonly formatted = computed(() => this.format(this.count()));
+  /** any number in the page's number style (also used for the "online now" number in the header) */
+  format(n: number): string {
     const locale = this.i18n.locale();
-    return (locale === 'en' ? this.nf : new Intl.NumberFormat(locale)).format(this.count());
-  });
+    return (locale === 'en' ? this.nf : new Intl.NumberFormat(locale)).format(n);
+  }
   /** "12,345 videos transcribed" (used as the accessible name and for the full label) */
   readonly label = computed(() =>
     this.count() === 1 ? this.i18n.t('{n} video transcribed', { n: this.formatted() }) : this.i18n.t('{n} videos transcribed', { n: this.formatted() }),

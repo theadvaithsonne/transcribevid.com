@@ -210,13 +210,14 @@ summary:focus-visible {
 }
 @keyframes live-dot {
   50% {
-    box-shadow: 0 0 0 5px transparent;
-    opacity: 0.55;
+    opacity: 0.4;
   }
-  0%,
-  100% {
-    box-shadow: 0 0 0 0 var(--ok);
-  }
+}
+/* loading: a grey still dot until the first number arrives */
+.live.loading .ldot {
+  background: var(--muted);
+  animation: none;
+  opacity: 0.6;
 }
 @media (prefers-reduced-motion: reduce) {
   .live .ldot {
@@ -645,6 +646,12 @@ summary:focus-visible {
   }
   .tbtn {
     padding: 10px 12px;
+  }
+}
+/* two pills with their words need about 1340 px; from 1281 to 1340 px the "online now" pill keeps only its dot and number (measured: with both words the header overflowed at 1281 px and pushed the theme button off the window) */
+@media (max-width: 1340px) {
+  .counter.live .clabel {
+    display: none;
   }
 }
 @media (max-width: 1280px) {

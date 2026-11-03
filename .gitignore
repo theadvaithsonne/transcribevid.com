@@ -1,2 +1,5 @@
 # Local benchmark scratch: model weights, venv, pip cache, decoded audio
 video-transcriber/_bench_work/
+
+# Earlier builds kept so open pages do not hit missing files after a deploy (scripts/pages-keep-previous.mjs)
+.deploy-archive/
