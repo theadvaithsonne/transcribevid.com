@@ -1158,9 +1158,13 @@ const dict: Record<string, string> = {
     'リアルタイムの訪問者数も同じ仕組みです。ページが開いている間、あなたが離れた後まもなく削除されるランダムなコードを送りますが、ファイルや文字起こしを送ることはなく、ブラウザーがDo Not Trackを送っている場合は何も送りません。詳しくは[プライバシーポリシー](/privacy)をご覧ください。',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'リアルタイムの訪問者数のランダムなコードは、いまここにいる人を数えるためだけに保持され、各コードはページを閉じた後まもなく、遅くとも次の訪問が数えられるときに削除されます。現在の数だけがページのヘッダーに表示されます。',
-  'Want to place your ad here? Contact us:':
-    '広告をここに掲載しませんか？お問い合わせはこちら：',
   'online now':
     '人がオンライン',
+  '{formats} and more.': '{formats} など。',
+  '{formats}.': '{formats}。',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'このページに挙げた他の企業や製品は、それぞれの所有者のものです。TranscribeVid はそれらと提携しておらず、承認も受けていません。各社について書いた内容は、公開されているページに基づいています。',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google のサービスを利用しているサイトやアプリのデータを Google がどのように使用するかは、[パートナーのサイトやアプリを使用する際の Google によるデータの使用方法](https://policies.google.com/technologies/partner-sites)で説明されています。',
 };
 export default dict;

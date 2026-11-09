@@ -170,7 +170,8 @@ export class ToolDrop {
     const f = this.formats();
     const list = f.slice(0, 5).join(', ');
     const parts = [
-      list ? this.i18n.t(f.length > 5 ? '{formats} and more.' : '{formats}.', { formats: list }) : '',
+      // two literal calls, not one t(a ? b : c): the translation extractor only sees a string written directly inside t()
+      list ? (f.length > 5 ? this.i18n.t('{formats} and more.', { formats: list }) : this.i18n.t('{formats}.', { formats: list })) : '',
       this.kind() === 'video' ? this.i18n.t('Audio works too.') : '',
       this.limits(),
       // the in-browser edition never uploads the file; the server edition uploads it once Transcribe is pressed

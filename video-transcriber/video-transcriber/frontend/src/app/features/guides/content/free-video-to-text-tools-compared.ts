@@ -36,6 +36,7 @@ export const CONTENT: GuideContent = {
         'On 28 October 2026 we opened each tool\'s own free video-to-text or pricing page and wrote down what it says about sign-up, the free allowance, the size or length of a file and the formats it exports. Where a page does not say something, the table says "not stated", and we did not guess.',
         'We did not run any of these tools, and we did not test how accurate any of them is. Some pages quote accuracy figures of their own; we left them out because nobody here measured them. For our own measurements, which cover one open model, see the guide on Whisper accuracy by language.',
         'Free plans change often. Every row below has its page in the list of sources at the end, and we will check them again each quarter.',
+        'The other companies and products named in this guide belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.',
       ],
     },
     {

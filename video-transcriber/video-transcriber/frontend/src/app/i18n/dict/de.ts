@@ -1164,8 +1164,12 @@ const dict: Record<string, string> = {
     'Der Zähler für aktuelle Besucher funktioniert genauso: Solange eine Seite geöffnet ist, sendet er einen Zufallscode, der kurz nach Ihrem Verlassen der Seite gelöscht wird, nie eine Datei oder ein Transkript, und gar nichts, wenn Ihr Browser Do Not Track sendet. Einzelheiten stehen in der [Datenschutzerklärung](/privacy).',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'Die Zufallscodes des Besucherzählers werden nur gespeichert, um zu zählen, wer gerade da ist: Jeder Code wird kurz nach dem Schließen der Seite gelöscht, spätestens wenn der nächste Besuch gezählt wird. Angezeigt wird nur die aktuelle Zahl, im Header der Seite.',
-  'Want to place your ad here? Contact us:':
-    'Möchten Sie hier Ihre Werbung platzieren? Kontaktieren Sie uns:',
   'online now': 'jetzt online',
+  '{formats} and more.': '{formats} und mehr.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'Andere auf dieser Seite genannte Unternehmen und Produkte gehören ihren jeweiligen Eigentümern. TranscribeVid ist nicht mit ihnen verbunden und wird von ihnen nicht empfohlen; was wir über sie schreiben, stammt von ihren öffentlichen Seiten.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google erklärt, wie es Daten von Websites und Apps nutzt, die seine Dienste verwenden, unter [Wie Google Daten verwendet, wenn Sie Websites oder Apps unserer Partner nutzen](https://policies.google.com/technologies/partner-sites).',
 };
 export default dict;

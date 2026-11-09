@@ -19,6 +19,15 @@ const NEVER = new Set(['**', 'logs']);
 
 const isJob = (r: Route) => !!r.path?.startsWith('jobs/');
 
+/**
+ * The languages whose pages may show ads. EMPTY ON PURPOSE: every translation was made by a machine and no native speaker has
+ * reviewed it yet, and Google's publisher policy does not allow ads on "automatically generated content without manual review
+ * or curation" (support.google.com/publisherpolicies/answer/11112688). The translated pages stay up for visitors and for
+ * search, with their "translated with AI" note, but they are not ad pages. Add a language here only after a native speaker has
+ * read its review pack (scripts/review-pack.mjs) and the page text has been corrected.
+ */
+export const AD_LOCALES: ReadonlySet<Locale> = new Set<Locale>();
+
 /** What a translated route group may need to know (parameters so a spec can use other data). */
 export interface LocalizeOptions {
   /** the English paths that exist in each language */
@@ -36,13 +45,14 @@ export interface LocalizeOptions {
 const translated = (locale: Locale, key: string, english: string) => inject(I18nService).tIn(locale, key) ?? english;
 
 /**
- * The route of a page in a language: the same page component, the same flags (ads, noindex), a localised address, and a
- * title, description and label that come from the language's dictionary (`title:<en path>`, `description:<en path>`,
- * `label:<en path>`) with the English text as the fallback.
+ * The route of a page in a language: the same page component, the same flags (noindex; the ad flags only for a language in
+ * AD_LOCALES), a localised address, and a title, description and label that come from the language's dictionary
+ * (`title:<en path>`, `description:<en path>`, `label:<en path>`) with the English text as the fallback.
  */
-export function localizeRoute(base: Route, locale: Locale, slug: string): Route {
+export function localizeRoute(base: Route, locale: Locale, slug: string, adLocales: ReadonlySet<Locale> = AD_LOCALES): Route {
   const key = enPathOf(base);
-  const { description, label, ...data } = (base.data ?? {}) as Record<string, unknown>;
+  const { description, label, ads, adSlot, ...data } = (base.data ?? {}) as Record<string, unknown>;
+  if (adLocales.has(locale)) Object.assign(data, { ads, adSlot });
   const resolve = { ...(base.resolve ?? {}) } as NonNullable<Route['resolve']>;
   if (typeof description === 'string') resolve['description'] = () => translated(locale, `description:${key}`, description);
   if (typeof label === 'string') resolve['label'] = () => translated(locale, `label:${key}`, label);

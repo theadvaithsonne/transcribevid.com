@@ -1136,9 +1136,13 @@ const dict: Record<string, string> = {
     'يعمل عدّاد الزوّار المباشر بالطريقة نفسها: ما دامت الصفحة مفتوحة يرسل رمزًا عشوائيًا يُحذف بعد وقت قصير من مغادرتك، ولا يرسل أبدًا ملفًا ولا تفريغًا، ولا يرسل شيئًا على الإطلاق إذا كان متصفحك يرسل Do Not Track. التفاصيل في [سياسة الخصوصية](/privacy).',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'تُحفظ الرموز العشوائية لعدّاد الزوّار المباشر فقط لإحصاء من هو هنا: يُحذف كل رمز بعد وقت قصير من إغلاق الصفحة، وعلى أبعد تقدير عند احتساب الزيارة التالية. ولا يُعرض سوى الرقم الحالي، في ترويسة الصفحة.',
-  'Want to place your ad here? Contact us:':
-    'هل تريد وضع إعلانك هنا؟ تواصل معنا:',
   'online now': 'متصل الآن',
+  '{formats} and more.': '{formats} وغيرها.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'الشركات والمنتجات الأخرى المذكورة في هذه الصفحة مملوكة لأصحابها. TranscribeVid غير تابع لها ولا تؤيده، وما نذكره عنها مصدره صفحاتها العامة.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'توضح Google كيفية استخدامها للبيانات من المواقع والتطبيقات التي تستخدم خدماتها في [كيف تستخدم Google البيانات عند استخدامك مواقع شركائنا أو تطبيقاتهم](https://policies.google.com/technologies/partner-sites).',
 };
 
 export default dict;

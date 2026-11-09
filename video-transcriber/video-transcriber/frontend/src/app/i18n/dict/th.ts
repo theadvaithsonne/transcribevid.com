@@ -1139,9 +1139,13 @@ const dict: Record<string, string> = {
     'จำนวนผู้เข้าชมแบบสดทำงานในแบบเดียวกัน ขณะที่หน้าเปิดอยู่ จะส่งรหัสสุ่มที่ถูกลบไม่นานหลังจากคุณออกไป ไม่เคยส่งไฟล์หรือข้อความถอดเสียง และไม่ส่งอะไรเลยหากเบราว์เซอร์ของคุณส่ง Do Not Track รายละเอียดอยู่ใน [นโยบายความเป็นส่วนตัว](/privacy)',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'รหัสสุ่มของจำนวนผู้เข้าชมแบบสดจะถูกเก็บไว้เพียงเพื่อนับว่าใครอยู่ที่นี่ โดยแต่ละรหัสจะถูกลบไม่นานหลังจากปิดหน้า และอย่างช้าที่สุดเมื่อมีการนับการเข้าชมครั้งถัดไป แสดงเฉพาะตัวเลขปัจจุบัน ในส่วนหัวของหน้า',
-  'Want to place your ad here? Contact us:':
-    'ต้องการวางโฆษณาของคุณที่นี่ไหม ติดต่อเรา:',
   'online now':
     'ออนไลน์ตอนนี้',
+  '{formats} and more.': '{formats} และอื่น ๆ',
+  '{formats}.': '{formats}',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'บริษัทและผลิตภัณฑ์อื่นที่กล่าวถึงในหน้านี้เป็นของเจ้าของนั้น ๆ TranscribeVid ไม่มีส่วนเกี่ยวข้องและไม่ได้รับการรับรองจากพวกเขา สิ่งที่เราเขียนถึงพวกเขามาจากหน้าเว็บสาธารณะของพวกเขา',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google อธิบายวิธีใช้ข้อมูลจากเว็บไซต์และแอปที่ใช้บริการของ Google ไว้ใน [วิธีที่ Google ใช้ข้อมูลเมื่อคุณใช้เว็บไซต์หรือแอปของพาร์ทเนอร์ของเรา](https://policies.google.com/technologies/partner-sites)',
 };
 export default dict;

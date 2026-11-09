@@ -69,6 +69,8 @@ export class ToolPage {
   /** short name of the page, e.g. "MP4 to text" */
   readonly label = computed(() => String(this.data()['label'] ?? this.c().eyebrow));
   readonly path = computed(() => '/' + this.slug());
+  /** one of the pages that compares TranscribeVid with another company's product: it says the two are not affiliated */
+  readonly compares = computed(() => TOOL_PAGES.find((t) => t.path === this.path())?.group === 'compare');
   /** what a file dropped here starts the uploader with (a language page: its language), if anything */
   readonly preset = computed(() => TOOL_PAGES.find((t) => t.path === this.path())?.preset ?? null);
   /** why, sections, steps, tips and questions in this edition's words (the in-browser edition has no upload, limit or queue) */

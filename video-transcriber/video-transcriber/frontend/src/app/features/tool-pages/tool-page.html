@@ -8,6 +8,9 @@
       </nav>
       <h1 class="page-title">{{ text().h1 }}</h1>
       <p class="page-lead">{{ text().lead }}</p>
+      @if (compares()) {
+        <p class="page-note">{{ 'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.' | t }}</p>
+      }
     </div>
     <app-free-chips class="hero-chips" />
     <div class="hero-drop">

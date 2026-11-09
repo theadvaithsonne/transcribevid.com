@@ -1159,10 +1159,14 @@ const dict: Record<string, string> = {
     'Hitungan pengunjung langsung bekerja dengan cara yang sama: selama halaman terbuka, browser mengirim kode acak yang dihapus tidak lama setelah Anda pergi, tidak pernah file atau transkrip, dan sama sekali tidak ada yang dikirim jika browser Anda mengirim Do Not Track. Rinciannya ada di [Kebijakan privasi](/privacy).',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'Kode acak untuk hitungan pengunjung langsung disimpan hanya untuk menghitung siapa yang sedang ada di sini: setiap kode dihapus tidak lama setelah halaman ditutup, dan paling lambat saat kunjungan berikutnya dihitung. Hanya angka saat ini yang ditampilkan, di header halaman.',
-  'Want to place your ad here? Contact us:':
-    'Ingin memasang iklan Anda di sini? Hubungi kami:',
   'online now':
     'online sekarang',
+  '{formats} and more.': '{formats} dan lainnya.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'Perusahaan dan produk lain yang disebut di halaman ini adalah milik pemiliknya masing-masing. TranscribeVid tidak berafiliasi dengan mereka dan tidak didukung oleh mereka; apa yang kami tulis tentang mereka berasal dari halaman publik mereka.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google menjelaskan cara penggunaan data dari situs dan aplikasi yang memakai layanannya di [Cara Google menggunakan data saat Anda menggunakan situs atau aplikasi mitra kami](https://policies.google.com/technologies/partner-sites).',
 };
 
 export default dict;

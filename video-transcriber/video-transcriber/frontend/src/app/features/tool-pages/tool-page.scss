@@ -471,3 +471,11 @@
     }
   }
 }
+
+/* the "not affiliated" line under the lead of the pages that name another company's product */
+.page-note {
+  margin: 12px 0 0;
+  max-width: 62ch;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}

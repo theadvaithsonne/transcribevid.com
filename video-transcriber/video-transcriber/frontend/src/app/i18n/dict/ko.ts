@@ -1144,10 +1144,14 @@ const dict: Record<string, string> = {
     '실시간 방문자 수도 같은 방식으로 작동합니다. 페이지가 열려 있는 동안 페이지를 떠난 뒤 곧 삭제되는 무작위 코드를 보내며, 파일이나 변환 텍스트는 절대 보내지 않고, 브라우저가 Do Not Track을 보내면 아무것도 보내지 않습니다. 자세한 내용은 [개인정보 처리방침](/privacy)에 있습니다.',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     '실시간 방문자 수의 무작위 코드는 지금 여기 있는 사람을 세기 위해서만 보관되며, 각 코드는 페이지를 닫은 뒤 곧, 늦어도 다음 방문이 집계될 때 삭제됩니다. 현재 숫자만 표시되며, 페이지 헤더에 나타납니다.',
-  'Want to place your ad here? Contact us:':
-    '여기에 광고를 게재하고 싶으신가요? 문의하세요:',
   'online now':
     '명 접속 중',
+  '{formats} and more.': '{formats} 등.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    '이 페이지에 언급된 다른 회사와 제품은 각 소유자의 것입니다. TranscribeVid는 이들과 제휴하지 않았으며 이들의 보증을 받지 않았습니다. 이들에 대해 쓴 내용은 각 회사의 공개 페이지에서 가져왔습니다.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google 서비스를 사용하는 사이트와 앱의 데이터를 Google이 어떻게 사용하는지는 [파트너의 사이트 또는 앱을 사용할 때 Google이 데이터를 사용하는 방식](https://policies.google.com/technologies/partner-sites)에서 설명합니다.',
 };
 
 export default dict;

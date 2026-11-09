@@ -1153,10 +1153,14 @@ const dict: Record<string, string> = {
     'Canlı ziyaretçi sayısı da aynı şekilde çalışır: bir sayfa açıkken, ayrıldıktan kısa süre sonra silinen rastgele bir kod gönderir; asla bir dosya ya da transkript göndermez ve tarayıcınız Do Not Track gönderiyorsa hiçbir şey göndermez. Ayrıntılar [Gizlilik politikası](/privacy) sayfasındadır.',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'Canlı ziyaretçi sayısındaki rastgele kodlar yalnızca burada kimlerin olduğunu saymak için tutulur: her biri sayfa kapatıldıktan kısa süre sonra, en geç de bir sonraki ziyaret sayıldığında silinir. Yalnızca o anki sayı gösterilir, sayfa başlığında.',
-  'Want to place your ad here? Contact us:':
-    'Reklamınızı buraya yerleştirmek ister misiniz? Bize ulaşın:',
   'online now':
     'şu an çevrimiçi',
+  '{formats} and more.': '{formats} ve daha fazlası.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'Bu sayfada adı geçen diğer şirketler ve ürünler sahiplerine aittir. TranscribeVid onlarla bağlantılı değildir ve onlar tarafından onaylanmamıştır; onlar hakkında yazdıklarımız herkese açık sayfalarından alınmıştır.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google, hizmetlerini kullanan sitelerden ve uygulamalardan gelen verileri nasıl kullandığını [Ortaklarımızın sitelerini veya uygulamalarını kullandığınızda Google verileri nasıl kullanır](https://policies.google.com/technologies/partner-sites) sayfasında açıklar.',
 };
 
 export default dict;

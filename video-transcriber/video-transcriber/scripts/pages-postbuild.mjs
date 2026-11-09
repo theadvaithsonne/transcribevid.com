@@ -14,6 +14,8 @@
  *  4. Checks what Pages would refuse or silently get wrong, and exits 1 if anything is off: a file over 25 MiB, 20,000
  *     files or more, more than 100 header rules, a duplicated pattern, a line over 2,000 characters, a page left as
  *     dir/index.html, a sitemap URL without its page, a missing ads.txt.
+ *  4b. Makes every <link rel="modulepreload"> address start with "/" (scripts/pages-preload-links.mjs): Pages copies them into a
+ *     Link header, where a relative address is read against the page's own address and asked for /jobs/chunk-x.js.
  *  5. Adds an accurate <lastmod> to each address of the built sitemap.xml (scripts/sitemap-lastmod.mjs): the date of the
  *     last real change of that page's own text, never the build time.
  *
@@ -26,6 +28,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readI18n } from './i18n-data.mjs';
+import { absolutizePreloads, relativePreloads } from './pages-preload-links.mjs';
 import { addLastmod } from './sitemap-lastmod.mjs';
 
 /** The languages that have translated pages: their transcript pages (/es/jobs/<id>) are client-only too. */
@@ -166,6 +169,22 @@ function flatten(dir) {
 }
 flatten(root);
 
+// 1b. preload addresses start with "/" (before the shell is copied to 404.html, so both stay identical)
+let preloads = 0;
+(function fixPreloads(dir) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) fixPreloads(p);
+    else if (e.name.endsWith('.html')) {
+      const { html, changed } = absolutizePreloads(fs.readFileSync(p, 'utf8'));
+      if (changed) {
+        fs.writeFileSync(p, html);
+        preloads += changed;
+      }
+    }
+  }
+})(root);
+
 // 2. the 404 page is the client shell
 const shell = path.join(root, 'index.csr.html');
 if (!fs.existsSync(shell)) throw new Error('index.csr.html missing (is outputMode static with a Client route built?)');
@@ -195,6 +214,11 @@ for (const f of files) {
 if (!fs.readFileSync(path.join(root, '404.html')).equals(fs.readFileSync(shell))) fail('404.html differs from index.csr.html');
 if (!fs.existsSync(path.join(root, 'ads.txt'))) fail('ads.txt is missing (frontend/public/ads.txt)');
 
+for (const f of files.filter((x) => x.endsWith('.html'))) {
+  const left = relativePreloads(fs.readFileSync(f, 'utf8'));
+  if (left.length) fail(`${rel(f)} still has a relative preload address (${left[0]}): Pages would send it in a Link header that is read against the page address`);
+}
+
 const headerLines = HEADERS.split('\n');
 const patterns = headerLines.filter((l) => l && !l.startsWith('#') && !/^\s/.test(l));
 if (patterns.length > MAX_HEADER_RULES) fail(`_headers has ${patterns.length} rules (max ${MAX_HEADER_RULES})`);
@@ -223,4 +247,4 @@ if (problems.length) {
   console.error(`pages-postbuild: ${problems.length} problem(s) in ${root}:\n  - ${problems.join('\n  - ')}`);
   process.exit(1);
 }
-console.log(`pages-postbuild: flattened ${moved} prerendered pages; wrote 404.html, _headers (${patterns.length} rules), _redirects; ${files.length} files, all under 25 MiB.`);
+console.log(`pages-postbuild: made ${preloads} preload addresses root-relative; flattened ${moved} prerendered pages; wrote 404.html, _headers (${patterns.length} rules), _redirects; ${files.length} files, all under 25 MiB.`);

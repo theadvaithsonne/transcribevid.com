@@ -1158,10 +1158,14 @@ const dict: Record<string, string> = {
     'Số người truy cập trực tiếp hoạt động theo cách tương tự: khi một trang đang mở, nó gửi một mã ngẫu nhiên sẽ bị xóa ngay sau khi bạn rời đi, không bao giờ gửi tệp hay bản gỡ băng, và hoàn toàn không gửi gì nếu trình duyệt của bạn gửi Do Not Track. Chi tiết có trong [Chính sách quyền riêng tư](/privacy).',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'Các mã ngẫu nhiên của số người truy cập trực tiếp chỉ được giữ để đếm xem ai đang ở đây: mỗi mã bị xóa ngay sau khi đóng trang, và chậm nhất là khi lượt truy cập tiếp theo được đếm. Chỉ con số hiện tại được hiển thị, trong phần đầu trang.',
-  'Want to place your ad here? Contact us:':
-    'Muốn đặt quảng cáo của bạn ở đây? Hãy liên hệ chúng tôi:',
   'online now':
     'đang trực tuyến',
+  '{formats} and more.': '{formats} và nhiều định dạng khác.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'Các công ty và sản phẩm khác được nêu trên trang này thuộc về chủ sở hữu của họ. TranscribeVid không liên kết với họ và không được họ chứng thực; những gì chúng tôi viết về họ lấy từ các trang công khai của họ.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google giải thích cách Google sử dụng dữ liệu từ các trang web và ứng dụng dùng dịch vụ của Google tại [Cách Google sử dụng dữ liệu khi bạn sử dụng trang web hoặc ứng dụng của đối tác của chúng tôi](https://policies.google.com/technologies/partner-sites).',
 };
 
 export default dict;

@@ -1148,10 +1148,14 @@ const dict: Record<string, string> = {
     'لائیو وزیٹر کاؤنٹ بھی اسی طرح کام کرتا ہے: صفحہ کھلا ہو تو یہ ایک بے ترتیب کوڈ بھیجتا ہے جو آپ کے جانے کے تھوڑی دیر بعد حذف کر دیا جاتا ہے، کبھی کوئی فائل یا ٹرانسکرپٹ نہیں، اور اگر آپ کا براؤزر Do Not Track بھیجے تو کچھ بھی نہیں۔ تفصیلات [رازداری کی پالیسی](/privacy) میں ہیں۔',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'لائیو وزیٹر کاؤنٹ کے بے ترتیب کوڈ صرف یہ گننے کے لیے رکھے جاتے ہیں کہ یہاں کون ہے: ہر کوڈ صفحہ بند ہونے کے تھوڑی دیر بعد، اور زیادہ سے زیادہ اگلی وزٹ گنے جانے پر، حذف کر دیا جاتا ہے۔ صرف موجودہ تعداد دکھائی جاتی ہے، صفحے کے ہیڈر میں۔',
-  'Want to place your ad here? Contact us:':
-    'اپنا اشتہار یہاں لگانا چاہتے ہیں؟ ہم سے رابطہ کریں:',
   'online now':
     'اس وقت آن لائن',
+  '{formats} and more.': '{formats} اور مزید۔',
+  '{formats}.': '{formats}۔',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'اس صفحے پر ذکر کی گئی دوسری کمپنیاں اور مصنوعات اپنے اپنے مالکان کی ہیں۔ TranscribeVid کا ان سے کوئی تعلق نہیں اور انہوں نے اسے منظور نہیں کیا؛ ان کے بارے میں ہم جو لکھتے ہیں وہ ان کے عوامی صفحات سے لیا گیا ہے۔',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'جو سائٹس اور ایپس Google کی خدمات استعمال کرتی ہیں ان سے حاصل ہونے والے ڈیٹا کو Google کیسے استعمال کرتا ہے، یہ [ہمارے شراکت داروں کی سائٹس یا ایپس استعمال کرنے پر Google ڈیٹا کیسے استعمال کرتا ہے](https://policies.google.com/technologies/partner-sites) میں بیان کیا گیا ہے۔',
 };
 
 export default dict;

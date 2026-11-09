@@ -71,13 +71,14 @@ describe('the published languages (generated registry)', () => {
     expect(new Set(paths).size).toBe(paths.length);
   });
 
-  it('a translated route keeps the English route\'s flags and guards (ads, noindex, the ad-free document guard)', () => {
+  it('a translated route keeps the English route\'s flags and guards (noindex, the ad-free document guard) but is never an ad page while no language is reviewed', () => {
     const groups = localizedRoutes(appPages, { available: AVAILABLE, notFound: notFoundRoute });
     for (const g of groups) {
       for (const c of g.children!) {
         const english = c.data?.['pageKey'] === '/**' ? notFoundRoute : appPages.find((r) => `/${r.path}` === c.data?.['pageKey'] || (r.path === '' && c.data?.['pageKey'] === '/') || r.path === c.path);
         expect(english, `${g.path}/${c.path}`).toBeDefined();
-        expect(c.data?.['ads'], `${g.path}/${c.path}`).toEqual(english!.data?.['ads']);
+        expect(c.data?.['ads'], `${g.path}/${c.path}`).toBeUndefined();
+        expect(c.data?.['adSlot'], `${g.path}/${c.path}`).toBeUndefined();
         expect(c.data?.['noindex'], `${g.path}/${c.path}`).toEqual(english!.data?.['noindex']);
         expect(c.canActivate, `${g.path}/${c.path}`).toEqual(english!.canActivate);
         expect(c.loadComponent, `${g.path}/${c.path}`).toBe(english!.loadComponent);

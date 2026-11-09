@@ -1157,7 +1157,12 @@ const dict: Record<string, string> = {
     'El contador de visitantes en vivo funciona de la misma manera: mientras una página está abierta envía un código aleatorio que se elimina poco después de que te vas, nunca un archivo ni una transcripción, y no envía nada en absoluto si tu navegador envía Do Not Track. Los detalles están en la [Política de privacidad](/privacy).',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'Los códigos aleatorios del contador de visitantes en vivo se conservan solo para contar quién está aquí: cada uno se elimina poco después de cerrar la página y, como muy tarde, cuando se cuenta la siguiente visita. Solo se muestra el número actual, en el encabezado de la página.',
-  'Want to place your ad here? Contact us:': '¿Quieres colocar aquí tu anuncio? Contáctanos:',
   'online now': 'en línea ahora',
+  '{formats} and more.': '{formats} y más.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'Las demás empresas y productos que se nombran en esta página pertenecen a sus propietarios. TranscribeVid no está afiliado a ellos ni cuenta con su respaldo; lo que decimos sobre ellos procede de sus páginas públicas.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google explica cómo usa los datos de los sitios y aplicaciones que utilizan sus servicios en [Cómo usa Google los datos cuando utilizas sitios o aplicaciones de nuestros socios](https://policies.google.com/technologies/partner-sites).',
 };
 export default dict;

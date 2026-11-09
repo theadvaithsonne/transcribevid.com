@@ -1163,9 +1163,13 @@ const dict: Record<string, string> = {
     "Il conteggio dei visitatori in tempo reale funziona allo stesso modo: finché una pagina è aperta invia un codice casuale che viene eliminato poco dopo che te ne vai, mai un file o una trascrizione, e non invia assolutamente nulla se il tuo browser invia Do Not Track. I dettagli sono nell'[Informativa sulla privacy](/privacy).",
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'I codici casuali del conteggio dei visitatori in tempo reale vengono conservati solo per contare chi è presente: ciascun codice viene eliminato poco dopo la chiusura della pagina e, al più tardi, quando viene conteggiata la visita successiva. Viene mostrato solo il numero attuale, nell\'intestazione della pagina.',
-  'Want to place your ad here? Contact us:':
-    'Vuoi mettere qui il tuo annuncio? Contattaci:',
   'online now':
     'online ora',
+  '{formats} and more.': '{formats} e altri.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'Le altre aziende e gli altri prodotti citati in questa pagina appartengono ai rispettivi proprietari. TranscribeVid non è affiliato a loro e non è approvato da loro; ciò che scriviamo su di loro proviene dalle loro pagine pubbliche.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google spiega come usa i dati dei siti e delle app che utilizzano i suoi servizi in [Come Google utilizza i dati quando utilizzi siti o app dei nostri partner](https://policies.google.com/technologies/partner-sites).',
 };
 export default dict;

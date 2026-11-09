@@ -1170,8 +1170,12 @@ const dict: Record<string, string> = {
     'Le compteur de visiteurs en direct fonctionne de la même façon : tant qu’une page est ouverte, il envoie un code aléatoire supprimé peu après votre départ, jamais un fichier ni une transcription, et rien du tout si votre navigateur envoie Do Not Track. Les détails se trouvent dans la [Politique de confidentialité](/privacy).',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'Les codes aléatoires du compteur de visiteurs en direct ne sont conservés que pour compter qui est présent : chacun est supprimé peu après la fermeture de la page, et au plus tard lorsque la prochaine visite est comptée. Seul le nombre actuel est affiché, dans l’en-tête de la page.',
-  'Want to place your ad here? Contact us:':
-    'Vous souhaitez placer votre publicité ici ? Contactez-nous :',
   'online now': 'en ligne maintenant',
+  '{formats} and more.': '{formats} et plus.',
+  '{formats}.': '{formats}.',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'Les autres sociétés et produits cités sur cette page appartiennent à leurs propriétaires. TranscribeVid n’est pas affilié à eux et n’est pas approuvé par eux ; ce que nous en disons provient de leurs pages publiques.',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'Google explique comment il utilise les données des sites et des applications qui utilisent ses services sur la page [Comment Google utilise les données lorsque vous utilisez les sites ou applications de nos partenaires](https://policies.google.com/technologies/partner-sites).',
 };
 export default dict;

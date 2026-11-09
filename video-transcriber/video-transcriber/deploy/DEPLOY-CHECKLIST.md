@@ -45,7 +45,10 @@ Git push never deploys. A deploy happens only when the owner says "deploy" for t
 
 9. Check: `ads.txt` (publisher id), `/.well-known/security.txt` (200, plain text, Expires still ahead), `robots.txt`, `sitemap.xml` (569 addresses), the AdSense meta tag, 15 or so pages answer 200,
    the new text is in the HTML, `curl https://transcribevid.com/api/stats` still answers, and `wrangler pages deployment list`
-   shows the new commit as production.
+   shows the new commit as production. Also look at the `Link:` header Cloudflare Pages makes from the preload tags:
+   `curl -sI https://transcribevid.com/guides/srt-vs-vtt | grep -i '^link'` must name `</chunk-...js>` (with the leading slash).
+   A relative `<chunk-...js>` there makes every page at least two folders deep ask for `/guides/chunk-...js`, `/es/chunk-...js`,
+   `/jobs/chunk-...js` (wasted requests, 404s, fake page views). `pages-postbuild.mjs` step 1b prevents it and fails the build if it returns.
 10. `node ../scripts/indexnow.mjs --key 18e4d9821ce04f0329fceb62f7dca39c` (from `video-transcriber/video-transcriber`).
 
 ## Workers (separate from the website)

@@ -1148,8 +1148,12 @@ const dict: Record<string, string> = {
     'লাইভ ভিজিটর সংখ্যাও একই ভাবে কাজ করে: পৃষ্ঠা খোলা থাকলে এটি একটি এলোমেলো কোড পাঠায়, যা আপনি চলে যাওয়ার কিছুক্ষণের মধ্যেই মুছে ফেলা হয়, কখনো কোনো ফাইল বা ট্রান্সক্রিপ্ট নয়, আর আপনার ব্রাউজার Do Not Track পাঠালে কিছুই পাঠায় না। বিস্তারিত আছে [গোপনীয়তা নীতি](/privacy) পৃষ্ঠায়।',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'লাইভ ভিজিটর সংখ্যার এলোমেলো কোডগুলো শুধু কে এখানে আছে তা গণনার জন্য রাখা হয়: প্রতিটি কোড পৃষ্ঠা বন্ধ করার কিছুক্ষণের মধ্যেই মুছে ফেলা হয়, আর সবচেয়ে দেরিতে হলে পরবর্তী ভিজিট গণনার সময় মুছে ফেলা হয়। শুধু বর্তমান সংখ্যাটি দেখানো হয়, পৃষ্ঠার হেডারে।',
-  'Want to place your ad here? Contact us:':
-    'আপনার বিজ্ঞাপন এখানে দিতে চান? যোগাযোগ করুন:',
   'online now': 'এখন অনলাইনে',
+  '{formats} and more.': '{formats} এবং আরও অনেক।',
+  '{formats}.': '{formats}।',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'এই পাতায় উল্লেখ করা অন্যান্য কোম্পানি ও পণ্য তাদের নিজ নিজ মালিকের। TranscribeVid তাদের সঙ্গে যুক্ত নয় এবং তাদের দ্বারা অনুমোদিত নয়; তাদের সম্পর্কে আমরা যা বলি তা তাদের প্রকাশ্য পাতা থেকে নেওয়া।',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'যেসব সাইট ও অ্যাপ Google-এর পরিষেবা ব্যবহার করে, সেখান থেকে পাওয়া ডেটা Google কীভাবে ব্যবহার করে তা ব্যাখ্যা করা আছে [আমাদের অংশীদারদের সাইট বা অ্যাপ ব্যবহার করলে Google কীভাবে ডেটা ব্যবহার করে](https://policies.google.com/technologies/partner-sites) পাতায়।',
 };
 export default dict;

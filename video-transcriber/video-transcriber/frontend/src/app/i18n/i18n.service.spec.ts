@@ -185,7 +185,7 @@ describe('I18nService', () => {
       expect(snap.data['label']).toBe('Video a texto');
       expect(snap.data['locale']).toBe('es');
       expect(snap.data['pageKey']).toBe('/video-to-text');
-      expect(snap.data['ads']).toBe(true);
+      expect(snap.data['ads']).toBeUndefined(); // machine-translated pages are not ad pages (AD_LOCALES is empty)
       expect(snap.data['app']).toBe(true);
       await harness.navigateByUrl('/es/faq');
       const faq = TestBed.inject(Router).routerState.snapshot.root.firstChild!.firstChild!;
@@ -243,7 +243,8 @@ describe('localizedRoutes and localizedPaths', () => {
     const [es] = localizedRoutes(BASE, { available: d.available, slugs: d.slugs, notFound: NOT_FOUND });
     const tool = es.children!.find((c) => c.path === 'video-a-texto')!;
     expect(tool.component).toBe(Page);
-    expect(tool.data).toEqual({ app: true, ads: true, locale: 'es', pageKey: '/video-to-text' });
+    // the ad flag is not carried into a machine-translated language (AD_LOCALES is empty)
+    expect(tool.data).toEqual({ app: true, locale: 'es', pageKey: '/video-to-text' });
     expect(tool.resolve).toHaveProperty('description');
     expect(tool.resolve).toHaveProperty('label');
     expect(typeof tool.title).toBe('function');

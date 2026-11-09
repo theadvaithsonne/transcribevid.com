@@ -1149,9 +1149,13 @@ const dict: Record<string, string> = {
     'लाइव विज़िटर काउंट भी इसी तरह काम करता है: पेज खुला रहने पर वह एक रैंडम कोड भेजता है जिसे आपके जाने के कुछ ही देर बाद हटा दिया जाता है, कभी कोई फ़ाइल या ट्रांसक्रिप्ट नहीं, और अगर आपका ब्राउज़र Do Not Track भेजता है तो कुछ भी नहीं। विवरण [प्राइवेसी पॉलिसी](/privacy) में हैं।',
   'The random codes of the live visitor count are kept only to count who is here: each one is deleted soon after the page is closed, and at the latest when the next visit is counted. Only the current number is shown, in the page header.':
     'लाइव विज़िटर काउंट के रैंडम कोड सिर्फ़ यह गिनने के लिए रखे जाते हैं कि कौन यहाँ है: हर कोड पेज बंद होने के कुछ ही देर बाद हटा दिया जाता है, और ज़्यादा से ज़्यादा तब जब अगली विज़िट गिनी जाती है। सिर्फ़ मौजूदा संख्या दिखती है, पेज के हेडर में।',
-  'Want to place your ad here? Contact us:':
-    'अपना विज्ञापन यहाँ लगाना चाहते हैं? हमसे संपर्क करें:',
   'online now':
     'अभी ऑनलाइन',
+  '{formats} and more.': '{formats} और भी।',
+  '{formats}.': '{formats}।',
+  'Other companies and products named on this page belong to their owners. TranscribeVid is not affiliated with them and is not endorsed by them; what we say about them comes from their public pages.':
+    'इस पेज पर जिन अन्य कंपनियों और उत्पादों का नाम आया है, वे अपने-अपने मालिकों के हैं। TranscribeVid का उनसे कोई संबंध नहीं है और उन्होंने इसे मान्यता नहीं दी है; उनके बारे में हम जो लिखते हैं वह उनके सार्वजनिक पेजों से लिया गया है।',
+  'Google explains how it uses data from sites and apps that use its services in [How Google uses data when you use our partners\' sites or apps](https://policies.google.com/technologies/partner-sites).':
+    'जो साइट और ऐप Google की सेवाओं का इस्तेमाल करते हैं, उनसे मिले डेटा का Google कैसे उपयोग करता है, यह [हमारे पार्टनर की साइटों या ऐप्लिकेशन का इस्तेमाल करने पर Google डेटा का उपयोग कैसे करता है](https://policies.google.com/technologies/partner-sites) पेज पर समझाया गया है।',
 };
 export default dict;
