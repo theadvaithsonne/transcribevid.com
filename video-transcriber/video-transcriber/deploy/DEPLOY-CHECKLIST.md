@@ -18,7 +18,9 @@ Git push never deploys. A deploy happens only when the owner says "deploy" for t
 ## Build
 
 4. `npm run build:pages` (not a plain `ng build`: it writes the flattened pages, `_headers` and `_redirects`). The first download
-   must stay under 500 kB (`Initial total` in the output).
+   must stay under 510 kB (`Initial total` in the output; the warning line was 500 kB until the six language pages of 10 November
+   2026 added their titles and descriptions, 3.4 kB, to the route table; what a visitor really downloads first is about 75 kB
+   compressed). The next time it warns, move the page descriptions out of the first download instead of raising the line again.
 5. `node ../scripts/audit-prerender.mjs` must say every page is clean.
 
 ## Keep the earlier versions' files (so open pages do not break)

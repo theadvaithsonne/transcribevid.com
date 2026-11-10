@@ -27,8 +27,11 @@ describe('the published languages (generated registry)', () => {
       expect(new Set(pages).size, l).toBe(pages.length);
       expect(pages, l).toContain('/');
       for (const p of pages) expect(englishPages, `${l} ${p}`).toContain(p);
-      // the six language pages (hindi, hinglish, spanish ...) have no translated twin
-      for (const p of ['/hindi-audio-to-text', '/hinglish-transcription', '/spanish-audio-to-text', '/portuguese-audio-to-text', '/french-audio-to-text', '/german-audio-to-text']) {
+      // the language pages (hindi, hinglish, spanish ... japanese) have no translated twin
+      for (const p of [
+        '/hindi-audio-to-text', '/hinglish-transcription', '/spanish-audio-to-text', '/portuguese-audio-to-text', '/french-audio-to-text', '/german-audio-to-text',
+        '/arabic-audio-to-text', '/urdu-audio-to-text', '/bengali-audio-to-text', '/indonesian-audio-to-text', '/turkish-audio-to-text', '/japanese-audio-to-text',
+      ]) {
         expect(pages, `${l} ${p}`).not.toContain(p);
       }
     }

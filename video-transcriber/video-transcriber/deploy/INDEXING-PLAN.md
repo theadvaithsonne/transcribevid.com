@@ -143,3 +143,12 @@ The new pages, then the three pages whose titles changed (request each of those 
 - **Bing:** at https://www.bing.com/webmasters choose *Import from Google Search Console* once; it copies the site and the sitemap.
 - **Links matter more than requests.** Requesting indexing only gets Google to look. Whether a page ranks depends mostly on
   other websites linking to it: use the ready-made text in `deploy/LISTINGS.md` alongside this plan.
+
+## Added 10 November 2026: six more language pages (request after they are live, after the not-indexed list from Search Console)
+
+- [ ] https://transcribevid.com/arabic-audio-to-text
+- [ ] https://transcribevid.com/urdu-audio-to-text
+- [ ] https://transcribevid.com/indonesian-audio-to-text
+- [ ] https://transcribevid.com/turkish-audio-to-text
+- [ ] https://transcribevid.com/japanese-audio-to-text
+- [ ] https://transcribevid.com/bengali-audio-to-text

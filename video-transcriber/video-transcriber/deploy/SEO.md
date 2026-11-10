@@ -28,15 +28,15 @@ minutes or need an upload).
 | By use | `/whatsapp-voice-message-to-text`, `/whatsapp-voice-note-to-text`, `/meeting-recording-to-text`, `/lecture-to-text`, `/podcast-transcript-generator`, `/podcast-to-text`, `/interview-transcription`, `/private-transcription`, `/call-recording-to-text`, `/research-interview-transcription`, `/subtitle-generator-for-reels` |
 | Subtitle files | `/vtt-subtitle-generator`, `/youtube-subtitle-generator` |
 | Alternatives | `/otter-ai-alternative`, `/turboscribe-alternative` |
-| By language | `/hindi-audio-to-text`, `/hinglish-transcription`, `/translate-audio-to-english`, `/translate-hindi-audio-to-english`, `/spanish-audio-to-text`, `/portuguese-audio-to-text`, `/french-audio-to-text`, `/german-audio-to-text` |
+| By language | `/hindi-audio-to-text`, `/hinglish-transcription`, `/translate-audio-to-english`, `/translate-hindi-audio-to-english`, `/spanish-audio-to-text`, `/portuguese-audio-to-text`, `/french-audio-to-text`, `/german-audio-to-text`, `/arabic-audio-to-text`, `/urdu-audio-to-text`, `/bengali-audio-to-text`, `/indonesian-audio-to-text`, `/turkish-audio-to-text`, `/japanese-audio-to-text` |
 | Lists | `/tools` (every tool, grouped), `/guides` (every guide) |
 | Guides | `/guides/srt-vs-vtt`, `/guides/how-to-add-subtitles-to-a-video`, `/guides/transcribe-video-without-uploading`, `/guides/accurate-transcripts`, `/guides/what-is-whisper` |
 | Information | `/how-it-works`, `/faq`, `/about`, `/contact`, `/privacy`, `/terms` |
 
-59 English addresses, and the same pages in 15 languages (34 each: the home page, the six information pages, the two lists, 19 tool
+65 English addresses (the six newest are the Arabic, Urdu, Bengali, Indonesian, Turkish and Japanese language pages, English only), and the same pages in 15 languages (34 each: the home page, the six information pages, the two lists, 19 tool
 pages and the 6 guides; 22 tool pages exist in English only: the six "by language" pages, because a Spanish page about Spanish would only
 repeat the generic page, and the three alternatives pages and fourteen more, and the comparison and safety guides, that have not been translated yet): 569
-addresses in all, all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
+addresses in all (575 on 10 November 2026), all in `sitemap.xml`. A file dropped on a language page opens the uploader with that language already
 chosen (Hindi, Hinglish, Spanish, ...), so those pages are tools, not only text.
 
 ---

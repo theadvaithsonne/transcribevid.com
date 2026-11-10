@@ -463,6 +463,84 @@ export const TOOL_PAGE_ENTRIES: readonly ToolPageLink[] = [
     description:
       'Transcribe German audio and video to text for free: Germany, Austria and Switzerland. Timestamps, no login. Download TXT, SRT, VTT or PDF.',
   },
+  {
+    path: '/arabic-audio-to-text',
+    group: 'language',
+    preset: { language: 'ar' },
+    label: 'Arabic audio to text',
+    title: 'Arabic Audio to Text: Free, No Login',
+    description:
+      'Convert Arabic audio and video to text for free: Modern Standard Arabic and dialects. Timestamps, no login, no daily limit. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert Arabic audio and video to text for free in your browser: nothing is uploaded, no login, no limit. Timestamps, and TXT, SRT, VTT or PDF downloads.',
+    },
+  },
+  {
+    path: '/urdu-audio-to-text',
+    group: 'language',
+    preset: { language: 'ur' },
+    label: 'Urdu audio to text',
+    title: 'Urdu Audio to Text: Free, No Login',
+    description:
+      'Convert Urdu audio and video to text for free in Urdu script. Voice notes, news and speeches, with timestamps, no login. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert Urdu audio and video to text for free in Urdu script. Nothing is uploaded, no login, no limit. Timestamps, and TXT, SRT, VTT or PDF downloads.',
+    },
+  },
+  {
+    path: '/bengali-audio-to-text',
+    group: 'language',
+    preset: { language: 'bn' },
+    label: 'Bengali audio to text',
+    title: 'Bengali Audio to Text (Bangla), Free',
+    description:
+      'Convert Bengali (Bangla) audio and video to text for free, with an honest look at accuracy. Timestamps, no login. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert Bengali (Bangla) audio and video to text for free in your browser, with honest accuracy figures. Nothing is uploaded, no login. TXT, SRT, VTT, PDF.',
+    },
+  },
+  {
+    path: '/indonesian-audio-to-text',
+    group: 'language',
+    preset: { language: 'id' },
+    label: 'Indonesian audio to text',
+    title: 'Indonesian Audio to Text: Free, No Login',
+    description:
+      'Convert Indonesian audio and video to text (audio ke teks) for free: lectures, rapat and voice notes. Timestamps, no login. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert Indonesian audio and video to text (audio ke teks) for free. Nothing is uploaded, no login, no limit. Timestamps, and TXT, SRT, VTT or PDF downloads.',
+    },
+  },
+  {
+    path: '/turkish-audio-to-text',
+    group: 'language',
+    preset: { language: 'tr' },
+    label: 'Turkish audio to text',
+    title: 'Turkish Audio to Text: Free, No Login',
+    description:
+      'Convert Turkish audio and video to text (ses yazıya çevirme) for free, with ç, ğ, ı, İ and ş. Timestamps, no login. Download TXT, SRT, VTT or PDF.',
+    browser: {
+      description:
+        'Convert Turkish audio and video to text (ses yazıya çevirme) for free. Nothing is uploaded, no login, no limit. Timestamps, and TXT, SRT, VTT or PDF downloads.',
+    },
+  },
+  {
+    path: '/japanese-audio-to-text',
+    group: 'language',
+    preset: { language: 'ja' },
+    label: 'Japanese audio to text',
+    title: 'Japanese Audio to Text: Free, No Login',
+    description:
+      'Convert Japanese audio and video to text (文字起こし) for free: kanji, kana and timestamps, no login. Download TXT, SRT, VTT or PDF subtitles and transcripts.',
+    browser: {
+      description:
+        'Convert Japanese audio and video to text (文字起こし) for free. Nothing is uploaded, no login, no limit. Timestamps, and TXT, SRT, VTT or PDF downloads.',
+    },
+  },
   // ---------------------------------------------------------------- alternatives
   {
     path: '/turboscribe-alternative',

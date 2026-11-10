@@ -751,6 +751,11 @@
       "title": "About TranscribeVid",
       "description": "Who builds TranscribeVid and why: a free video and audio to text tool with no sign-up, no sign-in and a clean interface, funded by ads."
     },
+    "/arabic-audio-to-text": {
+      "title": "Arabic Audio to Text: Free, No Login",
+      "description": "Convert Arabic audio and video to text for free: Modern Standard Arabic and dialects. Timestamps, no login, no daily limit. Download TXT, SRT, VTT or PDF.",
+      "label": "Arabic audio to text"
+    },
     "/audio-to-text": {
       "title": "Audio to Text Converter: Free, Unlimited",
       "description": "Turn podcasts, interviews and lectures into text. Free audio to text converter with timestamps, 50+ languages and no login. Download TXT, SRT, VTT or PDF.",
@@ -760,6 +765,11 @@
       "title": "AVI to Text Converter: Free, No Login",
       "description": "Convert an AVI video to text for free. Timestamped transcript in 50+ languages, no login, no daily limit. Edit it and download TXT, SRT, VTT or PDF.",
       "label": "AVI to text"
+    },
+    "/bengali-audio-to-text": {
+      "title": "Bengali Audio to Text (Bangla), Free",
+      "description": "Convert Bengali (Bangla) audio and video to text for free, with an honest look at accuracy. Timestamps, no login. Download TXT, SRT, VTT or PDF.",
+      "label": "Bengali audio to text"
     },
     "/call-recording-to-text": {
       "title": "Phone Call Recording to Text: Free, Private",
@@ -852,10 +862,20 @@
       "title": "How it works",
       "description": "How TranscribeVid turns video and audio into accurate, timestamped text in three simple steps, what you get, and tips for the best results."
     },
+    "/indonesian-audio-to-text": {
+      "title": "Indonesian Audio to Text: Free, No Login",
+      "description": "Convert Indonesian audio and video to text (audio ke teks) for free: lectures, rapat and voice notes. Timestamps, no login. Download TXT, SRT, VTT or PDF.",
+      "label": "Indonesian audio to text"
+    },
     "/interview-transcription": {
       "title": "Free Interview Transcription, No Login",
       "description": "Transcribe research, journalism or job interviews for free. No login, a timestamp on every line, marks on unsure words, and editing before you download.",
       "label": "Interview transcription"
+    },
+    "/japanese-audio-to-text": {
+      "title": "Japanese Audio to Text: Free, No Login",
+      "description": "Convert Japanese audio and video to text (文字起こし) for free: kanji, kana and timestamps, no login. Download TXT, SRT, VTT or PDF subtitles and transcripts.",
+      "label": "Japanese audio to text"
     },
     "/lecture-to-text": {
       "title": "Lecture to Text: Free Lecture Transcription",
@@ -983,6 +1003,16 @@
       "title": "Free TurboScribe Alternative, No Daily Cap",
       "description": "A free TurboScribe alternative with no sign-up and no 3-a-day cap. An honest comparison of limits, privacy, speed and accuracy, checked in October 2026.",
       "label": "TurboScribe alternative"
+    },
+    "/turkish-audio-to-text": {
+      "title": "Turkish Audio to Text: Free, No Login",
+      "description": "Convert Turkish audio and video to text (ses yazıya çevirme) for free, with ç, ğ, ı, İ and ş. Timestamps, no login. Download TXT, SRT, VTT or PDF.",
+      "label": "Turkish audio to text"
+    },
+    "/urdu-audio-to-text": {
+      "title": "Urdu Audio to Text: Free, No Login",
+      "description": "Convert Urdu audio and video to text for free in Urdu script. Voice notes, news and speeches, with timestamps, no login. Download TXT, SRT, VTT or PDF.",
+      "label": "Urdu audio to text"
     },
     "/video-to-text": {
       "title": "Free Video to Text Converter, No Login",
